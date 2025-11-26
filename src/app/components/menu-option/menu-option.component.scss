@@ -1,0 +1,49 @@
+.option-container {
+    width: 235px;
+    height: 80px;
+    border-radius: 16px;
+    
+}
+
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 20px;
+}
+
+.menu-option {
+  height: 38px;
+  width: 235px;
+  background-color: transparent; // Default state - no background
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  cursor: pointer;
+  
+  // Selected state - dark background
+  &.selected {
+    background-color: #00313C;
+    width: 235px;
+    height: 80px;
+    border-radius: 16px;
+  }
+}
+
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+}
+
+.menu-text {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 20px;
+  color: #00313C;
+  
+  .menu-option.selected & {
+    color: #F5F4F2;
+    font-weight: 800;
+  }
+}
+

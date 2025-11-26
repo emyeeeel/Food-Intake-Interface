@@ -1,0 +1,45 @@
+<div class="main-container">
+    <div class="row-1">
+        <div class="name">
+            <span>住民姓名</span>
+            <h2 class="value">{{ getDisplayName() }}</h2>  
+        </div>
+
+        <div class="option" (click)="onOptionsClick()">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+    </div>
+
+    <div class="row-2">
+        <div class="age">
+            <span>年齡</span>
+            <h2 class="value">{{ getDisplayAge() }}</h2>  
+        </div>
+
+        <div class="reco-meal-intake">
+            <span>推薦膳食攝取量</span>
+            <h2 class="value">
+                {{ getRecommendedIntakeDisplay() }}  
+                <span class="unit">{{ intakeUnit }}</span>  
+            </h2>
+        </div>
+    </div>
+
+    <div class="row-3">
+        <div class="prev" (click)="onPreviousPatient()" [class.disabled]="isPrevDisabled()" [attr.aria-disabled]="isPrevDisabled()">
+            <svg class="left-arrow" width="1em" height="1em" viewBox="0 0 24 24" fill="none">
+                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>上一頁</span>  
+        </div>
+      
+        <div class="next" (click)="onNextPatient()" [class.disabled]="isNextDisabled()" [attr.aria-disabled]="isNextDisabled()">
+            <span>下一頁</span>  
+            <svg class="right-arrow" width="1em" height="1em" viewBox="0 0 24 24" fill="none">
+                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+      </div>      
+</div>

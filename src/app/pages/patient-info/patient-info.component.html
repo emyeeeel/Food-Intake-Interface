@@ -1,0 +1,65 @@
+<div class="patient-info-container">
+    <app-menu-bar></app-menu-bar>
+    <div class="main-container">
+        <div class="row-1">
+            <app-back></app-back>
+            <div class="search-bar">
+                <app-search-bar></app-search-bar>
+            </div>
+            <app-notif></app-notif>
+        </div>
+        <div class="row-2">
+            <app-patient-card 
+                [patientId]="patientId"
+                (patientIdChange)="onPatientIdChange($event)">
+            </app-patient-card>
+            <app-bmi-card [patientId]="patientId"></app-bmi-card>
+            <app-bp-card [patientId]="patientId"></app-bp-card>
+        </div>
+        <div class="row-3">
+            <app-main-options 
+                iconSrc="assets/icons/add-icon.svg"
+                optionText="新增紀錄"
+                altText="Add Record Icon"
+                backgroundColor="#00313C"
+                textColor="#E6FEF9"
+                (click)="navigateToAddRecord()">
+            </app-main-options>
+            <app-main-options 
+                iconSrc="assets/icons/all-icon.svg"
+                optionText="檢視所有紀錄"
+                altText="See All Records Icon"
+                backgroundColor="#40C1AC"
+                textColor="#E6FEF9"
+                (click)="navigateToAllRecord()">
+            </app-main-options>
+            <app-main-options 
+                iconSrc="assets/icons/print-icon.svg"
+                optionText="列印紀錄"
+                altText="Print Record Icon"
+                backgroundColor="#E6FEF9"
+                textColor="#00313C"
+                (click)="navigateToPrintRecord()">
+            </app-main-options>
+        </div>
+        <div class="row-4">
+            <div class="text-title">
+                膳食安排
+            </div>
+            <app-date-container></app-date-container>
+        </div>
+        <div class="row-5">
+            <app-meal-assignment
+                [mealType]="'lunch'"
+                [patientId]="patientId"
+                [dayCycle]="1">
+            </app-meal-assignment>
+
+            <app-meal-assignment
+                [mealType]="'dinner'"
+                [patientId]="patientId"
+                [dayCycle]="1">
+            </app-meal-assignment>
+        </div>
+    </div>
+</div>

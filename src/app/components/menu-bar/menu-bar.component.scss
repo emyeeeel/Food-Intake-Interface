@@ -1,0 +1,59 @@
+.menu-container{
+    width: 290px;
+    background-color: #D9F3EE;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo-container {
+    width: 235px;
+    height: 28px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    // border: 1px solid red;
+    
+    img {
+        width: 128px;
+        height: 28px;
+    }
+}
+
+.menu-options {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    flex: 1; // Take up remaining space
+}
+
+.logout-container {
+    margin-bottom: 30px;
+    margin-top: auto; // Push to bottom
+}
+
+.logout-option {
+    width: 235px;
+    height: 80px;
+    border-radius: 16px;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.logout-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 15px;
+}
+
+.logout-text {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 20px;
+    color: #00313C;
+    font-weight: 800;
+}

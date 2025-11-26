@@ -1,0 +1,24 @@
+<div class="main-container">
+    <div class="row-1">
+        <div class="height">
+            <span>身高</span>
+            <!-- Display height if patient data is available, else show a placeholder -->
+            <h2 class="value">{{ getHeight() }}<span class="unit">cm</span></h2>
+        </div>
+        <div class="option">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+    </div>
+    <div class="row-2">
+        <div class="weight">
+            <span>體重</span>
+            <!-- Display weight if patient data is available, else show a placeholder -->
+            <h2 class="value">{{ getWeight() }}<span class="unit">kgs</span></h2>
+        </div>
+    </div>
+    <div class="row-3">
+        <app-see-history-button></app-see-history-button>
+    </div>
+</div>

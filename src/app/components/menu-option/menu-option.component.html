@@ -1,0 +1,13 @@
+<div class="menu-container">
+  <div 
+    *ngFor="let option of menuOptions" 
+    class="menu-option"
+    [class.selected]="option.isSelected"
+    (click)="selectOption(option)">
+    <img 
+      [src]="option.isSelected ? option.selectedIcon : option.defaultIcon" 
+      [alt]="option.text + ' icon'"
+      class="menu-icon">
+    <span class="menu-text">{{ option.text }}</span>
+  </div>
+</div>

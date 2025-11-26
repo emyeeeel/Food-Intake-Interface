@@ -1,0 +1,32 @@
+.main-container{
+    height: 24px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+
+    .color{
+        border-radius: 8px;
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0; 
+    }
+
+    .percent {
+        font-family: 'Quicksand', sans-serif;
+        font-size: 14px;
+        font-weight: bold;
+        color: #00313C;
+        white-space: nowrap; 
+    }
+
+    .legend-text{
+        flex: 1;
+        font-family: 'Quicksand', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        color: #00313C;
+        white-space: nowrap; 
+    }
+}

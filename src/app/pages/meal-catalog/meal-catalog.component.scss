@@ -1,0 +1,515 @@
+:host {
+    display: block;
+    background-color: #CAECE5;
+    min-height: 100vh;
+    width: 100%;
+  }
+  
+  .meal-catalog-container {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .main-container {
+    flex: 1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 0;
+  
+    div {
+      width: 883px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  .row-1{
+    gap: 15px;
+  }
+
+  .row-2{
+    //gap: 15px;
+    margin-top: 15px;
+    margin-bottom: 42px;
+  }
+  
+ .search-bar{
+  flex: 1; 
+    
+    app-search-bar {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+ }
+
+ .row-3{
+  justify-content: space-between;
+  margin-bottom: 30px;
+ }
+
+ .row-4{
+  height: 57px;
+  justify-content: space-between;
+  margin-bottom: 30px;
+
+  .text-title{
+    font-family: 'Quicksand', sans-serif;
+    font-weight: bold;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    color: #00313C;
+  }
+
+ }
+
+ .row-5{
+  height: 316px;
+ }
+
+ .row-2-add, .row-2-print{
+  .title-text{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start !important;
+    justify-content: left !important;
+    font-family: 'Quicksand', sans-serif;
+    gap: 8px;
+
+    h2{
+      font-weight: bold;
+      font-size: 32px;
+      color: #00313C;
+    }
+
+    span{
+      font-weight: 500;
+      font-size: 20px;
+      color: #66838A;
+    }
+  }
+ }
+
+ .row-2-add, .row-2-print{
+  height: 57px;
+  // border: 1px solid red;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 42px;
+  
+  .title-text{
+    font-family: 'Quicksand', sans-serif;
+    font-weight: bold;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    color: #00313C;
+  }
+  .buttons{
+    width: 348px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+  }
+ }
+
+ .row-3-add{
+  width: 883px;
+  height: 276px;
+  display: flex;
+  flex-direction: row;
+  margin-top: 32px;
+  gap: 32px;
+
+  .col-1{
+    width: 430px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    span{
+      font-family: 'Quicksand', sans-serif;
+      font-weight: bold;
+      font-size: 20px;
+      color: #00313C;
+    }
+
+    .upload-container{
+      width: 430px;
+      height: 236px;
+      border-radius: 24px;
+      border: 2px dashed #6C9F94;
+      background-color: #BCE1D9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .placeholder{
+        width: 270px;
+        height: 88px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+
+        div{
+          width: 100%;
+        }
+
+        .icon{
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 24px;
+        }
+
+
+        .text {
+          font-family: 'Quicksand', sans-serif;
+          font-size: 14px;
+          font-weight: 500;
+          color: #6C9F94;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .button{
+          width: 94px;
+          height: 24px;
+          background-color: #00313C;
+          border-radius: 8px;
+          font-family: 'Quicksand', sans-serif;
+          font-size: 12px;
+          font-weight: 500;
+          color: #FFFFFF;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+    }
+  }
+
+  .col-2{
+    width: 409.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    span{
+      font-family: 'Quicksand', sans-serif;
+      font-weight: bold;
+      font-size: 20px;
+      color: #00313C;
+    }
+
+    // div{
+    //   border: 1px solid red;
+    // }
+
+    .row-1{
+      width: 100%;
+      height: 168px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .ingredients-list{
+        width: 100%;
+        height: 128px;
+        border-radius: 16px;
+        background-color: #E6FEF9;
+        border: 1px solid #6C9F94;
+      }
+    }
+
+    .row-2{
+      width: 100%;
+      height: 92px;
+      margin: 0;
+
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+
+      app-serving-time{
+        width: 204px;
+      }
+
+      app-day-cycle{
+        width: 204px;
+      }
+    }
+    
+  }
+ }
+
+.row-4-add{
+  width: 883px;
+  height: 288px;
+  display: flex;
+  flex-direction: column !important;
+  margin-top: 32px;
+  gap: 20px;
+
+  .description{
+    span{
+      font-family: 'Quicksand', sans-serif;
+      font-weight: bold;
+      font-size: 20px;
+      color: #00313C;
+    }
+  }
+
+  .description-box{
+    position: relative;
+    width: 100%;
+    height: 188px;
+    border-radius: 16px;
+    background-color: #E6FEF9;
+    border: 1px solid #6C9F94;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    
+    .description-textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background-color: transparent;
+      resize: none;
+      outline: none;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #00313C;
+      line-height: 1.5;
+      
+      &::placeholder {
+        color: #6C9F94;
+      }
+      
+      &:focus {
+        outline: none;
+      }
+    }
+    
+    .character-count {
+      width: 100px;
+      position: absolute;
+      bottom: 12px;
+      right: 16px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: #6C9F94;
+      padding: 2px 6px;
+      display: flex;
+      justify-content: right;
+    }
+    
+    &:hover {
+      border-color: #40C1AC;
+    }
+    
+    &:focus-within {
+      border-color: #40C1AC;
+      box-shadow: 0 0 0 2px rgba(64, 193, 172, 0.1);
+    }
+  }
+}
+
+.row-3-all{
+  width: 883px; 
+  height: 56px;
+  // border: 1px solid red;
+  display: flex;
+  align-items: center; 
+
+  .text-title{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start !important;
+    justify-content: left !important;
+    font-family: 'Quicksand', sans-serif;
+    gap: 8px;
+    flex: 1;
+
+    h2{
+      font-weight: bold;
+      font-size: 32px;
+      color: #00313C;
+    }
+
+    span{
+      font-weight: 500;
+      font-size: 20px;
+      color: #66838A;
+    }
+  }
+
+  .showing{
+    width: 197px;
+    height: 52px;
+    border: 1px solid red;
+    margin-right: 11px;
+    flex-shrink: 0; 
+  }
+
+  .export{
+    width: 112px;
+    height: 52px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; 
+    justify-content: center;
+    overflow: hidden; 
+    border-radius: 16px;
+    flex-shrink: 0; 
+  
+    app-dark-button{
+      flex: 1; 
+      width: 100%; 
+      min-height: 0; 
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.row-4-all{
+  width: 883px;
+  height: 460px;
+  margin-top: 32px;
+  border-radius: 16px;
+  background-color: #E6FEF9;
+  display: flex;
+  flex-direction: column !important;
+  padding: 25px;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  .meals-table{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .table-header {
+      width: 100%;
+      height: 20px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: bold;
+      font-size: 16px;
+      color: #66838A;
+      flex-shrink: 0;
+      display: flex; 
+      flex-direction: row; 
+      gap: 48px;
+
+      span{
+        display: flex;
+        align-items: center; // Vertically center text and img
+        justify-content: flex-start; // Align content to the start
+        height: 100%; // Take full height of parent
+        gap: 8px; // Small gap between text and img
+        
+        img.sort-arrow {
+          width: 11px;
+          height: 18px;
+          flex-shrink: 0; // Prevent shrinking
+        }
+      }
+
+      .meal-id {
+        width: 78px;
+      }
+
+      .weight-volume {
+        width: 152px;
+      }
+
+      .day-cycle {
+        width: 96px;
+      }
+
+      .ingredients { 
+        width: 107px;
+      }
+
+      .description {
+        width: 107px;
+      }
+
+      .action {
+        width: 50px;
+      }
+    }
+
+    .table-body{
+      height: 336px;
+      width: 100%;
+      border: 1px solid red;
+    }
+
+    .table-nav{
+      height: 25px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+
+      .prev{
+        width: 89px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+
+        span{
+          font-family: 'Quicksand', sans-serif;
+          font-weight: bold;
+          font-size: 16px;
+          color: #66838A;
+        }
+
+        img{
+          width: 7px;
+          height: 11px;
+        }
+      }
+
+      .page-no{
+        width: 245px;
+        height: 100%;
+        border: 1px solid red;
+      }
+
+      .next{
+        width: 60px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+
+        span{
+          font-family: 'Quicksand', sans-serif;
+          font-weight: bold;
+          font-size: 16px;
+          color: #00313C;
+        }
+
+        img{
+          width: 7px;
+          height: 11px;
+        }
+      }
+    }
+  }
+}

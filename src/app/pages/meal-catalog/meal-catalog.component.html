@@ -1,0 +1,238 @@
+<div class="meal-catalog-container">
+    <app-menu-bar></app-menu-bar>
+    <div class="main-container">
+        <div class="row-1">
+            <app-back></app-back>
+            <div class="search-bar">
+                <app-search-bar></app-search-bar>
+            </div>
+            <app-notif></app-notif>
+        </div>
+        <ng-container *ngIf="currentView === 'default'">
+            <div class="row-2">
+                <app-filter-icon></app-filter-icon>
+                <app-filter-options 
+                    *ngFor="let filterOption of filterOptions" 
+                    [filterText]="filterOption">
+                </app-filter-options>
+            </div>
+            <div class="row-3">
+                <app-main-options 
+                    iconSrc="assets/icons/add-icon.svg"
+                    optionText="新增膳食"
+                    altText="Add Meal Icon"
+                    backgroundColor="#00313C"
+                    textColor="#E6FEF9"
+                    (clicked)="navigateToAddMeal()"> 
+                </app-main-options>
+                <app-main-options 
+                    iconSrc="assets/icons/all-icon.svg"
+                    optionText="查看所有膳食"
+                    altText="See All Meals Icon"
+                    backgroundColor="#40C1AC"
+                    textColor="#E6FEF9"
+                    (clicked)="navigateToAllMeals()">
+                </app-main-options>
+                <app-main-options 
+                    iconSrc="assets/icons/print-icon.svg"
+                    optionText="列印膳食"
+                    altText="Print Meal Icon"
+                    backgroundColor="#E6FEF9"
+                    textColor="#00313C"
+                    (clicked)="navigateToPrintMeal()">
+                </app-main-options>
+            </div>
+            <div class="row-4">
+                <div class="text-title">
+                    本日膳食
+                </div>
+                <app-date-container></app-date-container>
+            </div>
+            <div class="row-5" *ngIf="meals.length >= 2; else noMeals">
+                <ng-container *ngFor="let meal of meals.slice(0, 2)">
+                  <app-meal-item
+                    [mealImageSrc]="meal.image || ''"
+                    [mealCode]="getMealCode(meal)"
+                    [dayCycleValue]="'第' + (meal.day_cycle || '') + '天'"
+                    [mealTimeValue]="meal.meal_time || ''"
+                    [plateTypeValue]="meal.plate_type || ''">
+                  </app-meal-item>
+                </ng-container>
+            </div>
+            <ng-template #noMeals>
+                <p>No meals available.</p>
+              </ng-template>
+        </ng-container>
+
+        <ng-container *ngIf="currentView === 'add-meal'">
+            <div class="row-2-add">
+                <div class="title-text">
+                    <h2>新增膳食</h2>
+                    <span>請在此新增今日的膳食餐點內容</span>
+                </div>
+                <div class="buttons">
+                    <app-clear-all-button></app-clear-all-button>
+                    <app-dark-button buttonText="新增餐點"></app-dark-button>
+                </div>
+            </div>
+            <div class="row-3-add">
+                <div class="col-1">
+                    <span class="upload-text">上傳檔案</span>
+                    <div class="upload-container">
+                        <div class="placeholder">
+                            <div class="icon">
+                                <img 
+                                src="assets/icons/upload-icon.svg" 
+                                alt="Upload Icon" 
+                                class="upload-icon">
+                            </div>
+                            <div class="text">
+                                最大 120 MB。支援 PNG, JPEG, WebP格式
+                            </div>
+                            <div class="button">
+                                瀏覽檔案
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="row-1">
+                        <span class="code-text">成分標籤</span>
+                        <div class="ingredients-list"></div>
+                    </div>
+                    <div class="row-2">
+                        <app-day-cycle/>
+                        <app-serving-time/>
+                    </div>
+                </div>
+            </div>
+            <div class="row-4-add">
+                <div class="description">
+                    <span>詳細內容</span>
+                </div>
+                <div class="description-box">
+                    <textarea 
+                        [(ngModel)]="mealDescription"
+                        placeholder="Enter meal description here..."
+                        class="description-textarea"
+                        rows="6"
+                        maxlength="500">
+                    </textarea>
+                    <div class="character-count">
+                        {{ mealDescription.length }}/500
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="currentView === 'all-meals'">
+            <div class="row-2">
+                <app-filter-icon></app-filter-icon>
+                <app-filter-options 
+                    *ngFor="let filterOption of filterOptions" 
+                    [filterText]="filterOption">
+                </app-filter-options>
+            </div>
+            <div class="row-3-all">
+                <h2 class="text-title">
+                    <h2>查看所有膳食</h2>
+                    <span>下列是所有膳食餐點資訊</span>
+                </h2>
+                <div class="showing">
+
+                </div>
+                <div class="export">
+                    <app-dark-button buttonText="輸出"></app-dark-button>
+                </div>
+            </div>
+            <div class="row-4-all">
+                <div class="meals-table">
+                    <div class="table-header">
+                        <span class="meal-id">
+                            餐點 ID
+                            <img 
+                            src="assets/icons/up-down-arrow.svg" 
+                            alt="Sort" 
+                            class="sort-arrow">
+                        </span>
+                        <span class="weight-volume">
+                            重量 & 體積
+                            <img 
+                                src="assets/icons/up-down-arrow.svg" 
+                                alt="Sort" 
+                                class="sort-arrow">
+                        </span>
+                        <span class="day-cycle">
+                            每日循環
+                            <img 
+                            src="assets/icons/up-down-arrow.svg" 
+                            alt="Sort" 
+                            class="sort-arrow">
+                        </span>
+                        <span class="ingredients">
+                            食材
+                            <img 
+                            src="assets/icons/up-down-arrow.svg" 
+                            alt="Sort" 
+                            class="sort-arrow">
+                        </span>
+                        <span class="description">
+                            描述
+                            <img 
+                            src="assets/icons/up-down-arrow.svg" 
+                            alt="Sort" 
+                            class="sort-arrow">
+                        </span>
+                        <span class="action">動作</span>
+                    </div>
+                    <div class="table-body">
+                        <!-- <div class="table-row" *ngFor="let meal of mealsData">
+                            <div class="meal-id">{{ meal.id }}</div>
+                            <div class="weigh-volume">{{ meal.weightVolume }}</div>
+                            <div class="day-cylce">{{ meal.dayCycle }}</div>
+                            <div class="ingredients">{{ meal.ingredients.join(', ') }}</div>
+                            <div class="description">{{ meal.description }}</div>
+                            <div class="action">
+
+                            </div>
+                        </div> -->
+                    </div>
+                    <div class="table-nav">
+                        <div class="prev">
+                            <img 
+                            src="assets/icons/left-arrow.svg" 
+                            alt="Left" 
+                            class="left-arrow">
+                            <span>上一頁</span>
+                        </div>
+                        <div class="page-no"></div>
+                        <div class="next">
+                            <span>下一頁</span>
+                            <img 
+                            src="assets/icons/right-arrow.svg" 
+                            alt="Right" 
+                            class="right-arrow">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="currentView === 'print-meal'">
+            <div class="row-2-print">
+                <div class="title-text">
+                    <h2>列印膳食</h2>
+                    <span>印出膳食資料</span>
+                </div>
+                <div class="buttons">
+                    <app-clear-all-button></app-clear-all-button>
+                    <app-dark-button buttonText="列印餐點"></app-dark-button>
+                </div>
+            </div>
+            <div class="row-3-print">
+                <!-- Additional print meal content -->
+            </div>
+        </ng-container>
+    </div>
+</div>
+

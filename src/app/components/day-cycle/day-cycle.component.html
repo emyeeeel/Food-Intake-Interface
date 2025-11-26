@@ -1,0 +1,22 @@
+<div class="cycle">
+    <span class="cycle-text">循環</span>
+    <div class="cycle-value" (click)="toggleDropdown()">
+        <span class="selected-value">{{ selectedTime }}</span>
+        <img 
+            src="assets/icons/down-icon.svg" 
+            alt="Down Icon" 
+            class="down-icon"
+            [class.rotated]="isDropdownOpen">
+    </div>
+    
+    <!-- Dropdown options -->
+    <div class="dropdown-menu" [class.open]="isDropdownOpen">
+        <div 
+            class="dropdown-option" 
+            *ngFor="let option of timeOptions"
+            (click)="selectTime(option)"
+            [class.selected]="option === selectedTime">
+            {{ option }}
+        </div>
+    </div>
+</div>

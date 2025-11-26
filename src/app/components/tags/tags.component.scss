@@ -1,0 +1,28 @@
+.tag-container{
+    height: 24px;
+    border-radius: 8px;
+    background-color: #B8EDE4;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    width: auto; 
+    padding: 7.5px 15px; 
+    min-width: fit-content; 
+    max-width: 100px;
+    
+    .tag-text{
+        color: #40C1AC;
+        font-family: 'Quicksand', sans-serif;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .close-btn{
+        width: 10px;
+        height: 10px;
+        cursor: pointer;
+    }
+}

@@ -1,0 +1,13 @@
+<div class="main-container">
+    <div class="current-week" (click)="togglePopup()">
+        <span *ngIf="isHomePage" class="week-text">{{ currentWeekRange }}</span>
+        <span *ngIf="!isHomePage" class="day-text">{{ currentDay }}</span>
+
+        <img src="assets/icons/down-icon.svg" alt="Down Icon" class="down-icon">
+    </div>
+
+    <!-- Popup with date picker -->
+    <div class="popup-container" *ngIf="showPopup">
+        <mat-calendar (selectedChange)="onCalendarSelected($event)"></mat-calendar>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+<div class="login-container">
+    <div class="right-container">
+        <div class="logo-container">
+            <img src="assets/logo/SpoonFull_Logo.png" alt="SpoonFull Logo" />
+        </div>
+        <div class="input-containers">
+            <input type="email" placeholder="Email Address" class="email-input" />
+            <input type="password" placeholder="密碼" class="password-input" />
+        </div>
+        <div class="button-container" (click)="login()">
+            <button type="submit" class="login-button">登入</button>
+        </div>
+        <div class="text-container">
+            <p>重設密碼</p>
+            <div class="checkbox-container">
+                <input type="checkbox" class="checkbox-input" />
+                <span class="checkbox-text">下次自動登入</span>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" class="checkbox-input" />
+                <span class="checkbox-text">開機時自動啟動 SpoonFull </span>
+            </div>
+        </div>
+    </div>
+    <div class="left-container">
+        <div class="qr-container"></div>
+        <div class="qr-login">
+            <h5>QR code 登入</h5>
+        </div>
+        <div class="qr-text">
+            <p>在您的智慧型手機上打開 SpoonFull 並在搜尋框中按一下QR code 圖示。</p>
+        </div>
+    </div>
+</div>

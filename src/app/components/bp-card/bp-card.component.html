@@ -1,0 +1,22 @@
+<div class="main-container">
+    <div class="row-1">
+        <div class="heart-rate">
+            <span>心率</span>
+            <h2 class="value">{{ getHeartRate() }}<span class="unit">bpm</span></h2>
+        </div>
+        <div class="option">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+    </div>
+    <div class="row-2">
+        <div class="bp">
+            <span>血壓</span>
+            <h2 class="value">{{ getBP() }}<span class="unit">mmHg</span></h2>
+        </div>
+    </div>
+    <div class="row-3">
+        <app-see-history-button></app-see-history-button>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+:host {
+    display: block;
+    background-color: #CAECE5;
+    min-height: 100vh;
+    width: 100%;
+  }
+  
+  .meal-intake-container {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .main-container {
+    flex: 1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 0;
+  
+    div {
+      width: 883px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  .row-1{
+    gap: 15px;
+  }
+
+  .search-bar{
+    flex: 1; 
+      
+      app-search-bar {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+   }
+
+   .row-2{
+    //gap: 15px;
+    margin-top: 15px;
+    margin-bottom: 42px;
+  }
+
+  .row-3{
+    justify-content: space-between;
+    margin-bottom: 30px;
+   }
+
+   .row-4{
+    height: 57px;
+    justify-content: space-between;
+    margin-bottom: 30px;
+  
+    .text-title{
+      font-family: 'Quicksand', sans-serif;
+      font-weight: bold;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: left;
+      color: #00313C;
+    }
+  
+   }

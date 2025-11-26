@@ -1,0 +1,17 @@
+.button-container{
+    height: 24px;
+    border-radius: 8px;
+    background-color: #40C1AC;
+    padding: 8px 10px;
+    min-width: 88px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    span{
+        color: #E6FEF9;
+        font-family: 'Quicksand', sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+    }
+}

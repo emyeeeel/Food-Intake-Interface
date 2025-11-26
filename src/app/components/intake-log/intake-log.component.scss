@@ -1,0 +1,143 @@
+.intake-container{
+    width: 430px;
+    height: 332px;
+    border-radius: 24px;
+    background-color: #E6FEF9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px;
+
+    .row-1{
+        width: 100%;
+        height: 48px;
+        margin-bottom: 32px;
+
+        display: flex;
+        flex-direction: row;
+
+        .icon{
+            width: 48px;
+            height: 48px;
+            background-color: #00313C;
+            border-radius: 16px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .time{
+            font-family: 'Quicksand', sans-serif;
+            font-weight: bold;
+            font-size: 32px;
+            color: #00313C;
+
+            display: flex;
+            flex: 1;
+        }
+
+        .option {
+            display: flex;
+            gap: 2px; // Small gap between circles
+            
+            .circle {
+              width: 7.24px;
+              height: 7.24px;
+              background-color: #00313C;
+              border-radius: 50%; // Makes it a perfect circle
+              flex-shrink: 0; // Prevent shrinking
+            }
+          }
+    }
+
+    .row-2{
+        width: 100%;
+        height: 62px;
+        margin-bottom: 21px;
+        
+        display: flex;
+        flex-direction: row;
+
+        .assigned-meal, .original-volume{
+            display: flex;
+            flex-direction: column;
+        }
+
+        .assigned-meal{
+            width: 171px;
+        }
+
+        span{
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+            color: #00313C;
+        }
+
+        .value{
+            font-family: 'Quicksand', sans-serif;
+            font-weight: bold;
+            font-size: 40px;
+            color: #00313C;
+
+            .unit {
+                font-family: 'Onest', sans-serif;
+                font-size: 20px; 
+                font-weight: 500; 
+                color: #40C1AC;
+                margin-left: 2px; 
+              }
+        }
+    }
+
+    .row-3{
+        width: 100%;
+        height: 62px;
+        margin-bottom: 38px;
+
+        display: flex;
+        flex-direction: row;
+
+        .remaining-percent, .remaining-volume{
+            display: flex;
+            flex-direction: column;
+        }
+
+        .remaining-percent{
+            width: 171px;
+        }
+
+        span{
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+            color: #00313C;
+        }
+
+        .value{
+            font-family: 'Quicksand', sans-serif;
+            font-weight: bold;
+            font-size: 40px;
+            color: #00313C;
+
+            .unit {
+                font-family: 'Onest', sans-serif;
+                font-size: 20px; 
+                font-weight: 500; 
+                color: #40C1AC;
+                margin-left: 2px; 
+              }
+        }
+    }
+
+    .row-4{
+        width: 100%;
+        height: 24px;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}

@@ -1,0 +1,52 @@
+<div class="notif-container">
+    <div class="notif" (click)="toggleNotificationDropdown()">
+        <img src="assets/icons/notif-icon.svg" alt="Notification Icon" class="notif-icon">
+        <div class="notification-badge" *ngIf="notificationCount > 0">
+            {{ notificationCount > 99 ? '99+' : notificationCount }}
+        </div>
+    </div>
+    
+    <div class="notification-dropdown" *ngIf="isDropdownOpen">
+        <div class="dropdown-header">
+            <div class="header-top">
+                <h3>Notifications</h3>
+                <span class="close-btn" (click)="closeDropdown()">&times;</span>
+            </div>
+            <div class="filter-tabs">
+                <div 
+                    class="filter-tab" 
+                    [class.active]="activeFilter === 'all'"
+                    (click)="setFilter('all')">
+                    All
+                </div>
+                <div 
+                    class="filter-tab" 
+                    [class.active]="activeFilter === 'unread'"
+                    (click)="setFilter('unread')">
+                    Unread
+                </div>
+            </div>
+        </div>
+        <div class="dropdown-content">
+            <div class="notification-item" 
+                 *ngFor="let notification of filteredNotifications"
+                 (click)="markAsRead(notification.id)"
+                 [class.unread-item]="!notification.read">
+                <div class="notification-icon">
+                    <img 
+                        [src]="notification.read ? 'assets/images/notif-read.png' : 'assets/images/notif-unread.png'"
+                        [alt]="notification.read ? 'Read notification' : 'Unread notification'"
+                        class="notification-status-icon">
+                </div>
+                <div class="notification-text">
+                    <p class="notification-message">{{ notification.message }}</p>
+                    <span class="notification-time">{{ notification.time }}</span>
+                </div>
+                <div class="notification-dot" [class.unread]="!notification.read"></div>
+            </div>
+            <div class="no-notifications" *ngIf="filteredNotifications.length === 0">
+                <p>No {{ activeFilter === 'unread' ? 'unread' : '' }} notifications</p>
+            </div>
+        </div>
+    </div>
+</div>

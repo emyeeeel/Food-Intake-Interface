@@ -1,0 +1,66 @@
+<div class="meal-intake-container">
+    <app-menu-bar></app-menu-bar>
+    <div class="main-container">
+        <div class="row-1">
+            <app-back></app-back>
+            <div class="search-bar">
+                <app-search-bar></app-search-bar>
+            </div>
+            <app-notif></app-notif>
+        </div>
+        <div class="row-2">
+            <app-filter-icon></app-filter-icon>
+            <ng-container *ngFor="let filterOption of filterOptions">
+                <app-filter-options [filterText]="filterOption"></app-filter-options>
+            </ng-container>
+        </div>
+        <div class="row-3">
+            <app-main-options 
+                iconSrc="assets/icons/add-icon.svg"
+                optionText="新增攝取紀錄"
+                altText="Add Intake Icon"
+                backgroundColor="#00313C"
+                textColor="#E6FEF9"
+                (click)="navigateToAddIntake()">
+            </app-main-options>
+            <app-main-options 
+                iconSrc="assets/icons/all-icon.svg"
+                optionText="查詢所有紀錄"
+                altText="See All Logs Icon"
+                backgroundColor="#40C1AC"
+                textColor="#E6FEF9"
+                (click)="navigateToAllLogs()">
+            </app-main-options>
+            <app-main-options 
+                iconSrc="assets/icons/print-icon.svg"
+                optionText="列印攝取紀錄"
+                altText="Print Intake Logs Icon"
+                backgroundColor="#E6FEF9"
+                textColor="#00313C"
+                (click)="navigateToPrintLogs()">
+            </app-main-options>
+        </div>
+        <div class="row-4">
+            <div class="text-title">
+                近期攝取紀錄
+            </div>
+            <app-date-container></app-date-container>
+        </div>
+        <div class="row-5">
+            <app-intake-log 
+                time="午餐"
+                assignedMeal="L-01-A"
+                [originalVolume]="300"
+                [remainingPercent]="40"
+                [remainingVolume]="135">
+            </app-intake-log>
+            <app-intake-log 
+                time="晚餐"
+                assignedMeal="D-01-A"
+                [originalVolume]="350"
+                [remainingPercent]="25"
+                [remainingVolume]="87">
+            </app-intake-log>
+        </div>
+    </div> 
+</div> 
