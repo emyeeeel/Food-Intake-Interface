@@ -9,6 +9,7 @@ import { SettingsComponent } from './pages/settings/settings.component';
 import { MealAssignmentComponent } from './components/meal-assignment/meal-assignment.component';
 import { DailyConsumptionComponent } from './components/daily-consumption/daily-consumption.component';
 import { QrTestComponent } from './components/qr-test/qr-test.component';
+import { PatientDetailsComponent } from './components/patient-details/patient-details.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -36,5 +37,5 @@ export const routes: Routes = [
     { path: 'patient-info/print', component: PatientInfoComponent },
 
     { path: 'settings', component: SettingsComponent },
-    { path: 'test', component: QrTestComponent },
+    { path: 'test', component: PatientDetailsComponent },
 ];

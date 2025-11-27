@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import QRCode from 'qrcode';
 
 @Component({
@@ -8,12 +8,13 @@ import QRCode from 'qrcode';
   styleUrl: './qr-test.component.scss'
 })
 export class QrTestComponent {
+  @Input() patientId: number = 1;
   @ViewChild('qrCanvas') qrCanvas!: ElementRef<HTMLCanvasElement>;
+  
 
   ngAfterViewInit() {
-    const patientId = 1;
-    // const apiUrl = `http://127.0.0.1:8000/api/patients/${patientId}/`;
-    const apiUrl = `https://mr7661km-8000.asse.devtunnels.ms/api/patients/${patientId}/`;
+    const apiUrl = `http://127.0.0.1:8000/api/patients/${this.patientId}/recommended-intake`;
+    // const apiUrl = `https://h3vkhzth-8000.asse.devtunnels.ms//api/patients/${this.patientId}/`;
 
     QRCode.toCanvas(this.qrCanvas.nativeElement, apiUrl, {
       width: 200,

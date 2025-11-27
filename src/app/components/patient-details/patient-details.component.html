@@ -1,0 +1,16 @@
+<div class="patient-detail">
+    <p>Patient Details</p>
+    <div *ngIf="loading" class="loading">Loading patient details...</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+    <div *ngIf="patient && !loading" class="patient-info">
+        <h2>{{ patient.name }}</h2>
+        <p><strong>Age:</strong> {{ patient.age }}</p>
+        <p><strong>Height:</strong> {{ patient.height_cm }} cm</p>
+        <p><strong>Weight:</strong> {{ patient.weight_kg }} kg</p>
+        <p><strong>BMI:</strong> {{ patient.bmi }}</p>
+        <p *ngIf="patient.heart_rate"><strong>Heart Rate:</strong> {{ patient.heart_rate }} bpm</p>
+        <p *ngIf="patient.systolic_bp"><strong>BP:</strong> {{ patient.systolic_bp }}/{{ patient.diastolic_bp }} mmHg</p>
+        <p><strong>Activity Level:</strong> {{ patient.activity_level }}</p>
+        <app-qr-test [patientId]="patient.id"></app-qr-test>
+    </div>
+</div>
