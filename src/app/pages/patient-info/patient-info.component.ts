@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { Patient } from '../../models/patient.model';
 import { RecommendedIntake } from '../../models/recommended-intake.model';
 import { PatientService } from '../../services/patient.service';
@@ -15,13 +15,17 @@ import { BmiCardComponent } from "../../components/bmi-card/bmi-card.component";
 import { BpCardComponent } from "../../components/bp-card/bp-card.component";
 import { MealAssignmentComponent } from "../../components/meal-assignment/meal-assignment.component";
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { filter } from 'rxjs';
+import { PatientDetailsComponent } from '../../components/patient-details/patient-details.component';
 
 @Component({
   selector: 'app-patient-info',
   imports: [
     MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent,
     MainOptionsComponent, DateContainerComponent, PatientCardComponent,
-    BmiCardComponent, BpCardComponent, MealAssignmentComponent, CommonModule
+    BmiCardComponent, BpCardComponent, MealAssignmentComponent, CommonModule, 
+    FormsModule, PatientDetailsComponent
   ],
   templateUrl: './patient-info.component.html',
   styleUrls: ['./patient-info.component.scss']
@@ -31,12 +35,41 @@ export class PatientInfoComponent implements OnInit {
   loading: boolean = true;
   error: string | null = null;
 
+  currentView: string = 'default'; 
+
   constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.patientId = this.getPatientIdFromRoute() || 1;
     // console.log('Patient ID:',this.patientId)
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        const path = event.urlAfterRedirects;
+        this.updateCurrentView(path);
+      });
+    this.updateCurrentView(this.router.url);
   }
+
+  private updateCurrentView(path: string): void {
+    if (path.endsWith('/add') || path === 'add') {
+      this.currentView = 'addRecord';
+
+    } else if (path.endsWith('/all') || path === 'all') {
+      this.currentView = 'allRecord';
+
+    } else if (path.endsWith('/print') || path === 'print') {
+      this.currentView = 'printRecord';
+
+    } else if (/\/patient-info\/\d+$/.test(path)) {
+      // Matches /patient-info/1, /patient-info/25, etc.
+      this.currentView = 'patientRecord';
+
+    } else {
+      this.currentView = 'default';
+    }
+  }
+
 
   getPatientIdFromRoute(): number | null {
     const url = this.router.url;
@@ -61,5 +94,10 @@ export class PatientInfoComponent implements OnInit {
   navigateToPrintRecord(): void {
     console.log('Navigate to Print Record');
     this.router.navigate(['/patient-info/print']);
+  }
+
+  navigateToPatientRecord(): void {
+    console.log('Navigate to Patient Record');
+    this.router.navigate(['/patient-info/' + this.patientId]);
   }
 }

@@ -1,16 +1,38 @@
 <div class="patient-detail">
-    <p>Patient Details</p>
-    <div *ngIf="loading" class="loading">Loading patient details...</div>
-    <div *ngIf="error" class="error">{{ error }}</div>
-    <div *ngIf="patient && !loading" class="patient-info">
-        <h2>{{ patient.name }}</h2>
-        <p><strong>Age:</strong> {{ patient.age }}</p>
-        <p><strong>Height:</strong> {{ patient.height_cm }} cm</p>
-        <p><strong>Weight:</strong> {{ patient.weight_kg }} kg</p>
-        <p><strong>BMI:</strong> {{ patient.bmi }}</p>
-        <p *ngIf="patient.heart_rate"><strong>Heart Rate:</strong> {{ patient.heart_rate }} bpm</p>
-        <p *ngIf="patient.systolic_bp"><strong>BP:</strong> {{ patient.systolic_bp }}/{{ patient.diastolic_bp }} mmHg</p>
-        <p><strong>Activity Level:</strong> {{ patient.activity_level }}</p>
-        <app-qr-test [patientId]="patient.id"></app-qr-test>
-    </div>
+
+  <p>Patient Info</p>
+
+  <!-- Loading and error states -->
+  <div *ngIf="loading" class="loading">Loading patient details...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <!-- Patient information -->
+  <div *ngIf="patient && !loading" class="patient-info">
+      <h2>{{ patient.name }}</h2>
+      <p><strong>Age:</strong> {{ patient.age }}</p>
+      <p><strong>Height:</strong> {{ patient.height_cm }} cm</p>
+      <p><strong>Weight:</strong> {{ patient.weight_kg }} kg</p>
+      <p><strong>BMI:</strong> {{ patient.bmi }}</p>
+      <p *ngIf="patient.heart_rate"><strong>Heart Rate:</strong> {{ patient.heart_rate }} bpm</p>
+      <p *ngIf="patient.systolic_bp"><strong>BP:</strong> {{ patient.systolic_bp }}/{{ patient.diastolic_bp }} mmHg</p>
+      <p><strong>Activity Level:</strong> {{ patient.activity_level }}</p>
+      <app-qr-test [patientId]="patient.id"></app-qr-test>
+  </div>
+
+  <!-- Recommended intake -->
+  <div *ngIf="recommendedIntake && !loading" class="patient-recommended-intake">
+      <h3>Recommended Daily Intake</h3>
+      <p><strong>Calories:</strong> {{ recommendedIntake?.daily_caloric_needs }} kcal</p>
+      <p><strong>Protein:</strong> {{ recommendedIntake?.protein }} g</p>
+      <p><strong>Carbohydrates:</strong> {{ recommendedIntake?.carbohydrate }} g</p>
+      <p><strong>Fat:</strong> {{ recommendedIntake?.fat }} g</p>
+      <p><strong>Total Fiber:</strong> {{ recommendedIntake?.total_fiber }} g</p>
+      <p><strong>Saturated Fatty Acids:</strong> {{ recommendedIntake?.saturated_fatty_acids }} g</p>
+      <p><strong>Trans Fatty Acids:</strong> {{ recommendedIntake?.trans_fatty_acids }} g</p>
+      <p><strong>Alpha Linolenic Acid:</strong> {{ recommendedIntake?.alpha_linolenic_acid }} g</p>
+      <p><strong>Linoleic Acid:</strong> {{ recommendedIntake?.linoleic_acid }} g</p>
+      <p><strong>Dietary Cholesterol:</strong> {{ recommendedIntake?.dietary_cholesterol }} mg</p>
+      <p><strong>Total Water:</strong> {{ recommendedIntake?.total_water }} L</p>
+  </div>
+
 </div>

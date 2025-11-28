@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { RecommendedIntake } from '../models/recommended-intake.model';
+import { RecommendedIntakeApiResponse } from '../models/recommended-intake-api.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ export class RecommendedIntakeService {
 
   constructor(private http: HttpClient) {}
 
-  getRecommendedIntake(patientId: number): Observable<RecommendedIntake> {
-    return this.http.get<RecommendedIntake>(`${this.apiUrl}${patientId}/recommended-intake/`);
+  getRecommendedIntake(patientId: number): Observable<RecommendedIntakeApiResponse> {
+    return this.http.get<RecommendedIntakeApiResponse>(`${this.apiUrl}${patientId}/recommended-intake/`);
   }
 }
