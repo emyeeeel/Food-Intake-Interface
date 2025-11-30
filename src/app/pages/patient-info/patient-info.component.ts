@@ -1,8 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { Patient } from '../../models/patient.model';
-import { RecommendedIntake } from '../../models/recommended-intake.model';
-import { PatientService } from '../../services/patient.service';
 
 import { MenuBarComponent } from "../../components/menu-bar/menu-bar.component";
 import { BackComponent } from "../../components/back/back.component";
@@ -38,11 +35,27 @@ export class PatientInfoComponent implements OnInit {
 
   currentView: string = 'default'; 
 
-  constructor(private router: Router, private cloudTestService: CloudTestService) {}
+  lunchHasMeal: boolean = false;
+dinnerHasMeal: boolean = false;
+
+onLunchStatus(status: boolean) {
+  this.lunchHasMeal = status;
+  this.cdr.detectChanges();
+  console.log("Lunch meal assigned?", status);
+}
+
+onDinnerStatus(status: boolean) {
+  this.dinnerHasMeal = status;
+  this.cdr.detectChanges();
+  console.log("Dinner meal assigned?", status);
+}
+
+
+  constructor(private router: Router, private cloudTestService: CloudTestService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.patientId = this.getPatientIdFromRoute() || 1;
-    // console.log('Patient ID:',this.patientId)
+    console.log('Patient ID:',this.patientId)
     
     this.cloudTestService.getPatientData().subscribe({
       next: (data) => {
