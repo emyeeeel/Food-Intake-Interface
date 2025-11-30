@@ -38,5 +38,5 @@ export const routes: Routes = [
     { path: 'patient-info/:id', component: PatientInfoComponent },
 
     { path: 'settings', component: SettingsComponent },
-    { path: 'test', component: PatientDetailsComponent },
+    { path: 'test', component: QrTestComponent },
 ];

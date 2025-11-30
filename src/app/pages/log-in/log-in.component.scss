@@ -1,258 +1,400 @@
-:host {
-  display: block;
-  background-color: #00313C;
-  min-height: 100vh;
-  width: 100%;
-}
-
 .login-container{
-    width: 886px;
-    height: 554px;
-    border-radius: 16px;
-    margin: 0 auto;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex; 
-    overflow: hidden;
-    
-    // Only apply mobile styles for phones
-    @media (max-width: 480px) {
-      width: 95vw;
-      height: auto;
-      min-height: 90vh;
-      position: relative;
-      top: auto;
-      left: auto;
-      transform: none;
-      margin: 5vh auto;
-      flex-direction: column;
-    }
-}
+  width: 886px;
+  height: 554px;
+  border-radius: 16px;
+  margin: 0 auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; 
+  overflow: hidden;
   
-.right-container{
-    height: 554px;
-    background-color: #D9F3EE;
-    display: flex;
-    flex-direction: column;
-    flex: 1; 
-    border-radius: 16px 0 0 16px; 
-    align-items: center;
-    
-    @media (max-width: 480px) {
-      height: auto;
-      min-height: 60vh;
-      border-radius: 16px 16px 0 0;
-      padding: 30px 20px;
-    }
-}
-  
-.left-container{
-    width: 355px;
-    height: 554px;
-    border-radius: 0 16px 16px 0;
-    background-color: #B3E6DE;
-    flex-shrink: 0; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #00313C;
-    
-    @media (max-width: 480px) {
-      width: 100%;
-      height: auto;
-      min-height: 30vh;
-      border-radius: 0 0 16px 16px;
-      padding: 20px;
-    }
+  // Medium desktop / small desktop
+  @media (max-width: 1024px) {
+    width: 750px;
+    height: 470px;
+  }
 
-    .qr-container{
-        margin-top: 66px;
-        width: 232px;
-        height: 232px;
-        border-radius: 4px;
-        background-color: #D9F3EE;
-        
-        @media (max-width: 480px) {
-          margin-top: 20px;
-          width: 150px;
-          height: 150px;
-        }
-    }
+  // Mobile
+  @media (max-width: 480px) {
+    width: 95vw;
+    height: auto;
+    min-height: 90vh;
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin: 5vh auto;
+    flex-direction: column;
+  }
+}
+
+.right-container{
+  height: 554px;
+  background-color: #D9F3EE;
+  display: flex;
+  flex-direction: column;
+  flex: 1; 
+  border-radius: 16px 0 0 16px; 
+  align-items: center;
+
+  // Medium desktop
+  @media (max-width: 1024px) {
+    height: 470px;
+  }
+  
+  @media (max-width: 480px) {
+    height: auto;
+    min-height: 60vh;
+    border-radius: 16px 16px 0 0;
+    padding: 30px 20px;
+  }
+}
+
+.left-container{
+  width: 355px;
+  height: 554px;
+  border-radius: 0 16px 16px 0;
+  background-color: #B3E6DE;
+  flex-shrink: 0; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #00313C;
+
+  // Medium desktop
+  @media (max-width: 1024px) {
+    width: 300px;
+    height: 470px;
+  }
+  
+  @media (max-width: 480px) {
+    width: 100%;
+    height: auto;
+    min-height: 30vh;
+    border-radius: 0 0 16px 16px;
+    padding: 20px;
+  }
+
+  .qr-container{
+      margin-top: 66px;
+      width: 232px;
+      height: 232px;
+      border-radius: 4px;
+      background-color: #D9F3EE;
+
+      // Medium desktop
+      @media (max-width: 1024px) {
+        margin-top: 50px;
+        width: 200px;
+        height: 200px;
+      }
+
+      @media (max-width: 480px) {
+        margin-top: 20px;
+        width: 150px;
+        height: 150px;
+      }
+  }
 }
 
 .logo-container{
-    width: 280px;
-    height: 65px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 80px;
-    
-    @media (max-width: 480px) {
-      width: 200px;
-      height: 50px;
-      margin-top: 40px;
-    }
-    
-    img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain; 
-    }
+  width: 280px;
+  height: 65px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 80px;
+
+  // Medium desktop
+  @media (max-width: 1024px) {
+    width: 220px;
+    height: 55px;
+    margin-top: 60px;
+  }
+
+  @media (max-width: 480px) {
+    width: 200px;
+    height: 50px;
+    margin-top: 40px;
+  }
+
+  img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; 
+  }
 }
 
 .input-containers {
-    display: flex;
-    flex-direction: column;
-    margin-top: 40px;
-    
-    @media (max-width: 480px) {
-      margin-top: 30px;
-      width: 100%;
-    }
+  display: flex;
+  flex-direction: column;
+  margin-top: 40px;
+  justify-content: center; 
+  align-items: center;
+
+  // Medium desktop
+  @media (max-width: 1024px) {
+    margin-top: 30px;
+  }
+  
+  @media (max-width: 480px) {
+    margin-top: 30px;
+    width: 100%;
+  }
 }
 
 input{
-    width: 389px;
-    height: 56px;
-    padding: 12px 16px;
-    border: 1px solid #00313C;
-    font-family: 'Onest', sans-serif;
-    
-    @media (max-width: 480px) {
-      width: 100%;
-      max-width: 300px;
-      height: 48px;
-      font-size: 14px;
-    }
-}
-  
-.email-input {
-    border-radius: 8px 8px 0 0;
-    outline: none;
-    font-size: 16px;
-    border-bottom: .5px;
-}
-  
-.password-input {
-    border-radius: 0 0 8px 8px;
-    outline: none;
-    font-size: 16px;
+  width: 389px;
+  height: 56px;
+  padding: 12px 16px;
+  border: 1px solid #00313C;
+  font-family: 'Onest', sans-serif;
+
+  // Medium desktop
+  @media (max-width: 1024px) {
+    width: 320px;
+    height: 50px;
+    font-size: 15px;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+    max-width: 300px;
+    height: 48px;
+    font-size: 14px;
+  }
 }
 
 .button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+
+  // Medium desktop
+  @media (max-width: 1024px) {
+    margin-top: 15px;
+  }
+
+  // Mobile: match input width
+  @media (max-width: 480px) {
+    width: 100%;
+    max-width: 300px; // same as input max-width
+    margin: 20px auto 0 auto; // center horizontally
+  }
 }
-  
+
+
 .login-button {
-    width: 389px;
-    height: 56px;
-    background-color: #40C1AC;
-    color: #00313C;
-    border: none;
-    border-radius: 8px;
-    font-size: 20px;
-    font-weight: 600;
-    font-family: 'Quicksand', sans-serif; 
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    
-    @media (max-width: 480px) {
-      width: 100%;
-      max-width: 300px;
-      height: 48px;
-      font-size: 18px;
-    }
-    
-    &:hover {
-      background-color: #359e8a;
-      box-shadow: 0 0 0 2px rgba(64, 193, 172, 0.3);
-    }
-    
-    &:active {
-      background-color: #2d8a78;
-      box-shadow: 0 0 0 2px rgba(64, 193, 172, 0.5);
-    }
+  width: 389px;
+  height: 56px;
+  background-color: #40C1AC;
+  color: #00313C;
+  border: none;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: 'Quicksand', sans-serif; 
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+
+  // Medium desktop
+  @media (max-width: 1024px) {
+    width: 320px;
+    height: 50px;
+    font-size: 18px;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+    max-width: 300px;
+    height: 48px;
+    font-size: 18px;
+  }
+
+  &:hover {
+    background-color: #359e8a;
+    box-shadow: 0 0 0 2px rgba(64, 193, 172, 0.3);
+  }
+
+  &:active {
+    background-color: #2d8a78;
+    box-shadow: 0 0 0 2px rgba(64, 193, 172, 0.5);
+  }
 }
 
 .text-container{
-    min-width: 389px;
-    font-family: 'Onest', sans-serif; 
-    align-items: flex-start;
+  min-width: 389px;
+  font-family: 'Onest', sans-serif; 
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #00313C;
+
+  // Medium desktop
+  @media (max-width: 1024px) {
+    min-width: 320px;
+    font-size: 13px;
+  }
+
+  @media (max-width: 480px) {
+    min-width: auto;
+    width: 100%;
+    max-width: 300px;
+    font-size: 12px;
+  }
+
+  p{
+    font-family: 'Quicksand', sans-serif; 
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #40C1AC; 
+      text-decoration: underline;
+    }
+  }
+
+  .checkbox-container{
     display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 15px;
-    font-size: 14px;
-    color: #00313C;
-    
-    @media (max-width: 480px) {
-      min-width: auto;
-      width: 100%;
-      max-width: 300px;
-      font-size: 12px;
-    }
+    flex-direction: row;
+    align-items: center;
 
-    p{
-      font-family: 'Quicksand', sans-serif; 
-      font-weight: 500;
-      cursor: pointer;
-      transition: color 0.2s ease;
+    .checkbox-input {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
 
-      &:hover {
-        color: #40C1AC; 
-        text-decoration: underline;
+      @media (max-width: 1024px) {
+        width: 16px;
+        height: 16px;
+      }
+
+      @media (max-width: 480px) {
+        width: 16px;
+        height: 16px;
       }
     }
-
-    .checkbox-container{
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-
-      .checkbox-input {
-        width: 18px;
-        height: 18px;
-        margin-right: 10px;
-        
-        @media (max-width: 480px) {
-          width: 16px;
-          height: 16px;
-        }
-      }
-    }
+  }
 }
 
 .qr-login{
-    font-family: 'Quicksand', sans-serif; 
-    font-weight: 500;
-    font-size: 20px;
-    margin-top: 35px;
-    text-align: center;
-    
-    @media (max-width: 480px) {
-      font-size: 16px;
-      margin-top: 20px;
-    }
+  font-family: 'Quicksand', sans-serif; 
+  font-weight: 500;
+  font-size: 20px;
+  margin-top: 35px;
+  text-align: center;
+
+  // Medium desktop
+  @media (max-width: 1024px) {
+    font-size: 18px;
+    margin-top: 25px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 16px;
+    margin-top: 20px;
+  }
 }
 
 .qr-text{
-    margin-top: 30px;
-    max-width: 220px;
-    font-family: 'Onest', sans-serif; 
+  margin-top: 30px;
+  max-width: 220px;
+  font-family: 'Onest', sans-serif; 
+  font-size: 14px;
+  text-align: center;
+
+  // Medium desktop
+  @media (max-width: 1024px) {
+    max-width: 180px;
+    font-size: 13px;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 480px) {
+    margin-top: 15px;
+    max-width: 180px;
+    font-size: 12px;
+  }
+}
+
+// Mobile improvements
+@media (max-width: 480px) {
+
+  .right-container {
+    height: auto;           // let it grow with content
+    min-height: 55vh;       // slightly smaller than before
+    padding: 25px 20px;     // balanced padding
+    border-radius: 16px 16px 0 0;
+  }
+
+  .left-container {
+    width: 100%;
+    height: auto;
+    min-height: 25vh;       // slightly smaller than before
+    padding: 15px 20px;
+    border-radius: 0 0 16px 16px;
+  }
+
+  .logo-container {
+    width: 180px;           // smaller logo on mobile
+    height: 45px;
+    margin-top: 30px;       // less vertical spacing
+  }
+
+  .input-containers {
+    width: 100%;
+    margin-top: 20px;       // reduce spacing
+  }
+
+  input {
+    width: 100%;
+    max-width: 280px;       // slightly smaller for mobile
+    height: 46px;
     font-size: 14px;
-    text-align: center;
-    
-    @media (max-width: 480px) {
-      margin-top: 15px;
-      max-width: 180px;
-      font-size: 12px;
-    }
+  }
+
+  .button-container {
+    width: 100%;
+    max-width: 280px;       // match input width
+    margin: 15px auto 0 auto;
+  }
+
+  .login-button {
+    width: 100%;            // fills button container
+    height: 46px;
+    font-size: 16px;        // smaller font for mobile
+  }
+
+  .text-container {
+    width: 100%;
+    max-width: 280px;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
+  .qr-login {
+    font-size: 15px;
+    margin-top: 15px;
+  }
+
+  .qr-text {
+    max-width: 160px;
+    font-size: 11px;
+    margin-top: 10px;
+  }
+
+  .qr-container {
+    width: 140px;
+    height: 140px;
+    margin-top: 15px;
+  }
 }
