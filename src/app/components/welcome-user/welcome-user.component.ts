@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './welcome-user.component.scss'
 })
 export class WelcomeUserComponent implements OnInit {
-  @Input() username: string = 'Amiel Catado'; // Default fallback username
+  @Input() username: string = 'Emyeeeel'; // Default fallback username
   
   ngOnInit(): void {
     this.loadUsername();
