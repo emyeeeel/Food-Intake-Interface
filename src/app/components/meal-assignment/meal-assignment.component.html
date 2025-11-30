@@ -1,21 +1,28 @@
-<div class="main-container">
-    <div class="col-1">
-        <img [src]="assignedMeal?.image" [alt]="'Meal Image'" class="meal-image">
-    </div>
-    <div class="col-2">
-        <div class="row-1">
-            <div class="text">
-                <h2>{{ mealCode }}</h2>
-                <span>{{ assignedMeal?.meal_description }}</span> 
+<ng-container *ngIf="assignedMeal; else noMeal">
+    <div class="main-container">
+        <div class="col-1">
+            <img [src]="assignedMeal!.image" [alt]="'Meal Image'" class="meal-image">
+        </div>
+        <div class="col-2">
+            <div class="row-1">
+                <div class="text">
+                    <h2>{{ mealCode }}</h2>
+                    <span>{{ assignedMeal!.meal_description }}</span> 
+                </div>
+                <div class="option">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
             </div>
-            <div class="option">
-                <div class="circle"></div>
-                <div class="circle"></div>
-                <div class="circle"></div>
+            <div class="row-2">
+                <app-tags [tagText]="assignedMeal!.meal_time || ''" [showCloseButton]="showCloseButton"></app-tags>
             </div>
         </div>
-        <div class="row-2">
-            <app-tags [tagText]="assignedMeal?.meal_time || ''" [showCloseButton]="showCloseButton"></app-tags>
-        </div>
     </div>
-</div>
+  </ng-container>
+  
+  <ng-template #noMeal>
+    <!-- Optional: empty or placeholder for no assigned meal -->
+  </ng-template>
+  

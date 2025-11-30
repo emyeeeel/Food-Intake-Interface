@@ -22,17 +22,14 @@
   <!-- Recommended intake -->
   <div *ngIf="recommendedIntake && !loading" class="patient-recommended-intake">
       <h3>Recommended Daily Intake</h3>
-      <p><strong>Calories:</strong> {{ recommendedIntake?.daily_caloric_needs }} kcal</p>
-      <p><strong>Protein:</strong> {{ recommendedIntake?.protein }} g</p>
-      <p><strong>Carbohydrates:</strong> {{ recommendedIntake?.carbohydrate }} g</p>
-      <p><strong>Fat:</strong> {{ recommendedIntake?.fat }} g</p>
-      <p><strong>Total Fiber:</strong> {{ recommendedIntake?.total_fiber }} g</p>
-      <p><strong>Saturated Fatty Acids:</strong> {{ recommendedIntake?.saturated_fatty_acids }} g</p>
-      <p><strong>Trans Fatty Acids:</strong> {{ recommendedIntake?.trans_fatty_acids }} g</p>
-      <p><strong>Alpha Linolenic Acid:</strong> {{ recommendedIntake?.alpha_linolenic_acid }} g</p>
-      <p><strong>Linoleic Acid:</strong> {{ recommendedIntake?.linoleic_acid }} g</p>
-      <p><strong>Dietary Cholesterol:</strong> {{ recommendedIntake?.dietary_cholesterol }} mg</p>
-      <p><strong>Total Water:</strong> {{ recommendedIntake?.total_water }} L</p>
+      <p><strong>Calories:</strong> {{ recommendedIntake!.daily_caloric_needs }} kcal</p>
+      <p><strong>Protein:</strong> {{ recommendedIntake!.protein }} g</p>
+      <p><strong>Carbohydrates:</strong> {{ recommendedIntake!.carbohydrate }} g</p>
+      <p><strong>Fat:</strong> {{ recommendedIntake!.fat }} g</p>
+      <p><strong>Total Fiber:</strong> {{ recommendedIntake!.total_fiber }} g</p>
+      <p><strong>Alpha Linolenic Acid:</strong> {{ recommendedIntake!.alpha_linolenic_acid }} g</p>
+      <p><strong>Linoleic Acid:</strong> {{ recommendedIntake!.linoleic_acid }} g</p>
+      <p><strong>Total Water:</strong> {{ recommendedIntake!.total_water }} L</p>
   </div>
 
 </div>

@@ -71,3 +71,25 @@
     height: 132px;
     
    }
+
+.no-meals-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .no-meals-text{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    p{
+      font-family: 'Quicksand', sans-serif;
+      font-weight: bold;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: left;
+      color: #00313C;
+    }
+  }
+}

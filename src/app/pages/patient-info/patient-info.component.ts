@@ -1,8 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { Patient } from '../../models/patient.model';
-import { RecommendedIntake } from '../../models/recommended-intake.model';
-import { PatientService } from '../../services/patient.service';
 
 import { MenuBarComponent } from "../../components/menu-bar/menu-bar.component";
 import { BackComponent } from "../../components/back/back.component";
@@ -18,6 +15,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs';
 import { PatientDetailsComponent } from '../../components/patient-details/patient-details.component';
+import { CloudTestService } from '../../services/cloud-test.service';
 
 @Component({
   selector: 'app-patient-info',
@@ -37,11 +35,55 @@ export class PatientInfoComponent implements OnInit {
 
   currentView: string = 'default'; 
 
-  constructor(private router: Router) {}
+  lunchHasMeal: boolean = false;
+dinnerHasMeal: boolean = false;
+
+onLunchStatus(status: boolean) {
+  this.lunchHasMeal = status;
+  this.cdr.detectChanges();
+  console.log("Lunch meal assigned?", status);
+}
+
+onDinnerStatus(status: boolean) {
+  this.dinnerHasMeal = status;
+  this.cdr.detectChanges();
+  console.log("Dinner meal assigned?", status);
+}
+
+
+  constructor(private router: Router, private cloudTestService: CloudTestService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.patientId = this.getPatientIdFromRoute() || 1;
-    // console.log('Patient ID:',this.patientId)
+    console.log('Patient ID:',this.patientId)
+    
+    this.cloudTestService.getPatientData().subscribe({
+      next: (data) => {
+        console.log('Patient data:', data);
+      },
+      error: (err) => {
+        console.error('CloudTestService error:', err);
+      }
+    });
+
+    this.cloudTestService.getFoodData().subscribe({
+      next: (data) => {
+        console.log('Food data:', data);
+      },
+      error: (err) => {
+        console.error('CloudTestService error:', err);
+      }
+    });
+
+    this.cloudTestService.getMealData('1').subscribe({
+      next: (data) => {
+        console.log('Meal data:', data);
+      },
+      error: (err) => {
+        console.error('CloudTestService error:', err);
+      }
+    });
+
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
