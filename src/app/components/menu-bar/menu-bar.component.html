@@ -1,14 +1,26 @@
-<div class="menu-container">
-    <div class="logo-container">
-        <img src="assets/logo/SpoonFull_Logo.png" alt="SpoonFull Logo" />
+<div class="menu-container" [class.mobile-open]="isMobileOpen">
+  <!-- Logo -->
+  <div class="logo-container">
+    <!-- Hamburger button for mobile -->
+    <button class="hamburger-btn" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+    <img src="assets/logo/SpoonFull_Logo.png" alt="SpoonFull Logo" />
+  </div>
+
+  <!-- Menu options -->
+  <div class="menu-options">
+    <app-menu-option></app-menu-option>
+
+    <!-- Logout inside mobile menu -->
+    <div class="logout-option mobile-logout" (click)="logout()">
+      <img src="assets/icons/logout-icon.svg" alt="Logout icon" class="logout-icon" />
+      <span class="logout-text">登出</span>
     </div>
-    <div class="menu-options">
-        <app-menu-option></app-menu-option>
-    </div>
-    <div class="logout-container">
-        <div class="logout-option" (click)="logout()"> 
-            <img src="assets/icons/logout-icon.svg" alt="Logout icon" class="logout-icon" />
-            <span class="logout-text">登出</span> 
-        </div>
-    </div>
+  </div>
+
+  <!-- Overlay for mobile menu -->
+  <div class="mobile-overlay" *ngIf="isMobileOpen" (click)="toggleMobileMenu()"></div>
 </div>

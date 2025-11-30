@@ -1,28 +1,32 @@
 <div class="home-container">
-    <app-menu-bar></app-menu-bar>
-    <div class="main-container">
-        <div class="row-1">
-            <div class="search-bar">
-                <app-search-bar></app-search-bar>
-            </div>
-            <!-- <div class="filter">
-                <img src="assets/icons/filter-icon.svg" alt="Filter Icon" class="filter-icon">
-                <span class="filter-text">Filter</span>
-            </div> -->
-            <app-notif/>
-        </div>
-        <div class="row-2">
-            <app-welcome-user/>
-        </div>
-        <div class="row-3">
-            <div class="summary-text">
-                <h3>每週摘要</h3>
-            </div>
-            <app-date-container></app-date-container>
-        </div>
-        <div class="row-4">
-            <app-daily-consumption></app-daily-consumption>
-            <app-nutrient-intake></app-nutrient-intake>
-        </div>
+  <app-menu-bar (mobileMenuToggle)="onMobileMenuToggle($event)"></app-menu-bar>
+
+  <div class="main-container" [class.mobile-menu-open]="isMobileMenuOpen">
+    <div class="row-1">
+      <div class="search-bar">
+        <app-search-bar></app-search-bar>
+      </div>
+      <!-- <div class="filter">
+          <img src="assets/icons/filter-icon.svg" alt="Filter Icon" class="filter-icon">
+          <span class="filter-text">Filter</span>
+      </div> -->
+      <app-notif></app-notif>
     </div>
+
+    <div class="row-2">
+      <app-welcome-user></app-welcome-user>
+    </div>
+
+    <div class="row-3">
+      <div class="summary-text">
+        <h3>每週摘要</h3>
+      </div>
+      <app-date-container></app-date-container>
+    </div>
+
+    <div class="row-4">
+      <app-daily-consumption></app-daily-consumption>
+      <app-nutrient-intake></app-nutrient-intake>
+    </div>
+  </div>
 </div>

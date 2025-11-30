@@ -11,15 +11,26 @@ import { NutrientIntakeComponent } from "../../components/nutrient-intake/nutrie
 
 @Component({
   selector: 'app-homepage',
-  imports: [MenuBarComponent, CommonModule, FormsModule, NotifComponent, WelcomeUserComponent, SearchBarComponent, DateContainerComponent, DailyConsumptionComponent, NutrientIntakeComponent],
+  imports: [
+    MenuBarComponent,
+    CommonModule,
+    FormsModule,
+    NotifComponent,
+    WelcomeUserComponent,
+    SearchBarComponent,
+    DateContainerComponent,
+    DailyConsumptionComponent,
+    NutrientIntakeComponent
+  ],
   templateUrl: './homepage.component.html',
-  styleUrl: './homepage.component.scss'
+  styleUrls: ['./homepage.component.scss']
 })
 export class HomepageComponent implements OnInit {
   currentWeekRange: string = '';
   isSearchActive: boolean = false;
   searchQuery: string = '';
-  
+  isMobileMenuOpen = false; // for dimming main content
+
   @ViewChild('searchInput') searchInput!: ElementRef;
 
   ngOnInit() {
@@ -28,7 +39,6 @@ export class HomepageComponent implements OnInit {
 
   toggleSearch(): void {
     this.isSearchActive = true;
-    // Focus the input after view update
     setTimeout(() => {
       if (this.searchInput) {
         this.searchInput.nativeElement.focus();
@@ -37,7 +47,6 @@ export class HomepageComponent implements OnInit {
   }
 
   onSearchBlur(): void {
-    // Only hide search if no text is entered
     if (!this.searchQuery.trim()) {
       this.isSearchActive = false;
     }
@@ -46,8 +55,6 @@ export class HomepageComponent implements OnInit {
   performSearch(): void {
     if (this.searchQuery.trim()) {
       console.log('Searching for:', this.searchQuery);
-      // Implement your search logic here
-      // For example: this.searchService.search(this.searchQuery);
     }
   }
 
@@ -55,19 +62,24 @@ export class HomepageComponent implements OnInit {
     const today = new Date();
     const currentDay = today.getDay();
     const daysToMonday = currentDay === 0 ? 6 : currentDay - 1;
-    
+
     const monday = new Date(today);
     monday.setDate(today.getDate() - daysToMonday);
-    
+
     const sunday = new Date(monday);
     sunday.setDate(monday.getDate() + 6);
-    
+
     const formatDate = (date: Date): string => {
       const month = (date.getMonth() + 1).toString();
       const day = date.getDate().toString();
       return `${month}/${day}`;
     };
-    
+
     this.currentWeekRange = `${formatDate(monday)}-${formatDate(sunday)}`;
+  }
+
+  // Called by MenuBar to toggle main content dimming
+  onMobileMenuToggle(isOpen: boolean) {
+    this.isMobileMenuOpen = isOpen;
   }
 }

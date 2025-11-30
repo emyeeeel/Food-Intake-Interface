@@ -1,8 +1,8 @@
+/* --- Desktop: 1280x800 --- */
 .option-container {
-    width: 235px;
-    height: 80px;
-    border-radius: 16px;
-    
+  width: 235px;
+  height: 80px;
+  border-radius: 16px;
 }
 
 .menu-container {
@@ -15,13 +15,14 @@
 .menu-option {
   height: 38px;
   width: 235px;
-  background-color: transparent; // Default state - no background
+  background-color: transparent;
   display: flex;
   align-items: center;
   padding: 0 20px;
   cursor: pointer;
-  
-  // Selected state - dark background
+  border-radius: 16px;
+  transition: all 0.3s ease;
+
   &.selected {
     background-color: #00313C;
     width: 235px;
@@ -40,10 +41,75 @@
   font-family: 'Quicksand', sans-serif;
   font-size: 20px;
   color: #00313C;
-  
+
   .menu-option.selected & {
     color: #F5F4F2;
     font-weight: 800;
   }
 }
 
+/* --- Medium Desktop: 1024x600 --- */
+@media (max-width: 1024px) {
+  .menu-container {
+    width: 200px;
+    gap: 15px;
+    padding: 15px;
+    flex-shrink: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .menu-option {
+    width: 100%;
+    height: 38px;
+
+    &.selected {
+      height: 70px;
+      width: 100%;
+      border-radius: 16px;
+    }
+  }
+
+  .menu-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+  }
+
+  .menu-text {
+    font-size: 18px;
+    white-space: nowrap;
+  }
+}
+
+/* --- Mobile: <=480px --- */
+@media (max-width: 480px) {
+  .menu-container {
+    flex-direction: column;
+    gap: 15px;
+    padding: 0;
+    width: 100%;
+  }
+
+  .menu-option {
+    width: 100%;
+    height: auto;
+    padding: 12px 20px;
+
+    &.selected {
+      height: auto;
+      background-color: #00313C;
+      border-radius: 12px;
+    }
+  }
+
+  .menu-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+  }
+
+  .menu-text {
+    font-size: 16px;
+  }
+}
