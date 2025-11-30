@@ -1,0 +1,10 @@
+{
+  "/api": {
+    "target": "http://120.117.53.21/medical/da/api",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": ""
+    }
+  }
+}

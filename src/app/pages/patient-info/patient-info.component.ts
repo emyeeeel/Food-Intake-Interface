@@ -18,6 +18,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs';
 import { PatientDetailsComponent } from '../../components/patient-details/patient-details.component';
+import { CloudTestService } from '../../services/cloud-test.service';
 
 @Component({
   selector: 'app-patient-info',
@@ -37,11 +38,22 @@ export class PatientInfoComponent implements OnInit {
 
   currentView: string = 'default'; 
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private cloudTestService: CloudTestService) {}
 
   ngOnInit(): void {
     this.patientId = this.getPatientIdFromRoute() || 1;
     // console.log('Patient ID:',this.patientId)
+    
+    //currently not working due to php cors issue
+    this.cloudTestService.getDaPatientData().subscribe({
+      next: (data) => {
+        console.log('CloudTestService response:', data);
+      },
+      error: (err) => {
+        console.error('CloudTestService error:', err);
+      }
+    });
+
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
