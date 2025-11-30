@@ -1,32 +1,57 @@
-.main-container{
-    height: 24px;
-    width: 100%;
+.main-container {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 16px;
-
-    .color{
-        border-radius: 8px;
+    width: 100%;
+    height: auto;
+    gap: 12px;
+  
+    @media (min-width: 481px) {
+      gap: 14px;
+    }
+  
+    @media (min-width: 1025px) {
+      gap: 16px;
+    }
+  
+    .color {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      flex-shrink: 0;
+  
+      @media (min-width: 481px) {
+        width: 22px;
+        height: 22px;
+      }
+  
+      @media (min-width: 1025px) {
         width: 24px;
         height: 24px;
-        flex-shrink: 0; 
+      }
     }
-
+  
+    .legend-text {
+      flex: 1;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 500;
+      color: #00313C;
+      font-size: 12px;
+      white-space: nowrap;
+  
+      @media (min-width: 481px) { font-size: 13px; }
+      @media (min-width: 1025px) { font-size: 14px; }
+    }
+  
     .percent {
-        font-family: 'Quicksand', sans-serif;
-        font-size: 14px;
-        font-weight: bold;
-        color: #00313C;
-        white-space: nowrap; 
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      color: #00313C;
+      white-space: nowrap;
+      font-size: 12px;
+  
+      @media (min-width: 481px) { font-size: 13px; }
+      @media (min-width: 1025px) { font-size: 14px; }
     }
-
-    .legend-text{
-        flex: 1;
-        font-family: 'Quicksand', sans-serif;
-        font-size: 14px;
-        font-weight: 500;
-        color: #00313C;
-        white-space: nowrap; 
-    }
-}
+  }
+  

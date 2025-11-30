@@ -6,41 +6,48 @@
   overflow-x: hidden;
 }
 
+/* =========================================================
+   HOME CONTAINER
+========================================================= */
 .home-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 
-  @media (max-width: 480px) {
-    flex-direction: column;
+  @media (min-width: 481px) {
+    flex-direction: row;
   }
 }
 
+/* =========================================================
+   MAIN CONTAINER
+========================================================= */
 .main-container {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px; // default desktop padding
   width: 100%;
+  padding: 20px;
+  gap: 15px;
+  overflow-x: hidden;
   transition: filter 0.3s ease, pointer-events 0.3s ease;
 
-  gap: 30px; // desktop default spacing between rows
-
-  @media (max-width: 1024px) {
-    gap: 20px;
+  @media (min-width: 481px) {
     padding: 30px;
+    gap: 20px;
   }
 
-  @media (max-width: 480px) {
-    gap: 15px;
-    padding: 20px;
+  @media (min-width: 1025px) {
+    padding: 35px 20px;
+    gap: 25px;
   }
 
+  /* Global container width constraint */
   div {
     width: 100%;
     max-width: 883px;
-    box-sizing: border-box;
     margin: 0 auto;
+    box-sizing: border-box;
   }
 
   &.mobile-menu-open {
@@ -48,18 +55,23 @@
     pointer-events: none;
   }
 
-  /* --- Row 1 --- */
+  /* =========================================================
+     ROW 1 — Search + Notification
+  ========================================================= */
   .row-1 {
-    height: 52px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 15px;
+    height: 52px;
+    gap: 10px;
+
+    @media (min-width: 481px) {
+      gap: 15px;
+    }
 
     .search-bar {
       flex: 1;
       min-width: 0;
-
       app-search-bar {
         width: 100%;
         height: 100%;
@@ -70,155 +82,117 @@
     app-notif {
       flex-shrink: 0;
     }
-
-    @media (max-width: 480px) {
-      gap: 10px;
-      flex-wrap: wrap;
-      height: 52px;
-    }
   }
 
-  /* --- Row 2 --- */
+  /* =========================================================
+     ROW 2 — Welcome User Panel
+  ========================================================= */
   .row-2 {
     display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    width: 100%;
+    flex-direction: column;
+
+    @media (min-width: 481px) {
+      flex-direction: row;
+    }
 
     app-welcome-user {
+      display: flex;
+      flex-direction: column;
       flex: 1;
       min-width: 0;
-      display: block;
-      height: 100%;
+      height: auto;
     }
   }
 
-  /* --- Row 3 --- */
+  /* =========================================================
+     ROW 3 — Summary Text + Date
+  ========================================================= */
   .row-3 {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 
     .summary-text {
-      display: flex;
-      align-items: center;
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 800;
       font-family: 'Quicksand', sans-serif;
       color: #00313C;
+      white-space: nowrap;
     }
 
-    @media (max-width: 1024px) {
-      .summary-text { font-size: 20px; }
+    @media (min-width: 481px) {
+      .summary-text { font-size: 22px; }
     }
 
-    @media (max-width: 480px) {
-      flex-direction: column;
-      .summary-text { font-size: 18px; }
+    @media (min-width: 1025px) {
+      .summary-text { font-size: 24px; }
     }
   }
 
-  /* --- Row 4 --- */
+  /* =========================================================
+     ROW 4 — Daily Consumption, Nutrient Intake, Calendar
+     (THE MAIN ISSUE → FIXED HERE)
+  ========================================================= */
   .row-4 {
     display: flex;
-    flex-direction: row;
-    gap: 30px;
+    flex-direction: column;
+    gap: 15px;
 
-    @media (max-width: 1024px) {
-      flex-direction: column;
+    /* --- Allow shrink + avoid overflow --- */
+    > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    @media (min-width: 481px) {
       gap: 20px;
     }
 
-    @media (max-width: 480px) {
-      flex-direction: column;
-      gap: 15px;
+    /* =========================================================
+       DESKTOP FIX — ENSURE ROW 4 FITS WITHOUT SCROLLING
+    ========================================================= */
+    @media (min-width: 1024px) {
+      flex-direction: row;
+      gap: 22px;
+      flex-wrap: nowrap;
+
+      /* Each child card (daily consumption, nutrient intake, calendar)
+         gets a height clamp that ALWAYS fits inside view */
+      > * {
+        height: clamp(260px, 26vh, 320px);   /* compressed responsive height */
+        max-height: 320px;                   /* prevents row overflow */
+      }
+    }
+
+    /* 1280×800 medium desktop */
+    @media (min-width: 1280px) {
+      gap: 25px;
+
+      > * {
+        height: clamp(280px, 28vh, 340px);
+        max-height: 340px;
+      }
+    }
+
+    /* 1440px and above */
+    @media (min-width: 1440px) {
+      gap: 30px;
+
+      > * {
+        height: clamp(300px, 30vh, 360px);
+        max-height: 360px;
+      }
     }
   }
 }
 
-/* --- Home Welcome (Row 2 child) --- */
-.home-welcome {
-  width: 100%;
-  max-width: 883px;
-  height: 200px;
-  border-radius: 26px;
-  background: linear-gradient(to right, #00313C 0%, #00252D 100%);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  box-sizing: border-box;
-
-  .welcome-text {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex: 1;
-    min-width: 0;
-
-    h2 {
-      font-family: 'Quicksand', sans-serif;
-      font-weight: 800;
-      color: #F5F4F2;
-      margin: 0;
-      line-height: 1.2;
-
-      &:first-child { font-size: 28px; }
-      &.username { font-size: 36px; }
-    }
-  }
-
-  .img {
-    flex-shrink: 0;
-    height: 100%;
-    max-width: 398px;
-    display: flex;
-    align-items: stretch;
-    justify-content: flex-end;
-
-    img.doctor-image {
-      height: 100%;
-      width: auto;
-      max-width: 100%;
-      object-fit: cover;
-      display: block;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    height: 160px;
-    padding: 0 30px;
-
-    .welcome-text h2:first-child { font-size: 24px; }
-    .welcome-text h2.username { font-size: 28px; }
-  }
-
-  @media (max-width: 480px) {
-    height: 140px;
-    padding: 0 15px;
-
-    .welcome-text h2:first-child { font-size: 16px; }
-    .welcome-text h2.username { font-size: 20px; }
-
-    .img {
-      max-width: 250px;
-    }
-  }
-
-  @media (max-width: 360px) {
-    height: 120px;
-    padding: 0 10px;
-
-    .welcome-text h2:first-child { font-size: 14px; }
-    .welcome-text h2.username { font-size: 18px; }
-
-    .img { max-width: 200px; }
-  }
-}
-
-/* --- Background & text helpers --- */
+/* =========================================================
+   HELPER CLASSES
+========================================================= */
 .bg-primary { background-color: #00313C; }
 .bg-secondary { background-color: #E6FEF9; }
 .bg-dark { background-color: #01262E; }
+
 .text-primary { color: #00313C; }
 .text-white { color: #FFFFFF; }

@@ -1,44 +1,99 @@
-.main-container{
-    height: 100%;
-    width: 336px;
+.main-container {
+    width: 100%;
+    height: auto;
     background-color: #E6FEF9;
     border-radius: 16px;
-    padding: 40px 45px;
-
-    .content{
-        width: 100%;
-        height: 232px;
-
+    padding: 24px;
+    box-sizing: border-box;
+    flex: 1 1 0;
+    min-width: 0; // prevents flex overflow
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    @media (min-width: 481px) {
+      padding: 32px;
+    }
+  
+    @media (min-width: 1025px) {
+      padding: 40px 45px;
+    }
+  
+    .content {
+      width: 100%;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+  
+      @media (min-width: 481px) {
+        gap: 32px;
+      }
+  
+      @media (min-width: 1025px) {
+        gap: 40px;
+      }
+  
+      .text {
         display: flex;
         flex-direction: column;
-        gap: 40px;
-
-        .text{
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            h2{
-                font-family: 'Quicksand', sans-serif;
-                font-weight: bold;
-                font-size: 20px;
-                color: #00313C;
-            }
-
-            span{
-                font-family: 'Quicksand', sans-serif;
-                font-weight: 500;
-                font-size: 12px;
-                color: #00313C;
-            }
+        gap: 4px;
+  
+        h2 {
+          font-family: 'Quicksand', sans-serif;
+          font-weight: 700;
+          font-size: 18px;
+          color: #00313C;
+  
+          @media (min-width: 481px) {
+            font-size: 19px;
+          }
+  
+          @media (min-width: 1025px) {
+            font-size: 20px;
+          }
         }
-
-        .chart{
-            width: 100%;
-            height: 146px;
-
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
+  
+        span {
+          font-family: 'Quicksand', sans-serif;
+          font-weight: 500;
+          font-size: 11px;
+          color: #00313C;
+  
+          @media (min-width: 481px) {
+            font-size: 12px;
+          }
         }
+      }
+  
+      .chart {
+        width: 100%;
+        height: 140px;      // required
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 8px;
+      
+        @media (min-width: 481px) {
+          height: 146px;
+          gap: 10px;
+        }
+      
+        @media (min-width: 1025px) {
+          height: 160px;
+          gap: 12px;
+        }
+      
+        .bar-item {
+          height: 100%;     
+          flex: 1 1 0;
+          min-width: 0;
+          display: flex;
+          justify-content: center;
+        }
+      }      
     }
-}
+  }
+  

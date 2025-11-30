@@ -1,19 +1,28 @@
 .progress-container {
-    position: relative;
-    width: 15px; 
-    height: 100%; 
-    background-color: #CEEFE8; 
+  position: relative;
+  width: 10px;      // mobile-first
+  height: 100%;
+  background-color: #CEEFE8;
+  border-radius: 60px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  .progress-bar {
+    height: 100%;
+    width: 100%;
+    background-color: #40C1AC;
     border-radius: 60px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end; 
-    
-    .progress-bar {
-      width: 100%;
-      background-color: #40C1AC; 
-      border-radius: 60px;
-      transition: height 0.3s ease; 
-      min-height: 0; 
-    }
+    transition: height 0.3s ease;
+    min-height: 0;
   }
+
+  @media (min-width: 768px) {
+    width: 12px;
+  }
+
+  @media (min-width: 1025px) {
+    width: 15px;
+  }
+}

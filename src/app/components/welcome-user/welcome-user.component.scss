@@ -1,23 +1,25 @@
 .home-welcome {
   width: 100%;
   max-width: 883px;
-  height: 200px;
+  height: 120px; 
   border-radius: 26px;
   background: linear-gradient(to right, #00313C 0%, #00252D 100%);
   display: flex;
   flex-direction: row;
-  align-items: center;           // vertical centering
+  align-items: center;
   justify-content: space-between;
-  padding: 0 40px;
+  padding: 0 10px; 
   box-sizing: border-box;
+  flex-shrink: 0;
 
   .welcome-text {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    flex: 1;                    // allow text to shrink
+    flex: 1;
     min-width: 0;
-    gap: 10px;
+    gap: 5px;
+    margin-left: 10px;
 
     h2 {
       font-family: 'Quicksand', sans-serif;
@@ -26,87 +28,70 @@
       margin: 0;
       line-height: 1.2;
 
-      &:first-child {
-        font-size: 28px;
-      }
-      &.username {
-        font-size: 36px;
-      }
+      &:first-child { font-size: 14px; }
+      &.username { font-size: 18px; }
     }
   }
 
   .img {
-    flex-shrink: 0;             // prevent shrinking
-    height: 100%;               // take full container height
+    flex-shrink: 0;
+    height: 100%;
+    max-width: 210px;
     display: flex;
+    align-items: stretch;
     justify-content: flex-end;
 
     img.doctor-image {
-      height: 100%;             // full height
-      width: auto;              // maintain aspect ratio
+      height: 100%;
+      width: auto;
+      max-width: 100%;
+      object-fit: cover;
       display: block;
     }
   }
-}
 
-/* --- Medium Desktop: 1024px --- */
-@media (max-width: 1024px) {
-  .home-welcome {
-    height: 160px;
-    padding: 0 30px;
-
-    .welcome-text h2:first-child { font-size: 24px; }
-    .welcome-text h2.username { font-size: 28px; }
-
-    .welcome-text{
-      gap: 5px;
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .home-welcome {
-    flex-direction: row;
+  /* --- Medium Mobile / Tablets --- */
+  @media (min-width: 391px) and (max-width: 480px) {
     height: 140px;
     padding: 0 15px;
 
     .welcome-text {
+      gap: 5px;
+
       h2:first-child { font-size: 16px; }
       h2.username { font-size: 20px; }
     }
 
-    .img {
-      flex-shrink: 0;
-      height: 100%;             // full height of container
-      max-width: 240px;
-      display: flex;
-      align-items: stretch;      // key: let child fill height
-      justify-content: flex-end;
-
-      img.doctor-image {
-        height: 100%;           // fill parent height
-        width: auto;            // keep aspect ratio
-        max-width: 100%;        // do not exceed container width
-        display: block;
-        object-fit: cover;      // ensures image covers full height
-      }
-    }
+    .img { max-width: 240px; }
   }
-}
 
-
-
-/* --- Extra Small Mobile: <=360px --- */
-@media (max-width: 360px) {
-  .home-welcome {
-    height: 120px;
-    padding: 0 10px;
+  /* --- Medium Desktop --- */
+  @media (min-width: 481px) and (max-width: 1024px) {
+    height: 160px;
+    padding: 0 30px;
 
     .welcome-text {
-      h2:first-child { font-size: 18px; }
-      h2.username { font-size: 20px; }
+      gap: 5px;
+
+      h2:first-child { font-size: 24px; }
+      h2.username { font-size: 28px; }
     }
 
-    .img { height: 100%; max-width: 250px; }
+    .img { max-width: 280px; }
+  }
+
+  /* --- Large Desktop --- */
+  @media (min-width: 1025px) {
+    height: 200px;
+    padding: 0 40px;
+
+    .welcome-text {
+      gap: 10px;
+
+      h2:first-child { font-size: 28px; }
+      h2.username { font-size: 36px; }
+    }
+
+    .img { max-width: 398px; }
   }
 }

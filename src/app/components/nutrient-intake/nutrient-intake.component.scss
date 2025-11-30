@@ -1,84 +1,139 @@
-.main-container{
-    height: 100%;
-    width: 520px;
+.main-container {
+    width: 100%;
+    height: auto;
     background-color: #E6FEF9;
     border-radius: 16px;
-    padding: 40px 45px;
-
-    .content{
-        width: 100%;
-        height: 233px;
-
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-
-        .row-1{
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-
-            .text{
-                display: flex;
-                flex-direction: column;
-                gap: 5px;
-                h2{
-                    font-family: 'Quicksand', sans-serif;
-                    font-weight: bold;
-                    font-size: 20px;
-                    color: #00313C;
-                }
-    
-                span{
-                    font-family: 'Quicksand', sans-serif;
-                    font-weight: 500;
-                    font-size: 12px;
-                    color: #00313C;
-                }
-            }
-
-            .view-report{
-                height: 24px;
-                width: 120px;
-
-                app-see-history-button {
-                    width: 100%;  
-                    height: 100%; 
-                    display: block;
-                }
-            }
-        }
-
-        .row-2{
-            width: 100%;
-            height: 180px;
-
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-
-            .classifier{
-                width: 200px;
-                height: 169px;
-                display: flex;
-                flex-direction: row;
-
-                .legend{
-                    height: 100%;
-                    flex: 1;
-
-                    display: flex;
-                    flex-direction: column;
-                    gap: 6px;
-                }
-            }
-
-            .chart{
-                height: 180px;
-                width: 180px;
-                border: 1px solid black;
-            }
-        }
+    padding: 24px 20px;   // mobile-first padding
+    box-sizing: border-box;
+  
+    @media (min-width: 481px) {
+      padding: 32px 32px;
     }
-}
+  
+    @media (min-width: 1025px) {
+      padding: 40px 45px;
+    }
+  
+    .content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+  
+      @media (min-width: 768px) {
+        gap: 24px;
+      }
+  
+      /* ------------------- ROW 1 ------------------- */
+      .row-1 {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+  
+        .text {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+  
+          h2 {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #00313C;
+  
+            @media (min-width: 481px) { font-size: 20px; }
+            @media (min-width: 1025px) { font-size: 22px; }
+          }
+  
+          span {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 500;
+            font-size: 11px;
+            color: #00313C;
+  
+            @media (min-width: 481px) { font-size: 12px; }
+          }
+        }
+  
+        .view-report {
+          height: 28px;
+          width: 130px;
+  
+          @media (min-width: 1025px) {
+            height: 30px;
+            width: 150px;
+          }
+  
+          app-see-history-button {
+            width: 100%;
+            height: 100%;
+            display: block;
+          }
+        }
+      }
+  
+      /* ------------------- ROW 2 ------------------- */
+      .row-2 {
+        width: 100%;
+        display: flex;
+        flex-direction: column;        // mobile first
+        gap: 20px;
+        align-items: center;
+  
+        @media (min-width: 768px) {
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+        }
+  
+        .classifier {
+          width: 100%;
+          max-width: 260px;
+  
+          display: flex;
+          flex-direction: column;
+  
+          @media (min-width: 768px) {
+            width: 220px;
+          }
+  
+          .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+  
+            @media (min-width: 1025px) {
+              gap: 12px;
+            }
+          }
+        }
+  
+        .chart {
+          width: 160px;
+          height: 160px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+  
+          @media (min-width: 481px) {
+            width: 180px;
+            height: 180px;
+          }
+  
+          @media (min-width: 1025px) {
+            width: 200px;
+            height: 200px;
+          }
+  
+          app-pie-chart {
+            width: 100%;
+            height: 100%;
+            display: block;
+          }
+        }
+      }
+    }
+  }
+  
