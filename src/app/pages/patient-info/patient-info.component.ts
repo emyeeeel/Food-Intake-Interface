@@ -44,10 +44,27 @@ export class PatientInfoComponent implements OnInit {
     this.patientId = this.getPatientIdFromRoute() || 1;
     // console.log('Patient ID:',this.patientId)
     
-    //currently not working due to php cors issue
-    this.cloudTestService.getDaPatientData().subscribe({
+    this.cloudTestService.getPatientData().subscribe({
       next: (data) => {
-        console.log('CloudTestService response:', data);
+        console.log('Patient data:', data);
+      },
+      error: (err) => {
+        console.error('CloudTestService error:', err);
+      }
+    });
+
+    this.cloudTestService.getFoodData().subscribe({
+      next: (data) => {
+        console.log('Food data:', data);
+      },
+      error: (err) => {
+        console.error('CloudTestService error:', err);
+      }
+    });
+
+    this.cloudTestService.getMealData('1').subscribe({
+      next: (data) => {
+        console.log('Meal data:', data);
       },
       error: (err) => {
         console.error('CloudTestService error:', err);
