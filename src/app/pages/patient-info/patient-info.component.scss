@@ -1,34 +1,87 @@
 :host {
-    display: block;
-    background-color: #CAECE5;
-    min-height: 100vh;
-    width: 100%;
-  }
-  
-  .patient-info-container {
-    display: flex;
+  display: block;
+  background-color: #CAECE5;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* =========================================================
+   MEAL CATALOG CONTAINER
+========================================================= */
+.patient-info-container {
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 481px) {
     flex-direction: row;
   }
-  
-  .main-container {
-    flex: 1;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 0;
-  
-    div {
-      width: 883px;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-    }
+} 
+
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  gap: 15px;
+  overflow-x: hidden;
+  transition: filter 0.3s ease, pointer-events 0.3s ease;
+
+  @media (min-width: 481px) {
+    padding: 30px;
+    gap: 20px;
   }
 
-  .row-1{
-    gap: 15px;
+  @media (min-width: 1025px) {
+    padding: 35px 20px;
+    gap: 25px;
   }
+
+  /* Global container width constraint */
+  div {
+    width: 100%;
+    max-width: 883px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  &.mobile-menu-open {
+    filter: brightness(0.7);
+    pointer-events: none;
+  }
+
+  /* =========================================================
+     ROW 1 — Search + Notification
+  ========================================================= */
+  .row-1 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 52px;
+    gap: 10px;
+
+    @media (min-width: 481px) {
+      gap: 15px;
+    }
+
+    .search-bar {
+      flex: 1;
+      min-width: 0;
+      app-search-bar {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    }
+
+    app-notif {
+      flex-shrink: 0;
+    }
+  }
+}
+
 
   .search-bar{
     flex: 1; 

@@ -45,6 +45,8 @@ export class MealCatalogComponent implements OnInit {
   mealDescription: string = ''; 
   meals: Meal[] = [];
 
+  isMobileMenuOpen = false; 
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -131,5 +133,9 @@ export class MealCatalogComponent implements OnInit {
   
     return `${mealLetter}-${dayCycle}-0${mealId}`;
   }
-   
+  
+  // Called by MenuBar to toggle main content dimming
+  onMobileMenuToggle(isOpen: boolean) {
+    this.isMobileMenuOpen = isOpen;
+  }
 }

@@ -1,5 +1,5 @@
 <div class="patient-info-container">
-    <app-menu-bar></app-menu-bar>
+    <app-menu-bar (mobileMenuToggle)="onMobileMenuToggle($event)"></app-menu-bar>
 
     <!-- DEFAULT VIEW -->
     <ng-container *ngIf="currentView === 'default'">

@@ -17,6 +17,7 @@ import { IngredientsCategoriesComponent } from "../../components/ingredients-cat
   styleUrl: './ingredients.component.scss'
 })
 export class IngredientsComponent {
+  isMobileMenuOpen = false; 
   filterOptions: string[] = [
     '低過敏源飲食',
     '高纖維飲食',
@@ -101,5 +102,10 @@ export class IngredientsComponent {
   printIngredients(): void {
     console.log('Print Ingredients');
     this.router.navigate(['/ingredients/print']);
+  }
+
+  // Called by MenuBar to toggle main content dimming
+  onMobileMenuToggle(isOpen: boolean) {
+    this.isMobileMenuOpen = isOpen;
   }
 }

@@ -36,7 +36,9 @@ export class PatientInfoComponent implements OnInit {
   currentView: string = 'default'; 
 
   lunchHasMeal: boolean = false;
-dinnerHasMeal: boolean = false;
+  dinnerHasMeal: boolean = false;
+
+  isMobileMenuOpen = false; 
 
 onLunchStatus(status: boolean) {
   this.lunchHasMeal = status;
@@ -141,5 +143,10 @@ onDinnerStatus(status: boolean) {
   navigateToPatientRecord(): void {
     console.log('Navigate to Patient Record');
     this.router.navigate(['/patient-info/' + this.patientId]);
+  }
+
+  // Called by MenuBar to toggle main content dimming
+  onMobileMenuToggle(isOpen: boolean) {
+    this.isMobileMenuOpen = isOpen;
   }
 }
