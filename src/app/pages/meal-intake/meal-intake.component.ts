@@ -29,6 +29,7 @@ import { IntakeLogComponent } from "../../components/intake-log/intake-log.compo
   styleUrl: './meal-intake.component.scss'
 })
 export class MealIntakeComponent {
+  isMobileMenuOpen = false; 
   filterOptions: string[] = [
     '低過敏源飲食',
     '高纖維飲食',
@@ -54,4 +55,8 @@ export class MealIntakeComponent {
     this.router.navigate(['/meal-intake/print']);
   }
 
+  // Called by MenuBar to toggle main content dimming
+  onMobileMenuToggle(isOpen: boolean) {
+    this.isMobileMenuOpen = isOpen;
+  }
 }

@@ -1,69 +1,196 @@
 :host {
-    display: block;
-    background-color: #CAECE5;
-    min-height: 100vh;
-    width: 100%;
-  }
-  
-  .meal-intake-container {
-    display: flex;
+  display: block;
+  background-color: #CAECE5;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* =========================================================
+   MEAL INTAKE CONTAINER
+========================================================= */
+.meal-intake-container {
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 481px) {
     flex-direction: row;
   }
+}
   
-  .main-container {
-    flex: 1;
-    height: 100vh;
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  gap: 15px;
+  overflow-x: hidden;
+  transition: filter 0.3s ease, pointer-events 0.3s ease;
+
+  @media (min-width: 481px) {
+    padding: 30px;
+    gap: 20px;
+  }
+
+  @media (min-width: 1025px) {
+    padding: 35px 20px;
+    gap: 25px;
+  }
+
+  /* Global container width constraint */
+  div {
+    width: 100%;
+    max-width: 883px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  &.mobile-menu-open {
+    filter: brightness(0.7);
+    pointer-events: none;
+  }
+
+  /* =========================================================
+     ROW 1 — Search + Notification
+  ========================================================= */
+  .row-1 {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    padding: 40px 0;
-  
-    div {
-      width: 883px;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
+    height: 52px;
+    gap: 10px;
+
+    @media (min-width: 481px) {
+      gap: 15px;
     }
-  }
 
-  .row-1{
-    gap: 15px;
-  }
-
-  .search-bar{
-    flex: 1; 
-      
+    .search-bar {
+      flex: 1;
+      min-width: 0;
       app-search-bar {
         width: 100%;
         height: 100%;
         display: block;
       }
-   }
+    }
 
-   .row-2{
-    //gap: 15px;
-    margin-top: 15px;
-    margin-bottom: 42px;
+    app-notif {
+      flex-shrink: 0;
+    }
   }
 
-  .row-3{
-    justify-content: space-between;
-    margin-bottom: 30px;
-   }
+  /* =========================================================
+   ROW 2 — Filter Options
+  ========================================================= */
 
-   .row-4{
-    height: 57px;
-    justify-content: space-between;
-    margin-bottom: 30px;
-  
-    .text-title{
-      font-family: 'Quicksand', sans-serif;
-      font-weight: bold;
-      font-size: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: left;
-      color: #00313C;
+  .row-2 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+
+    > * {
+      flex: 1 1 0;
+      min-width: 0; /* ensures children don't overflow */
     }
-  
-   }
+
+    @media (min-width: 481px) {
+      flex-direction: row;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 1025px) {
+      gap: 20px;
+    }
+  }
+
+  /* =========================================================
+     ROW 3 — Main Options
+  ========================================================== */
+  .row-3 {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    justify-content: flex-start;
+
+    > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    @media (min-width: 481px) {
+      flex-direction: row;
+      gap: 15px;
+    }
+
+    @media (min-width: 1025px) {
+      gap: 20px;
+    }
+  }
+
+  /* =========================================================
+     ROW 4 — Recent Intake Title + Date
+  ========================================================== */
+  .row-4 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 30px;
+
+    .text-title {
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      color: #00313C;
+      white-space: nowrap;
+
+      @media (min-width: 481px) {
+        font-size: 22px;
+      }
+
+      @media (min-width: 1025px) {
+        font-size: 24px;
+      }
+    }
+  }
+
+  /* =========================================================
+     ROW 5 — Intake Logs
+  ========================================================== */
+  .row-5 {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+
+    > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    @media (min-width: 481px) {
+      flex-direction: row;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 1025px) {
+      gap: 20px;
+      flex-wrap: nowrap;
+
+      > * {
+        /* Optional: clamp log card height similar to homepage row-4 */
+        height: clamp(150px, 20vh, 220px);
+      }
+    }
+  }
+}

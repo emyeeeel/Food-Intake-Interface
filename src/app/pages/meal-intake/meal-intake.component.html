@@ -1,6 +1,6 @@
 <div class="meal-intake-container">
-    <app-menu-bar></app-menu-bar>
-    <div class="main-container">
+    <app-menu-bar (mobileMenuToggle)="onMobileMenuToggle($event)"></app-menu-bar>
+    <div class="main-container" [class.mobile-menu-open]="isMobileMenuOpen">
         <div class="row-1">
             <app-back></app-back>
             <div class="search-bar">
