@@ -59,32 +59,32 @@ onDinnerStatus(status: boolean) {
     this.patientId = this.getPatientIdFromRoute() || 1;
     console.log('Patient ID:',this.patientId)
     
-    this.cloudTestService.getPatientData().subscribe({
-      next: (data) => {
-        console.log('Patient data:', data);
-      },
-      error: (err) => {
-        console.error('CloudTestService error:', err);
-      }
-    });
+    // this.cloudTestService.getPatientData().subscribe({
+    //   next: (data) => {
+    //     console.log('Patient data:', data);
+    //   },
+    //   error: (err) => {
+    //     console.error('CloudTestService error:', err);
+    //   }
+    // });
 
-    this.cloudTestService.getFoodData().subscribe({
-      next: (data) => {
-        console.log('Food data:', data);
-      },
-      error: (err) => {
-        console.error('CloudTestService error:', err);
-      }
-    });
+    // this.cloudTestService.getFoodData().subscribe({
+    //   next: (data) => {
+    //     console.log('Food data:', data);
+    //   },
+    //   error: (err) => {
+    //     console.error('CloudTestService error:', err);
+    //   }
+    // });
 
-    this.cloudTestService.getMealData('1').subscribe({
-      next: (data) => {
-        console.log('Meal data:', data);
-      },
-      error: (err) => {
-        console.error('CloudTestService error:', err);
-      }
-    });
+    // this.cloudTestService.getMealData('1').subscribe({
+    //   next: (data) => {
+    //     console.log('Meal data:', data);
+    //   },
+    //   error: (err) => {
+    //     console.error('CloudTestService error:', err);
+    //   }
+    // });
 
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))

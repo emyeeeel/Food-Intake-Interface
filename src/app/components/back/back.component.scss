@@ -1,10 +1,32 @@
 .back-btn {
-    width: 52px;
-    height: 52px;
+    width: 44px; // base mobile
+    height: 44px;
     background-color: #00313C;
     border-radius: 16px;
     cursor: pointer;
     background-image: url('../../assets/icons/back-icon.svg');
     background-repeat: no-repeat;
     background-position: center;
-}
+    transition: all 0.2s ease;
+  
+    // =========================
+    // TABLET — 768px+
+    // =========================
+    @media (min-width: 768px) {
+      width: 48px;
+      height: 48px;
+    }
+  
+    // DESKTOP — 1024px+
+    @media (min-width: 1024px) {
+      width: 52px;
+      height: 52px;
+    }
+  
+    // LARGE DESKTOP — 1280px+
+    @media (min-width: 1280px) {
+      width: 56px;
+      height: 56px;
+    }
+  }
+  

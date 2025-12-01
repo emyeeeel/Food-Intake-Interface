@@ -1,6 +1,6 @@
 .progress-container {
   position: relative;
-  width: 10px;      // mobile-first
+  width: 20px;      // mobile-first
   height: 100%;
   background-color: #CEEFE8;
   border-radius: 60px;
@@ -19,10 +19,10 @@
   }
 
   @media (min-width: 768px) {
-    width: 12px;
+    width: 15px;
   }
 
   @media (min-width: 1025px) {
-    width: 15px;
+    width: 18px;
   }
 }

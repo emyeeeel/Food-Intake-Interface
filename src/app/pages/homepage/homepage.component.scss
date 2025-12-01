@@ -58,31 +58,47 @@
   /* =========================================================
      ROW 1 — Search + Notification
   ========================================================= */
-  .row-1 {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    height: 52px;
-    gap: 10px;
+/* =========================================================
+   ROW 1 — Search + Notification (match notif height)
+========================================================= */
+.row-1 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  height: 44px; // base mobile height, matches notif
 
-    @media (min-width: 481px) {
-      gap: 15px;
-    }
-
-    .search-bar {
-      flex: 1;
-      min-width: 0;
-      app-search-bar {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-    }
-
-    app-notif {
-      flex-shrink: 0;
+  .search-bar {
+    flex: 1;
+    min-width: 0;
+    height: 100%; // input fills row
+    app-search-bar {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
   }
+
+  app-notif {
+    flex-shrink: 0;
+    height: 100%; // notif fills row
+  }
+
+  @media (min-width: 768px) {
+    gap: 12px;
+    height: 48px; // tablet
+  }
+
+  @media (min-width: 1024px) {
+    gap: 15px;
+    height: 52px; // desktop
+  }
+
+  @media (min-width: 1280px) {
+    gap: 15px;
+    height: 56px; // large desktop
+  }
+}
 
   /* =========================================================
      ROW 2 — Welcome User Panel

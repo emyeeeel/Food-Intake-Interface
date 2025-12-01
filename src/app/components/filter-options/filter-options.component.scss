@@ -1,16 +1,41 @@
-.filter-option{
-    min-width: 150px;
-    max-width: 160px;
-    height: 52px;
+.filter-option {
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Quicksand', sans-serif;
     font-weight: 500;
-    font-size: 20px;
+    font-size: 16px;           /* smaller default font for mobile */
     background-color: #E6FEF9;
-    border-radius: 16px;
+    border-radius: 10px;
     color: #00313C;
-    padding-left: 20px;
-    padding-right: 20px;
-} 
+    padding: 0 15px;           /* horizontal padding */
+    height: 35px;              /* slightly smaller on mobile */
+    flex: 0 1 auto;            /* allow shrink */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  
+    /* =====================
+       Tablet/Desktop ≥1024px
+    ===================== */
+    @media (min-width: 1024px) {
+      font-size: 18px;
+      padding: 0 20px;
+      height: 52px;             /* match desktop row height */
+      min-width: 120px;
+      max-width: 180px;         /* slightly more flexible than before */
+    }
+  
+    /* =====================
+       Desktop ≥1280px
+    ===================== */
+    @media (min-width: 1280px) {
+      font-size: 20px;
+      padding: 0 25px;
+      min-width: 120px;
+      max-width: 200px;
+      height: 56px;
+    }
+  }
+  

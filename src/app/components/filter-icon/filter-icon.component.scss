@@ -1,10 +1,52 @@
 .filter-icon {
+  width: 44px; // base mobile
+  height: 35px;
+  background-color: #E6FEF9;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  .filter-img {
+      width: 60%;        // adjust scaling
+      height: 60%;       // adjust scaling
+      object-fit: contain;
+  }
+
+  // =========================
+  // TABLET — 768px+
+  // =========================
+  @media (min-width: 768px) {
+    width: 48px;
+    height: 48px;
+
+    .filter-img {
+        width: 65%;
+        height: 65%;
+    }
+  }
+
+  // DESKTOP — 1024px+
+  @media (min-width: 1024px) {
     width: 52px;
     height: 52px;
-    background-color: #E6FEF9;
-    border-radius: 16px;
-    cursor: pointer;
-    background-image: url('../../assets/icons/filter-icon.svg');
-    background-repeat: no-repeat;
-    background-position: center;
+
+    .filter-img {
+        width: 55%;
+        height: 55%;
+    }
+  }
+
+  // LARGE DESKTOP — 1280px+
+  @media (min-width: 1280px) {
+    width: 56px;
+    height: 56px;
+
+    .filter-img {
+      width: 55%;
+      height: 55%;
+    }
+  }
 }

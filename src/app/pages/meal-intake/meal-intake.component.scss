@@ -59,8 +59,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    height: 52px;
     gap: 10px;
+    height: 44px; // base mobile height, matches notif
 
     @media (min-width: 481px) {
       gap: 15px;
@@ -69,6 +69,7 @@
     .search-bar {
       flex: 1;
       min-width: 0;
+      height: 100%; // input fills row
       app-search-bar {
         width: 100%;
         height: 100%;
@@ -78,61 +79,117 @@
 
     app-notif {
       flex-shrink: 0;
+      height: 100%; // notif fills row
     }
-  }
-
-  /* =========================================================
-   ROW 2 — Filter Options
-  ========================================================= */
-
-  .row-2 {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    width: 100%;
-
-    > * {
-      flex: 1 1 0;
-      min-width: 0; /* ensures children don't overflow */
+  
+    @media (min-width: 768px) {
+      gap: 12px;
+      height: 48px; // tablet
     }
-
-    @media (min-width: 481px) {
-      flex-direction: row;
+  
+    @media (min-width: 1024px) {
       gap: 15px;
-      align-items: center;
-      flex-wrap: wrap;
+      height: 52px; // desktop
     }
-
-    @media (min-width: 1025px) {
-      gap: 20px;
+  
+    @media (min-width: 1280px) {
+      gap: 15px;
+      height: 56px; // large desktop
     }
   }
 
   /* =========================================================
-     ROW 3 — Main Options
-  ========================================================== */
-  .row-3 {
-    display: flex;
-    flex-direction: column;
+   ROW 2 — Filter Options (Responsive Single Row for Desktop)
+========================================================= */
+.row-2 {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;           /* allow wrapping by default for small screens */
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+
+  > * {
+    flex: 1 1 auto;          /* allow items to shrink/grow */
+    min-width: 0;            /* prevent overflow */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;     /* truncate text if needed */
+  }
+
+  app-filter-icon {
+    flex: 0 0 auto;          /* icon keeps fixed size */
+  }
+
+  app-filter-options {
+    flex: 1 1 auto;
+  }
+
+  /* =========================
+     Desktop: force single row
+  ========================= */
+  @media (min-width: 1024px) {
+    flex-wrap: nowrap;       /* single row for larger screens */
     gap: 15px;
-    width: 100%;
-    justify-content: flex-start;
+
+    > * {
+      min-width: 0;          /* ensure all items shrink properly */
+    }
+  }
+
+  @media (min-width: 1280px) {
+    gap: 20px;               /* slightly larger gap for bigger screens */
+  }
+}
+
+
+ /* =========================================================
+   ROW 3 — Main Options (Content contained)
+========================================================= */
+.row-3 {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  justify-content: flex-start;
+  flex-wrap: wrap;           /* allow wrap on small screens */
+  align-items: stretch;      /* make children fill row width */
+
+  > * {
+    flex: 1 1 100%;          /* full width on mobile */
+    min-width: 0;            /* prevent overflow */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 481px) {
+    flex-direction: row;     /* horizontal layout on tablet+ */
+    gap: 15px;
+
+    > * {
+      flex: 1 1 0;           /* shrink/grow proportionally */
+      min-width: 0;          /* ensures content stays inside container */
+    }
+  }
+
+  @media (min-width: 1025px) {
+    gap: 20px;
 
     > * {
       flex: 1 1 0;
-      min-width: 0;
-    }
-
-    @media (min-width: 481px) {
-      flex-direction: row;
-      gap: 15px;
-    }
-
-    @media (min-width: 1025px) {
-      gap: 20px;
+      max-width: 300px;      /* optional: limit card width to avoid overflow */
     }
   }
+
+  @media (min-width: 1280px) {
+    gap: 25px;
+
+    > * {
+      max-width: 340px;      /* slightly wider on larger desktops */
+    }
+  }
+}
 
   /* =========================================================
      ROW 4 — Recent Intake Title + Date
@@ -144,7 +201,6 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    margin-bottom: 30px;
 
     .text-title {
       font-family: 'Quicksand', sans-serif;

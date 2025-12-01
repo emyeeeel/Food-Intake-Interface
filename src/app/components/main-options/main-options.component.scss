@@ -1,23 +1,94 @@
-.main-option{
-    width: 282px;
-    height: 100px;
-    font-family: 'Quicksand', sans-serif;
-    font-weight: 500;
-    font-size: 24px;
-    display: flex;
-    flex-direction: row;
-    border-radius: 16px;
-    justify-content: center;
-    align-items: center;
-    gap: 18px;
+.main-option {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 12px; /* smaller gap on mobile */
+  border-radius: 16px;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 500;
+  font-size: 18px; /* mobile default */
+  color: inherit;
+  background-color: inherit;
+  flex: 1 1 auto;  /* allow shrink/grow */
+  min-width: 0;     /* prevents overflow */
+  height: 100px;     /* default mobile height */
+  padding: 0 10px;
+  text-align: center;
+  // max-width: 250px;
+
+  .option-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    flex-shrink: 0; /* prevent icon from shrinking */
+  }
+
+  .option-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 150px;
+    // border: 1px solid red;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ======================
+     Tablet ≥481px
+  ====================== */
+  @media (min-width: 481px) {
+    font-size: 20px;
+    gap: 15px;
+    height: 90px;
+    padding: 0 15px;
 
     .option-icon {
-        width: 32px;
-        height: 32px;
-        object-fit: contain;
-      }
+      width: 28px;
+      height: 28px;
+    }
+  }
 
-    .option-text{
+  /* ======================
+     Desktop ≥1024px
+  ====================== */
+  @media (min-width: 1024px) {
+    font-size: 22px;
+    gap: 10px;
+    height: 100px;
+    min-width: 200px;
+    max-width: 282px;
+    padding: 0 25px;
+
+    .option-icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    .option-text {
       max-width: 190px;
     }
+  }
+
+  /* ======================
+     Large Desktop ≥1280px
+  ====================== */
+  @media (min-width: 1280px) {
+    font-size: 24px;
+    gap: 20px;
+    height: 110px;
+    min-width: 220px;
+    max-width: 320px;
+
+    .option-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .option-text {
+      max-width: 220px;
+    }
+  }
+
+  transition: all 0.2s ease;
 }
