@@ -13,7 +13,7 @@ export class QrTestComponent {
   
 
   ngAfterViewInit() {
-    const apiUrl = `https://mr7661km-4200.asse.devtunnels.ms/settings`;
+    const apiUrl = `https://mr7661km-4200.asse.devtunnels.ms/home`;
     // const apiUrl = `http://127.0.0.1:8000/api/patients/${this.patientId}/recommended-intake`;
     // const apiUrl = `https://h3vkhzth-8000.asse.devtunnels.ms//api/patients/${this.patientId}/`;
     // const apiUrl = `https://h3vkhzth-4200.asse.devtunnels.ms//login`;

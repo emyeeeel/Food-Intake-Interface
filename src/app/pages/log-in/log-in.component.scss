@@ -1,9 +1,13 @@
 :host {
-  display: block;
-  background-color: #00313C;
-  min-height: 100vh;
+  display: flex;            
+  flex-direction: column;
+  min-height: 100dvh;       
   width: 100%;
+  max-width: 100%;          
+  overflow-x: hidden;       
+  background-color: #00313C;
 }
+
 
 .login-container{
   width: 886px;

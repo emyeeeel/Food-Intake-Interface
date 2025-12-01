@@ -1,57 +1,91 @@
 .main-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
-    height: auto;
-    gap: 12px;
-  
-    @media (min-width: 481px) {
-      gap: 14px;
-    }
-  
-    @media (min-width: 1025px) {
-      gap: 16px;
-    }
-  
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  gap: 12px;
+
+  // ------------------- MOBILE -------------------
+  @media (max-width: 480px) {
+    gap: 10px;
+
     .color {
-      width: 20px;
-      height: 20px;
       border-radius: 6px;
-      flex-shrink: 0;
-  
-      @media (min-width: 481px) {
-        width: 22px;
-        height: 22px;
-      }
-  
-      @media (min-width: 1025px) {
-        width: 24px;
-        height: 24px;
-      }
+      width: 18px;
+      height: 18px;
     }
-  
+
     .legend-text {
-      flex: 1;
-      font-family: 'Quicksand', sans-serif;
-      font-weight: 500;
-      color: #00313C;
-      font-size: 12px;
-      white-space: nowrap;
-  
-      @media (min-width: 481px) { font-size: 13px; }
-      @media (min-width: 1025px) { font-size: 14px; }
+      font-size: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-  
+
     .percent {
-      font-family: 'Quicksand', sans-serif;
-      font-weight: 700;
-      color: #00313C;
-      white-space: nowrap;
-      font-size: 12px;
-  
-      @media (min-width: 481px) { font-size: 13px; }
-      @media (min-width: 1025px) { font-size: 14px; }
+      font-size: 11px;
     }
   }
-  
+
+  // ------------------- TABLET / SMALL DESKTOP 1024x600 -------------------
+  @media (min-width: 1024px) and (max-height: 600px) {
+    gap: 10px;
+
+    .color {
+      border-radius: 6px;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .legend-text {
+      font-size: 12px;
+      flex-shrink: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .percent {
+      font-size: 12px;
+    }
+  }
+
+  // ------------------- MEDIUM DESKTOP 1280x800 -------------------
+  @media (min-width: 1280px) and (max-height: 800px) {
+    gap: 14px;
+
+    .color {
+      border-radius: 6px;
+      width: 22px;
+      height: 22px;
+    }
+
+    .legend-text {
+      font-size: 13px;
+    }
+
+    .percent {
+      font-size: 13px;
+    }
+  }
+
+  // ------------------- LARGE DESKTOP ABOVE 1440 -------------------
+  @media (min-width: 1440px) {
+    gap: 16px;
+
+    .color {
+      border-radius: 6px;
+      width: 24px;
+      height: 24px;
+    }
+
+    .legend-text {
+      font-size: 14px;
+    }
+
+    .percent {
+      font-size: 14px;
+    }
+  }
+}

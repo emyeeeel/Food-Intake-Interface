@@ -1,13 +1,45 @@
 .pie-chart-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .pie-chart {
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
+    display: block; // removes inline spacing
+  }
+
+  // ------------------- MOBILE -------------------
+  @media (max-width: 480px) {
     .pie-chart {
-      width: 100%;
-      height: 100%;
-      display: block; // Removes any inline spacing
+      max-width: 150px;
+      max-height: 150px;
     }
+  }
+
+  // ------------------- SMALL DESKTOP 1024x600 -------------------
+  @media (min-width: 1024px) and (max-height: 600px) {
+    .pie-chart {
+      max-width: 150px;
+      max-height: 120px; // fit the .row-2 height in nutrient intake
+    }
+  }
+
+  // ------------------- MEDIUM DESKTOP 1280x800 -------------------
+  @media (min-width: 1280px) and (max-height: 800px) {
+    .pie-chart {
+      max-width: 180px;
+      max-height: 180px; // scaled proportionally to container
+    }
+  }
+
+  // ------------------- LARGER DESKTOP ABOVE 1280 -------------------
+  @media (min-width: 1440px) {
+    .pie-chart {
+      max-width: 200px;
+      max-height: 200px;
+    }
+  }
 }

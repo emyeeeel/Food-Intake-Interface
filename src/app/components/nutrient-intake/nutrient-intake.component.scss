@@ -1,139 +1,207 @@
 .main-container {
+  width: 100%;
+  height: auto;
+  background-color: #E6FEF9;
+  border-radius: 16px;
+  padding: 24px 20px; // mobile-first padding
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 0;
+
+  @media (min-width: 481px) {
+    padding: 32px 32px;
+  }
+
+  @media (min-width: 1025px) {
+    padding: 40px 45px;
+  }
+
+  .content {
     width: 100%;
     height: auto;
-    background-color: #E6FEF9;
-    border-radius: 16px;
-    padding: 24px 20px;   // mobile-first padding
-    box-sizing: border-box;
-  
-    @media (min-width: 481px) {
-      padding: 32px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    @media (min-width: 768px) {
+      gap: 24px;
     }
-  
-    @media (min-width: 1025px) {
-      padding: 40px 45px;
+
+    .row-1 {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+
+      .text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        h2 {
+          font-family: 'Quicksand', sans-serif;
+          font-size: 18px;
+          font-weight: 700;
+          color: #00313C;
+
+          @media (min-width: 481px) { font-size: 20px; }
+          @media (min-width: 1025px) { font-size: 22px; }
+        }
+
+        span {
+          font-family: 'Quicksand', sans-serif;
+          font-weight: 500;
+          font-size: 11px;
+          color: #00313C;
+
+          @media (min-width: 481px) { font-size: 12px; }
+        }
+      }
+
+      .view-report {
+        height: 28px;
+        width: 130px;
+
+        @media (min-width: 1025px) {
+          height: 30px;
+          width: 150px;
+        }
+
+        app-see-history-button {
+          width: 100%;
+          height: 100%;
+          display: block;
+        }
+      }
     }
-  
-    .content {
+
+    .row-2 {
       width: 100%;
       display: flex;
-      flex-direction: column;
+      flex-direction: column; // mobile-first
       gap: 20px;
-  
+      align-items: center;
+
       @media (min-width: 768px) {
-        gap: 24px;
-      }
-  
-      /* ------------------- ROW 1 ------------------- */
-      .row-1 {
-        display: flex;
         flex-direction: row;
         justify-content: space-between;
-        align-items: flex-start;
-        gap: 12px;
-  
-        .text {
+        align-items: center;
+      }
+
+      .classifier {
+        width: 100%;
+        max-width: 260px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; // contain children
+        flex-shrink: 1;
+
+        @media (min-width: 768px) {
+          width: 220px;
+        }
+
+        .legend {
           display: flex;
           flex-direction: column;
-          gap: 4px;
-  
-          h2 {
-            font-family: 'Quicksand', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: #00313C;
-  
-            @media (min-width: 481px) { font-size: 20px; }
-            @media (min-width: 1025px) { font-size: 22px; }
-          }
-  
-          span {
-            font-family: 'Quicksand', sans-serif;
-            font-weight: 500;
-            font-size: 11px;
-            color: #00313C;
-  
-            @media (min-width: 481px) { font-size: 12px; }
-          }
-        }
-  
-        .view-report {
-          height: 28px;
-          width: 130px;
-  
+          gap: 10px;
+          flex-shrink: 1;
+          overflow-y: auto; // scroll if too many items
+          max-height: 100%;
+          padding-right: 4px; // for scrollbar space
+
           @media (min-width: 1025px) {
-            height: 30px;
-            width: 150px;
-          }
-  
-          app-see-history-button {
-            width: 100%;
-            height: 100%;
-            display: block;
+            gap: 12px;
           }
         }
       }
-  
-      /* ------------------- ROW 2 ------------------- */
-      .row-2 {
-        width: 100%;
+
+      .chart {
+        width: 160px;
+        height: 160px;
         display: flex;
-        flex-direction: column;        // mobile first
-        gap: 20px;
+        justify-content: center;
         align-items: center;
-  
-        @media (min-width: 768px) {
-          flex-direction: row;
-          justify-content: space-between;
-          align-items: center;
+        flex-shrink: 0;
+
+        @media (min-width: 481px) {
+          width: 180px;
+          height: 180px;
         }
-  
-        .classifier {
+
+        @media (min-width: 1025px) {
+          width: 200px;
+          height: 200px;
+        }
+
+        app-pie-chart {
           width: 100%;
-          max-width: 260px;
-  
-          display: flex;
-          flex-direction: column;
-  
-          @media (min-width: 768px) {
-            width: 220px;
-          }
-  
-          .legend {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-  
-            @media (min-width: 1025px) {
-              gap: 12px;
-            }
-          }
-        }
-  
-        .chart {
-          width: 160px;
-          height: 160px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-  
-          @media (min-width: 481px) {
-            width: 180px;
-            height: 180px;
-          }
-  
-          @media (min-width: 1025px) {
-            width: 200px;
-            height: 200px;
-          }
-  
-          app-pie-chart {
-            width: 100%;
-            height: 100%;
-            display: block;
-          }
+          height: 100%;
+          display: block;
         }
       }
     }
   }
-  
+
+  /* ------------------- 1024x600 FIX ------------------- */
+  @media (min-width: 1024px) and (max-height: 600px) {
+    height: 220px;
+    padding: 20px;
+
+    .content {
+      height: 100%;
+      gap: 12px;
+    }
+
+    .row-1 .text h2 { font-size: 16px; }
+    .row-1 .text span { font-size: 10px; }
+
+    .row-2 {
+      flex-direction: row;
+      gap: 12px;
+      height: 130px; 
+      align-items: stretch; 
+
+      .classifier {
+        max-width: 180px;
+        overflow-y: auto; 
+      }
+
+      .chart {
+        width: 150px;
+        height: 100%; // fill row-2 height
+      }
+    }
+  }
+
+  /* ------------------- 1280x800 FIX ------------------- */
+  @media (min-width: 1280px) and (max-height: 800px) {
+    height: 350px;
+    padding: 32px 32px;
+
+    .content {
+      height: 100%;
+      gap: 20px;
+    }
+
+    .row-2 {
+      flex-direction: row;
+      gap: 20px;
+      height: auto;
+      align-items: center;
+
+      .classifier {
+        max-width: 220px;
+        overflow: visible;
+      }
+
+      .chart {
+        width: 180px;
+        height: 180px;
+      }
+    }
+
+    .row-1 .text h2 { font-size: 22px; }
+    .row-1 .text span { font-size: 12px; }
+  }
+}
