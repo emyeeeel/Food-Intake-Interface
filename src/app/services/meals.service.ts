@@ -2,13 +2,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Meal } from '../models/meal.model';
 import { map, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MealsService {
 
-  private apiUrl = 'http://127.0.0.1:8000/api/meals/';
+  private baseUrl = environment.apiBaseUrl;
+  private apiUrl = `${this.baseUrl}/api/meals/`;
 
   constructor(private http: HttpClient) {}
 

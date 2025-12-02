@@ -16,7 +16,7 @@
       <p *ngIf="patient.heart_rate"><strong>Heart Rate:</strong> {{ patient.heart_rate }} bpm</p>
       <p *ngIf="patient.systolic_bp"><strong>BP:</strong> {{ patient.systolic_bp }}/{{ patient.diastolic_bp }} mmHg</p>
       <p><strong>Activity Level:</strong> {{ patient.activity_level }}</p>
-      <app-qr-test [patientId]="patient.id"></app-qr-test>
+      <app-qr-test [patientId]="patient.id" type="Intake"></app-qr-test>
   </div>
 
   <!-- Recommended intake -->

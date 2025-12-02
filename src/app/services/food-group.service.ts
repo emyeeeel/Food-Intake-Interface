@@ -2,12 +2,14 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FoodGroup } from '../models/food-group.model';
 import { catchError, Observable, retry, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FoodGroupService {
-  private apiUrl = 'http://127.0.0.1:8000/api/food-groups/';
+  private baseUrl = environment.apiBaseUrl;
+  private apiUrl = `${this.baseUrl}/api/food-groups/`;
 
   constructor(private http: HttpClient) { }
 
