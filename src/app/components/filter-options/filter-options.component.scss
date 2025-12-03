@@ -21,8 +21,9 @@
     ===================== */
     @media (min-width: 1024px) {
       font-size: 18px;
-      padding: 0 20px;
-      height: 52px;             /* match desktop row height */
+      padding: 0 10px;
+      border-radius: 12px;
+      height: 40px;             /* match desktop row height */
       min-width: 120px;
       max-width: 180px;         /* slightly more flexible than before */
     }

@@ -1,28 +1,275 @@
-.tag-container{
+/* ==========================================
+   INTAKE CONTAINER STYLING
+   ========================================== */
+   .intake-container {
+    width: 100%;
+    max-width: 100%;
+    background-color: #E6FEF9;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    box-sizing: border-box;
+  
+    // ==================================================
+    // ROW 1 — ICON, TIME, OPTIONS
+    // ==================================================
+    .row-1 {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+  
+      // Icon container
+      .icon {
+        width: 32px;
+        height: 32px;
+        background-color: #00313C;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 16px;
+        flex-shrink: 0;
+  
+        img {
+          width: 55%;
+          height: 55%;
+        }
+      }
+  
+      // Time text
+      .time {
+        font-family: "Quicksand", sans-serif;
+        font-weight: bold;
+        font-size: 20px;
+        color: #00313C;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+  
+      // Option circles
+      .option {
+        display: flex;
+        gap: 2px;
+  
+        .circle {
+          width: 5px;
+          height: 5px;
+          background-color: #00313C;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+      }
+    }
+  
+    // ==================================================
+    // ROW 2 & 3 — MEAL INFO & VOLUME
+    // ==================================================
+    .row-2,
+    .row-3 {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap; // allows items to wrap on small screens
+      margin-bottom: 16px;
+  
+      .assigned-meal,
+      .original-volume,
+      .remaining-percent,
+      .remaining-volume {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 45%; // responsive width
+        min-width: 120px;
+        margin-bottom: 10px;
+      }
+  
+      // Labels
+      span {
+        font-family: "Quicksand", sans-serif;
+        font-weight: 500;
+        font-size: 14px;
+        color: #00313C;
+      }
+  
+      // Values
+      .value {
+        font-family: "Quicksand", sans-serif;
+        font-weight: bold;
+        font-size: 24px;
+        color: #00313C;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+  
+        .unit {
+          font-family: "Onest", sans-serif;
+          font-size: 12px;
+          font-weight: 500;
+          color: #40C1AC;
+          margin-left: 2px;
+        }
+      }
+    }
+  
+    // ==================================================
+    // ROW 4 — TAGS
+    // ==================================================
+    .row-4 {
+      width: 100%;
+      display: flex;
+      flex-wrap: nowrap;       // single row
+      gap: 5px;
+      overflow-x: auto;        // allow horizontal scrolling if too many tags
+      padding-bottom: 4px;     // optional: spacing below scroll
+  
+      app-tags {
+        flex: none;            // width based on content
+        display: inline-flex;
+      }
+    }
+  
+    // ==================================================
+    // RESPONSIVE BREAKPOINTS
+    // ==================================================
+  
+    // Small screens (>=480px)
+    @media (min-width: 480px) {
+      padding: 18px;
+  
+      .row-1 .time { font-size: 22px; }
+  
+      .row-1 .icon { width: 36px; height: 36px; }
+  
+      .row-2 .value,
+      .row-3 .value { font-size: 28px; }
+  
+      .row-2 .unit,
+      .row-3 .unit { font-size: 14px; }
+    }
+  
+    // Tablet (>=768px)
+    @media (min-width: 768px) {
+      max-width: 220px;
+      padding: 22px;
+  
+      .row-1 .time { font-size: 24px; }
+      .row-1 .icon { width: 40px; height: 40px; }
+      .row-2 .value,
+      .row-3 .value { font-size: 32px; }
+      .row-2 .unit,
+      .row-3 .unit { font-size: 16px; }
+      .row-1 .option .circle { width: 6px; height: 6px; }
+    }
+  
+    // Desktop (>=1024px)
+    @media (min-width: 1024px) {
+      max-width: 450px;
+      padding: 24px;
+  
+      .row-1 .time { font-size: 28px; }
+      .row-1 .icon { width: 44px; height: 44px; }
+      .row-2 .value,
+      .row-3 .value { font-size: 36px; }
+      .row-2 .unit,
+      .row-3 .unit { font-size: 18px; }
+      .row-1 .option .circle { width: 6.5px; height: 6.5px; }
+    }
+  
+    // Large desktop (>=1280px)
+    @media (min-width: 1280px) {
+      max-width: 500px;
+      padding: 25px;
+  
+      .row-1 .time { font-size: 32px; }
+      .row-1 .icon { width: 48px; height: 48px; }
+      .row-2 .value,
+      .row-3 .value { font-size: 40px; }
+      .row-2 .unit,
+      .row-3 .unit { font-size: 20px; }
+      .row-1 .option .circle { width: 7px; height: 7px; }
+    }
+  }
+  
+  /* ==========================================
+     TAG CONTAINER STYLING
+     ========================================== */
+  .tag-container {
+    display: inline-flex;          // width based on content
+    align-items: center;
+    gap: 6px;
+  
     height: 24px;
     border-radius: 8px;
     background-color: #B8EDE4;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-
-    width: auto; 
-    padding: 7.5px 15px; 
-    min-width: fit-content; 
-    max-width: 100px;
-    
-    .tag-text{
-        color: #40C1AC;
-        font-family: 'Quicksand', sans-serif;
-        font-size: 12px;
-        font-weight: bold;
+  
+    padding: 0 10px;               // horizontal padding
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;                   // allows shrinking in flex container
+    max-width: fit-content;         // width based on content
+  
+    .tag-text {
+      color: #40C1AC;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-
-    .close-btn{
-        width: 10px;
-        height: 10px;
-        cursor: pointer;
+  
+    .close-btn {
+      width: 10px;
+      height: 10px;
+      cursor: pointer;
+      margin-left: 4px;
     }
-}
+  }
+  
+  /* Mobile & tablet */
+  @media (max-width: 1023px) {
+    .tag-container {
+      padding: 0 8px;
+  
+      .tag-text { font-size: 11px; }
+  
+      .close-btn { width: 9px; height: 9px; }
+    }
+  }
+  
+  /* Desktop */
+  @media (min-width: 1024px) {
+    .tag-container {
+      padding: 0 10px;
+  
+      .tag-text { font-size: 12px; }
+  
+      .close-btn { width: 10px; height: 10px; }
+    }
+  }
+  
+  /* Special case: 1024px width & small height */
+  @media (min-width: 1024px) and (max-height: 700px) {
+    .tag-container {
+      padding: 0 8px;
+      border-radius: 7px;
+  
+      .tag-text { font-size: 11px; }
+  
+      .close-btn { width: 9px; height: 9px; }
+    }
+  }
+  
+  /* Host styling for Angular */
+  :host {
+    display: block;
+    padding: 0;
+    margin: 0;
+  }
+  

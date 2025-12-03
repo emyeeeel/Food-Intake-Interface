@@ -22,8 +22,8 @@ export class IntakeLogComponent implements OnInit {
 
   private setIconSrc(): void {
     const timeToIconMap: { [key: string]: string } = {
-      'lunch': 'assets/icons/lunch-time.svg',
-      'dinner': 'assets/icons/dinner-time.svg',
+      '午餐': 'assets/icons/lunch-time.svg',
+      '晚餐': 'assets/icons/dinner-time.svg',
       'snack': 'assets/icons/snack-time.svg'
     };
 

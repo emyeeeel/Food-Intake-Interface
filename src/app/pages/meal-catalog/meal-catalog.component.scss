@@ -6,6 +6,9 @@
   overflow-x: hidden;
 }
 
+
+// ------------ Default Page -------------------------------
+
 /* =========================================================
    MEAL CATALOG CONTAINER
 ========================================================= */
@@ -31,7 +34,7 @@
 
   @media (min-width: 481px) {
     padding: 30px;
-    gap: 20px;
+    // gap: 20px;
   }
 
   @media (min-width: 1025px) {
@@ -52,7 +55,7 @@
     pointer-events: none;
   }
 
-  /* =========================================================
+   /* =========================================================
      ROW 1 — Search + Notification
   ========================================================= */
   .row-1 {
@@ -89,7 +92,9 @@
   
     @media (min-width: 1024px) {
       gap: 15px;
-      height: 52px; // desktop
+      height: 45px; // desktop
+
+      //let its content follow the 
     }
   
     @media (min-width: 1280px) {
@@ -98,46 +103,49 @@
     }
   }
 
-  .row-2 {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;           /* allow wrapping by default for small screens */
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-  
+   /* =========================================================
+   ROW 2 — Filter Options (Responsive Single Row for Desktop)
+========================================================= */
+.row-2 {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;           /* allow wrapping by default for small screens */
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+
+  > * {
+    flex: 1 1 auto;          /* allow items to shrink/grow */
+    min-width: 0;            /* prevent overflow */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;     /* truncate text if needed */
+  }
+
+  app-filter-icon {
+    flex: 0 0 auto;          /* icon keeps fixed size */
+  }
+
+  app-filter-options {
+    flex: 1 1 auto;
+  }
+
+  /* =========================
+     Desktop: force single row
+  ========================= */
+  @media (min-width: 1024px) {
+    flex-wrap: nowrap;       /* single row for larger screens */
+    gap: 15px;
+
     > * {
-      flex: 1 1 auto;          /* allow items to shrink/grow */
-      min-width: 0;            /* prevent overflow */
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;     /* truncate text if needed */
-    }
-  
-    app-filter-icon {
-      flex: 0 0 auto;          /* icon keeps fixed size */
-    }
-  
-    app-filter-options {
-      flex: 1 1 auto;
-    }
-  
-    /* =========================
-       Desktop: force single row
-    ========================= */
-    @media (min-width: 1024px) {
-      flex-wrap: nowrap;       /* single row for larger screens */
-      gap: 15px;
-  
-      > * {
-        min-width: 0;          /* ensure all items shrink properly */
-      }
-    }
-  
-    @media (min-width: 1280px) {
-      gap: 20px;               /* slightly larger gap for bigger screens */
+      min-width: 0;          /* ensure all items shrink properly */
     }
   }
+
+  @media (min-width: 1280px) {
+    gap: 20px;               /* slightly larger gap for bigger screens */
+  }
+}
 
    /* =========================================================
    ROW 3 — Main Options (Content contained)
@@ -197,7 +205,6 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    margin-bottom: 30px;
 
     .text-title {
       font-family: 'Quicksand', sans-serif;
@@ -218,38 +225,9 @@
   
 }
 
-  
- .search-bar{
-  flex: 1; 
-    
-    app-search-bar {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
- }
 
- .row-3{
-  justify-content: space-between;
-  margin-bottom: 30px;
- }
 
- .row-4{
-  height: 57px;
-  justify-content: space-between;
-  margin-bottom: 30px;
-
-  .text-title{
-    font-family: 'Quicksand', sans-serif;
-    font-weight: bold;
-    font-size: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: left;
-    color: #00313C;
-  }
-
- }
+// ------------ Add Meal Page -------------------------------
 
  .row-5{
   height: 316px;

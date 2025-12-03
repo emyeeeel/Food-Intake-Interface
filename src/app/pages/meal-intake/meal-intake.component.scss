@@ -31,7 +31,7 @@
 
   @media (min-width: 481px) {
     padding: 30px;
-    gap: 20px;
+    // gap: 20px;
   }
 
   @media (min-width: 1025px) {
@@ -89,7 +89,9 @@
   
     @media (min-width: 1024px) {
       gap: 15px;
-      height: 52px; // desktop
+      height: 45px; // desktop
+
+      //let its content follow the 
     }
   
     @media (min-width: 1280px) {

@@ -1,30 +1,257 @@
 .intake-container {
+  width: 100%;
+  max-width: 100%;
+  background-color: #E6FEF9;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  box-sizing: border-box;
+
+  // ==================================================
+  // ROW 1 — ICON, TIME, OPTIONS
+  // ==================================================
+  .row-1 {
     width: 100%;
-    max-width: 430px;
-    background-color: #E6FEF9;
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .icon {
+      width: 32px;
+      height: 32px;
+      background-color: #00313C;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 16px;
+      flex-shrink: 0;
+
+      img {
+        width: 55%;
+        height: 55%;
+      }
+    }
+
+    .time {
+      font-family: "Quicksand", sans-serif;
+      font-weight: bold;
+      font-size: 20px;
+      color: #00313C;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .option {
+      display: flex;
+      gap: 2px;
+
+      .circle {
+        width: 5px;
+        height: 5px;
+        background-color: #00313C;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  // ==================================================
+  // ROW 2 & 3 — MEAL INFO & VOLUME
+  // ==================================================
+  .row-2,
+  .row-3 {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; // allows items to wrap on small screens
+    margin-bottom: 16px;
+
+    .assigned-meal,
+    .original-volume,
+    .remaining-percent,
+    .remaining-volume {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 45%; // responsive width
+      min-width: 120px;
+      margin-bottom: 10px;
+    }
+
+    span {
+      font-family: "Quicksand", sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      color: #00313C;
+    }
+
+    .value {
+      font-family: "Quicksand", sans-serif;
+      font-weight: bold;
+      font-size: 24px;
+      color: #00313C;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      .unit {
+        font-family: "Onest", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        color: #40C1AC;
+        margin-left: 2px;
+      }
+    }
+  }
+
+  // ==================================================
+  // ROW 4 — TAGS
+  // ==================================================
+  .row-4 {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;      // force all tags in a single row
+    gap: 5px;               // spacing between tags
+    overflow: hidden;       // prevent overflow outside container
+  
+    app-tags {
+      display: inline-flex; // tag width based on content
+      flex: 1 1 auto;       // allow tags to shrink proportionally
+    }
+  }
+  
+
+  // ==================================================
+  // RESPONSIVE BREAKPOINTS
+  // ==================================================
+
+  @media (min-width: 480px) {
+    padding: 18px;
+
+    .row-1 .time { font-size: 22px; }
+
+    .row-1 .icon { width: 36px; height: 36px; }
+
+    .row-2 .value,
+    .row-3 .value {
+      font-size: 28px;
+
+      .unit { font-size: 14px; }
+    }
+  }
+
+  @media (min-width: 768px) {
+    max-width: 220px;
+    padding: 22px;
+
+    .row-1 .time { font-size: 24px; }
+    .row-1 .icon { width: 40px; height: 40px; }
+    .row-2 .value,
+    .row-3 .value {
+      font-size: 32px;
+
+      .unit { font-size: 16px; }
+    }
+
+    .row-1 .option .circle { width: 6px; height: 6px; }
+  }
+
+  @media (min-width: 1024px) {
+    max-width: 450px;
+    padding: 14px;          // tighter padding to fit content
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; // ensures rows do not overflow
+  
+    // ------------------------------
+    // ROW 1
+    // ------------------------------
+    .row-1 {
+      margin-bottom: 20px;         // reduce vertical spacing
+      .time { font-size: 20px; }   // slightly smaller to avoid pushing content down
+      .icon { width: 38px; height: 38px;  border-radius: 12px;}
+  
+      .option .circle { 
+        width: 6px; 
+        height: 6px; 
+      }
+    }
+  
+    // ------------------------------
+    // ROW 2 & 3
+    // ------------------------------
+    .row-2,
+    .row-3 {
+      margin-bottom: 8px;          // reduce spacing so total rows fit
+  
+      .value {
+        font-size: 28px;           // reduced from 32px for vertical fit
+        line-height: 1.1;          // tighter line-height to save space
+  
+        .unit { font-size: 14px; }
+      }
+    }
+  
+    // ------------------------------
+    // ROW 4 (TAGS)
+    // ------------------------------
+    .row-4 {
+      margin-top: auto;            // push tags to the bottom cleanly
+      overflow: hidden;            // prevent spilling
+      gap: 4px;                    // tighter spacing for safety
+  
+      app-tags {
+        flex: 1 1 auto;
+        min-width: 0;              // avoids overflow from long tags
+      }
+    }
+  }
+  
+
+  @media (min-width: 1280px) {
+    width: 430px;
+    height: 350px;
     border-radius: 24px;
+    background-color: #E6FEF9;
+    padding: 25px;
+  
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 25px;
-    box-sizing: border-box;
+    overflow: hidden;
   
+    // ------------------------------------------------
+    // ROW 1
+    // ------------------------------------------------
     .row-1 {
       width: 100%;
-      display: flex;
-      align-items: center;
+      height: 48px;
       margin-bottom: 32px;
+  
+      display: flex;
+      flex-direction: row;
+      align-items: center;
   
       .icon {
         width: 48px;
         height: 48px;
         background-color: #00313C;
         border-radius: 16px;
+        margin-right: 20px;
+  
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-right: 20px;
-        flex-shrink: 0;
+  
+        img {
+          width: 55%;
+          height: 55%;
+        }
       }
   
       .time {
@@ -33,6 +260,8 @@
         font-size: 32px;
         color: #00313C;
         flex: 1;
+        display: flex;
+        align-items: center;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -52,20 +281,26 @@
       }
     }
   
-    .row-2, .row-3 {
+    // ------------------------------------------------
+    // ROW 2
+    // ------------------------------------------------
+    .row-2 {
       width: 100%;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
+      height: 62px;
       margin-bottom: 21px;
   
-      .assigned-meal, .original-volume,
-      .remaining-percent, .remaining-volume {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+  
+      .assigned-meal,
+      .original-volume {
         display: flex;
         flex-direction: column;
-        flex: 1 1 45%;
-        min-width: 120px;
-        margin-bottom: 10px;
+      }
+  
+      .assigned-meal {
+        width: 171px;
       }
   
       span {
@@ -80,9 +315,8 @@
         font-weight: bold;
         font-size: 40px;
         color: #00313C;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        display: flex;
+        align-items: baseline;
   
         .unit {
           font-family: 'Onest', sans-serif;
@@ -94,118 +328,73 @@
       }
     }
   
+    // ------------------------------------------------
+    // ROW 3
+    // ------------------------------------------------
+    .row-3 {
+      width: 100%;
+      height: 62px;
+      margin-bottom: 38px;
+  
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+  
+      .remaining-percent,
+      .remaining-volume {
+        display: flex;
+        flex-direction: column;
+      }
+  
+      .remaining-percent {
+        width: 171px;
+      }
+  
+      span {
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 500;
+        font-size: 16px;
+        color: #00313C;
+      }
+  
+      .value {
+        font-family: 'Quicksand', sans-serif;
+        font-weight: bold;
+        font-size: 40px;
+        color: #00313C;
+        display: flex;
+        align-items: baseline;
+  
+        .unit {
+          font-family: 'Onest', sans-serif;
+          font-size: 20px;
+          font-weight: 500;
+          color: #40C1AC;
+          margin-left: 2px;
+        }
+      }
+    }
+  
+    // ------------------------------------------------
+    // ROW 4
+    // ------------------------------------------------
     .row-4 {
       width: 100%;
+      height: 24px;
+  
       display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      justify-content: flex-start;
-    }
+      flex-direction: row;
+      justify-content: space-between;
+      overflow: hidden;
   
-    // =========================
-    // MOBILE-FIRST SCALING
-    // =========================
-    @media (max-width: 1280px) {
-      max-width: 400px;
-      padding: 22px;
-  
-      .row-2, .row-3 .value {
-        font-size: 36px;
-        .unit {
-          font-size: 18px;
-        }
-      }
-  
-      .row-1 .time {
-        font-size: 28px;
-      }
-  
-      .row-1 .icon {
-        width: 44px;
-        height: 44px;
-      }
-  
-      .row-1 .option .circle {
-        width: 6.5px;
-        height: 6.5px;
-      }
-    }
-  
-    @media (max-width: 1024px) {
-      max-width: 360px;
-      padding: 20px;
-  
-      .row-2, .row-3 .value {
-        font-size: 32px;
-        .unit {
-          font-size: 16px;
-        }
-      }
-  
-      .row-1 .time {
-        font-size: 24px;
-      }
-  
-      .row-1 .icon {
-        width: 40px;
-        height: 40px;
-      }
-  
-      .row-1 .option .circle {
-        width: 6px;
-        height: 6px;
-      }
-    }
-  
-    @media (max-width: 768px) {
-      max-width: 100%;
-      padding: 18px;
-  
-      .row-2, .row-3 .value {
-        font-size: 28px;
-        .unit {
-          font-size: 14px;
-        }
-      }
-  
-      .row-1 .time {
-        font-size: 22px;
-      }
-  
-      .row-1 .icon {
-        width: 36px;
-        height: 36px;
-      }
-  
-      .row-1 .option .circle {
-        width: 5.5px;
-        height: 5.5px;
-      }
-    }
-  
-    @media (max-width: 480px) {
-      padding: 15px;
-  
-      .row-2, .row-3 .value {
-        font-size: 24px;
-        .unit {
-          font-size: 12px;
-        }
-      }
-  
-      .row-1 .time {
-        font-size: 20px;
-      }
-  
-      .row-1 .icon {
-        width: 32px;
-        height: 32px;
-      }
-  
-      .row-1 .option .circle {
-        width: 5px;
-        height: 5px;
+      app-tags {
+        height: 24px;       // keeps row consistent
+        display: flex;
+        align-items: center;
+        flex: 1 1 auto;
+        min-width: 0;
       }
     }
   }
   
+}
