@@ -1,17 +1,17 @@
 .meal-item{
-    width: 430px;
-    height: 316px;
+    width: 390px;
+    height: 280px;
     border-radius: 24px;
     background-color: #E6FEF9;
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 22px 24px;
+    padding: 25px;
     gap: 25px;
 
     .col-1{
-        width: 192px;
-        height: 270px;
+        width: 180px;
+        height: 100%;
         border-radius: 14px;
         display: flex;
         align-items: center;
@@ -21,20 +21,20 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 12px;
           }
     }
 
     .col-2{
-        width: 167px;
-        height: 270px;
+        width: 180px;
+        height: 100%;
 
         .row-1{
             height: 8px;
 
             .circles {
                 display: flex;
-                gap: 4px; // 4px spacing between circles
+                gap: 4px; 
                 align-items: center;
                 justify-content: right;
                 
@@ -49,7 +49,7 @@
 
         .row-2{
             height: 54px;
-            margin-top: 45px;
+            margin-top: 25px;
             display: flex;
             align-items: center;
             justify-content: left;
@@ -66,7 +66,7 @@
         }
 
         .row-3{
-            height: 58px;
+            height: 50px;
             margin-top: 30px;
 
             display: flex;
@@ -80,7 +80,7 @@
                 span{
                     font-family: 'Quicksand', sans-serif;
                     font-weight: 600;
-                    font-size: 20px;
+                    font-size: 18px;
                     color: #00313C;
                     margin: 0;
                     padding: 0;
@@ -101,7 +101,7 @@
             span{
                 font-family: 'Quicksand', sans-serif;
                 font-weight: 600;
-                font-size: 20px;
+                font-size: 14px;
                 color: #00313C;
                 margin: 0;
                 padding: 0;
@@ -122,10 +122,101 @@
                     color: #E6FEF9;
                     font-family: 'Quicksand', sans-serif;
                     font-weight: 600;
-                    font-size: 14px;
+                    font-size: 12px;
                     margin: 0;
                     padding: 0;
                     line-height: 1;
+                }
+            }
+        }
+    }
+
+    //for 1024x600
+    @media (min-width: 1024px){
+        width: 350px;
+        height: 260px;
+        padding: 22px 24px;
+        justify-content: space-between;
+        gap: 15px;
+
+        .col-1{
+            width: 192px;
+        }
+
+        .col-2{
+            width: 167px;
+
+            .row-2{
+                margin-top: 25px;
+                h1{
+                    font-size: 34px;
+                }
+            }
+
+            .row-3{
+                height: 50px;
+                margin-top: 15px;
+
+                .first, .second{
+                    span{
+                        font-size: 16px;
+                    }
+                }
+            }
+
+            .row-4{
+                span{
+                    font-size: 16px;
+                }
+
+                .type{
+                    span{
+                        font-size: 12px;
+                    }
+                }
+            }
+        }
+    }
+
+    @media (min-width: 1280px){ 
+        width: 430px;
+        height: 316px;
+        padding: 22px 24px;
+
+        .col-1{
+            width: 192px;
+        }
+
+        .col-2{
+            width: 170px;
+
+            .row-2{
+                margin-top: 45px;
+                h1{
+                    font-size: 40px;
+                }
+            }
+
+            .row-3{
+                height: 58px;
+                margin-top: 30px;
+
+                .first, .second{
+                    span{
+                        font-size: 20px;
+                    }
+                }
+            }
+
+            .row-4{
+                span{
+                    font-size: 20px;
+                }
+
+                .type{
+                    span{
+                        font-size: 14px;
+                    }
                 }
             }
         }

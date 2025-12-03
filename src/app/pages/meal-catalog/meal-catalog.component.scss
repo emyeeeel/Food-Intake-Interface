@@ -39,7 +39,7 @@
 
   @media (min-width: 1025px) {
     padding: 35px 20px;
-    gap: 25px;
+    gap: 30px;
   }
 
   /* Global container width constraint */
@@ -221,7 +221,35 @@
         font-size: 24px;
       }
     }
+
   }
+
+  .row-5 {
+    /* ===== MOBILE FIRST ===== */
+    display: flex;
+    flex-direction: column;      // stack items vertically
+    gap: 15px;                   // spacing between items
+    justify-content: space-between;
+    width: 100%;
+    height: auto;                // let height adjust naturally
+  
+    font-size: 18px;             // mobile font size
+  
+    /* ===== TABLET / SMALL SCREENS ===== */
+    @media (min-width: 481px) {
+      flex-direction: row;       // horizontal layout
+      gap: 10px;                 // spacing between items
+      font-size: 22px;
+    }
+  
+    /* ===== DESKTOP / LARGE SCREENS ===== */
+    @media (min-width: 1025px) {
+      flex-direction: row;
+      gap: 25px;                 // slightly larger spacing
+      font-size: 24px;
+    }
+  }
+  
   
 }
 

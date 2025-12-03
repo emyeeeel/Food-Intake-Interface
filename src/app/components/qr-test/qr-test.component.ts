@@ -15,7 +15,9 @@ export class QrTestComponent implements AfterViewInit {
     const detailsUrl = `https://h3vkhzth-4200.asse.devtunnels.ms/patient-info/${this.patientId}`;
     const intakeUrl = `https://h3vkhzth-8000.asse.devtunnels.ms/api/patients/${this.patientId}/recommended-intake/`;
 
-    const apiUrl = this.type === 'Intake' ? intakeUrl : detailsUrl;
+    // const apiUrl = this.type === 'Intake' ? intakeUrl : detailsUrl;
+
+    const apiUrl = 'https://mr7661km-4200.asse.devtunnels.ms/home';
 
     QRCode.toCanvas(this.qrCanvas.nativeElement, apiUrl, {
       width: 200,
