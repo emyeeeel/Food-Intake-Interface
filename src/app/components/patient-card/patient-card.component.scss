@@ -1,6 +1,7 @@
 .main-container{
-    width: 360px;
-    height: 260px;
+    width: 100%;
+    max-width: 390px;
+    height: 100%;
     border-radius: 24px;
     background: linear-gradient(to right, #00313C 0%, #00252D 100%);
     padding: 25px;
@@ -122,6 +123,93 @@
                 cursor: pointer;
                 width: 1em;  
                 height: 1em; 
+            }
+        }
+    }
+
+    @media (min-width: 1024px) { // 1024x600
+        height: 205px; // reduced height
+            gap: 20px; // reduce gap between rows
+    
+            .row-1 {
+                height: 50px; // adjust row height
+                .name {
+                    span {
+                        font-size: 14px; // smaller label
+                    }
+                    .value {
+                        font-size: 32px; // scale down main value
+                    }
+                }
+    
+                .option {
+                    gap: 2px;
+                    .circle {
+                        width: 6px;
+                        height: 6px;
+                    }
+                }
+            }
+    
+            .row-2 {
+                height: 50px; // scale down row height
+                gap: 24px; // reduce gap between columns
+                div {
+                    span {
+                        font-size: 14px; // smaller label
+                    }
+                    .value {
+                        font-size: 32px; // smaller value
+                        .unit {
+                            font-size: 16px; // smaller unit
+                        }
+                    }
+                }
+            }
+    
+            .row-3 {
+                height: 18px; // slightly smaller
+                .prev, .next {
+                    gap: 6px;
+                    span {
+                        font-size: 14px; // smaller text
+                    }
+                    .left-arrow, .right-arrow {
+                        width: 0.9em;
+                        height: 0.9em;
+                    }
+                }
+            }
+    }
+
+    // 1280px screens: restore “normal” desktop values
+    @media (min-width: 1280px) {
+        max-width: 360px;
+        height: 100%;
+        padding: 25px;
+        gap: 32px;
+
+        .row-1 { height: 62px;
+            .name {
+                span { font-size: 16px; }
+                .value { font-size: 40px; }
+            }
+            .option .circle { width: 7.24px; height: 7.24px; }
+        }
+
+        .row-2 { height: 62px; gap: 32px;
+            div {
+                span { font-size: 16px; }
+                .value { font-size: 40px; }
+                .unit { font-size: 20px; }
+            }
+        }
+
+        .row-3 { height: 20px;
+            .prev, .next {
+                gap: 8px;
+                span { font-size: 16px; }
+                .left-arrow, .right-arrow { width: 1em; height: 1em; }
             }
         }
     }

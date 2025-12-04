@@ -31,7 +31,7 @@
 
   @media (min-width: 481px) {
     padding: 30px;
-    // gap: 20px;
+    // justify-content: space-between;
   }
 
   @media (min-width: 1025px) {
@@ -203,6 +203,10 @@
     align-items: center;
     gap: 10px;
     width: 100%;
+
+    @media (min-width: 481px) {
+      height: 45px;
+    }
 
     .text-title {
       font-family: 'Quicksand', sans-serif;

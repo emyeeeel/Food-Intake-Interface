@@ -4,7 +4,8 @@
   position: relative;
 
   @media (max-width: 1024px) {
-    height: 48px;
+    height: 40px;
+    max-height: 48px;
   }
 
   @media (max-width: 480px) {
@@ -23,6 +24,14 @@
     gap: 15px;
     padding: 0 16px;
     cursor: pointer;
+
+    @media (max-width: 1024px) {
+      border-radius: 12px;
+    }
+  
+    @media (max-width: 480px) {
+      border-radius: 10px;
+    }
 
     .week-text,
     .day-text {

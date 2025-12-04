@@ -17,8 +17,10 @@
                     [patientId]="patientId"
                     (patientIdChange)="onPatientIdChange($event)">
                 </app-patient-card>
-                <app-bmi-card [patientId]="patientId"></app-bmi-card>
-                <app-bp-card [patientId]="patientId"></app-bp-card>
+                <div class="medical-data">
+                    <app-bmi-card [patientId]="patientId"></app-bmi-card>
+                    <app-bp-card [patientId]="patientId"></app-bp-card>
+                </div>
             </div>
 
             <div class="row-3">
