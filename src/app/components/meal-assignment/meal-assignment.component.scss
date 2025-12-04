@@ -123,6 +123,31 @@
         min-width: 431px;
         max-width: none;     
         width: 100%;       
-        flex: 1 1 0;         
+        flex: 1 1 0;   
+        min-height: 150px;
+        padding: 15px;
+        
+        .col-2{
+            gap: 0;
+            justify-content: space-between;
+            .row-1{
+                .text{
+                    gap: 20px;
+                    h2{
+                        font-size: 36px;
+                    }
+
+                    span{
+                        font-size: 20px;
+                    }
+                }
+                .option{
+                    .circle{
+                        width: 7px;
+                        height: 7px;
+                    }
+                }
+            }
+        }
     }
 }
