@@ -25,11 +25,21 @@ export class NutrientIntakeComponent implements OnInit {
   private loadFoodGroups(): void {
     this.foodGroupService.getFoodGroups().subscribe({
       next: (foodGroups) => {
-        this.nutritionLegends = foodGroups.map((fg, index) => ({
+        // this.nutritionLegends = foodGroups.map((fg, index) => ({
+        //   text: fg.name,
+        //   color: this.colors[index % this.colors.length], 
+        //   percent: '0%'
+        // }));
+
+        // Exclude food group with id 7 (Condiments/Seasonings) since this is to be discussed
+        const filteredGroups = foodGroups.filter(fg => fg.id !== 7);
+
+        this.nutritionLegends = filteredGroups.map((fg, index) => ({
           text: fg.name,
           color: this.colors[index % this.colors.length], 
           percent: '0%'
         }));
+        console.log(this.nutritionLegends)
 
         this.generateSimpleRandomPercentages();
       },

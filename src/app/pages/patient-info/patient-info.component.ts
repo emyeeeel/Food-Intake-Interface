@@ -40,18 +40,17 @@ export class PatientInfoComponent implements OnInit {
 
   isMobileMenuOpen = false; 
 
-onLunchStatus(status: boolean) {
-  this.lunchHasMeal = status;
-  this.cdr.detectChanges();
-  console.log("Lunch meal assigned?", status);
-}
+  onLunchStatus(status: boolean) {
+    this.lunchHasMeal = status;
+    this.cdr.detectChanges();
+    console.log("Lunch meal assigned?", status);
+  }
 
-onDinnerStatus(status: boolean) {
-  this.dinnerHasMeal = status;
-  this.cdr.detectChanges();
-  console.log("Dinner meal assigned?", status);
-}
-
+  onDinnerStatus(status: boolean) {
+    this.dinnerHasMeal = status;
+    this.cdr.detectChanges();
+    console.log("Dinner meal assigned?", status);
+  }
 
   constructor(private router: Router, private cloudTestService: CloudTestService, private cdr: ChangeDetectorRef) {}
 

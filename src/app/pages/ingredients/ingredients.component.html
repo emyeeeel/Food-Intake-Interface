@@ -1,56 +1,111 @@
 <div class="ingredients-container">
     <app-menu-bar (mobileMenuToggle)="onMobileMenuToggle($event)"></app-menu-bar>
-    <div class="main-container">
+  
+    <!-- DEFAULT VIEW -->
+    <ng-container *ngIf="currentView === 'default'">
+      <div class="main-container">
         <div class="row-1">
-            <app-back></app-back>
-            <div class="search-bar">
-                <app-search-bar></app-search-bar>
-            </div>
-            <app-notif></app-notif>
+          <app-back></app-back>
+          <div class="search-bar">
+            <app-search-bar></app-search-bar>
+          </div>
+          <app-notif></app-notif>
         </div>
+  
         <div class="row-2">
-            <app-filter-icon></app-filter-icon>
-            <ng-container *ngFor="let filterOption of filterOptions">
-                <app-filter-options [filterText]="filterOption"></app-filter-options>
-            </ng-container>
+          <app-filter-icon></app-filter-icon>
+          <ng-container *ngFor="let filterOption of filterOptions">
+            <app-filter-options [filterText]="filterOption"></app-filter-options>
+          </ng-container>
         </div>
+  
         <div class="row-3">
-            <app-main-options 
-                iconSrc="assets/icons/add-icon.svg"
-                optionText="新增食材"
-                altText="Add Ingredient Icon"
-                backgroundColor="#00313C"
-                textColor="#E6FEF9"
-                (click)="navigateToAddIngredient()">
-            </app-main-options>
-            <app-main-options 
-                iconSrc="assets/icons/all-icon.svg"
-                optionText="查看所有食材"
-                altText="All Ingredients Icon"
-                backgroundColor="#40C1AC"
-                textColor="#E6FEF9"
-                (click)="navigateToAllIngredients()">
-            </app-main-options>
-            <app-main-options 
-                iconSrc="assets/icons/print-icon.svg"
-                optionText="列印食材"
-                altText="Print Ingredients Icon"
-                backgroundColor="#E6FEF9"
-                textColor="#00313C"
-                (click)="printIngredients()">
-            </app-main-options>
+          <app-main-options 
+              iconSrc="assets/icons/add-icon.svg"
+              optionText="新增食材"
+              altText="Add Ingredient Icon"
+              backgroundColor="#00313C"
+              textColor="#E6FEF9"
+              (click)="navigateToAddIngredient()">
+          </app-main-options>
+          <app-main-options 
+              iconSrc="assets/icons/all-icon.svg"
+              optionText="查看所有食材"
+              altText="All Ingredients Icon"
+              backgroundColor="#40C1AC"
+              textColor="#E6FEF9"
+              (click)="navigateToAllIngredients()">
+          </app-main-options>
+          <app-main-options 
+              iconSrc="assets/icons/print-icon.svg"
+              optionText="列印食材"
+              altText="Print Ingredients Icon"
+              backgroundColor="#E6FEF9"
+              textColor="#00313C"
+              (click)="printIngredients()">
+          </app-main-options>
         </div>
+  
         <div class="row-4">
-            <h2>食材目錄</h2>
+          <h2>食材目錄</h2>
         </div>
+  
         <div class="row-5">
-            <app-ingredients-categories
-                *ngFor="let category of categories"
-                [imageSrc]="category.image"
-                [imageAlt]="category.alt"
-                [categoryText]="category.text"
-                (categorySelected)="onCategorySelected($event)">
-            </app-ingredients-categories>
+          <app-ingredients-categories
+              *ngFor="let category of categories"
+              [imageSrc]="category.image"
+              [imageAlt]="category.alt"
+              [categoryText]="category.text"
+              (categorySelected)="onCategorySelected($event)">
+          </app-ingredients-categories>
         </div>
-    </div>
-</div>
+      </div>
+    </ng-container>
+  
+    <!-- ADD INGREDIENT VIEW -->
+    <ng-container *ngIf="currentView === 'add'">
+      <div class="main-container">
+        <div class="row-1">
+          <app-back (click)="currentView = 'default'"></app-back>
+          <div class="search-bar">
+            <app-search-bar></app-search-bar>
+          </div>
+          <app-notif></app-notif>
+        </div>
+        <!-- Add your add-ingredient form content here -->
+        <h2>Add Ingredient</h2>
+      </div>
+    </ng-container>
+  
+    <!-- ALL INGREDIENTS VIEW -->
+    <ng-container *ngIf="currentView === 'all'">
+      <div class="main-container">
+        <div class="row-1">
+          <app-back (click)="currentView = 'default'"></app-back>
+          <div class="search-bar">
+            <app-search-bar></app-search-bar>
+          </div>
+          <app-notif></app-notif>
+        </div>
+        <!-- Display all ingredients here -->
+        <h2>All Ingredients</h2>
+      </div>
+    </ng-container>
+  
+    <!-- PRINT INGREDIENTS VIEW -->
+    <ng-container *ngIf="currentView === 'print'">
+      <div class="main-container">
+        <div class="row-1">
+          <app-back (click)="currentView = 'default'"></app-back>
+          <div class="search-bar">
+            <app-search-bar></app-search-bar>
+          </div>
+          <app-notif></app-notif>
+        </div>
+        <!-- Print ingredients content here -->
+        <h2>Print Ingredients</h2>
+      </div>
+    </ng-container>
+  
+  </div>
+  
