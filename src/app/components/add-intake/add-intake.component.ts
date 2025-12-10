@@ -101,7 +101,7 @@ export class AddIntakeComponent implements OnDestroy {
   }
 
   private async handleQRCodeDetected(qrData: string): Promise<void> {
-    this.scanResult = qrData;
+    this.scanResult = qrData; 
     console.log('QR Code detected:', qrData);
     
     // Stop the camera
@@ -198,19 +198,18 @@ export class AddIntakeComponent implements OnDestroy {
     if (this.videoElement) {
       this.videoElement.nativeElement.srcObject = null;
     }
-    
-    this.scanResult = null;
+
+    console.log("SCAN RESULT BEFORE UPLOAD:", this.scanResult);
   }
 
   private capture(): Promise<any> {
     return new Promise((resolve, reject) => {
-      const apiUrl = 'http://127.0.0.1:8000/api/capture/'; 
+      const apiUrl = 'http://127.0.0.1:8000/api/capture/';  //let this receive qr url link
       
       const testData = {
         message: 'QR Code scanned - uploading intake data',
         timestamp: new Date().toISOString(),
-        qrData: this.scanResult, 
-        scannedUrl: this.scanResult, 
+        segment_url: this.scanResult, 
         data: {
           test: true,
           value: 123,
