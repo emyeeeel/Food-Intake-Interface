@@ -1,5 +1,6 @@
 import { Component, ElementRef, Input, ViewChild, AfterViewInit } from '@angular/core';
 import QRCode from 'qrcode';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-qr-test',
@@ -8,7 +9,7 @@ import QRCode from 'qrcode';
 })
 export class QrTestComponent implements AfterViewInit {
   @Input() patientId: number = 1;
-  @Input() type: 'Details' | 'Intake' = 'Details'; // new input to switch QR type
+  @Input() type: 'Details' | 'Intake' | 'Before' | 'After' = 'Details'; 
   @ViewChild('qrCanvas') qrCanvas!: ElementRef<HTMLCanvasElement>;
 
   ngAfterViewInit() {
@@ -17,7 +18,15 @@ export class QrTestComponent implements AfterViewInit {
 
     const detailsUrl = `https://mr7661km-4200.asse.devtunnels.ms/patient-info/${this.patientId}`;
     const intakeUrl = `https://mr7661km-8000.asse.devtunnels.ms/api/patients/${this.patientId}/recommended-intake/`;
-    const apiUrl = this.type === 'Intake' ? intakeUrl : detailsUrl;
+    const captureBeforeUrl = `https://mr7661km-8000.asse.devtunnels.ms/api/segment/before`;
+    const captureAfterUrl = `https://mr7661km-8000.asse.devtunnels.ms//api/segment/after`;
+    
+    // Updated to handle Capture type
+    const apiUrl = this.type === 'Intake' ? intakeUrl : 
+                   this.type === 'Before' ? captureBeforeUrl : 
+                   this.type === 'After' ? captureAfterUrl : 
+                   detailsUrl;
+    
     // const apiUrl = 'https://mr7661km-4200.asse.devtunnels.ms/home';
 
     QRCode.toCanvas(this.qrCanvas.nativeElement, apiUrl, {
@@ -27,16 +36,17 @@ export class QrTestComponent implements AfterViewInit {
       if (error) console.error('QR generation error:', error);
     });
 
-    const ws = new WebSocket("wss://mr7661km-8000.asse.devtunnels.ms/ws/test/"); 
-    //"ws://192.168.0.100:8000/ws/test/" this only works if angular endpoint is currently running on http 
-    //change 192.168.0.100:8000 to <ip address>:<port> of LLM server 
-    //if angular runs on https like utilizing port forwarded endpoint, use wss 
-    //e.g. "wss://mr7661km-8000.asse.devtunnels.ms/ws/test/" -> this worked on both 
+    // const ws = new WebSocket("wss://mr7661km-8000.asse.devtunnels.ms/ws/test/"); 
+    // //"ws://192.168.0.100:8000/ws/test/" this only works if angular endpoint is currently running on http 
+    // //change 192.168.0.100:8000 to <ip address>:<port> of LLM server 
+    // //if angular runs on https like utilizing port forwarded endpoint, use wss 
+    // //e.g. "wss://mr7661km-8000.asse.devtunnels.ms/ws/test/" -> this worked on both 
   
-    ws.onopen = () => console.log("WS CONNECTED");
-    ws.onerror = (error) => console.error("WS ERROR:", error);
-    ws.onmessage = (msg) => console.log("WS MESSAGE:", msg.data);
+    // ws.onopen = () => console.log("WS CONNECTED");
+    // ws.onerror = (error) => console.error("WS ERROR:", error);
+    // ws.onmessage = (msg) => console.log("WS MESSAGE:", msg.data);
   
-    ws.onclose = () => console.log("WS CLOSED");
+    // ws.onclose = () => console.log("WS CLOSED");
+
   }
 }

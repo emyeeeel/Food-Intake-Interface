@@ -1,0 +1,39 @@
+<div class="main-container">
+    <h3>Add Intake Record</h3>
+
+    <!--Add for before meal and after meal and utilize qr for capturing -->
+
+    <!-- QR Camera Scanner Section -->
+    <div class="qr-scanner-container">
+        <div class="scanner-section">
+          <button class="start-scanner-btn" (click)="toggleScanner()">
+            {{ showScanner ? 'Stop Camera' : 'Scan QR Code' }}
+          </button>
+          <div *ngIf="showScanner" class="camera-container">
+            <div class="camera-viewport">
+              <video #videoElement autoplay playsinline></video>
+              <div class="scanner-overlay">
+                <div class="scanner-frame"></div>
+              </div>
+            </div>
+            <div class="scanner-result" *ngIf="scanResult">
+              <p>Scanned: {{ scanResult }}</p>
+            </div>
+          </div>
+    </div>
+
+    <!-- Redirected Output -->
+    <!-- <div class="intake-record">
+    </div> -->
+
+    <!-- <div class="test-QR">
+      <h1>Before Meal</h1>
+      <app-qr-test type="Before"></app-qr-test>
+    </div>
+    <div class="test-QR">
+      <h1>After Meal</h1>
+      <app-qr-test type="After"></app-qr-test>
+    </div> -->
+
+    <!-- Add loading state when it is not yet redirecting -->
+</div>

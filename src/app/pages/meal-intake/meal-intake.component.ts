@@ -11,11 +11,12 @@ import { BackComponent } from "../../components/back/back.component";
 import { FilterOptionsComponent } from "../../components/filter-options/filter-options.component";
 import { IntakeLogComponent } from "../../components/intake-log/intake-log.component";
 import { filter } from 'rxjs';
+import { AddIntakeComponent } from "../../components/add-intake/add-intake.component";
 
 @Component({
   selector: 'app-meal-intake',
   imports: [
-    CommonModule, 
+    CommonModule,
     MenuBarComponent,
     MainOptionsComponent,
     DateContainerComponent,
@@ -24,7 +25,8 @@ import { filter } from 'rxjs';
     NotifComponent,
     BackComponent,
     FilterOptionsComponent,
-    IntakeLogComponent
+    IntakeLogComponent,
+    AddIntakeComponent
 ],
   templateUrl: './meal-intake.component.html',
   styleUrl: './meal-intake.component.scss'
