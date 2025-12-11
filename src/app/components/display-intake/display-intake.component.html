@@ -1,0 +1,24 @@
+<div class="display-intake">
+  <div *ngIf="loading" class="loading">Loading segmentation results...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <ng-container *ngIf="!loading && !error && beforeResult && afterResult">
+    <div class="segment-section">
+      <h3>Before</h3>
+      <img [src]="beforeResult.segmented_image_url" alt="Before Segmented Image">
+      <p>Number of classes: {{ beforeResult.num_classes }}</p>
+      <ul>
+        <li *ngFor="let className of beforeResult.class_names">{{ className }}</li>
+      </ul>
+    </div>
+
+    <div class="segment-section">
+      <h3>After</h3>
+      <img [src]="afterResult.segmented_image_url" alt="After Segmented Image">
+      <p>Number of classes: {{ afterResult.num_classes }}</p>
+      <ul>
+        <li *ngFor="let className of afterResult.class_names">{{ className }}</li>
+      </ul>
+    </div>
+  </ng-container>
+</div>

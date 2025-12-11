@@ -12,6 +12,7 @@ import { FilterOptionsComponent } from "../../components/filter-options/filter-o
 import { IntakeLogComponent } from "../../components/intake-log/intake-log.component";
 import { filter } from 'rxjs';
 import { AddIntakeComponent } from "../../components/add-intake/add-intake.component";
+import { DisplayIntakeComponent } from '../../components/display-intake/display-intake.component';
 
 @Component({
   selector: 'app-meal-intake',
@@ -26,7 +27,8 @@ import { AddIntakeComponent } from "../../components/add-intake/add-intake.compo
     BackComponent,
     FilterOptionsComponent,
     IntakeLogComponent,
-    AddIntakeComponent
+    AddIntakeComponent,
+    DisplayIntakeComponent
 ],
   templateUrl: './meal-intake.component.html',
   styleUrl: './meal-intake.component.scss'
