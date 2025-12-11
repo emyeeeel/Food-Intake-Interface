@@ -17,6 +17,7 @@ import { ServingTimeComponent } from '../../components/serving-time/serving-time
 import { DayCycleComponent } from '../../components/day-cycle/day-cycle.component';
 import { MealsService } from '../../services/meals.service';
 import { Meal } from '../../models/meal.model';
+import { AddMealComponent } from '../../components/add-meal/add-meal.component';
 
 @Component({
   selector: 'app-meal-catalog',
@@ -35,7 +36,8 @@ import { Meal } from '../../models/meal.model';
     DateContainerComponent,
     MealItemComponent,
     ServingTimeComponent,
-    DayCycleComponent
+    DayCycleComponent,
+    AddMealComponent
   ],
   templateUrl: './meal-catalog.component.html',
   styleUrl: './meal-catalog.component.scss'
