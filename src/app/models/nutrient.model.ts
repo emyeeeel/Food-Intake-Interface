@@ -1,4 +1,4 @@
-export interface FoodGroup {
+export interface Nutrient {
     id: number;
     name: string;
   }

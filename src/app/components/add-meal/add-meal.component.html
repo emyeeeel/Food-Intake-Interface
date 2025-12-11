@@ -1,1 +1,103 @@
-<p>add-meal works!</p>
+<div class="main-container">
+    <div class="add-meal-container">
+      <h3>Add New Meal</h3>
+      
+      <!-- Initial Form - Only Meal Name -->
+      <form class="meal-form" *ngIf="!showFullForm" (ngSubmit)="onInitialSubmit()" #initialForm="ngForm">
+        <div class="form-group">
+          <label for="mealName">Meal Name</label>
+          <input 
+            type="text" 
+            id="mealName" 
+            name="mealName"
+            [(ngModel)]="meal.meal_name"
+            class="form-input"
+            placeholder="Enter meal name"
+            required
+          />
+        </div>
+  
+        <!-- Image Upload -->
+        <div class="form-group">
+          <label for="mealImage">Meal Image</label>
+          <input 
+            type="file"
+            id="mealImage"
+            name="mealImage"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+            class="form-input"
+          />
+          <div class="image-preview" *ngIf="mealImagePreview">
+            <img [src]="mealImagePreview" alt="Meal Image Preview">
+          </div>
+        </div>
+  
+        <div *ngIf="isLoading" class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Processing meal name...</p>
+        </div>
+  
+        <div class="form-actions" *ngIf="!isLoading">
+          <button type="submit" class="btn-primary" [disabled]="!initialForm.valid">Continue</button>
+        </div>
+      </form>
+  
+      <!-- Full Form - After API Response -->
+        <form class="meal-form" *ngIf="showFullForm" (ngSubmit)="onSubmit()" #mealForm="ngForm">
+
+            <!-- Row 1: Meal Name + Image (Col 1) | Combined Dropdowns (Col 2) -->
+            <div class="form-row">
+            <div class="form-col meal-info">
+                <h2>{{meal.meal_name}}</h2>
+                <img [src]="meal.image" alt="Meal Image" class="meal-image">
+            </div>
+        
+            <div class="form-col dropdowns">
+                <div class="dropdown-wrapper">
+                <label for="mealTime">Meal Time</label>
+                <select id="mealTime" name="mealTime" [(ngModel)]="meal.meal_time" class="form-select" required>
+                    <option value="" disabled>Select meal time</option>
+                    <option *ngFor="let option of mealTimeOptions" [value]="option.value">{{ option.label }}</option>
+                </select>
+                </div>
+        
+                <div class="dropdown-wrapper">
+                <label for="dayCycle">Day Cycle</label>
+                <select id="dayCycle" name="dayCycle" [(ngModel)]="meal.day_cycle" class="form-select" required>
+                    <option value="" disabled>Select day cycle</option>
+                    <option *ngFor="let option of dayCycleOptions" [value]="option.value">{{ option.label }}</option>
+                </select>
+                </div>
+        
+                <div class="dropdown-wrapper">
+                <label for="plateType">Plate Type</label>
+                <select id="plateType" name="plateType" [(ngModel)]="meal.plate_type" class="form-select" required>
+                    <option value="" disabled>Select plate type</option>
+                    <option *ngFor="let option of plateTypeOptions" [value]="option.value">{{ option.label }}</option>
+                </select>
+                </div>
+            </div>
+            </div>
+        
+            <!-- Row 2: Ingredients -->
+            <div class="form-row ingredients-row">
+            <label>Ingredients</label>
+            <div class="meal-ingredients">
+                <app-tags *ngFor="let ingredientName of meal.ingredients" [tagText]="ingredientName.name"></app-tags>
+            </div>
+            </div>
+        
+            <!-- Row 3: Form Actions -->
+            <div class="form-row form-actions-row">
+            <button type="button" class="btn-secondary" (click)="onCancel()">Cancel</button>
+            <button type="submit" class="btn-primary" [disabled]="!mealForm.valid || isSubmitting">
+                <span *ngIf="isSubmitting">Adding...</span>
+                <span *ngIf="!isSubmitting">Add Meal</span>
+            </button>
+            </div>
+  
+      </form>
+    </div>
+  </div>
+  

@@ -1,0 +1,634 @@
+.main-container {
+    width: 100%;
+    background-color: #CAECE5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    font-family: 'Quicksand', sans-serif;
+    box-sizing: border-box;
+    padding: 20px;
+  }
+  
+  /* --- Form Container --- */
+  .add-meal-container {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 49, 60, 0.1);
+    border: 1px solid #B8D8D3;
+    width: 100%;
+    max-width: 100%;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  
+    h3 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #00313C;
+      margin: 0 0 25px 0;
+      text-align: center;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #40C1AC;
+    }
+
+    .meal-form:not(.full-form) {
+      overflow: hidden;
+      
+      .form-group {
+        overflow: hidden;
+        
+        .image-preview {
+          overflow: hidden;
+          
+          img {
+            /* Ensure image never exceeds container */
+            max-width: 100% !important;
+            max-height: 100% !important;
+            width: auto;
+            height: auto;
+          }
+        }
+      }
+    }
+  }
+  
+  /* --- Initial Form (Meal Name Only) --- */
+  .initial-input {
+    grid-column: 1 / -1;
+    text-align: center;
+  
+    .form-input {
+      max-width: 500px;
+      margin: 0 auto;
+      font-size: 16px;
+      padding: 16px 20px;
+      border: 2px solid #E0F7F4;
+      transition: all 0.3s ease;
+  
+      &:focus {
+        border-color: #40C1AC;
+        box-shadow: 0 0 0 4px rgba(64, 193, 172, 0.1);
+        transform: translateY(-1px);
+      }
+    }
+  
+    label {
+      font-size: 16px;
+      font-weight: 600;
+      color: #00313C;
+      margin-bottom: 12px;
+      display: block;
+    }
+  }
+  
+  .meal-form {
+    &:not(.full-form) {
+      /* Initial form specific styling */
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+      animation: slideIn 0.3s ease-out;
+    }
+  }
+  
+  /* --- Initial Form Groups --- */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  
+    label {
+      font-size: 16px;
+      font-weight: 600;
+      color: #00313C;
+      margin-bottom: 6px;
+    }
+    
+    /* Special styling for image upload group */
+    &:has(input[type="file"]) {
+      align-items: center;
+      text-align: center;
+    }
+  }
+  
+  /* --- File Input Styling --- */
+  input[type="file"].form-input {
+    padding: 12px 16px;
+    border: 2px dashed #E0F7F4;
+    border-radius: 12px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    color: #00313C;
+    background: linear-gradient(135deg, #F8FFFE, #F0FBF9);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    
+    &:hover {
+      border-color: #40C1AC;
+      background: linear-gradient(135deg, #F0FBF9, #E6FEF9);
+      transform: translateY(-1px);
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: #40C1AC;
+      box-shadow: 0 0 0 3px rgba(64, 193, 172, 0.1);
+    }
+    
+    /* File input placeholder styling */
+    &::file-selector-button {
+      background: linear-gradient(135deg, #40C1AC, #2FA695);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      font-size: 12px;
+      margin-right: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: linear-gradient(135deg, #2FA695, #268B7A);
+        transform: translateY(-1px);
+      }
+    }
+  }
+  
+  /* --- Image Preview Container --- */
+  .image-preview {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Container constraints */
+    width: 100%;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    
+    img {
+      /* Fixed dimensions with proper containment */
+      width: 200px;
+      height: 200px;
+      max-width: 100%;
+      max-height: 100%;
+      
+      /* Image display properties */
+      object-fit: cover;
+      object-position: center;
+      
+      /* Styling */
+      border-radius: 16px;
+      border: 3px solid #E0F7F4;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      
+      /* Animation */
+      animation: imageLoad 0.5s ease-out;
+      transition: all 0.3s ease;
+      
+      /* Hover effect */
+      &:hover {
+        transform: scale(1.02);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        border-color: #40C1AC;
+      }
+      
+      /* Prevent image from breaking layout */
+      display: block;
+      flex-shrink: 0;
+    }
+  }
+  
+  /* --- Loading State --- */
+  .loading-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px 20px;
+  
+    p {
+      color: #40C1AC;
+      font-weight: 600;
+      margin-top: 15px;
+      font-size: 15px;
+    }
+  }
+  
+  .loading-spinner {
+    width: 45px;
+    height: 45px;
+    border: 4px solid #E6FEF9;
+    border-top: 4px solid #40C1AC;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+  }
+  
+  /* --- Full Form Layout (3 Rows) --- */
+  .meal-form {
+    display: grid;
+    grid-template-rows: auto auto auto; /* 3 rows */
+    gap: 20px;
+    animation: slideIn 0.3s ease-out;
+  
+    /* Row 1: Meal Info + Dropdowns */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+  
+    .meal-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+  
+      .meal-image {
+        width: 100%;
+        max-width: 250px;
+        border-radius: 12px;
+        margin-top: 8px;
+        object-fit: cover;
+      }
+    }
+  
+    .dropdowns {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+  
+    /* Row 2: Ingredients full width */
+    .ingredients-row {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+  
+    /* Row 3: Form Actions full width */
+    .form-actions-row {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+  }
+  
+  /* --- Meal Ingredients Container --- */
+  .meal-ingredients {
+    background-color: #F8FFFE;
+    border: 2px solid #E0F7F4;
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 120px;
+    max-height: 300px;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+  
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #F0F9F6;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #B8D8D3;
+      border-radius: 3px;
+  
+      &:hover {
+        background: #40C1AC;
+      }
+    }
+  
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-start;
+    align-content: flex-start;
+  
+    &:focus-within {
+      border-color: #40C1AC;
+      background-color: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(64, 193, 172, 0.1);
+    }
+  
+    &:empty::before {
+      content: "No ingredients added yet";
+      color: #9EC2BD;
+      font-style: italic;
+      font-size: 14px;
+      width: 100%;
+      text-align: center;
+      padding: 20px 0;
+      display: block;
+    }
+  
+    app-tags {
+      animation: fadeInScale 0.3s ease-out;
+      flex-shrink: 0;
+      min-width: fit-content;
+    }
+  }
+  
+  /* --- Form Actions --- */
+  .form-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+    margin-top: 10px;
+    
+    .btn-primary {
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      min-width: 150px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      
+      background: linear-gradient(135deg, #40C1AC, #2FA695);
+      color: white;
+      box-shadow: 0 4px 12px rgba(64, 193, 172, 0.3);
+  
+      &:hover:not(:disabled) {
+        background: linear-gradient(135deg, #2FA695, #268B7A);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(64, 193, 172, 0.4);
+      }
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+        background: #B8D8D3;
+      }
+      
+      &:focus {
+        outline: 2px solid #40C1AC;
+        outline-offset: 2px;
+      }
+    }
+  }
+  
+  @keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  
+  /* --- Buttons --- */
+  .btn-primary, .btn-secondary, .edit-btn, .btn-regenerate, .btn-generate, .btn-toggle-summary {
+    transition: all 0.3s ease;
+  }
+  
+  /* --- Form Inputs --- */
+  .form-input, .form-select, .form-textarea {
+    padding: 12px 16px;
+    border: 2px solid #E0F7F4;
+    border-radius: 8px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    color: #00313C;
+    background-color: #FFFFFF;
+    transition: all 0.3s ease;
+  
+    &:focus {
+      outline: none;
+      border-color: #40C1AC;
+      background-color: #F8FFFE;
+      box-shadow: 0 0 0 3px rgba(64, 193, 172, 0.1);
+      transform: translateY(-1px);
+    }
+  
+    &:hover:not(:focus) {
+      border-color: #B8D8D3;
+    }
+  
+    &::placeholder {
+      color: #9EC2BD;
+      font-style: italic;
+    }
+  }
+  
+  /* --- Read-only Input --- */
+  .readonly {
+    background-color: #F8FFFE !important;
+    cursor: not-allowed;
+    color: #6B7280;
+    border-style: dashed;
+  }
+  
+  /* --- Animations --- */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes imageLoad {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  @keyframes loading-bg {
+    0% { background-position: 0 0, 0 10px, 10px -10px, -10px 0px; }
+    100% { background-position: 20px 20px, 20px 30px, 30px 10px, 10px 20px; }
+  }
+  
+  /* --- Responsive Design --- */
+  @media (max-width: 768px) {
+    .meal-form .form-row {
+      grid-template-columns: 1fr; /* stack columns vertically */
+    }
+  
+    .meal-info .meal-image {
+      max-width: 100%;
+    }
+
+    .meal-form:not(.full-form) {
+      max-width: 100%;
+      gap: 18px;
+    }
+    
+    .image-preview {
+      max-width: 250px;
+      
+      img {
+        width: 180px;
+        height: 180px;
+      }
+    }
+    
+    .form-group label {
+      font-size: 15px;
+    }
+    
+    input[type="file"].form-input {
+      font-size: 13px;
+      
+      &::file-selector-button {
+        font-size: 11px;
+        padding: 6px 12px;
+      }
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .meal-form {
+      gap: 15px;
+    }
+    .form-input, .form-select, .form-textarea {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+    .btn-primary, .btn-secondary {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+    .meal-ingredients {
+      min-height: 80px;
+      max-height: 150px;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .meal-form:not(.full-form) {
+      gap: 16px;
+    }
+    
+    .image-preview {
+      max-width: 200px;
+      margin-top: 12px;
+      
+      img {
+        width: 150px;
+        height: 150px;
+        border-radius: 12px;
+      }
+    }
+    
+    .form-group label {
+      font-size: 14px;
+    }
+    
+    input[type="file"].form-input {
+      padding: 10px 12px;
+      font-size: 12px;
+      border-radius: 8px;
+      
+      &::file-selector-button {
+        font-size: 10px;
+        padding: 5px 10px;
+        margin-right: 8px;
+      }
+    }
+    
+    .form-actions .btn-primary {
+      padding: 12px 24px;
+      font-size: 13px;
+      min-width: 120px;
+    }
+    
+    .loading-state {
+      padding: 20px 15px;
+      
+      p {
+        font-size: 14px;
+      }
+    }
+    
+    .loading-spinner {
+      width: 35px;
+      height: 35px;
+    }
+  }
+  
+  @media (max-width: 360px) {
+    .add-meal-container {
+      padding: 16px;
+      border-radius: 12px;
+      h3 { font-size: 18px; margin-bottom: 16px; }
+    }
+
+    .meal-form:not(.full-form) {
+      gap: 14px;
+    }
+    
+    .image-preview {
+      max-width: 180px;
+      
+      img {
+        width: 130px;
+        height: 130px;
+        border-radius: 10px;
+        border-width: 2px;
+      }
+    }
+    
+    .form-group label {
+      font-size: 13px;
+    }
+    
+    input[type="file"].form-input {
+      padding: 8px 10px;
+      font-size: 11px;
+      
+      &::file-selector-button {
+        font-size: 9px;
+        padding: 4px 8px;
+      }
+    }
+    
+    .form-actions .btn-primary {
+      padding: 10px 20px;
+      font-size: 12px;
+      min-width: 100px;
+      border-radius: 8px;
+    }
+  }
+  
+  /* --- Image Error State --- */
+  .image-preview img {
+    /* Fallback styling if image fails to load */
+    background-color: #F8FFFE;
+    border: 2px dashed #E0F7F4;
+    
+    /* Add a subtle loading placeholder */
+    &::before {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+                  linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+                  linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+                  linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+      animation: loading-bg 2s linear infinite;
+    }
+  }
