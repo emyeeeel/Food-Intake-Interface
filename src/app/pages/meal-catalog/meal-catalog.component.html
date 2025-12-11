@@ -65,7 +65,7 @@
         </ng-container>
 
         <ng-container *ngIf="currentView === 'add-meal'">
-            <div class="row-2-add">
+            <!-- <div class="row-2-add">
                 <div class="title-text">
                     <h2>新增膳食</h2>
                     <span>請在此新增今日的膳食餐點內容</span>
@@ -122,11 +122,12 @@
                         {{ mealDescription.length }}/500
                     </div>
                 </div>
-            </div>
+            </div> -->
+            <h2>Add Meal</h2>
         </ng-container>
 
         <ng-container *ngIf="currentView === 'all-meals'">
-            <div class="row-2">
+            <!-- <div class="row-2">
                 <app-filter-icon></app-filter-icon>
                 <app-filter-options 
                     *ngFor="let filterOption of filterOptions" 
@@ -186,7 +187,7 @@
                         <span class="action">動作</span>
                     </div>
                     <div class="table-body">
-                        <!-- <div class="table-row" *ngFor="let meal of mealsData">
+                        <div class="table-row" *ngFor="let meal of mealsData">
                             <div class="meal-id">{{ meal.id }}</div>
                             <div class="weigh-volume">{{ meal.weightVolume }}</div>
                             <div class="day-cylce">{{ meal.dayCycle }}</div>
@@ -195,7 +196,7 @@
                             <div class="action">
 
                             </div>
-                        </div> -->
+                        </div>
                     </div>
                     <div class="table-nav">
                         <div class="prev">
@@ -215,11 +216,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
+            <h2>Display All Meals</h2>
         </ng-container>
 
         <ng-container *ngIf="currentView === 'print-meal'">
-            <div class="row-2-print">
+            <!-- <div class="row-2-print">
                 <div class="title-text">
                     <h2>列印膳食</h2>
                     <span>印出膳食資料</span>
@@ -230,8 +232,9 @@
                 </div>
             </div>
             <div class="row-3-print">
-                <!-- Additional print meal content -->
-            </div>
+                Additional print meal content
+            </div> -->
+            <h2>Print Meals</h2>
         </ng-container>
     </div>
 </div>
