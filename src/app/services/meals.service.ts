@@ -36,7 +36,7 @@ generateIngredientsFromMeal(mealData: {
   plate_type?: string,
   image?: string | File 
 }): Observable<any> {
-  const url = 'http://127.0.0.1:8000/api/generate-ingredients-from-meal/';
+  const url = `${this.baseUrl}/api/generate-ingredients-from-meal/`;
   
   // Create FormData for file upload support
   const formData = new FormData();
