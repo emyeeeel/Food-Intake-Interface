@@ -17,17 +17,24 @@
           />
         </div>
   
-        <!-- Image Upload -->
+        <!-- Image Capture -->
         <div class="form-group">
-          <label for="mealImage">Meal Image</label>
-          <input 
-            type="file"
-            id="mealImage"
-            name="mealImage"
-            accept="image/*"
-            (change)="onImageSelected($event)"
-            class="form-input"
-          />
+          <label>Meal Image</label>
+
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="captureMealImage()"
+            [disabled]="isLoading"
+          >
+            Capture Image
+          </button>
+
+          <div *ngIf="isCapturing" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Capturing image...</p>
+          </div>
+
           <div class="image-preview" *ngIf="mealImagePreview">
             <img [src]="mealImagePreview" alt="Meal Image Preview">
           </div>

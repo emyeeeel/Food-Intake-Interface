@@ -113,6 +113,12 @@
       align-items: center;
       text-align: center;
     }
+
+    /* Special styling for image capture group */
+    &:has(.btn-secondary) {
+      align-items: center;
+      text-align: center;
+    }
   }
   
   /* --- File Input Styling --- */
@@ -385,6 +391,126 @@
     }
   }
   
+  /* --- Image Capture Button Styling --- */
+  .btn-secondary {
+    padding: 12px 16px;
+    border: 2px solid #40C1AC;
+    border-radius: 12px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    color: #40C1AC;
+    background: linear-gradient(135deg, #FFFFFF, #F8FFFE);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-weight: 600;
+    min-width: 160px;
+    margin-bottom: 16px;
+    
+    &:hover:not(:disabled) {
+      border-color: #2FA695;
+      color: #2FA695;
+      background: linear-gradient(135deg, #F0FBF9, #E6FEF9);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(64, 193, 172, 0.2);
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: #40C1AC;
+      box-shadow: 0 0 0 3px rgba(64, 193, 172, 0.1);
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: #F3F4F6;
+      color: #9CA3AF;
+      border-color: #D1D5DB;
+      transform: none;
+    }
+  }
+  
+  /* --- Enhanced Image Capture States --- */
+  .form-group {
+    /* When capturing image */
+    &.capturing {
+      .btn-secondary {
+        background: linear-gradient(135deg, #40C1AC, #2FA695);
+        color: white;
+        border-color: #40C1AC;
+        
+        &::before {
+          content: "⏳ ";
+        }
+        
+        &:disabled {
+          opacity: 0.8;
+          background: linear-gradient(135deg, #B8D8D3, #9EC2BD);
+          color: white;
+          border-color: #B8D8D3;
+        }
+      }
+    }
+    
+    /* When image is captured */
+    &.captured {
+      .btn-secondary {
+        background: linear-gradient(135deg, #10B981, #059669);
+        color: white;
+        border-color: #10B981;
+        
+        &::before {
+          content: "✓ ";
+        }
+        
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, #059669, #047857);
+          border-color: #059669;
+        }
+      }
+    }
+  }
+  
+  /* --- Image Capture Error State --- */
+  .image-capture-error {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #FEF2F2, #FECACA);
+    border: 2px solid #F87171;
+    border-radius: 8px;
+    text-align: center;
+    
+    p {
+      color: #DC2626;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      font-size: 13px;
+    }
+    
+    .retry-btn {
+      background: linear-gradient(135deg, #EF4444, #DC2626);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: linear-gradient(135deg, #DC2626, #B91C1C);
+        transform: translateY(-1px);
+      }
+      
+      &::before {
+        content: "🔄 ";
+        margin-right: 4px;
+      }
+    }
+  }
+  
   @keyframes fadeInScale {
     from { opacity: 0; transform: scale(0.8); }
     to { opacity: 1; transform: scale(1); }
@@ -495,6 +621,30 @@
         padding: 6px 12px;
       }
     }
+
+    .btn-secondary {
+      min-width: 140px;
+      font-size: 13px;
+      padding: 10px 14px;
+      
+      &::before {
+        font-size: 14px;
+      }
+    }
+    
+    .loading-state {
+      padding: 16px 12px;
+      margin: 12px 0;
+      
+      .loading-spinner {
+        width: 35px;
+        height: 35px;
+      }
+      
+      p {
+        font-size: 13px;
+      }
+    }
   }
   
   @media (max-width: 480px) {
@@ -565,6 +715,31 @@
       width: 35px;
       height: 35px;
     }
+
+    .btn-secondary {
+      min-width: 120px;
+      font-size: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      
+      &::before {
+        font-size: 13px;
+        margin-right: 6px;
+      }
+    }
+    
+    .image-capture-error {
+      padding: 10px 12px;
+      
+      p {
+        font-size: 12px;
+      }
+      
+      .retry-btn {
+        font-size: 11px;
+        padding: 5px 10px;
+      }
+    }
   }
   
   @media (max-width: 360px) {
@@ -609,6 +784,30 @@
       min-width: 100px;
       border-radius: 8px;
     }
+
+    .btn-secondary {
+      min-width: 100px;
+      font-size: 11px;
+      padding: 8px 10px;
+      
+      &::before {
+        font-size: 12px;
+        margin-right: 4px;
+      }
+    }
+    
+    .loading-state {
+      padding: 12px 8px;
+      
+      .loading-spinner {
+        width: 25px;
+        height: 25px;
+      }
+      
+      p {
+        font-size: 11px;
+      }
+    }
   }
   
   /* --- Image Error State --- */
@@ -631,4 +830,11 @@
       background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
       animation: loading-bg 2s linear infinite;
     }
+  }
+  
+  /* --- Focus States for Accessibility --- */
+  .btn-secondary:focus,
+  .retry-btn:focus {
+    outline: 2px solid #40C1AC;
+    outline-offset: 2px;
   }

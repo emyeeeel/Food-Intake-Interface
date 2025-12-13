@@ -144,30 +144,36 @@ export class AddMealComponent {
 
   // Generate ingredients using MealsService
   private generateIngredientsFromMeal(mealName: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const mealData = {
-        meal_name: mealName,
-        meal: mealName, // Use meal_name as default meal description
-        meal_time: this.meal.meal_time || undefined,
-        day_cycle: this.meal.day_cycle || undefined,
-        plate_type: this.meal.plate_type || undefined,
-        image: this.mealImage || undefined
-      };
+  return new Promise((resolve, reject) => {
 
-      console.log('Generating ingredients for meal with data:', mealData);
+    const formData = new FormData();
 
-      this.mealsService.generateIngredientsFromMeal(mealData).subscribe({
-        next: (response) => {
-          console.log('Ingredients generation response:', response);
-          resolve(response);
-        },
-        error: (error) => {
-          console.error('Ingredients generation error:', error);
-          reject(error);
-        }
-      });
+    formData.append('meal_name', mealName);
+    formData.append('meal', mealName);
+
+    if (this.meal.meal_time) {
+      formData.append('meal_time', this.meal.meal_time);
+    }
+
+    if (this.meal.day_cycle) {
+      formData.append('day_cycle', this.meal.day_cycle);
+    }
+
+    if (this.meal.plate_type) {
+      formData.append('plate_type', this.meal.plate_type);
+    }
+
+    if (this.mealImage) {
+      formData.append('image', this.mealImage, this.mealImage.name);
+    }
+
+    this.mealsService.generateIngredientsFromMeal(formData).subscribe({
+      next: resolve,
+      error: reject
     });
-  }
+  });
+}
+
 
   // Final form submit
   onSubmit(): void {
@@ -245,4 +251,31 @@ export class AddMealComponent {
     return this.meal.ingredients?.map(ing => ing.name) || [];
   }
 
+  isCapturing = false;
+
+  captureMealImage(): void {
+    this.isCapturing = true;
+  
+    this.mealsService.captureMealImage().subscribe({
+      next: (blob: Blob) => {
+        this.isCapturing = false;
+  
+        // Convert Blob → File
+        const file = new File([blob], 'meal.jpg', { type: blob.type });
+        this.mealImage = file;
+  
+        // Preview
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.mealImagePreview = reader.result as string;
+        };
+        reader.readAsDataURL(file);
+      },
+      error: (error) => {
+        this.isCapturing = false;
+        console.error('Image capture failed:', error);
+      }
+    });
+  }
+  
 }
