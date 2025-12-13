@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { MealsService } from '../../services/meals.service';
 import { TagsComponent } from "../tags/tags.component";
 import { IngredientsService } from '../../services/ingredients.service';
-import { forkJoin } from 'rxjs';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -22,7 +22,7 @@ export class AddMealComponent {
     day_cycle: '',
     meal_description: '',
     plate_type: '',
-    ingredients: [] as Ingredient[] // Explicitly type as Ingredient array
+    ingredients: [] as number[]
   };
 
   showFullForm = false;
@@ -53,7 +53,7 @@ export class AddMealComponent {
 ];
 
 
-  constructor(private mealsService: MealsService, private ingredientsService: IngredientsService) {}
+  constructor(private mealsService: MealsService, private ingredientsService: IngredientsService, private router: Router) {}
 
   mealImage: File | null = null;
   mealImagePreview: string | null = null;
@@ -85,7 +85,12 @@ export class AddMealComponent {
         if (response && response.ingredients) {
           this.generatedIngredients = response.ingredients;
           // Convert to Ingredient objects if needed
-          this.meal.ingredients = this.processIngredientsResponse(response.ingredients);
+          if (response && response.ingredients) {
+            this.generatedIngredients = response.ingredients;
+          
+            // store ONLY ingredient IDs on the meal
+            this.meal.ingredients = response.ingredients.map((ing: any) => ing.id);
+          }
           console.log('Generated ingredients:', this.meal.ingredients);
         }
         
@@ -120,7 +125,13 @@ export class AddMealComponent {
         this.mealsService.getMealByName(this.meal.meal_name!).subscribe({
           next: (mealsFromApi: Meal[]) => {
             if (mealsFromApi.length > 0) {
-              this.meal = mealsFromApi[0];
+              const apiMeal = mealsFromApi[0];
+
+              this.meal = {
+                ...this.meal,
+                ...apiMeal,
+                ingredients: apiMeal.ingredients // keep IDs
+              };
 
               console.log('Meal fetched from API:', this.meal);
             } else {
@@ -197,10 +208,11 @@ private buildMealFormData(): FormData {
 
   // Ingredients (IDs or names depending on backend)
   if (this.meal.ingredients?.length) {
-    this.meal.ingredients.forEach((ing, index) => {
-      formData.append(`ingredients[${index}]`, String(ing.id));
+    this.meal.ingredients.forEach((id) => {
+      formData.append('ingredients', String(id));
     });
   }
+  
 
   if (this.mealImage) {
     formData.append('image', this.mealImage, this.mealImage.name);
@@ -227,7 +239,8 @@ private buildMealFormData(): FormData {
       this.meal = updatedMeal;
 
       console.log('Meal successfully updated:', updatedMeal);
-      alert('Meal updated successfully!');
+      
+      this.router.navigate(['/meal-catalog']);
     },
     error: (error) => {
       this.isSubmitting = false;
@@ -241,7 +254,7 @@ private buildMealFormData(): FormData {
 
   onCancel(): void {
     this.resetForm();
-    // Add navigation back or close modal logic here
+    this.router.navigate(['/meal-catalog/add']);
   }
 
   private isValidMeal(): boolean {
@@ -261,7 +274,7 @@ private buildMealFormData(): FormData {
       day_cycle: '',
       meal_description: '',
       plate_type: '',
-      ingredients: [] as Ingredient[]
+      ingredients: []
     };
     this.generatedIngredients = [];
     this.mealImage = null;
@@ -273,7 +286,7 @@ private buildMealFormData(): FormData {
 
   // Helper method to get ingredient names for display
   getIngredientNames(): string[] {
-    return this.meal.ingredients?.map(ing => ing.name) || [];
+    return this.generatedIngredients.map(ing => ing.name);
   }
 
   isCapturing = false;

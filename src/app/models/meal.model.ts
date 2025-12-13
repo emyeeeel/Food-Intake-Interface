@@ -8,7 +8,7 @@ export interface Meal {
                'day_8' | 'day_9' | 'day_10' | 'day_11' | 'day_12' | 'day_13' | 'day_14' | string; 
   meal_description: string;
   plate_type: 'metal_plate' | 'metal_bowl' | 'ceramic_bowl' | string;
-  ingredients: Ingredient[]; 
+  ingredients: number[]; 
   image?: string | null; 
   created_at: string;
   updated_at: string;
