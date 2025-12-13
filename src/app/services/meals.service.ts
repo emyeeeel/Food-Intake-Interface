@@ -28,16 +28,28 @@ export class MealsService {
     );
   }
 
-generateIngredientsFromMeal(formData: FormData): Observable<any> {
-  const url = `${this.baseUrl}/api/generate-ingredients-from-meal/`;
-  return this.http.post<any>(url, formData);
-}
+  generateIngredientsFromMeal(formData: FormData): Observable<any> {
+    const url = `${this.baseUrl}/api/generate-ingredients-from-meal/`;
+    return this.http.post<any>(url, formData);
+  }
 
-captureMealImage() {
-  return this.http.get(
-    'http://127.0.0.1:8000/api/capture/meal/',
-    { responseType: 'blob' }
-  );
-}
+  captureMealImage() {
+    return this.http.get(
+      'http://127.0.0.1:8000/api/capture/meal/',
+      { responseType: 'blob' }
+    );
+  }
 
+  getMealByName(mealName: string): Observable<Meal[]> {
+    const params = { meal_name: mealName };
+    return this.http.get<Meal[]>(this.apiUrl, { params });
+  }
+
+  addMeal(meal: Meal): Observable<Meal> {
+    return this.http.post<Meal>(this.apiUrl, meal);
+  }
+
+  updateMeal(id: number, meal: Meal): Observable<Meal> {
+    return this.http.put<Meal>(`${this.apiUrl}${id}/`, meal);
+  }
 }
