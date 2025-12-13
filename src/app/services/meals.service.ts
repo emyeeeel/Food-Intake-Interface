@@ -46,10 +46,11 @@ export class MealsService {
   }
 
   addMeal(meal: Meal): Observable<Meal> {
-    return this.http.post<Meal>(this.apiUrl, meal);
+    return this.http.post<Meal>(this.apiUrl, meal); 
   }
 
-  updateMeal(id: number, meal: Meal): Observable<Meal> {
-    return this.http.put<Meal>(`${this.apiUrl}${id}/`, meal);
+
+  updateMeal(id: number, data: FormData): Observable<Meal> {
+    return this.http.put<Meal>(`${this.apiUrl}${id}/`, data);
   }
 }

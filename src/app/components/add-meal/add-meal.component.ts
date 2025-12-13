@@ -8,18 +8,6 @@ import { TagsComponent } from "../tags/tags.component";
 import { IngredientsService } from '../../services/ingredients.service';
 import { forkJoin } from 'rxjs';
 
-interface MealPayload{
-  id: number;
-  meal_name: string;
-  meal_time: string; 
-  day_cycle?: string; 
-  meal_description: string;
-  plate_type: string;
-  ingredients: number[]; 
-  image?: string | null; 
-  created_at: string;
-  updated_at: string;
-}
 
 @Component({
   selector: 'app-add-meal',
@@ -46,33 +34,24 @@ export class AddMealComponent {
 
   // Dropdown options based on your model
   mealTimeOptions = [
-    { value: 'lunch', label: 'Lunch' },
-    { value: 'dinner', label: 'Dinner' },
-    { value: 'snack', label: 'Snack' }
-  ];
+  { value: '午餐', label: 'Lunch' },
+  { value: '晚餐', label: 'Dinner' },
+  { value: '點心', label: 'Snack' }
+];
 
-  dayCycleOptions = [
-    { value: 'day_1', label: 'Day 1' },
-    { value: 'day_2', label: 'Day 2' },
-    { value: 'day_3', label: 'Day 3' },
-    { value: 'day_4', label: 'Day 4' },
-    { value: 'day_5', label: 'Day 5' },
-    { value: 'day_6', label: 'Day 6' },
-    { value: 'day_7', label: 'Day 7' },
-    { value: 'day_8', label: 'Day 8' },
-    { value: 'day_9', label: 'Day 9' },
-    { value: 'day_10', label: 'Day 10' },
-    { value: 'day_11', label: 'Day 11' },
-    { value: 'day_12', label: 'Day 12' },
-    { value: 'day_13', label: 'Day 13' },
-    { value: 'day_14', label: 'Day 14' }
-  ];
+
+  dayCycleOptions = Array.from({ length: 14 }, (_, i) => ({
+  value: i + 1,            // ✅ INTEGER
+  label: `Day ${i + 1}`
+}));
+
 
   plateTypeOptions = [
-    { value: 'metal_plate', label: 'Metal Plate' },
-    { value: 'metal_bowl', label: 'Metal Bowl' },
-    { value: 'ceramic_bowl', label: 'Ceramic Bowl' }
-  ];
+  { value: '金属板', label: 'Metal Plate' },
+  { value: '金属碗', label: 'Metal Bowl' },
+  { value: '陶瓷碗', label: 'Ceramic Bowl' }
+];
+
 
   constructor(private mealsService: MealsService, private ingredientsService: IngredientsService) {}
 
@@ -144,30 +123,6 @@ export class AddMealComponent {
               this.meal = mealsFromApi[0];
 
               console.log('Meal fetched from API:', this.meal);
-
-              // Get list of ingredient IDs
-              const ingredientIds = this.getIngredientIds();
-              console.log('Ingredient IDs:', ingredientIds);
-
-              if (ingredientIds.length > 0) {
-                // Fetch all ingredients by their IDs
-                const ingredientRequests = ingredientIds.map(id =>
-                  this.ingredientsService.getIngredient(id)
-                );
-              
-                forkJoin(ingredientRequests).subscribe({
-                  next: (ingredients: Ingredient[]) => {
-                    this.generatedIngredients = ingredients;
-                    console.log('Populated generatedIngredients:', this.generatedIngredients);
-                  },
-                  error: (err) => {
-                    console.error('Failed to fetch ingredients by IDs:', err);
-                  }
-                });
-              } else {
-                // If no ingredient IDs, just clear
-                this.generatedIngredients = [];
-              }
             } else {
               console.warn('No meals found with the given name.');
             }
@@ -186,14 +141,11 @@ export class AddMealComponent {
     }
   }
 
-  getIngredientIds(): number[] {
-    return this.meal.ingredients!.map(ingredient => ingredient.id) || [];
-  }
 
   // Process the ingredients response from the API
   private processIngredientsResponse(ingredients: any[]): Ingredient[] {
     return ingredients.map(ingredient => ({
-      id: ingredient.id || 0, // API might not return ID for new ingredients
+      id: ingredient.id, 
       name: ingredient.name,
       food_group: ingredient.food_group,
       nutrients: ingredient.nutrients || [],
@@ -234,58 +186,57 @@ export class AddMealComponent {
 }
 
 
+private buildMealFormData(): FormData {
+  const formData = new FormData();
 
-  // Final form submit
-  onSubmit(): void {
-    if (!this.isValidMeal()) return;
-  
-    this.isSubmitting = true;
-  
-    // Map this.meal to MealPayload
-    const mealPayload: MealPayload = {
-      id: this.meal.id || 0,
-      meal_name: this.meal.meal_name!,
-      meal_time: this.meal.meal_time!,
-      day_cycle: this.meal.day_cycle,
-      meal_description: this.meal.meal_description!,
-      plate_type: this.meal.plate_type!,
-      ingredients: (this.meal.ingredients || []).map(ing => ing.id),
-      image: this.mealImagePreview || null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-  
-    // Determine whether to create or update
-    if (this.meal.id && this.meal.id > 0) {
-      // Update existing meal
-      this.mealsService.updateMeal(this.meal.id, mealPayload as unknown as Meal)
-        .subscribe({
-          next: (updatedMeal) => {
-            console.log('Meal updated successfully:', updatedMeal);
-            this.isSubmitting = false;
-            this.resetForm();
-          },
-          error: (err) => {
-            console.error('Failed to update meal:', err);
-            this.isSubmitting = false;
-          }
-        });
-    } else {
-      // Add new meal
-      this.mealsService.addMeal(mealPayload as unknown as Meal)
-        .subscribe({
-          next: (newMeal) => {
-            console.log('Meal created successfully:', newMeal);
-            this.isSubmitting = false;
-            this.resetForm();
-          },
-          error: (err) => {
-            console.error('Failed to create meal:', err);
-            this.isSubmitting = false;
-          }
-        });
-    }
+  formData.append('meal_name', this.meal.meal_name!);
+  formData.append('meal_description', this.meal.meal_description!);
+  formData.append('meal_time', this.meal.meal_time!);
+  formData.append('day_cycle', this.meal.day_cycle!);
+  formData.append('plate_type', this.meal.plate_type!);
+
+  // Ingredients (IDs or names depending on backend)
+  if (this.meal.ingredients?.length) {
+    this.meal.ingredients.forEach((ing, index) => {
+      formData.append(`ingredients[${index}]`, String(ing.id));
+    });
   }
+
+  if (this.mealImage) {
+    formData.append('image', this.mealImage, this.mealImage.name);
+  }
+
+  return formData;
+}
+
+
+
+  onSubmit(): void {
+  if (!this.isValidMeal() || !this.meal.id) {
+    console.warn('Meal is invalid or missing ID');
+    return;
+  }
+
+  this.isSubmitting = true;
+
+  const formData = this.buildMealFormData();
+
+  this.mealsService.updateMeal(this.meal.id, formData).subscribe({
+    next: (updatedMeal) => {
+      this.isSubmitting = false;
+      this.meal = updatedMeal;
+
+      console.log('Meal successfully updated:', updatedMeal);
+      alert('Meal updated successfully!');
+    },
+    error: (error) => {
+      this.isSubmitting = false;
+      console.error('Failed to update meal:', error);
+      alert('Failed to update meal. Please try again.');
+    }
+  });
+}
+
   
 
   onCancel(): void {
