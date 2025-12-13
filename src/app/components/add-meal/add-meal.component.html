@@ -91,7 +91,7 @@
             <div class="form-row ingredients-row">
             <label>Ingredients</label>
             <div class="meal-ingredients">
-                <app-tags *ngFor="let ingredientName of meal.ingredients" [tagText]="ingredientName.name"></app-tags>
+                <app-tags *ngFor="let ingredientName of generatedIngredients" [tagText]="ingredientName.name"></app-tags>
             </div>
             </div>
         
