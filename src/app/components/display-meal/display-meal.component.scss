@@ -1,0 +1,249 @@
+.display-meal-container {
+    width: 100%;
+    background-color: #CAECE5;
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
+    max-height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #FFFFFF, #F8FFFE);
+    padding: 8px 12px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 49, 60, 0.08);
+    border: 1px solid #B8D8D3;
+    flex-shrink: 0;
+
+    h2{
+        color: #00313C;
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        margin: 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .header-actions{
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .total-count{
+        color: #00313C;
+        font-size: 10px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #E0F7F4, #C7F0E8);
+        padding: 3px 6px;
+        border-radius: 6px;
+        border: 1px solid #B8D8D3;
+    }
+
+    .btn-refresh{
+        background: linear-gradient(135deg, #40C1AC, #2FA695);
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 10px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 6px rgba(64, 193, 172, 0.2);
+    }
+  }
+
+  .loading-state, .error-state, .empty-state {
+    text-align: center;
+    padding: 20px 15px;
+    background: linear-gradient(135deg, #FFFFFF, #F8FFFE);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 49, 60, 0.08);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .loading-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #E6FEF9;
+    border-top: 3px solid #40C1AC;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+  }
+  
+  .page-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 8px;
+  }
+
+  .pagination-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0;
+    color: #00313C;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .meals-grid-container {
+    background: linear-gradient(135deg, #FFFFFF, #F8FFFE);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 49, 60, 0.1);
+    border: 1px solid #B8D8D3;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .meals-grid {
+    display: grid;
+    grid-template-columns: 1fr; 
+    gap: 6px;
+    padding: 8px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  .page-indicator {
+    color: #00313C;
+    font-size: 11px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #40C1AC, #2FA695);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 5px 10px;
+  }
+  
+  .page-numbers{
+    display: flex;
+    justify-content: space-between;
+    background-color: transparent;
+
+    .btn-page-number {
+        background: linear-gradient(135deg, #E0F7F4, #C7F0E8); 
+        color: #00313C;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-page-number.active {
+        background: linear-gradient(135deg, #40C1AC, #2FA695); 
+        color: white;
+        font-weight: 700; 
+      }
+  }
+ 
+  .nav-buttons{
+    display: flex;
+    justify-content: space-between;
+
+    .btn-page{
+        background: linear-gradient(135deg, #40C1AC, #2FA695); 
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+
+    .btn-page:disabled {
+        background: #f1f1f1; 
+        color: #b8d8d3; 
+        cursor: not-allowed;
+        box-shadow: none; 
+      }
+  }
+
+  app-meal-item {
+    width: 100%;
+    box-sizing: border-box; 
+    display: block;
+  }
+
+  @media (min-width: 1024px){
+    .meals-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 12px;
+        max-height: 400px;
+        overflow-y: hidden;
+      }
+    
+      app-meal-item {
+        max-width: 350px;
+      }
+
+      .page-numbers{
+        .btn-page-number {
+            color: #00313C;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 6px;
+          }
+    
+          .btn-page-number.active {
+            font-weight: 700; 
+          }
+      }
+
+      .nav-buttons{
+        .btn-page{
+            font-size: 16px;
+            font-weight: 600;
+            padding: 5px 10px;
+        }
+    
+        .btn-page:disabled {
+            background: #f1f1f1; 
+            color: #b8d8d3; 
+            cursor: not-allowed;
+            box-shadow: none; 
+          }
+      }
+  }
+
+  @media (min-width: 1280px){
+    .meals-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 15px;
+        overflow-y: hidden;
+      } //why is app-meal-item going beyond meals-grid padding? please contain this
+      
+
+  }

@@ -57,6 +57,13 @@
     box-sizing: border-box;
 }
 
+app-display-meal{
+  width: 100%;
+    max-width: 883px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
   &.mobile-menu-open {
     filter: brightness(0.7);
     pointer-events: none;

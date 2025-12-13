@@ -1,0 +1,141 @@
+<div class="display-meal-container">
+    <div class="header">
+      <h2>All Meals</h2>
+      <div class="header-actions">
+        <span class="total-count" *ngIf="!isLoading && !error">
+          Total: {{ totalMeals }} meals
+        </span>
+        <button 
+          type="button" 
+          class="btn-refresh"
+          (click)="refreshMeals()"
+          [disabled]="isLoading"
+        >
+          <span *ngIf="!isLoading">Refresh</span>
+          <span *ngIf="isLoading">Loading...</span>
+        </button>
+      </div>
+    </div>
+  
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading meals...</p>
+    </div>
+  
+    <!-- Error State -->
+    <div *ngIf="error && !isLoading" class="error-state">
+      <div class="error-icon">❌</div>
+      <p class="error-message">{{ error }}</p>
+      <button type="button" class="btn-retry" (click)="refreshMeals()">
+        Try Again
+      </button>
+    </div>
+  
+    <!-- Meals Grid with Pagination -->
+    <div *ngIf="!isLoading && !error && meals.length > 0" class="meals-grid-container">
+      <!-- Current Page Info -->
+      <div class="page-info">
+        <span class="page-indicator">
+          Page {{ currentPage }} of {{ totalPages }}
+        </span>
+        <!-- <span class="showing-info">
+          Showing {{ getStartIndex() }} - {{ getEndIndex() }} of {{ totalMeals }} meals
+        </span> -->
+      </div>
+  
+      <!-- Meals Grid using app-meal-item -->
+      <div class="meals-grid">
+        <app-meal-item 
+          *ngFor="let meal of paginatedMeals; trackBy: trackByMealId; let i = index"
+          [mealImageSrc]="meal.image || ''"
+          [mealCode]="getMealCode(meal)"
+          [dayCycleValue]="'第' + (meal.day_cycle || '') + '天'"
+          [mealTimeValue]="meal.meal_time || ''"
+          [plateTypeValue]="meal.plate_type || 'Standard'"
+          [plateTypeValue]="meal.plate_type || ''"
+          class="meal-item-wrapper"
+        >
+        </app-meal-item>
+      </div>
+  
+      <!-- Pagination Controls -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          <span>
+            Displaying {{ paginatedMeals.length }} of {{ totalMeals }} meals
+          </span>
+        </div>
+        
+        <div class="pagination-controls">
+          <div class="nav-buttons">
+            <button 
+            type="button"
+            class="btn-page btn-first"
+            [disabled]="currentPage === 1"
+            (click)="goToFirstPage()"
+            title="First Page"
+          >
+          <<
+          </button>
+          
+          <button 
+            type="button"
+            class="btn-page btn-prev"
+            [disabled]="currentPage === 1"
+            (click)="goToPreviousPage()"
+            title="Previous Page"
+          >
+          <
+          </button>
+          </div>
+          
+          <div class="page-numbers">
+            <button
+              *ngFor="let page of getVisiblePages()"
+              type="button"
+              class="btn-page-number"
+              [class.active]="page === currentPage"
+              [class.ellipsis]="page === '...'"
+              [disabled]="page === '...'"
+              (click)="goToPage(page)"
+              [title]="page === '...' ? '' : 'Go to page ' + page"
+            >
+              {{ page }}
+            </button>
+          </div>
+          
+          <div class="nav-buttons">
+            <button 
+            type="button"
+            class="btn-page btn-next"
+            [disabled]="currentPage === totalPages"
+            (click)="goToNextPage()"
+          >
+          >
+          </button>
+          
+          <button 
+            type="button"
+            class="btn-page btn-last"
+            [disabled]="currentPage === totalPages"
+            (click)="goToLastPage()"
+            title="Last Page"
+          >
+          >>
+          </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && !error && meals.length === 0" class="empty-state">
+      <div class="empty-icon">🍽️</div>
+      <h3>No Meals Found</h3>
+      <p>There are no meals in the database yet.</p>
+      <button type="button" class="btn-primary" routerLink="/add-meal">
+        Add First Meal
+      </button>
+    </div>
+  </div>

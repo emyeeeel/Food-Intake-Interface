@@ -18,12 +18,13 @@ import { DayCycleComponent } from '../../components/day-cycle/day-cycle.componen
 import { MealsService } from '../../services/meals.service';
 import { Meal } from '../../models/meal.model';
 import { AddMealComponent } from '../../components/add-meal/add-meal.component';
+import { DisplayMealComponent } from "../../components/display-meal/display-meal.component";
 
 @Component({
   selector: 'app-meal-catalog',
   imports: [
     CommonModule,
-    FormsModule, 
+    FormsModule,
     MenuBarComponent,
     BackComponent,
     NotifComponent,
@@ -37,8 +38,9 @@ import { AddMealComponent } from '../../components/add-meal/add-meal.component';
     MealItemComponent,
     ServingTimeComponent,
     DayCycleComponent,
-    AddMealComponent
-  ],
+    AddMealComponent,
+    DisplayMealComponent
+],
   templateUrl: './meal-catalog.component.html',
   styleUrl: './meal-catalog.component.scss'
 })
