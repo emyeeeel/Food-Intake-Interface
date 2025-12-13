@@ -1,9 +1,9 @@
-<div class="tag-container">
-    <span class="tag-text">{{ tagText }}</span>
-    <img 
-        *ngIf="showCloseButton"
-        src="assets/icons/close-icon.svg" 
-        alt="Close" 
-        class="close-btn" 
-        (click)="onClose()">
+<div class="tag-container" *ngIf="isVisible">
+  <span class="tag-text">{{ tagText }}</span>
+  <img 
+      *ngIf="showCloseButton"
+      src="assets/icons/close-icon.svg" 
+      alt="Close" 
+      class="close-btn" 
+      (click)="onClose()">
 </div>

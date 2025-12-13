@@ -55,20 +55,6 @@
     max-width: 883px;
     margin: 0 auto;
     box-sizing: border-box;
-    
-    /* Height containment - ensure it doesn't exceed parent */
-    max-height: 100%;
-    height: fit-content;
-    overflow: hidden;
-    
-    /* Flex child behavior for proper height calculation */
-    flex-shrink: 1;
-    min-height: 0; /* Important for flex children to shrink properly */
-    
-    /* Ensure internal scrolling if content is too tall */
-    display: flex;
-    flex-direction: column;
-    // border: 1px solid red;
 }
 
   &.mobile-menu-open {

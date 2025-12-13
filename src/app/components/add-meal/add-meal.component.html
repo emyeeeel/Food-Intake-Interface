@@ -2,7 +2,6 @@
     <div class="add-meal-container">
       <h3>Add New Meal</h3>
       
-      <!-- Initial Form - Only Meal Name -->
       <form class="meal-form" *ngIf="!showFullForm" (ngSubmit)="onInitialSubmit()" #initialForm="ngForm">
         <div class="form-group">
           <label for="mealName">Meal Name</label>
@@ -17,7 +16,6 @@
           />
         </div>
   
-        <!-- Image Capture -->
         <div class="form-group">
           <label>Meal Image</label>
 
@@ -50,23 +48,24 @@
         </div>
       </form>
   
-      <!-- Full Form - After API Response -->
         <form class="meal-form" *ngIf="showFullForm" (ngSubmit)="onSubmit()" #mealForm="ngForm">
 
-            <!-- Row 1: Meal Name + Image (Col 1) | Combined Dropdowns (Col 2) -->
+          <div class="row-1 meal-name">
+            <h2>{{meal.meal_name}}</h2>
+          </div>
+
             <div class="form-row">
             <div class="form-col meal-info">
-                <h2>{{meal.meal_name}}</h2>
                 <img [src]="meal.image" alt="Meal Image" class="meal-image">
             </div>
         
             <div class="form-col dropdowns">
                 <div class="dropdown-wrapper">
-                <label for="mealTime">Meal Time</label>
-                <select id="mealTime" name="mealTime" [(ngModel)]="meal.meal_time" class="form-select" required>
-                    <option value="" disabled>Select meal time</option>
-                    <option *ngFor="let option of mealTimeOptions" [value]="option.value">{{ option.label }}</option>
-                </select>
+                  <label for="mealTime">Meal Time</label>
+                  <select id="mealTime" name="mealTime" [(ngModel)]="meal.meal_time" class="form-select" required>
+                      <option value="" disabled>Select meal time</option>
+                      <option *ngFor="let option of mealTimeOptions" [value]="option.value">{{ option.label }}</option>
+                  </select>
                 </div>
         
                 <div class="dropdown-wrapper">
@@ -87,7 +86,6 @@
             </div>
             </div>
         
-            <!-- Row 2: Ingredients -->
             <div class="form-row ingredients-row">
             <label>Ingredients</label>
             <div class="meal-ingredients">
@@ -95,7 +93,6 @@
             </div>
             </div>
         
-            <!-- Row 3: Form Actions -->
             <div class="form-row form-actions-row">
             <button type="button" class="btn-secondary" (click)="onCancel()">Cancel</button>
             <button type="submit" class="btn-primary" [disabled]="!mealForm.valid || isSubmitting">

@@ -206,7 +206,8 @@ private buildMealFormData(): FormData {
   formData.append('day_cycle', this.meal.day_cycle!);
   formData.append('plate_type', this.meal.plate_type!);
 
-  // Ingredients (IDs or names depending on backend)
+  console.log('Ingredients List: ', this.generatedIngredients)
+
   if (this.meal.ingredients?.length) {
     this.meal.ingredients.forEach((id) => {
       formData.append('ingredients', String(id));
