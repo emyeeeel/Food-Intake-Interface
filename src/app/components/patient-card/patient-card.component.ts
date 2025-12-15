@@ -6,6 +6,7 @@ import { RecommendedIntake } from '../../models/recommended-intake.model';
 import { CommonModule } from '@angular/common';
 import { Meal } from '../../models/meal.model';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-patient-card',
@@ -22,7 +23,7 @@ export class PatientCardComponent implements OnInit {
   recommendedIntake: RecommendedIntake | null = null;
   loading: boolean = true;
   error: string | null = null;
-  intakeUnit: string | null = null;
+  intakeUnit: string | null = null;  
 
   totalPatients: number = 0;
 
@@ -30,8 +31,15 @@ export class PatientCardComponent implements OnInit {
     private patientService: PatientService,
     private recommendedIntakeService: RecommendedIntakeService,
     private router: Router,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
   ) {}
+
+  ngOnInit(): void {
+    this.loadPatientCount(); 
+    if (this.patientId) {
+      this.fetchPatientData();
+    }
+  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
@@ -49,13 +57,6 @@ export class PatientCardComponent implements OnInit {
           this.closeOptions();
         }
       }
-    }
-  }
-
-  ngOnInit(): void {
-    this.loadPatientCount(); 
-    if (this.patientId) {
-      this.fetchPatientData();
     }
   }
 

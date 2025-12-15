@@ -7,6 +7,7 @@ import { Patient } from '../../models/patient.model';
 import { RecommendedIntake } from '../../models/recommended-intake.model';
 import { CommonModule } from '@angular/common';
 import jsQR from 'jsqr';
+import { GetAnalysisService } from '../../services/get-analysis.service';
 
 @Component({
   selector: 'app-patient-details',
@@ -20,7 +21,7 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
 
   patient: Patient | null = null;
   recommendedIntake: RecommendedIntake | null = null;
-  recommendedAnalysis: String | null = null;
+  recommendedAnalysis: string | null = null;
   loading: boolean = true;
   showQRCode = false;
   showScanner = false;
@@ -30,14 +31,93 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
   private stream: MediaStream | null = null;
   private scanInterval: any;
 
+  query = `
+  You are a clinical nutrition assistant writing guidance for non-medical caregivers.
+  
+  TASK:
+  Review the patient information, recommended daily intake, and meals, then provide clear dietary guidance that compares actual intake patterns against recommended needs.
+  
+  CRITICAL OUTPUT RULES:
+  - Output PLAIN TEXT only
+  - Do NOT use JSON
+  - Do NOT use markdown
+  - Do NOT use bullet symbols other than the ones shown below
+  - Do NOT use code blocks or backticks
+  - Do NOT include medical disclaimers
+  - Do NOT include any introductory or closing remarks
+  
+  FORMAT RULES (MUST FOLLOW EXACTLY):
+  
+  Summary:
+  (2 short sentences describing overall diet vs recommended intake)
+  
+  Key Health Concerns:
+  - Line 1
+  - Line 2
+  
+  Dietary Issues Observed:
+  - Line 1
+  - Line 2
+  
+  Caregiver Action Steps:
+  1. Step one
+  2. Step two
+  3. Step three
+  
+  CONTENT LIMITS:
+  - Keep total length under 140 words
+  - Use simple, supportive language
+  - Focus on food choices, portion size, and balance
+  - Reference recommended intake only when helpful for guidance
+  
+  PATIENT DETAILS:
+  Patient Name: Granny
+  Age: 72
+  Gender: Female
+  Height: 173 cm
+  Weight: 98 kg
+  BMI: 32.74
+  Heart Rate: 93 bpm
+  Blood Pressure: 140/90 mmHg
+  Activity Level: Active
+  
+  RECOMMENDED DAILY INTAKE:
+  Calories: 2547 kcal
+  Protein: 78.1 g
+  Carbohydrates: 350.2 g
+  Fat: 78 g
+  Total Fiber: 35.8 g
+  Alpha Linolenic Acid: 1.1 g
+  Linoleic Acid: 10.998 g
+  Total Water: 2.7 L
+  
+  MEAL INTAKES:
+  Meal 1: Braised pork chop, 690 g
+  Meal 2: Dried fish in soy sauce, 240 g
+  
+  FINAL CHECK:
+  Return ONLY the formatted text exactly as specified above. No extra text.
+  `;
+  
   constructor(
     private patientService: PatientService,
     private recommendedIntakeService: RecommendedIntakeService,
+    private getAnalysisService: GetAnalysisService,
     private router: Router
   ) {}
 
   ngOnInit() {
     this.loadPatient(this.patientId);
+    this.getAnalysisService.getAnalysis(this.query).subscribe({
+      next: (response: { recommendation: string }) => {
+        this.recommendedAnalysis = response.recommendation;
+        console.log(this.recommendedAnalysis)
+      },
+      error: (err) => {
+        console.error(err);
+        this.recommendedAnalysis = 'Failed to load analysis.';
+      }
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
