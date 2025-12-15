@@ -40,7 +40,7 @@
   }
 
   /* Global container width constraint */
-  div {
+  div, app-display-ingredients {
     width: 100%;
     max-width: 883px;
     margin: 0 auto;

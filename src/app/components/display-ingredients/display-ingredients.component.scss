@@ -1,4 +1,4 @@
-.display-meal-container {
+.display-ingredients-container {
     width: 100%;
     background-color: #CAECE5;
     box-sizing: border-box;
@@ -7,9 +7,9 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-  }
+}
 
-  .header{
+.header{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -104,7 +104,7 @@
     font-weight: 600;
   }
 
-  .meals-grid-container {
+  .ingredients-grid-container {
     background: linear-gradient(135deg, #FFFFFF, #F8FFFE);
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 49, 60, 0.1);
@@ -116,7 +116,7 @@
     flex-direction: column;
   }
 
-  .meals-grid {
+  .ingredients-grid {
     display: grid;
     grid-template-columns: 1fr; 
     gap: 6px;
@@ -188,18 +188,17 @@
       }
   }
 
-  app-meal-item {
+  app-ingredients-card  {
     width: 100%;
     box-sizing: border-box; 
     display: block;
   }
 
   @media (min-width: 1024px){
-    .meals-grid {
+    .ingredients-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
         padding: 12px;
-        max-height: 400px;
         overflow-y: hidden;
       }
     
@@ -237,38 +236,38 @@
       }
   }
 
-  @media (min-width: 1280px){
+  @media (min-width: 1280px) {
     .meals-grid {
-        grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 15px;
+      overflow-y: hidden;
+    }
+    
+    .header {
+      padding: 12px 20px;
+      margin-bottom: 12px;
+  
+      h2 {
+        font-size: 20px;
+      }
+  
+      .total-count {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+  
+      .btn-refresh {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+  
+      .header-actions {
         gap: 12px;
-        padding: 15px;
-        overflow-y: hidden;
-      } 
-      
-      .header {
-        padding: 12px 20px;
-        margin-bottom: 12px;
-    
-        h2 {
-          font-size: 20px;
-        }
-    
-        .total-count {
-          font-size: 12px;
-          padding: 4px 8px;
-        }
-    
-        .btn-refresh {
-          font-size: 12px;
-          padding: 6px 12px;
-        }
-    
-        .header-actions {
-          gap: 12px;
-        }
       }
-    
-      .pagination-controls {
-        margin-bottom: 20px;
-      }
+    }
+  
+    .pagination-controls {
+      margin-bottom: 20px;
+    }
   }

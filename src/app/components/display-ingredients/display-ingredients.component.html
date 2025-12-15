@@ -1,0 +1,133 @@
+<div class="display-ingredients-container">
+  <div class="header">
+    <h2>All Ingredients</h2>
+    <div class="header-actions">
+      <span class="total-count" *ngIf="!isLoading && !error">
+        Total: {{ totalIngredients }} ingredients
+      </span>
+      <button 
+        type="button" 
+        class="btn-refresh"
+        (click)="refreshIngredients()"
+        [disabled]="isLoading"
+      >
+        <span *ngIf="!isLoading">Refresh</span>
+        <span *ngIf="isLoading">Loading...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Loading ingredients...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <div class="error-icon">❌</div>
+    <p class="error-message">{{ error }}</p>
+    <button type="button" class="btn-retry" (click)="refreshIngredients()">
+      Try Again
+    </button>
+  </div>
+
+  <!-- Ingredients Grid with Pagination -->
+  <div *ngIf="!isLoading && !error && ingredients.length > 0" class="ingredients-grid-container">
+    <!-- Current Page Info -->
+    <div class="page-info">
+      <span class="page-indicator">
+        Page {{ currentPage }} of {{ totalPages }}
+      </span>
+    </div>
+
+    <!-- Ingredients Grid using app-ingredients-card -->
+    <div class="ingredients-grid">
+      <app-ingredients-card 
+        *ngFor="let ingredient of paginatedIngredients; trackBy: trackByIngredientId"
+        [ingredient]="ingredient"
+        class="ingredient-item-wrapper"
+      >
+      </app-ingredients-card>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-container">
+      <div class="pagination-info">
+        <span>
+          Displaying {{ paginatedIngredients.length }} of {{ totalIngredients }} ingredients
+        </span>
+      </div>
+      
+      <div class="pagination-controls">
+        <div class="nav-buttons">
+          <button 
+            type="button"
+            class="btn-page btn-first"
+            [disabled]="currentPage === 1"
+            (click)="goToFirstPage()"
+            title="First Page"
+          >
+            <<
+          </button>
+          
+          <button 
+            type="button"
+            class="btn-page btn-prev"
+            [disabled]="currentPage === 1"
+            (click)="goToPreviousPage()"
+            title="Previous Page"
+          >
+            <
+          </button>
+        </div>
+        
+        <div class="page-numbers">
+          <button
+            *ngFor="let page of getVisiblePages()"
+            type="button"
+            class="btn-page-number"
+            [class.active]="page === currentPage"
+            [class.ellipsis]="page === '...'"
+            [disabled]="page === '...'"
+            (click)="goToPage(page)"
+            [title]="page === '...' ? '' : 'Go to page ' + page"
+          >
+            {{ page }}
+          </button>
+        </div>
+        
+        <div class="nav-buttons">
+          <button 
+            type="button"
+            class="btn-page btn-next"
+            [disabled]="currentPage === totalPages"
+            (click)="goToNextPage()"
+          >
+            >
+          </button>
+          
+          <button 
+            type="button"
+            class="btn-page btn-last"
+            [disabled]="currentPage === totalPages"
+            (click)="goToLastPage()"
+            title="Last Page"
+          >
+            >>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !error && ingredients.length === 0" class="empty-state">
+    <div class="empty-icon">🥕</div>
+    <h3>No Ingredients Found</h3>
+    <p>There are no ingredients in the database yet.</p>
+    <button type="button" class="btn-primary" routerLink="/add-ingredient">
+      Add First Ingredient
+    </button>
+  </div>
+</div>

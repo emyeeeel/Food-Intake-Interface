@@ -1,0 +1,40 @@
+<div class="ingredient-card" *ngIf="ingredient">
+    <!-- Ingredient Image -->
+    <div class="ingredient-image-container">
+      <img 
+        [src]="ingredient.image || defaultImage" 
+        [alt]="ingredient.name"
+        class="ingredient-image"
+        (error)="onImageError($event)">
+      <div class="image-placeholder" *ngIf="!ingredient.image">
+        <span class="placeholder-text">{{ ingredient.name.charAt(0).toUpperCase() }}</span>
+      </div>
+    </div>
+  
+    <!-- Ingredient Information -->
+    <div class="ingredient-info">
+      <div class="name-and-food-group">
+        <h3 class="ingredient-name">{{ ingredient.name }}</h3>
+      
+        <!-- Food Group -->
+        <div class="food-group-section" *ngIf="foodGroup">
+          <span class="food-group-badge">{{ foodGroup!.name }}</span>
+        </div>
+      </div>
+  
+      <!-- Nutrients List -->
+      <div class="nutrients-section" *ngIf="nutrients && nutrients.length > 0">
+        <h4 class="section-title">Nutritional Components</h4>
+        <div class="nutrients-list">
+          <span class="nutrient-tag" *ngFor="let nutrient of nutrients">
+            {{ nutrient.name }}
+          </span>
+        </div>
+      </div>
+  
+      <!-- No nutrients message -->
+      <div class="no-data" *ngIf="!ingredient.nutrients || ingredient.nutrients.length === 0">
+        <p>No nutritional data available</p>
+      </div>
+    </div>
+  </div>

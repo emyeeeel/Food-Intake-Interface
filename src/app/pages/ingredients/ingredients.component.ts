@@ -10,10 +10,11 @@ import { CommonModule } from '@angular/common';
 import { MainOptionsComponent } from "../../components/main-options/main-options.component";
 import { IngredientsCategoriesComponent } from "../../components/ingredients-categories/ingredients-categories.component";
 import { filter } from 'rxjs';
+import { DisplayIngredientsComponent } from "../../components/display-ingredients/display-ingredients.component";
 
 @Component({
   selector: 'app-ingredients',
-  imports: [CommonModule, MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent, FilterIconComponent, FilterOptionsComponent, MainOptionsComponent, IngredientsCategoriesComponent],
+  imports: [CommonModule, MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent, FilterIconComponent, FilterOptionsComponent, MainOptionsComponent, IngredientsCategoriesComponent, DisplayIngredientsComponent],
   templateUrl: './ingredients.component.html',
   styleUrl: './ingredients.component.scss'
 })
