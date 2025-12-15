@@ -3,11 +3,16 @@ import { Router } from '@angular/router';
 import { QrTestComponent } from '../qr-test/qr-test.component';
 import { PatientService } from '../../services/patient.service';
 import { RecommendedIntakeService } from '../../services/recommended-intake.service';
+import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { Patient } from '../../models/patient.model';
 import { RecommendedIntake } from '../../models/recommended-intake.model';
 import { CommonModule } from '@angular/common';
 import jsQR from 'jsqr';
 import { GetAnalysisService } from '../../services/get-analysis.service';
+import { MealAssignment } from '../../models/meal-assignment.mode';
+import { Meal } from '../../models/meal.model';
+import { MealsService } from '../../services/meals.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-patient-details',
@@ -21,6 +26,8 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
 
   patient: Patient | null = null;
   recommendedIntake: RecommendedIntake | null = null;
+  mealAssignments: MealAssignment[] = [];
+  private mealMap: Map<number, Meal> = new Map();
   recommendedAnalysis: string | null = null;
   loading: boolean = true;
   showQRCode = false;
@@ -31,7 +38,24 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
   private stream: MediaStream | null = null;
   private scanInterval: any;
 
-  query = `
+  query: string = '';
+
+  private buildQuery(): string {
+    if (!this.patient || !this.recommendedIntake || !this.mealAssignments.length) {
+      return ''; // Return empty or default if data not ready
+    }
+  
+    // Generate random intake (grams) for each meal (e.g., 150g - 700g)
+    const mealText = this.mealAssignments
+    .map((meal, index) => {
+      const intakeGrams = Math.floor(Math.random() * (700 - 150 + 1)) + 150;
+      const mealName = this.mealMap.get(meal.meal)?.meal_name || 'Unknown Meal'; // <-- get name
+      return `Meal ${index + 1}: ${meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1)}, ${mealName}, ${intakeGrams} g`;
+    })
+    .join('\n');
+
+  
+    return `
   You are a clinical nutrition assistant writing guidance for non-medical caregivers.
   
   TASK:
@@ -71,54 +95,110 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
   - Reference recommended intake only when helpful for guidance
   
   PATIENT DETAILS:
-  Patient Name: Granny
-  Age: 72
-  Gender: Female
-  Height: 173 cm
-  Weight: 98 kg
-  BMI: 32.74
-  Heart Rate: 93 bpm
-  Blood Pressure: 140/90 mmHg
-  Activity Level: Active
+  Patient Name: ${this.patient.name}
+  Age: ${this.patient.age}
+  Gender: ${this.patient.sex}
+  Height: ${this.patient.height_cm} cm
+  Weight: ${this.patient.weight_kg} kg
+  BMI: ${this.patient.bmi}
+  Heart Rate: ${this.patient.heart_rate} bpm
+  Blood Pressure: ${this.patient.systolic_bp}/${this.patient.diastolic_bp} mmHg
+  Activity Level: ${this.patient.activity_level}
   
   RECOMMENDED DAILY INTAKE:
-  Calories: 2547 kcal
-  Protein: 78.1 g
-  Carbohydrates: 350.2 g
-  Fat: 78 g
-  Total Fiber: 35.8 g
-  Alpha Linolenic Acid: 1.1 g
-  Linoleic Acid: 10.998 g
-  Total Water: 2.7 L
+  Calories: ${this.recommendedIntake.daily_caloric_needs} kcal
+  Protein: ${this.recommendedIntake.protein} g
+  Carbohydrates: ${this.recommendedIntake.carbohydrate} g
+  Fat: ${this.recommendedIntake.fat} g
+  Total Fiber: ${this.recommendedIntake.total_fiber} g
+  Alpha Linolenic Acid: ${this.recommendedIntake.alpha_linolenic_acid} g
+  Linoleic Acid: ${this.recommendedIntake.linoleic_acid} g
+  Total Water: ${this.recommendedIntake.total_water} L
   
   MEAL INTAKES:
-  Meal 1: Braised pork chop, 690 g
-  Meal 2: Dried fish in soy sauce, 240 g
+  ${mealText}
   
   FINAL CHECK:
-  Return ONLY the formatted text exactly as specified above. No extra text.
-  `;
+  Return ONLY the formatted text exactly as specified above. No extra text. 
+    `;
+  }
+  
   
   constructor(
     private patientService: PatientService,
     private recommendedIntakeService: RecommendedIntakeService,
+    private mealAssignmentService: MealAssignmentService,
+    private mealsService: MealsService,
     private getAnalysisService: GetAnalysisService,
     private router: Router
   ) {}
 
   ngOnInit() {
-    this.loadPatient(this.patientId);
-    this.getAnalysisService.getAnalysis(this.query).subscribe({
-      next: (response: { recommendation: string }) => {
-        this.recommendedAnalysis = response.recommendation;
-        console.log(this.recommendedAnalysis)
+    this.loadAllDataAndAnalyze(this.patientId);
+  }
+
+  
+
+  private loadAllDataAndAnalyze(patientId: number) {
+    this.loading = true;
+    this.error = null;
+  
+    // Load patient
+    this.patientService.getPatient(patientId).subscribe({
+      next: (patientData) => {
+        this.patient = patientData;
+  
+        // Load recommended intake
+        this.recommendedIntakeService.getRecommendedIntake(patientId).subscribe({
+          next: (recData) => {
+            this.recommendedIntake = recData.nutritional_recommendations;
+  
+            // Load meal assignments
+            this.mealAssignmentService.getAssignmentsByPatient(patientId).subscribe({
+              next: (assignments) => {
+                this.mealAssignments = assignments;
+  
+                // All data loaded, now build query
+                this.query = this.buildQuery();
+
+                console.log(this.query)
+  
+                // Call analysis service
+                this.getAnalysisService.getAnalysis(this.query).subscribe({
+                  next: (response: { recommendation: string }) => {
+                    this.recommendedAnalysis = this.formatAnalysisForUI(response.recommendation)
+                    console.log(this.recommendedAnalysis)
+                    this.loading = false;
+                  },
+                  error: (err) => {
+                    console.error(err);
+                    this.recommendedAnalysis = 'Failed to load analysis.';
+                    this.loading = false;
+                  }
+                });
+              },
+              error: (err) => {
+                console.error(err);
+                this.error = 'Failed to load meal assignments';
+                this.loading = false;
+              }
+            });
+          },
+          error: (err) => {
+            console.error(err);
+            this.error = 'Failed to load recommended intake';
+            this.loading = false;
+          }
+        });
       },
       error: (err) => {
         console.error(err);
-        this.recommendedAnalysis = 'Failed to load analysis.';
+        this.error = 'Failed to load patient details';
+        this.loading = false;
       }
     });
   }
+  
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['patientId'] && changes['patientId'].currentValue) {
@@ -140,6 +220,7 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
         this.loading = false;
         console.log('Patient:', this.patient);
         this.loadRecommendedIntake(patientId);
+        this.loadMealAssignments(patientId);
       },
       error: (err) => {
         this.error = 'Failed to load patient details';
@@ -159,6 +240,36 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
         console.error('Error loading recommended intake:', err);
       }
     });
+  }
+
+  private loadMealAssignments(patientId: number) {
+    this.mealAssignmentService.getAssignmentsByPatient(patientId).subscribe({
+      next: (assignments) => {
+        this.mealAssignments = assignments;
+  
+        // Prepare observables for all meals
+        const mealRequests = this.mealAssignments.map(a =>
+          this.mealsService.getMeal(a.meal)
+        );
+  
+        forkJoin(mealRequests).subscribe({
+          next: (meals) => {
+            meals.forEach(meal => this.mealMap.set(meal.id, meal));
+            console.log(meals) //this returns 
+          },
+          error: (err) => console.error('Failed to load meals', err)
+        });
+      },
+      error: (err) => console.error('Error loading meal assignments:', err)
+    });
+  }
+
+  private formatAnalysisForUI(rawText: string): string {
+    let text = rawText.replace(/[*_#`]/g, '').trim();
+  
+    text = text.replace(/\n{2,}/g, '\n\n');
+  
+    return text;
   }
 
   toggleQRCode(): void {
@@ -188,7 +299,6 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
         this.videoElement.nativeElement.srcObject = this.stream;
         await this.videoElement.nativeElement.play();
         
-        // Start QR code detection after camera is ready
         this.startQRDetection();
       }
     } catch (error) {
@@ -234,34 +344,24 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
     this.scanResult = qrData;
     console.log('QR Code detected:', qrData);
     
-    // Stop the camera
     this.stopCamera();
     this.showScanner = false;
     
-    // Parse the QR data and redirect
     this.redirectToQRLink(qrData);
   }
 
   private redirectToQRLink(qrData: string): void {
     try {
-      // Check if it's a URL
       if (qrData.startsWith('http://') || qrData.startsWith('https://')) {
-        // External URL - open in new tab
         window.open(qrData, '_blank');
       } else if (qrData.startsWith('/')) {
-        // Internal route
         this.router.navigate([qrData]);
       } else {
-        // Try to parse as patient ID or other data
         const patientId = parseInt(qrData);
         if (!isNaN(patientId)) {
-          // Navigate to patient page
           this.router.navigate(['/patient', patientId]);
         } else {
-          // Handle other QR data formats
           console.log('QR Code contains:', qrData);
-          // You can add custom logic here based on your QR code format
-          // For now, just show the result
           alert(`QR Code detected: ${qrData}`);
         }
       }

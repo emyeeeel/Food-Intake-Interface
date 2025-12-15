@@ -27,6 +27,4 @@ export class MealAssignmentService {
     }
     return this.http.get<MealAssignment[]>(url);
   }
-
-
 }

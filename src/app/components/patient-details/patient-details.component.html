@@ -99,7 +99,11 @@
 
       <div class="recommended-analysis-section">
         <h3>Recommender Analysis</h3>
-        <div *ngIf="recommendedAnalysis" class="recommended-analysis-content">
+        <div class="recommended-analysis-content">
+          <div *ngIf="!recommendedAnalysis && loading" class="analysis-loading">
+            <div class="loading-spinner"></div>
+            <span>Generating analysis...</span>
+          </div>
           <pre>{{ recommendedAnalysis }}</pre>
         </div>
       </div>
