@@ -20,6 +20,7 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
 
   patient: Patient | null = null;
   recommendedIntake: RecommendedIntake | null = null;
+  recommendedAnalysis: String | null = null;
   loading: boolean = true;
   showQRCode = false;
   showScanner = false;

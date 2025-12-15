@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, AfterViewInit, input } from '@angular/core';
 import QRCode from 'qrcode';
 import { environment } from '../../../environments/environment';
 
@@ -10,6 +10,7 @@ import { environment } from '../../../environments/environment';
 export class QrTestComponent implements AfterViewInit {
   @Input() patientId: number = 1;
   @Input() type: 'Details' | 'Intake' | 'Before' | 'After' = 'Details'; 
+  @Input() qrSize: number = 150;
   @ViewChild('qrCanvas') qrCanvas!: ElementRef<HTMLCanvasElement>;
 
   ngAfterViewInit() {
@@ -30,7 +31,7 @@ export class QrTestComponent implements AfterViewInit {
     // const apiUrl = 'https://h3vkhzth-4200.asse.devtunnels.ms/home';
 
     QRCode.toCanvas(this.qrCanvas.nativeElement, apiUrl, {
-      width: 200,
+      width: this.qrSize,
       margin: 2
     }, (error: any) => {
       if (error) console.error('QR generation error:', error);

@@ -1,10 +1,11 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, ElementRef, HostListener } from '@angular/core';
 import { PatientService } from '../../services/patient.service';
 import { RecommendedIntakeService } from '../../services/recommended-intake.service';
 import { Patient } from '../../models/patient.model';
 import { RecommendedIntake } from '../../models/recommended-intake.model';
 import { CommonModule } from '@angular/common';
 import { Meal } from '../../models/meal.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-patient-card',
@@ -28,7 +29,28 @@ export class PatientCardComponent implements OnInit {
   constructor(
     private patientService: PatientService,
     private recommendedIntakeService: RecommendedIntakeService,
+    private router: Router,
+    private elementRef: ElementRef
   ) {}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (this.optionsOpen) {
+      const target = event.target as HTMLElement;
+      const optionElement = this.elementRef.nativeElement.querySelector('.option');
+      const dropdownElement = this.elementRef.nativeElement.querySelector('.options-dropdown');
+      
+      // Check if click is outside both the option button and dropdown
+      if (optionElement && dropdownElement) {
+        const isClickInsideOption = optionElement.contains(target);
+        const isClickInsideDropdown = dropdownElement.contains(target);
+        
+        if (!isClickInsideOption && !isClickInsideDropdown) {
+          this.closeOptions();
+        }
+      }
+    }
+  }
 
   ngOnInit(): void {
     this.loadPatientCount(); 
@@ -104,6 +126,7 @@ export class PatientCardComponent implements OnInit {
 
   // Navigate to the previous patient
   onPreviousPatient(): void {
+    this.closeOptions();
     if (this.patientId > 1) {
       this.patientId--;  
       this.patientIdChange.emit(this.patientId);  
@@ -113,12 +136,35 @@ export class PatientCardComponent implements OnInit {
 
   // Navigate to the next patient
   onNextPatient(): void {
+    this.closeOptions();
     this.patientId++;  
     this.patientIdChange.emit(this.patientId); 
     this.fetchPatientData(); 
   }
 
+  optionsOpen: boolean = false;
+
   onOptionsClick(): void {
+    this.optionsOpen = true;
     this.optionsClicked.emit();
+  }
+
+  closeOptions(): void {
+    this.optionsOpen = false;
+  }
+
+  onEditPatient(): void {
+    console.log('Edit patient', this.patientId);
+    this.closeOptions();
+  }
+  
+  onViewPatient(): void {
+    console.log('View patient', this.patientId);
+    this.closeOptions();
+
+    this.router.navigate(['/patient-info', this.patientId]).catch(error => {
+      console.error('Navigation failed:', error);
+      alert('Failed to navigate to patient details. Please try again.');
+    });
   }
 }

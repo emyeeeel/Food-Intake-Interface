@@ -1,8 +1,4 @@
 <div class="patient-detail">
-  <div class="header">
-    <h1>Patient Information</h1>
-  </div>
-
   <!-- Loading and error states -->
   <div *ngIf="loading" class="loading">Loading patient details...</div>
   <div *ngIf="error" class="error">{{ error }}</div>
@@ -10,12 +6,15 @@
   <!-- Main content grid -->
   <div *ngIf="patient && !loading" class="content-grid">
     
-    <!-- Main container - Patient Basic Info + Recommended Intake -->
-    <div class="main-info-container">
-      <!-- Patient Basic Info Section -->
+    <!-- Patient Basic Info Section (Separated) -->
+    <div class="patient-basic-info-container">
       <div class="patient-info-section">
-        <h2>{{ patient.name }}</h2>
+        <h3>Patient Basic Information</h3>
         <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Name:</span>
+            <span class="value">{{ patient.name  }}</span>
+          </div>
           <div class="info-item">
             <span class="label">Age:</span>
             <span class="value">{{ patient.age }}</span>
@@ -47,7 +46,19 @@
         </div>
       </div>
 
-      <!-- Recommended Intake Section -->
+      <!-- QR Code Container (Moved to Basic Info) -->
+      <div class="qr-container">
+        <h3>Patient QR Code</h3>
+        <div class="qr-section">
+          <div class="qr-code-container">
+            <app-qr-test [patientId]="patient.id" type="Intake"></app-qr-test>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommender Section -->
+    <div class="recommended-intake-container">
       <div *ngIf="recommendedIntake" class="recommended-intake-section">
         <h3>Recommended Daily Intake</h3>
         <div class="intake-grid">
@@ -85,44 +96,11 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Separate QR Code Container -->
-    <div class="qr-main-container">
-      <!-- QR Generation Section -->
-      <div class="qr-container">
-        <h3>Patient QR Code</h3>
-        <div class="qr-section">
-          <button class="generate-qr-btn" (click)="toggleQRCode()">
-            {{ showQRCode ? 'Hide QR Code' : 'Generate QR Code' }}
-          </button>
-          <div *ngIf="showQRCode" class="qr-code-container">
-            <app-qr-test [patientId]="patient.id" type="Intake"></app-qr-test>
-          </div>
-        </div>
-      </div>
-
-      <!-- QR Camera Scanner Section -->
-      <div class="qr-scanner-container">
-        <h3>Scan QR Code</h3>
-        <div class="scanner-section">
-          <button class="start-scanner-btn" (click)="toggleScanner()">
-            {{ showScanner ? 'Stop Camera' : 'Start Camera' }}
-          </button>
-          <div *ngIf="showScanner" class="camera-container">
-            <div class="camera-viewport">
-              <video #videoElement autoplay playsinline></video>
-              <div class="scanner-overlay">
-                <div class="scanner-frame"></div>
-              </div>
-            </div>
-            <div class="scanner-result" *ngIf="scanResult">
-              <p>Scanned: {{ scanResult }}</p>
-            </div>
-          </div>
-        </div>
+      <div class="recommended-analysis-section">
+        <h3>Recommender Analysis</h3>
+        <div *ngIf="recommendedAnalysis" class="recommended-analysis-content"></div>
       </div>
     </div>
-
   </div>
 </div>

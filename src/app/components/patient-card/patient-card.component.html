@@ -5,11 +5,19 @@
             <h2 class="value">{{ getDisplayName() }}</h2>  
         </div>
 
-        <div class="option" (click)="onOptionsClick()">
-            <div class="circle"></div>
-            <div class="circle"></div>
-            <div class="circle"></div>
-        </div>
+        <div class="option-wrapper">
+            <div class="option" (click)="onOptionsClick()">
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+            </div>
+          
+            <!-- Dropdown menu -->
+            <div class="options-dropdown" *ngIf="optionsOpen">
+              <button (click)="onViewPatient()">View Details</button>
+              <button (click)="onEditPatient()">Edit Details</button>
+            </div>
+          </div>
     </div>
 
     <div class="row-2">
@@ -41,5 +49,7 @@
                 <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </div>
-      </div>      
+      </div>
 </div>
+
+
