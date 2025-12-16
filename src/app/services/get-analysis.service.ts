@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class GetAnalysisService {
   private baseUrl = `https://jqh2g82b-8000.asse.devtunnels.ms`;
-  private apiUrl = `${this.baseUrl}/api/ollama/prompt/`;
+  private apiUrl = `${this.baseUrl}/api/rag/query/`;
 
   constructor(private http: HttpClient) { }
 
