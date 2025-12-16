@@ -8,6 +8,8 @@ interface SegmentationResult {
   segmented_image_url: string;
   num_classes: number;
   class_names: string[];
+  raw_weight?: number;         
+  estimated_volumes_ml?: { [className: string]: number };
 }
 
 interface ApiResult {
@@ -18,6 +20,7 @@ interface ApiResult {
   };
 }
 
+
 @Component({
   selector: 'app-display-intake',
   imports: [CommonModule],
@@ -26,8 +29,8 @@ interface ApiResult {
 })
 export class DisplayIntakeComponent implements OnInit {
 
-  beforeResult!: SegmentationResult | null;
-  afterResult!: SegmentationResult | null;
+  beforeResult: SegmentationResult | null = null;
+  afterResult: SegmentationResult | null = null;
   loading: boolean = true;
   error: string | null = null;
 
@@ -37,10 +40,10 @@ export class DisplayIntakeComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchSegmentationResults();
-    console.log(this.fetchSegmentationResults());
   }
 
   fetchSegmentationResults(): void {
+    this.loading = true;
     this.http.get<ApiResult>(this.apiUrl)
       .pipe(
         catchError(err => {
@@ -49,14 +52,18 @@ export class DisplayIntakeComponent implements OnInit {
           return of(null);
         })
       )
-      .subscribe((data) => {
-        if (data && data.status === 'success') {
+      .subscribe(data => {
+        this.loading = false;
+        if (data?.status === 'success') {
           this.beforeResult = data.results.before;
           this.afterResult = data.results.after;
+
+          // Debug logs
+          console.log('Before:', this.beforeResult);
+          console.log('After:', this.afterResult);
         } else {
           this.error = 'No results found.';
         }
-        this.loading = false;
       });
   }
 }
