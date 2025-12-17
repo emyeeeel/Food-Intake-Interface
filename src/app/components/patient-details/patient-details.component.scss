@@ -168,7 +168,6 @@
 }
 
 .recommended-analysis-content {
-  border: 1px solid red;
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
@@ -195,6 +194,46 @@
     line-height: inherit;
   }
 }
+
+.analysis-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  color: #00313C;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 12px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+
+  border: 3px solid #E0F7F4;
+  border-top-color: #40C1AC;
+
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+
+  animation: spin 0.9s linear infinite;
+}
+
+
+/* Spin animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 
 @media (min-width: 1280px){
   .patient-detail{
@@ -255,12 +294,13 @@
   }
 
   .patient-basic-info-container{
-    flex-shrink: 0; // Prevent shrinking
-    width: auto; // Let it size based on content
-    min-width: 350px; // Minimum width to maintain usability
-    max-width: 450px; // Maximum width to prevent it from taking too much space
+    flex-shrink: 0; 
+    width: auto; 
+    min-width: 350px; 
+    max-width: 450px; 
     max-height: 560px;
     overflow-y:hidden;
+    gap: 0;
 
     .qr-container{
       display: flex;

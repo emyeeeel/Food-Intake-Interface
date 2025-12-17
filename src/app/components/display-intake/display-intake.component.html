@@ -1,48 +1,113 @@
 <div class="display-intake">
-  <div *ngIf="loading" class="loading">Loading segmentation results...</div>
+  <div *ngIf="loading" class="loading">正在載入分割結果...</div>
   <div *ngIf="error" class="error">{{ error }}</div>
 
-  <ng-container *ngIf="!loading && !error && beforeResult && afterResult">
-    <!-- BEFORE MEAL -->
-    <div class="segment-section">
-      <h3>Before Meal</h3>
-      <img [src]="beforeResult.segmented_image_url" alt="Before Segmented Image">
+  <!-- Segmentation Results - Hidden after calculate button is clicked -->
+  <ng-container *ngIf="!loading && !error && beforeResult && afterResult && !showIntakeResults">
+    <div class="segmentation-result">
+      <!-- BEFORE MEAL -->
+      <div class="segment-section">
+        <h3>飯前</h3>
+        <img [src]="beforeResult.segmented_image_url" alt="Before Segmented Image">
 
-      <p><strong>Number of classes:</strong> {{ beforeResult.num_classes }}</p>
+        <p><strong>已識別的食物數量:</strong> {{ beforeResult.num_classes }}</p>
 
-      <ul>
-        <li *ngFor="let className of beforeResult.class_names">{{ className }}</li>
-      </ul>
+        <ul>
+          <li *ngFor="let className of beforeResult.class_names">{{ className }}</li>
+        </ul>
 
-      <p *ngIf="beforeResult.raw_weight"><strong>Raw Weight:</strong> {{ beforeResult.raw_weight }} g</p>
+        <p *ngIf="beforeResult.raw_weight"><strong>重量:</strong> {{ beforeResult.raw_weight }} g</p>
 
-      <div *ngIf="beforeResult.estimated_volumes_ml" class="volumes">
-        <strong>Estimated Volumes (ml):</strong>
-        <div *ngFor="let key of beforeResult.class_names" class="volume-item">
-          {{ key }}: {{ beforeResult.estimated_volumes_ml[key] | number:'1.0-2' }} ml
+        <div *ngIf="beforeResult.estimated_volumes_ml" class="volumes">
+          <strong>預估體積 (ml):</strong>
+          <div *ngFor="let key of beforeResult.class_names" class="volume-item">
+            {{ key }}: {{ beforeResult.estimated_volumes_ml[key] | number:'1.0-2' }} ml
+          </div>
+        </div>
+      </div>
+
+      <!-- AFTER MEAL -->
+      <div class="segment-section">
+        <h3>餐後</h3>
+        <img [src]="afterResult.segmented_image_url" alt="After Segmented Image">
+
+        <p><strong>已識別的食物數量:</strong> {{ afterResult.num_classes }}</p>
+
+        <ul>
+          <li *ngFor="let className of afterResult.class_names">{{ className }}</li>
+        </ul>
+
+        <p *ngIf="afterResult.raw_weight"><strong>重量:</strong> {{ afterResult.raw_weight }} g</p>
+
+        <div *ngIf="afterResult.estimated_volumes_ml" class="volumes">
+          <strong>預估體積 (ml):</strong>
+          <div *ngFor="let key of afterResult.class_names" class="volume-item">
+            {{ key }}: {{ afterResult.estimated_volumes_ml[key] | number:'1.0-2' }} ml
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- AFTER MEAL -->
-    <div class="segment-section">
-      <h3>After Meal</h3>
-      <img [src]="afterResult.segmented_image_url" alt="After Segmented Image">
-
-      <p><strong>Number of classes:</strong> {{ afterResult.num_classes }}</p>
-
-      <ul>
-        <li *ngFor="let className of afterResult.class_names">{{ className }}</li>
-      </ul>
-
-      <p *ngIf="afterResult.raw_weight"><strong>Raw Weight:</strong> {{ afterResult.raw_weight }} g</p>
-
-      <div *ngIf="afterResult.estimated_volumes_ml" class="volumes">
-        <strong>Estimated Volumes (ml):</strong>
-        <div *ngFor="let key of afterResult.class_names" class="volume-item">
-          {{ key }}: {{ afterResult.estimated_volumes_ml[key] | number:'1.0-2' }} ml
-        </div>
-      </div>
-    </div>
+    <button class="generate-intake" (click)="calculateIntake()" [disabled]="isCalculating">
+      <span *ngIf="!isCalculating">計算攝取量</span>
+      <span *ngIf="isCalculating">計算中...</span>
+    </button>
   </ng-container>
+
+  <!-- Intake Calculation Results - Shown after calculate button is clicked -->
+  <div *ngIf="showIntakeResults" class="intake-results-container">
+    <div class="intake-results-header">
+      <h2>食物攝取</h2>
+      <button class="btn-back" (click)="goBackToResults()"> < </button>
+    </div>
+
+    <div class="intake-summary">
+      <div class="summary-card">
+        <h3>總攝取量</h3>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="label">菜色數量:</span>
+            <span class="value">{{ intakeData.totalItems }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">總重量:</span>
+            <span class="value">{{ intakeData.totalWeight }} g</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">食物體積:</span>
+            <span class="value">{{ intakeData.consumptionPercentage }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="consumption-details">
+        <h3>進食量分析</h3>
+        <div class="detail-grid">
+          <div *ngFor="let item of intakeData.itemDetails" class="detail-item">
+            <div class="item-header">
+              <h4>{{ item.name | titlecase }}</h4>
+            </div>
+            <div class="item-stats">
+              <div class="stat">
+                <span class="stat-label">之前:</span>
+                <span class="stat-value">{{ item.before }} ml</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">之後:</span>
+                <span class="stat-value">{{ item.after }} ml</span>
+              </div>
+              <div class="stat consumption">
+                <span class="stat-label">已食用的食物:</span>
+                <span class="stat-value">{{ item.consumed }} ml</span>
+              </div>
+              <div class="stat percentage">
+                <span class="stat-label">百分比:</span>
+                <span class="stat-value">{{ item.percentage }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

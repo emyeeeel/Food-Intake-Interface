@@ -1,5 +1,5 @@
 <div class="main-container">
-    <h3>Add Intake Record</h3>
+    <h3>新增食物攝取紀錄</h3>
 
     <!--Add for before meal and after meal and utilize qr for capturing -->
 
@@ -7,7 +7,7 @@
     <div class="qr-scanner-container">
         <div class="scanner-section">
           <button class="start-scanner-btn" (click)="toggleScanner()">
-            {{ showScanner ? 'Stop Camera' : 'Scan QR Code' }}
+            {{ showScanner ? '停止攝影機' : '掃描 QR 碼' }}
           </button>
           <div *ngIf="showScanner" class="camera-container">
             <div class="camera-viewport">

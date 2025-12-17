@@ -1,6 +1,6 @@
 <div class="patient-detail">
   <!-- Loading and error states -->
-  <div *ngIf="loading" class="loading">Loading patient details...</div>
+  <div *ngIf="loading" class="loading">正在載入病人資料...</div>
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <!-- Main content grid -->
@@ -9,22 +9,22 @@
     <!-- Patient Basic Info Section (Separated) -->
     <div class="patient-basic-info-container">
       <div class="patient-info-section">
-        <h3>Patient Basic Information</h3>
+        <h3>病人基本資料</h3>
         <div class="info-grid">
           <div class="info-item">
-            <span class="label">Name:</span>
+            <span class="label">姓名:</span>
             <span class="value">{{ patient.name  }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Age:</span>
+            <span class="label">年齡:</span>
             <span class="value">{{ patient.age }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Height:</span>
+            <span class="label">高度:</span>
             <span class="value">{{ patient.height_cm }} cm</span>
           </div>
           <div class="info-item">
-            <span class="label">Weight:</span>
+            <span class="label">重量:</span>
             <span class="value">{{ patient.weight_kg }} kg</span>
           </div>
           <div class="info-item">
@@ -32,15 +32,15 @@
             <span class="value">{{ patient.bmi }}</span>
           </div>
           <div class="info-item" *ngIf="patient.heart_rate">
-            <span class="label">Heart Rate:</span>
+            <span class="label">心率:</span>
             <span class="value">{{ patient.heart_rate }} bpm</span>
           </div>
           <div class="info-item" *ngIf="patient.systolic_bp">
-            <span class="label">Blood Pressure:</span>
+            <span class="label">BP:</span>
             <span class="value">{{ patient.systolic_bp }}/{{ patient.diastolic_bp }} mmHg</span>
           </div>
           <div class="info-item">
-            <span class="label">Activity Level:</span>
+            <span class="label">身體活動量:</span>
             <span class="value">{{ patient.activity_level }}</span>
           </div>
         </div>
@@ -48,7 +48,7 @@
 
       <!-- QR Code Container (Moved to Basic Info) -->
       <div class="qr-container">
-        <h3>Patient QR Code</h3>
+        <h3>病人 QR 碼</h3>
         <div class="qr-section">
           <div class="qr-code-container">
             <app-qr-test [patientId]="patient.id" type="Intake"></app-qr-test>
@@ -60,49 +60,49 @@
     <!-- Recommender Section -->
     <div class="recommended-intake-container">
       <div *ngIf="recommendedIntake" class="recommended-intake-section">
-        <h3>Recommended Daily Intake</h3>
+        <h3>每日建議攝取量</h3>
         <div class="intake-grid">
           <div class="intake-item">
-            <span class="label">Calories:</span>
+            <span class="label">卡路里:</span>
             <span class="value">{{ recommendedIntake!.daily_caloric_needs }} kcal</span>
           </div>
           <div class="intake-item">
-            <span class="label">Protein:</span>
+            <span class="label">蛋白質:</span>
             <span class="value">{{ recommendedIntake!.protein }} g</span>
           </div>
           <div class="intake-item">
-            <span class="label">Carbohydrates:</span>
+            <span class="label">碳水化合物:</span>
             <span class="value">{{ recommendedIntake!.carbohydrate }} g</span>
           </div>
           <div class="intake-item">
-            <span class="label">Fat:</span>
+            <span class="label">胖:</span>
             <span class="value">{{ recommendedIntake!.fat }} g</span>
           </div>
           <div class="intake-item">
-            <span class="label">Total Fiber:</span>
+            <span class="label">總纖維:</span>
             <span class="value">{{ recommendedIntake!.total_fiber }} g</span>
           </div>
           <div class="intake-item">
-            <span class="label">Alpha Linolenic Acid:</span>
+            <span class="label">亞麻酸:</span>
             <span class="value">{{ recommendedIntake!.alpha_linolenic_acid }} g</span>
           </div>
           <div class="intake-item">
-            <span class="label">Linoleic Acid:</span>
+            <span class="label">亞油酸:</span>
             <span class="value">{{ recommendedIntake!.linoleic_acid }} g</span>
           </div>
           <div class="intake-item">
-            <span class="label">Total Water:</span>
+            <span class="label">水分攝取:</span>
             <span class="value">{{ recommendedIntake!.total_water }} L</span>
           </div>
         </div>
       </div>
 
       <div class="recommended-analysis-section">
-        <h3>Recommender Analysis</h3>
+        <h3>推薦系統分析</h3>
         <div class="recommended-analysis-content">
-          <div *ngIf="!recommendedAnalysis && loading" class="analysis-loading">
+          <div *ngIf="!recommendedAnalysis" class="analysis-loading">
             <div class="loading-spinner"></div>
-            <span>Generating analysis...</span>
+            <span>生成分析...</span>
           </div>
           <pre>{{ recommendedAnalysis }}</pre>
         </div>

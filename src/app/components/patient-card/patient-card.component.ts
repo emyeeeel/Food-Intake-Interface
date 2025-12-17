@@ -109,7 +109,7 @@ export class PatientCardComponent implements OnInit {
 
   // Helper methods to display patient and recommended intake data
   getDisplayName(): string {
-    return this.patient?.name || 'No Patient Selected';
+    return this.patient?.name || '未選擇病人';
   }
 
   getDisplayAge(): number | string {

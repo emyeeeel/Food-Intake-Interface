@@ -1,10 +1,10 @@
 <div class="main-container">
     <div class="add-meal-container">
-      <h3>Add New Meal</h3>
+      <h3>新增餐點</h3>
       
       <form class="meal-form" *ngIf="!showFullForm" (ngSubmit)="onInitialSubmit()" #initialForm="ngForm">
         <div class="form-group">
-          <label for="mealName">Meal Name</label>
+          <label for="mealName">餐點名稱</label>
           <input 
             type="text" 
             id="mealName" 
@@ -17,7 +17,7 @@
         </div>
   
         <div class="form-group">
-          <label>Meal Image</label>
+          <label>餐點圖片</label>
 
           <button
             type="button"
@@ -25,12 +25,12 @@
             (click)="captureMealImage()"
             [disabled]="isLoading"
           >
-            Capture Image
+          拍攝影像
           </button>
 
           <div *ngIf="isCapturing" class="loading-state">
             <div class="loading-spinner"></div>
-            <p>Capturing image...</p>
+            <p>拍攝影像...</p>
           </div>
 
           <div class="image-preview" *ngIf="mealImagePreview">
@@ -40,11 +40,11 @@
   
         <div *ngIf="isLoading" class="loading-state">
           <div class="loading-spinner"></div>
-          <p>Processing meal name...</p>
+          <p>處理餐點名稱...</p>
         </div>
   
         <div class="form-actions" *ngIf="!isLoading">
-          <button type="submit" class="btn-primary" [disabled]="!initialForm.valid">Continue</button>
+          <button type="submit" class="btn-primary" [disabled]="!initialForm.valid">繼續</button>
         </div>
       </form>
   
@@ -61,25 +61,25 @@
         
             <div class="form-col dropdowns">
                 <div class="dropdown-wrapper">
-                  <label for="mealTime">Meal Time</label>
+                  <label for="mealTime">用餐時間</label>
                   <select id="mealTime" name="mealTime" [(ngModel)]="meal.meal_time" class="form-select" required>
-                      <option value="" disabled>Select meal time</option>
+                      <option value="" disabled>選擇用餐時間</option>
                       <option *ngFor="let option of mealTimeOptions" [value]="option.value">{{ option.label }}</option>
                   </select>
                 </div>
         
                 <div class="dropdown-wrapper">
-                <label for="dayCycle">Day Cycle</label>
+                <label for="dayCycle">日循環</label>
                 <select id="dayCycle" name="dayCycle" [(ngModel)]="meal.day_cycle" class="form-select" required>
-                    <option value="" disabled>Select day cycle</option>
+                    <option value="" disabled>選擇日期周期</option>
                     <option *ngFor="let option of dayCycleOptions" [value]="option.value">{{ option.label }}</option>
                 </select>
                 </div>
         
                 <div class="dropdown-wrapper">
-                <label for="plateType">Plate Type</label>
+                <label for="plateType">板式</label>
                 <select id="plateType" name="plateType" [(ngModel)]="meal.plate_type" class="form-select" required>
-                    <option value="" disabled>Select plate type</option>
+                    <option value="" disabled>選擇板類型</option>
                     <option *ngFor="let option of plateTypeOptions" [value]="option.value">{{ option.label }}</option>
                 </select>
                 </div>
@@ -87,17 +87,17 @@
             </div>
         
             <div class="form-row ingredients-row">
-            <label>Ingredients</label>
+            <label>成分</label>
             <div class="meal-ingredients">
                 <app-tags *ngFor="let ingredientName of generatedIngredients" [tagText]="ingredientName.name"></app-tags>
             </div>
             </div>
         
             <div class="form-row form-actions-row">
-            <button type="button" class="btn-secondary" (click)="onCancel()">Cancel</button>
+            <button type="button" class="btn-secondary" (click)="onCancel()">取消</button>
             <button type="submit" class="btn-primary" [disabled]="!mealForm.valid || isSubmitting">
-                <span *ngIf="isSubmitting">Adding...</span>
-                <span *ngIf="!isSubmitting">Add Meal</span>
+                <span *ngIf="isSubmitting">添加...</span>
+                <span *ngIf="!isSubmitting">新增餐點</span>
             </button>
             </div>
   

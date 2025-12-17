@@ -1,9 +1,9 @@
 <div class="display-ingredients-container">
   <div class="header">
-    <h2>All Ingredients</h2>
+    <h2>所有成分</h2>
     <div class="header-actions">
       <span class="total-count" *ngIf="!isLoading && !error">
-        Total: {{ totalIngredients }} ingredients
+        總計: {{ totalIngredients }} 成分
       </span>
       <button 
         type="button" 
@@ -11,8 +11,8 @@
         (click)="refreshIngredients()"
         [disabled]="isLoading"
       >
-        <span *ngIf="!isLoading">Refresh</span>
-        <span *ngIf="isLoading">Loading...</span>
+        <span *ngIf="!isLoading">重新整理</span>
+        <span *ngIf="isLoading">載入中...</span>
       </button>
     </div>
   </div>
@@ -20,7 +20,7 @@
   <!-- Loading State -->
   <div *ngIf="isLoading" class="loading-state">
     <div class="loading-spinner"></div>
-    <p>Loading ingredients...</p>
+    <p>正在載入食材...</p>
   </div>
 
   <!-- Error State -->
@@ -28,7 +28,7 @@
     <div class="error-icon">❌</div>
     <p class="error-message">{{ error }}</p>
     <button type="button" class="btn-retry" (click)="refreshIngredients()">
-      Try Again
+      再試一次
     </button>
   </div>
 
@@ -37,7 +37,7 @@
     <!-- Current Page Info -->
     <div class="page-info">
       <span class="page-indicator">
-        Page {{ currentPage }} of {{ totalPages }}
+        第 {{ currentPage }} 頁，共 {{ totalPages }} 頁
       </span>
     </div>
 
@@ -55,7 +55,7 @@
     <div class="pagination-container">
       <div class="pagination-info">
         <span>
-          Displaying {{ paginatedIngredients.length }} of {{ totalIngredients }} ingredients
+          顯示 {{ paginatedIngredients.length }} / {{ totalIngredients }} 成分
         </span>
       </div>
       
@@ -124,10 +124,10 @@
   <!-- Empty State -->
   <div *ngIf="!isLoading && !error && ingredients.length === 0" class="empty-state">
     <div class="empty-icon">🥕</div>
-    <h3>No Ingredients Found</h3>
-    <p>There are no ingredients in the database yet.</p>
+    <h3>未找到成分</h3>
+    <p>資料庫中尚無任何成分.</p>
     <button type="button" class="btn-primary" routerLink="/add-ingredient">
-      Add First Ingredient
+      加入第一個食材
     </button>
   </div>
 </div>

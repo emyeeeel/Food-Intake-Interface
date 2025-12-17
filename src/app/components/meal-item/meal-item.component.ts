@@ -11,10 +11,10 @@ export class MealItemComponent {
   @Input() mealImageSrc: string = 'assets/images/meals/meal-1.png';
   @Input() mealImageAlt: string = 'Meal Image';
   @Input() mealCode: string = 'L-01-A';
-  @Input() dayCycleLabel: string = '日循环';
+  @Input() dayCycleLabel: string = '天數';
   @Input() dayCycleValue: string = '第1天';
-  @Input() mealTimeLabel: string = '用餐时间';
+  @Input() mealTimeLabel: string = '餐別';
   @Input() mealTimeValue: string = '午餐';
-  @Input() plateTypeLabel: string = '板式';
+  @Input() plateTypeLabel: string = '樣式';
   @Input() plateTypeValue: string = '便当';
 }

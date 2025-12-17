@@ -1,9 +1,9 @@
 <div class="display-meal-container">
     <div class="header">
-      <h2>All Meals</h2>
+      <h2>所有餐點</h2>
       <div class="header-actions">
         <span class="total-count" *ngIf="!isLoading && !error">
-          Total: {{ totalMeals }} meals
+          總計: {{ totalMeals }} 道餐點
         </span>
         <button 
           type="button" 
@@ -11,8 +11,8 @@
           (click)="refreshMeals()"
           [disabled]="isLoading"
         >
-          <span *ngIf="!isLoading">Refresh</span>
-          <span *ngIf="isLoading">Loading...</span>
+          <span *ngIf="!isLoading">重新整理</span>
+          <span *ngIf="isLoading">載入中...</span>
         </button>
       </div>
     </div>
@@ -20,7 +20,7 @@
     <!-- Loading State -->
     <div *ngIf="isLoading" class="loading-state">
       <div class="loading-spinner"></div>
-      <p>Loading meals...</p>
+      <p>正在載入餐點...</p>
     </div>
   
     <!-- Error State -->
@@ -28,7 +28,7 @@
       <div class="error-icon">❌</div>
       <p class="error-message">{{ error }}</p>
       <button type="button" class="btn-retry" (click)="refreshMeals()">
-        Try Again
+        再試一次
       </button>
     </div>
   
@@ -37,7 +37,7 @@
       <!-- Current Page Info -->
       <div class="page-info">
         <span class="page-indicator">
-          Page {{ currentPage }} of {{ totalPages }}
+          第 {{ currentPage }} 頁，共 {{ totalPages }} 頁
         </span>
         <!-- <span class="showing-info">
           Showing {{ getStartIndex() }} - {{ getEndIndex() }} of {{ totalMeals }} meals
@@ -63,7 +63,7 @@
       <div class="pagination-container">
         <div class="pagination-info">
           <span>
-            Displaying {{ paginatedMeals.length }} of {{ totalMeals }} meals
+            顯示 {{ paginatedMeals.length }} / {{ totalMeals }} 道餐點
           </span>
         </div>
         
@@ -132,10 +132,10 @@
     <!-- Empty State -->
     <div *ngIf="!isLoading && !error && meals.length === 0" class="empty-state">
       <div class="empty-icon">🍽️</div>
-      <h3>No Meals Found</h3>
-      <p>There are no meals in the database yet.</p>
+      <h3>尚無餐點</h3>
+      <p>資料庫中目前沒有任何餐點</p>
       <button type="button" class="btn-primary" routerLink="/add-meal">
-        Add First Meal
+        新增第一道餐點
       </button>
     </div>
   </div>
