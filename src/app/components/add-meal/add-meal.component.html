@@ -11,7 +11,7 @@
             name="mealName"
             [(ngModel)]="meal.meal_name"
             class="form-input"
-            placeholder="Enter meal name"
+            placeholder="在這裡輸入餐點名稱"
             required
           />
         </div>
@@ -40,7 +40,7 @@
   
         <div *ngIf="isLoading" class="loading-state">
           <div class="loading-spinner"></div>
-          <p>處理餐點名稱...</p>
+          <p>正在處理中...</p>
         </div>
   
         <div class="form-actions" *ngIf="!isLoading">
@@ -77,9 +77,9 @@
                 </div>
         
                 <div class="dropdown-wrapper">
-                <label for="plateType">板式</label>
+                <label for="plateType">餐盤類型</label>
                 <select id="plateType" name="plateType" [(ngModel)]="meal.plate_type" class="form-select" required>
-                    <option value="" disabled>選擇板類型</option>
+                    <option value="" disabled>選擇餐盤類型</option>
                     <option *ngFor="let option of plateTypeOptions" [value]="option.value">{{ option.label }}</option>
                 </select>
                 </div>
