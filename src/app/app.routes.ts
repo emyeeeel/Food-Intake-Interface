@@ -10,6 +10,7 @@ import { MealAssignmentComponent } from './components/meal-assignment/meal-assig
 import { DailyConsumptionComponent } from './components/daily-consumption/daily-consumption.component';
 import { QrTestComponent } from './components/qr-test/qr-test.component';
 import { PatientDetailsComponent } from './components/patient-details/patient-details.component';
+import { PrintAllMealsComponent } from './components/print-all-meals/print-all-meals.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -38,5 +39,5 @@ export const routes: Routes = [
     { path: 'patient-info/:id', component: PatientInfoComponent },
 
     { path: 'settings', component: SettingsComponent },
-    { path: 'test', component: QrTestComponent },
+    { path: 'test', component: PrintAllMealsComponent },
 ];

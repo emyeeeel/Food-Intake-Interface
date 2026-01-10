@@ -1,0 +1,790 @@
+.print-all-meals {
+  padding: 20px;
+  font-family: 'Quicksand', sans-serif;
+  background-color: #CAECE5;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .meals-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, #FFFFFF, #F8FFFE);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 49, 60, 0.1);
+    flex-shrink: 0;
+
+    h2 {
+      color: #00313C;
+      font-weight: 800;
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .header-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+
+      .meals-count {
+        color: #40C1AC;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .print-controls {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        button {
+          padding: 8px 12px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &.btn-print-all {
+            background: linear-gradient(135deg, #40C1AC, #2FA695);
+            color: white;
+          }
+
+          &.btn-print-selected {
+            background: linear-gradient(135deg, #2FA695, #258B7A);
+            color: white;
+          }
+
+          &.btn-clear-selection {
+            background: linear-gradient(135deg, #E0F7F4, #C7F0E8);
+            color: #00313C;
+            border: 1px solid #B8D8D3;
+          }
+
+          &:disabled {
+            background: #B8D8D3;
+            color: #7A9B96;
+            cursor: not-allowed;
+          }
+
+          &:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+          }
+        }
+      }
+    }
+  }
+
+  // Loading and Error States
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #00313C;
+    flex: 1;
+
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #E0F7F4;
+      border-top: 3px solid #40C1AC;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+  }
+
+  .error {
+    background: linear-gradient(135deg, #FFE6E6, #FFF0F0);
+    border: 1px solid #FFB3B3;
+    color: #CC0000;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .no-meals {
+    text-align: center;
+    padding: 40px;
+    color: #7A9B96;
+    background: white;
+    border-radius: 10px;
+    font-style: italic;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // Main Content Flexbox Layout
+  .main-content {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  // Meals Table Section (Left Side)
+  .meals-table-container {
+    flex: 1;
+    min-width: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 49, 60, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .meals-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 400px;
+
+      thead {
+        background: linear-gradient(135deg, #40C1AC, #2FA695);
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        flex-shrink: 0;
+
+        th {
+          padding: 15px 12px;
+          text-align: left;
+          font-weight: 700;
+          font-size: 14px;
+          white-space: nowrap;
+
+          &:first-child {
+            width: 45%;
+          }
+          
+          &:nth-child(2) {
+            width: 35%;
+          }
+          
+          &:last-child {
+            width: 20%;
+            text-align: center;
+          }
+        }
+      }
+
+      tbody {
+        tr.meal-row {
+          border-bottom: 1px solid #E0F7F4;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            background-color: #F8FFFE;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(64, 193, 172, 0.15);
+          }
+    
+          &.selected {
+            background-color: #E6FEF9 !important;
+            border-left: 4px solid #40C1AC;
+            box-shadow: 0 2px 8px rgba(64, 193, 172, 0.2);
+          }
+    
+          &.selected:hover {
+            background-color: #D0F2E8 !important;
+          }
+
+          &:last-child {
+            border-bottom: none;
+          }
+        }
+
+        td {
+          padding: 15px 12px;
+          color: #01262E;
+          font-size: 13px;
+          vertical-align: middle;
+
+          &.meal-name {
+            font-weight: 600;
+            color: #00313C;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .meal-checkbox {
+              width: 18px;
+              height: 18px;
+              accent-color: #40C1AC;
+              margin: 0;
+              flex-shrink: 0;
+            }
+          }
+
+          &.meal-time {
+            font-weight: 500;
+            color: #01262E;
+            font-size: 13px;
+          }
+    
+          &.day-cycle {
+            font-weight: 600;
+            color: #40C1AC;
+            font-size: 13px;
+            text-align: center;
+          }
+        }
+      }
+    }
+
+    // Hidden scrollbars but still scrollable
+    overflow-y: auto;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+
+    &::-webkit-scrollbar {
+      display: none; /* WebKit browsers */
+    }
+  }
+
+  .meals-table tbody tr.meal-row.selected td.meal-name .meal-checkbox {
+    transform: scale(1.1);
+  }
+
+  // Print Preview Section (Right Side)
+  .print-preview-container {
+    flex: 1;
+    min-width: 350px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 49, 60, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .print-preview-content-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
+      .print-preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #F8FFFE, #E6FEF9);
+        border-bottom: 1px solid #E0F7F4;
+        flex-shrink: 0;
+
+        h3 {
+          color: #00313C;
+          font-weight: 700;
+          margin: 0;
+          font-size: 16px;
+        }
+
+        .preview-controls {
+          display: flex;
+          gap: 8px;
+
+          button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+
+            &.btn-print {
+              background: linear-gradient(135deg, #40C1AC, #2FA695);
+              color: white;
+            }
+
+            &.btn-close {
+              background: linear-gradient(135deg, #E0F7F4, #C7F0E8);
+              color: #00313C;
+            }
+
+            &:hover {
+              transform: translateY(-1px);
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            }
+          }
+        }
+      }
+
+      .print-preview-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        background: #f9f9f9;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+
+        &::-webkit-scrollbar {
+          display: none; /* WebKit browsers */
+        }
+
+        .print-document {
+          background: white;
+          padding: 20px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          border-radius: 8px;
+
+          .print-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #40C1AC;
+
+            h1 {
+              color: #00313C;
+              margin: 0 0 10px 0;
+              font-size: 18px;
+              font-weight: 800;
+            }
+
+            p {
+              margin: 3px 0;
+              color: #666;
+              font-size: 12px;
+            }
+          }
+
+          .print-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-top: 15px;
+
+            th, td {
+              border: 1px solid #ddd;
+              padding: 6px 4px;
+              text-align: left;
+              word-wrap: break-word;
+            }
+
+            th {
+              background-color: #40C1AC;
+              color: white;
+              font-weight: bold;
+              font-size: 9px;
+            }
+
+            tr:nth-child(even) {
+              background-color: #f9f9f9;
+            }
+
+            td {
+              font-size: 9px;
+              line-height: 1.2;
+            }
+          }
+        }
+      }
+    }
+
+    .print-preview-placeholder {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      padding: 40px 20px;
+      text-align: center;
+      background: linear-gradient(135deg, #F8FFFE, #FFFFFF);
+
+      .placeholder-content {
+        .placeholder-icon {
+          font-size: 48px;
+          margin-bottom: 16px;
+          opacity: 0.3;
+        }
+
+        h4 {
+          color: #00313C;
+          font-weight: 700;
+          margin: 0 0 12px 0;
+          font-size: 18px;
+        }
+
+        p {
+          color: #7A9B96;
+          font-size: 14px;
+          line-height: 1.4;
+          max-width: 280px;
+          margin: 0;
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Responsive Design
+@media screen and (max-width: 1280px) and (min-width: 1025px) {
+  .print-all-meals {
+    padding: 15px;
+
+    .main-content {
+      gap: 15px;
+    }
+
+    .meals-header {
+      h2 {
+        font-size: 18px;
+      }
+
+      .header-controls .print-controls button {
+        padding: 6px 10px;
+        font-size: 11px;
+      }
+    }
+
+    .meals-table-container .meals-table {
+      thead th {
+        padding: 12px 10px;
+        font-size: 12px;
+      }
+
+      tbody td {
+        padding: 12px 10px;
+        font-size: 12px;
+
+        &.meal-name {
+          font-size: 13px;
+          gap: 8px;
+
+          .meal-checkbox {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    }
+
+    .print-preview-container {
+      min-width: 300px;
+
+      .print-preview-content .print-document {
+        padding: 15px;
+
+        .print-header h1 {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+  .print-all-meals {
+    padding: 15px;
+
+    .main-content {
+      gap: 15px;
+    }
+
+    .meals-header {
+      h2 {
+        font-size: 18px;
+      }
+
+      .header-controls {
+        .print-controls {
+          button {
+            padding: 6px 10px;
+            font-size: 11px;
+          }
+        }
+      }
+    }
+
+    .meals-table-container {
+      .meals-table {
+        min-width: 350px;
+
+        thead th {
+          padding: 10px 8px;
+          font-size: 11px;
+
+          &:first-child { width: 40%; }
+          &:nth-child(2) { width: 35%; }
+          &:last-child { width: 25%; }
+        }
+
+        tbody td {
+          padding: 10px 8px;
+          font-size: 11px;
+
+          &.meal-name {
+            font-size: 12px;
+            gap: 6px;
+
+            .meal-checkbox {
+              width: 14px;
+              height: 14px;
+            }
+          }
+        }
+      }
+    }
+
+    .print-preview-container {
+      min-width: 280px;
+
+      .print-preview-content-wrapper .print-preview-header {
+        padding: 12px 15px;
+
+        h3 {
+          font-size: 14px;
+        }
+
+        .preview-controls button {
+          padding: 6px 10px;
+          font-size: 11px;
+        }
+      }
+
+      .print-preview-placeholder .placeholder-content {
+        h4 {
+          font-size: 16px;
+        }
+
+        p {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .print-all-meals {
+    padding: 10px;
+
+    .meals-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      padding: 12px;
+
+      h2 {
+        font-size: 16px;
+        text-align: center;
+      }
+
+      .header-controls {
+        align-items: center;
+
+        .meals-count {
+          font-size: 12px;
+        }
+
+        .print-controls {
+          flex-direction: column;
+          width: 100%;
+          gap: 6px;
+
+          button {
+            width: 100%;
+            padding: 10px;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    .main-content {
+      flex-direction: column;
+      height: auto;
+      gap: 10px;
+    }
+
+    .meals-table-container {
+      max-height: 40vh;
+
+      .meals-table {
+        min-width: 320px;
+
+        thead th {
+          padding: 8px 6px;
+          font-size: 11px;
+
+          &:first-child { width: 50%; }
+          &:nth-child(2) { width: 30%; }
+          &:last-child { width: 20%; }
+        }
+
+        tbody td {
+          padding: 8px 6px;
+          font-size: 10px;
+
+          &.meal-name {
+            font-size: 11px;
+            gap: 4px;
+
+            .meal-checkbox {
+              width: 12px;
+              height: 12px;
+            }
+          }
+
+          &.meal-time, &.day-cycle {
+            font-size: 10px;
+          }
+        }
+      }
+    }
+
+    .print-preview-container {
+      max-height: 50vh;
+
+      .print-preview-content-wrapper {
+        .print-preview-header {
+          flex-direction: column;
+          gap: 10px;
+          padding: 10px;
+
+          h3 {
+            font-size: 14px;
+          }
+
+          .preview-controls {
+            width: 100%;
+
+            button {
+              flex: 1;
+              padding: 8px;
+              font-size: 11px;
+            }
+          }
+        }
+
+        .print-preview-content {
+          padding: 10px;
+
+          .print-document {
+            padding: 15px;
+
+            .print-header {
+              h1 {
+                font-size: 14px;
+              }
+
+              p {
+                font-size: 10px;
+              }
+            }
+
+            .print-table {
+              font-size: 8px;
+
+              th, td {
+                padding: 4px 2px;
+                font-size: 8px;
+              }
+            }
+          }
+        }
+      }
+
+      .print-preview-placeholder {
+        padding: 20px 10px;
+
+        .placeholder-content {
+          .placeholder-icon {
+            font-size: 32px;
+          }
+
+          h4 {
+            font-size: 14px;
+          }
+
+          p {
+            font-size: 11px;
+            max-width: 220px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .print-all-meals {
+    padding: 8px;
+
+    .meals-header {
+      padding: 10px;
+
+      h2 {
+        font-size: 14px;
+      }
+    }
+
+    .meals-table-container {
+      max-height: 35vh;
+
+      .meals-table {
+        min-width: 280px;
+
+        thead th {
+          padding: 6px 4px;
+          font-size: 10px;
+        }
+
+        tbody td {
+          padding: 6px 4px;
+          font-size: 9px;
+
+          &.meal-name {
+            font-size: 10px;
+            gap: 3px;
+
+            .meal-checkbox {
+              width: 10px;
+              height: 10px;
+            }
+          }
+        }
+      }
+    }
+
+    .print-preview-container {
+      max-height: 45vh;
+
+      .print-preview-content-wrapper .print-preview-content .print-document {
+        padding: 10px;
+
+        .print-table {
+          font-size: 7px;
+
+          th, td {
+            padding: 3px 2px;
+          }
+        }
+      }
+    }
+  }
+}

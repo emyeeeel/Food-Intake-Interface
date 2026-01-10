@@ -1,0 +1,131 @@
+<div class="print-all-meals">
+  <div class="meals-header">
+    <h2>Meal Records</h2>
+    <div class="header-controls">
+      <div *ngIf="!loading" class="meals-count">
+        Total Meals: {{ getMealCount() }}
+      </div>
+      <div class="print-controls">
+        <button class="btn-print-all" (click)="printAllMeals()" [disabled]="meals.length === 0">
+          Print All Meals
+        </button>
+        <button class="btn-print-selected" (click)="printSelectedMeals()" [disabled]="selectedMeals.size === 0">
+          Print Selected ({{ selectedMeals.size }})
+        </button>
+        <button class="btn-clear-selection" (click)="clearSelection()" [disabled]="selectedMeals.size === 0">
+          Clear Selection
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <span>Loading meals...</span>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error && meals.length > 0" class="main-content">
+    
+    <!-- Meals Table -->
+    <div class="meals-table-container">
+      <table class="meals-table">
+        <thead>
+          <tr>
+            <th>Meal Name</th>
+            <th>Meal Time</th>
+            <th>Day Cycle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let meal of meals; trackBy: trackByMealId" 
+              [class.selected]="selectedMeals.has(meal.id)"
+              (click)="toggleMealSelection(meal.id)"
+              class="meal-row">
+            
+            <!-- Meal Name -->
+            <td class="meal-name">
+              {{ meal.meal_name }}
+            </td>
+            
+            <!-- Meal Time -->
+            <td class="meal-time">{{ meal.meal_time }}</td>
+            
+            <!-- Day Cycle -->
+            <td class="day-cycle">Day {{ meal.day_cycle }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Print Preview Container (always present but shows content conditionally) -->
+    <div class="print-preview-container">
+      <!-- Content only shows when showPrintPreview is true -->
+      <div *ngIf="showPrintPreview" class="print-preview-content-wrapper">
+        <div class="print-preview-header">
+          <h3>Print Preview</h3>
+          <div class="preview-controls">
+            <button class="btn-print" (click)="executePrint()">Print</button>
+            <button class="btn-close" (click)="closePrintPreview()">Close</button>
+          </div>
+        </div>
+        
+        <div class="print-preview-content" #printContent>
+          <div class="print-document">
+            <div class="print-header">
+              <h1>Meal Records Report</h1>
+              <p>Generated on: {{ currentDate | date:'full' }}</p>
+              <p>Total Records: {{ mealsForPrint.length }}</p>
+            </div>
+            
+            <table class="print-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Meal Name</th>
+                  <th>Meal Time</th>
+                  <th>Day Cycle</th>
+                  <th>Plate Type</th>
+                  <th>Ingredients</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let meal of mealsForPrint">
+                  <td>{{ meal.id }}</td>
+                  <td>{{ meal.meal_name }}</td>
+                  <td>{{ meal.meal_time }}</td>
+                  <td>Day {{ meal.day_cycle }}</td>
+                  <td>{{ meal.plate_type }}</td>
+                  <td>{{ getMealIngredients(meal) }}</td>
+                  <td>{{ meal.created_at | date:'short' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder when no preview -->
+      <div *ngIf="!showPrintPreview" class="print-preview-placeholder">
+        <div class="placeholder-content">
+          <i class="placeholder-icon">📄</i>
+          <h4>Print Preview</h4>
+          <p>Select meals and click "Print All" or "Print Selected" to see the preview here.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- No Meals State -->
+  <div *ngIf="!loading && !error && meals.length === 0" class="no-meals">
+    <p>No meals found.</p>
+  </div>
+</div>
