@@ -19,6 +19,7 @@ import { MealsService } from '../../services/meals.service';
 import { Meal } from '../../models/meal.model';
 import { AddMealComponent } from '../../components/add-meal/add-meal.component';
 import { DisplayMealComponent } from "../../components/display-meal/display-meal.component";
+import { PrintAllMealsComponent } from "../../components/print-all-meals/print-all-meals.component";
 
 @Component({
   selector: 'app-meal-catalog',
@@ -39,7 +40,8 @@ import { DisplayMealComponent } from "../../components/display-meal/display-meal
     ServingTimeComponent,
     DayCycleComponent,
     AddMealComponent,
-    DisplayMealComponent
+    DisplayMealComponent,
+    PrintAllMealsComponent
 ],
   templateUrl: './meal-catalog.component.html',
   styleUrl: './meal-catalog.component.scss'

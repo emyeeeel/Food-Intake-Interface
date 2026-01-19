@@ -34,22 +34,22 @@ export class AddMealComponent {
 
   // Dropdown options based on your model
   mealTimeOptions = [
-  { value: '午餐', label: 'Lunch' },
-  { value: '晚餐', label: 'Dinner' },
-  { value: '點心', label: 'Snack' }
+  { value: '午餐', label: '午餐' },
+  { value: '晚餐', label: '晚餐' },
+  // { value: '點心', label: 'Snack' }
 ];
 
 
   dayCycleOptions = Array.from({ length: 14 }, (_, i) => ({
   value: i + 1,            // ✅ INTEGER
-  label: `Day ${i + 1}`
+  label: `第${i + 1}天`
 }));
 
 
   plateTypeOptions = [
-  { value: '金属板', label: 'Metal Plate' },
-  { value: '金属碗', label: 'Metal Bowl' },
-  { value: '陶瓷碗', label: 'Ceramic Bowl' }
+  { value: '金属板', label: '金属板' },
+  { value: '金属碗', label: '金属碗' },
+  { value: '陶瓷碗', label: '陶瓷碗' }
 ];
 
 

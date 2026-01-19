@@ -1,16 +1,16 @@
-<div class="print-all-meals">
+<div class="print-all-meals" (keydown)="onKeyDown($event)">
   <div class="meals-header">
     <h2>Meal Records</h2>
     <div class="header-controls">
-      <div *ngIf="!loading" class="meals-count">
-        Total Meals: {{ getMealCount() }}
-      </div>
       <div class="print-controls">
         <button class="btn-print-all" (click)="printAllMeals()" [disabled]="meals.length === 0">
           Print All Meals
         </button>
         <button class="btn-print-selected" (click)="printSelectedMeals()" [disabled]="selectedMeals.size === 0">
           Print Selected ({{ selectedMeals.size }})
+        </button>
+        <button class="btn-print-current" (click)="printCurrentPage()" [disabled]="paginatedMeals.length === 0">
+          Print Current Page
         </button>
         <button class="btn-clear-selection" (click)="clearSelection()" [disabled]="selectedMeals.size === 0">
           Clear Selection
@@ -33,55 +33,169 @@
   <!-- Main Content -->
   <div *ngIf="!loading && !error && meals.length > 0" class="main-content">
     
-    <!-- Meals Table -->
+    <!-- Meals Table - Now takes full width -->
     <div class="meals-table-container">
-      <table class="meals-table">
-        <thead>
-          <tr>
-            <th>Meal Name</th>
-            <th>Meal Time</th>
-            <th>Day Cycle</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let meal of meals; trackBy: trackByMealId" 
-              [class.selected]="selectedMeals.has(meal.id)"
-              (click)="toggleMealSelection(meal.id)"
-              class="meal-row">
-            
-            <!-- Meal Name -->
-            <td class="meal-name">
-              {{ meal.meal_name }}
-            </td>
-            
-            <!-- Meal Time -->
-            <td class="meal-time">{{ meal.meal_time }}</td>
-            
-            <!-- Day Cycle -->
-            <td class="day-cycle">Day {{ meal.day_cycle }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <!-- Table Controls -->
+      <div class="table-controls">
+        <div class="page-size-control">
+          <label for="pageSize">Items per page:</label>
+          <select id="pageSize" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="25">25</option>
+          </select>
+        </div>
+        <div class="selection-controls">
+          <button class="btn-select-all" 
+                  (click)="selectAllCurrentPage()" 
+                  [disabled]="isAllCurrentPageSelected()">
+            Select All on Page
+          </button>
+          <button class="btn-deselect-all" 
+                  (click)="deselectAllCurrentPage()" 
+                  [disabled]="!isAnyCurrentPageSelected()">
+            Deselect All on Page
+          </button>
+        </div>
+      </div>
 
-    <!-- Print Preview Container (always present but shows content conditionally) -->
-    <div class="print-preview-container">
-      <!-- Content only shows when showPrintPreview is true -->
-      <div *ngIf="showPrintPreview" class="print-preview-content-wrapper">
-        <div class="print-preview-header">
-          <h3>Print Preview</h3>
-          <div class="preview-controls">
-            <button class="btn-print" (click)="executePrint()">Print</button>
-            <button class="btn-close" (click)="closePrintPreview()">Close</button>
-          </div>
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table class="meals-table">
+          <thead>
+            <tr>
+              <th></th> <!-- Placeholder -->
+              <th>Meal Name</th>
+              <th>Meal Time</th>
+              <th>Day Cycle</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let meal of paginatedMeals; trackBy: trackByMealId; let i = index" 
+                [class.selected]="selectedMeals.has(meal.id)"
+                (click)="toggleMealSelection(meal.id)"
+                class="meal-row">
+              
+              <!-- Checkbox -->
+              <td class="meal-checkbox">
+                <input type="checkbox" 
+                       [checked]="selectedMeals.has(meal.id)"
+                       (click)="$event.stopPropagation()"
+                       (change)="toggleMealSelection(meal.id, $event)">
+              </td>
+              
+              <!-- Meal Name -->
+              <td class="meal-name">
+                {{ meal.meal_name }}
+              </td>
+              
+              <!-- Meal Time -->
+              <td class="meal-time">{{ meal.meal_time }}</td>
+              
+              <!-- Day Cycle -->
+              <td class="day-cycle">Day {{ meal.day_cycle }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="pagination-container" *ngIf="totalPages > 1">
+        <div class="pagination-info">
+          <span>Showing {{ getStartIndex() }} to {{ getEndIndex() }} of {{ totalMeals }} entries</span>
         </div>
         
+        <div class="pagination-controls">
+          <!-- First Page -->
+          <button class="btn-page" 
+                  (click)="goToFirstPage()" 
+                  [disabled]="currentPage === 1"
+                  title="First Page">
+            ⟪
+          </button>
+          
+          <!-- Previous Page -->
+          <button class="btn-page" 
+                  (click)="goToPreviousPage()" 
+                  [disabled]="currentPage === 1"
+                  title="Previous Page">
+            ⟨
+          </button>
+          
+          <!-- Page Numbers -->
+          <button *ngFor="let page of getVisiblePages()" 
+                  class="btn-page"
+                  [class.active]="page === currentPage"
+                  [disabled]="page === '...'"
+                  (click)="goToPage(page)"
+                  [title]="page === '...' ? '' : 'Go to page ' + page">
+            {{ page }}
+          </button>
+          
+          <!-- Next Page -->
+          <button class="btn-page" 
+                  (click)="goToNextPage()" 
+                  [disabled]="currentPage === totalPages"
+                  title="Next Page">
+            ⟩
+          </button>
+          
+          <!-- Last Page -->
+          <button class="btn-page" 
+                  (click)="goToLastPage()" 
+                  [disabled]="currentPage === totalPages"
+                  title="Last Page">
+            ⟫
+          </button>
+        </div>
+        
+        <!-- Jump to Page -->
+        <div class="jump-to-page">
+          <label for="targetPage">Go to page:</label>
+          <input type="number" 
+                 id="targetPage"
+                 [(ngModel)]="targetPage" 
+                 [min]="1" 
+                 [max]="totalPages"
+                 placeholder="Page #"
+                 (keyup.enter)="goToTargetPage()">
+          <button class="btn-go" 
+                  (click)="goToTargetPage()" 
+                  [disabled]="!targetPage || targetPage < 1 || targetPage > totalPages">
+            Go
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- No Meals State -->
+  <div *ngIf="!loading && !error && meals.length === 0" class="no-meals">
+    <p>No meals found.</p>
+  </div>
+
+  <!-- Print Modal Popup -->
+  <div *ngIf="showPrintModal" class="print-modal-overlay" #popupModal (click)="onModalBackdropClick($event)">
+    <div class="print-modal-content" (click)="$event.stopPropagation()">
+      <div class="print-modal-header">
+        <h3>Print Preview - {{ getPrintModeTitle() }}</h3>
+        <div class="modal-controls">
+          <button class="btn-print" (click)="executePrint()">Print</button>
+          <button class="btn-close" (click)="closePrintModal()">×</button>
+        </div>
+      </div>
+      
+      <div class="print-modal-body">
         <div class="print-preview-content" #printContent>
           <div class="print-document">
             <div class="print-header">
               <h1>Meal Records Report</h1>
               <p>Generated on: {{ currentDate | date:'full' }}</p>
               <p>Total Records: {{ mealsForPrint.length }}</p>
+              <p>Print Mode: {{ getPrintModeTitle() }}</p>
             </div>
             
             <table class="print-table">
@@ -97,7 +211,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let meal of mealsForPrint">
+                <tr *ngFor="let meal of mealsForPrint; trackBy: trackByMealId">
                   <td>{{ meal.id }}</td>
                   <td>{{ meal.meal_name }}</td>
                   <td>{{ meal.meal_time }}</td>
@@ -111,21 +225,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Placeholder when no preview -->
-      <div *ngIf="!showPrintPreview" class="print-preview-placeholder">
-        <div class="placeholder-content">
-          <i class="placeholder-icon">📄</i>
-          <h4>Print Preview</h4>
-          <p>Select meals and click "Print All" or "Print Selected" to see the preview here.</p>
-        </div>
-      </div>
     </div>
-
-  </div>
-
-  <!-- No Meals State -->
-  <div *ngIf="!loading && !error && meals.length === 0" class="no-meals">
-    <p>No meals found.</p>
   </div>
 </div>

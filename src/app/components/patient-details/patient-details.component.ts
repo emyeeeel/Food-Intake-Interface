@@ -172,28 +172,28 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
                   },
                   error: (err) => {
                     console.error(err);
-                    this.recommendedAnalysis = 'Failed to load analysis.';
+                    this.recommendedAnalysis = '載入分析失敗.'; //Failed to load analysis
                     this.loading = false;
                   }
                 });
               },
               error: (err) => {
                 console.error(err);
-                this.error = 'Failed to load meal assignments';
+                this.error = '膳食分配加載失敗.'; //Failed to load meal assignments
                 this.loading = false;
               }
             });
           },
           error: (err) => {
             console.error(err);
-            this.error = 'Failed to load recommended intake';
+            this.error = '加載建議攝取量失敗.'; //Failed to load recommended intake
             this.loading = false;
           }
         });
       },
       error: (err) => {
         console.error(err);
-        this.error = 'Failed to load patient details';
+        this.error = '加載患者詳細資料失敗.'; //Failed to load patient details
         this.loading = false;
       }
     });
@@ -223,7 +223,7 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
         this.loadMealAssignments(patientId);
       },
       error: (err) => {
-        this.error = 'Failed to load patient details';
+        this.error = '加載患者詳細資料失敗.'; //Failed to load patient details
         this.loading = false;
         console.error('Error loading patient:', err);
       }
@@ -303,7 +303,7 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
-      this.error = 'Unable to access camera. Please check permissions.';
+      this.error = '無法存取攝影機。請檢查權限。'; //Unable to access camera. Please check permissions.
     }
   }
 

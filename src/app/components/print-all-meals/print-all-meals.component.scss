@@ -1,21 +1,24 @@
 .print-all-meals {
-  padding: 20px;
-  font-family: 'Quicksand', sans-serif;
+  // Mobile First (Base styles for 320px and up)
+  width: 100%;
   background-color: #CAECE5;
-  min-height: 100vh;
-  max-height: 100vh;
+  box-sizing: border-box;
+  font-family: 'Quicksand', sans-serif;
+  height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   .meals-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 15px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 15px;
+    padding: 10px;
     background: linear-gradient(135deg, #FFFFFF, #F8FFFE);
-    border-radius: 10px;
+    border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 49, 60, 0.1);
     flex-shrink: 0;
 
@@ -23,30 +26,33 @@
       color: #00313C;
       font-weight: 800;
       margin: 0;
-      font-size: 20px;
+      font-size: 14px;
+      text-align: center;
     }
 
     .header-controls {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      align-items: flex-end;
+      gap: 8px;
+      align-items: center;
 
       .meals-count {
         color: #40C1AC;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 11px;
       }
 
       .print-controls {
         display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
 
         button {
-          padding: 8px 12px;
+          width: 100%;
+          padding: 10px;
           border-radius: 6px;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 600;
           border: none;
           cursor: pointer;
@@ -59,6 +65,11 @@
 
           &.btn-print-selected {
             background: linear-gradient(135deg, #2FA695, #258B7A);
+            color: white;
+          }
+
+          &.btn-print-current {
+            background: linear-gradient(135deg, #258B7A, #1F7A68);
             color: white;
           }
 
@@ -89,18 +100,18 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px;
+    padding: 30px 10px;
     color: #00313C;
     flex: 1;
 
     .loading-spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid #E0F7F4;
-      border-top: 3px solid #40C1AC;
+      width: 24px;
+      height: 24px;
+      border: 2px solid #E0F7F4;
+      border-top: 2px solid #40C1AC;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
   }
 
@@ -108,51 +119,135 @@
     background: linear-gradient(135deg, #FFE6E6, #FFF0F0);
     border: 1px solid #FFB3B3;
     color: #CC0000;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 12px;
+    border-radius: 6px;
     text-align: center;
     font-weight: 600;
+    font-size: 12px;
     flex-shrink: 0;
+    margin-bottom: 10px;
   }
 
   .no-meals {
     text-align: center;
-    padding: 40px;
+    padding: 30px 15px;
     color: #7A9B96;
     background: white;
-    border-radius: 10px;
+    border-radius: 8px;
     font-style: italic;
+    font-size: 12px;
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  // Main Content Flexbox Layout
+  // Main Content - Now single column layout
   .main-content {
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
     flex: 1;
     min-height: 0;
     overflow: hidden;
   }
 
-  // Meals Table Section (Left Side)
+  // Meals Table Section - Full width now
   .meals-table-container {
-    flex: 1;
-    min-width: 0;
+    height: 100%;
     background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 49, 60, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 49, 60, 0.1);
     overflow: hidden;
     display: flex;
     flex-direction: column;
 
+    // Table Controls
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: linear-gradient(135deg, #F8FFFE, #E6FEF9);
+      border-bottom: 1px solid #E0F7F4;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+
+      .page-size-control {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        label {
+          font-size: 10px;
+          font-weight: 600;
+          color: #00313C;
+        }
+
+        select {
+          padding: 3px 5px;
+          border: 1px solid #B8D8D3;
+          border-radius: 4px;
+          font-size: 10px;
+          background: white;
+          color: #00313C;
+
+          &:focus {
+            outline: none;
+            border-color: #40C1AC;
+          }
+        }
+      }
+
+      .selection-controls {
+        display: flex;
+        gap: 4px;
+
+        button {
+          padding: 4px 6px;
+          border: none;
+          border-radius: 4px;
+          font-size: 9px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &.btn-select-all {
+            background: linear-gradient(135deg, #40C1AC, #2FA695);
+            color: white;
+          }
+
+          &.btn-deselect-all {
+            background: linear-gradient(135deg, #E0F7F4, #C7F0E8);
+            color: #00313C;
+          }
+
+          &:disabled {
+            background: #B8D8D3;
+            color: #7A9B96;
+            cursor: not-allowed;
+          }
+
+          &:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+          }
+        }
+      }
+    }
+
+    .table-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
     .meals-table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 400px;
 
       thead {
         background: linear-gradient(135deg, #40C1AC, #2FA695);
@@ -160,25 +255,22 @@
         position: sticky;
         top: 0;
         z-index: 10;
-        flex-shrink: 0;
 
         th {
-          padding: 15px 12px;
+          padding: 8px 6px;
           text-align: left;
           font-weight: 700;
-          font-size: 14px;
+          font-size: 10px;
           white-space: nowrap;
 
-          &:first-child {
-            width: 45%;
+          &:first-child { 
+            width: 8%; 
+            text-align: center;
           }
-          
-          &:nth-child(2) {
-            width: 35%;
-          }
-          
-          &:last-child {
-            width: 20%;
+          &:nth-child(2) { width: 50%; }
+          &:nth-child(3) { width: 25%; }
+          &:last-child { 
+            width: 17%; 
             text-align: center;
           }
         }
@@ -192,18 +284,11 @@
           
           &:hover {
             background-color: #F8FFFE;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(64, 193, 172, 0.15);
           }
     
           &.selected {
             background-color: #E6FEF9 !important;
-            border-left: 4px solid #40C1AC;
-            box-shadow: 0 2px 8px rgba(64, 193, 172, 0.2);
-          }
-    
-          &.selected:hover {
-            background-color: #D0F2E8 !important;
+            border-left: 3px solid #40C1AC;
           }
 
           &:last-child {
@@ -212,223 +297,303 @@
         }
 
         td {
-          padding: 15px 12px;
+          padding: 8px 6px;
           color: #01262E;
-          font-size: 13px;
+          font-size: 10px;
           vertical-align: middle;
+
+          &.meal-checkbox {
+            text-align: center;
+            padding: 8px 4px;
+
+            input[type="checkbox"] {
+              width: 12px;
+              height: 12px;
+              accent-color: #40C1AC;
+              margin: 0;
+            }
+          }
 
           &.meal-name {
             font-weight: 600;
             color: #00313C;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-
-            .meal-checkbox {
-              width: 18px;
-              height: 18px;
-              accent-color: #40C1AC;
-              margin: 0;
-              flex-shrink: 0;
-            }
+            font-size: 11px;
           }
 
           &.meal-time {
             font-weight: 500;
             color: #01262E;
-            font-size: 13px;
+            font-size: 10px;
           }
     
           &.day-cycle {
             font-weight: 600;
             color: #40C1AC;
-            font-size: 13px;
+            font-size: 10px;
             text-align: center;
           }
         }
       }
     }
 
-    // Hidden scrollbars but still scrollable
-    overflow-y: auto;
-    overflow-x: auto;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    // Pagination Container
+    .pagination-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 8px;
+      background: linear-gradient(135deg, #F8FFFE, #E6FEF9);
+      border-top: 1px solid #E0F7F4;
+      align-items: center;
+      flex-shrink: 0;
 
-    &::-webkit-scrollbar {
-      display: none; /* WebKit browsers */
+      .pagination-info {
+        font-size: 9px;
+        color: #00313C;
+        font-weight: 500;
+        text-align: center;
+      }
+
+      .pagination-controls {
+        display: flex;
+        gap: 2px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+
+        .btn-page {
+          padding: 3px 5px;
+          border: 1px solid #B8D8D3;
+          background: white;
+          color: #00313C;
+          border-radius: 3px;
+          font-size: 9px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          min-width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover:not(:disabled) {
+            background: #E6FEF9;
+            transform: translateY(-1px);
+          }
+
+          &.active {
+            background: linear-gradient(135deg, #40C1AC, #2FA695);
+            color: white;
+            border-color: #2FA695;
+          }
+
+          &:disabled {
+            background: #F5F5F5;
+            color: #B8D8D3;
+            cursor: not-allowed;
+            border-color: #E0E0E0;
+          }
+        }
+      }
+
+      .jump-to-page {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        label {
+          font-size: 9px;
+          font-weight: 600;
+          color: #00313C;
+        }
+
+        input {
+          width: 40px;
+          padding: 2px 4px;
+          border: 1px solid #B8D8D3;
+          border-radius: 3px;
+          font-size: 9px;
+          text-align: center;
+
+          &:focus {
+            outline: none;
+            border-color: #40C1AC;
+          }
+        }
+
+        .btn-go {
+          padding: 2px 6px;
+          border: none;
+          background: linear-gradient(135deg, #40C1AC, #2FA695);
+          color: white;
+          border-radius: 3px;
+          font-size: 9px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+          }
+
+          &:disabled {
+            background: #B8D8D3;
+            cursor: not-allowed;
+          }
+        }
+      }
     }
   }
 
-  .meals-table tbody tr.meal-row.selected td.meal-name .meal-checkbox {
-    transform: scale(1.1);
-  }
-
-  // Print Preview Section (Right Side)
-  .print-preview-container {
-    flex: 1;
-    min-width: 350px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 49, 60, 0.1);
-    overflow: hidden;
+  // Print Modal Styles
+  .print-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(3px);
 
-    .print-preview-content-wrapper {
+    .print-modal-content {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      max-width: 90vw;
+      max-height: 90vh;
+      width: 800px;
       display: flex;
       flex-direction: column;
-      height: 100%;
+      overflow: hidden;
 
-      .print-preview-header {
+      .print-modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 15px 20px;
-        background: linear-gradient(135deg, #F8FFFE, #E6FEF9);
-        border-bottom: 1px solid #E0F7F4;
+        background: linear-gradient(135deg, #40C1AC, #2FA695);
+        color: white;
         flex-shrink: 0;
 
         h3 {
-          color: #00313C;
-          font-weight: 700;
           margin: 0;
           font-size: 16px;
+          font-weight: 700;
         }
 
-        .preview-controls {
+        .modal-controls {
           display: flex;
-          gap: 8px;
+          gap: 10px;
+          align-items: center;
 
-          button {
+          .btn-print {
             padding: 8px 12px;
-            border-radius: 6px;
             border: none;
+            background: white;
+            color: #40C1AC;
+            border-radius: 6px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            font-size: 12px;
             transition: all 0.3s ease;
 
-            &.btn-print {
-              background: linear-gradient(135deg, #40C1AC, #2FA695);
-              color: white;
+            &:hover {
+              background: #f0f0f0;
+              transform: translateY(-1px);
             }
+          }
 
-            &.btn-close {
-              background: linear-gradient(135deg, #E0F7F4, #C7F0E8);
-              color: #00313C;
-            }
+          .btn-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 5px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
             &:hover {
-              transform: translateY(-1px);
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+              background: rgba(255, 255, 255, 0.2);
             }
           }
         }
       }
 
-      .print-preview-content {
+      .print-modal-body {
         flex: 1;
         overflow-y: auto;
-        padding: 15px;
+        padding: 20px;
         background: #f9f9f9;
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* Internet Explorer 10+ */
 
-        &::-webkit-scrollbar {
-          display: none; /* WebKit browsers */
-        }
+        .print-preview-content {
+          .print-document {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 
-        .print-document {
-          background: white;
-          padding: 20px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          border-radius: 8px;
+            .print-header {
+              text-align: center;
+              margin-bottom: 20px;
+              padding-bottom: 15px;
+              border-bottom: 2px solid #40C1AC;
 
-          .print-header {
-            text-align: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #40C1AC;
+              h1 {
+                color: #00313C;
+                margin: 0 0 10px 0;
+                font-size: 20px;
+                font-weight: 800;
+              }
 
-            h1 {
-              color: #00313C;
-              margin: 0 0 10px 0;
-              font-size: 18px;
-              font-weight: 800;
+              p {
+                margin: 5px 0;
+                color: #666;
+                font-size: 12px;
+              }
             }
 
-            p {
-              margin: 3px 0;
-              color: #666;
-              font-size: 12px;
-            }
-          }
+            .print-table {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 10px;
+              margin-top: 15px;
 
-          .print-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 10px;
-            margin-top: 15px;
+              th, td {
+                border: 1px solid #ddd;
+                padding: 6px 4px;
+                text-align: left;
+                word-wrap: break-word;
+              }
 
-            th, td {
-              border: 1px solid #ddd;
-              padding: 6px 4px;
-              text-align: left;
-              word-wrap: break-word;
-            }
+              th {
+                background-color: #40C1AC;
+                color: white;
+                font-weight: bold;
+                font-size: 10px;
+              }
 
-            th {
-              background-color: #40C1AC;
-              color: white;
-              font-weight: bold;
-              font-size: 9px;
-            }
+              tr:nth-child(even) {
+                background-color: #f9f9f9;
+              }
 
-            tr:nth-child(even) {
-              background-color: #f9f9f9;
-            }
-
-            td {
-              font-size: 9px;
-              line-height: 1.2;
+              td {
+                font-size: 9px;
+                line-height: 1.2;
+              }
             }
           }
-        }
-      }
-    }
-
-    .print-preview-placeholder {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      padding: 40px 20px;
-      text-align: center;
-      background: linear-gradient(135deg, #F8FFFE, #FFFFFF);
-
-      .placeholder-content {
-        .placeholder-icon {
-          font-size: 48px;
-          margin-bottom: 16px;
-          opacity: 0.3;
-        }
-
-        h4 {
-          color: #00313C;
-          font-weight: 700;
-          margin: 0 0 12px 0;
-          font-size: 18px;
-        }
-
-        p {
-          color: #7A9B96;
-          font-size: 14px;
-          line-height: 1.4;
-          max-width: 280px;
-          margin: 0;
         }
       }
     }
@@ -441,78 +606,35 @@
   100% { transform: rotate(360deg); }
 }
 
-// Responsive Design
-@media screen and (max-width: 1280px) and (min-width: 1025px) {
+// 600px (Small Desktop/Large Tablet)
+@media screen and (min-width: 600px) {
   .print-all-meals {
-    padding: 15px;
-
-    .main-content {
-      gap: 15px;
-    }
 
     .meals-header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+
       h2 {
-        font-size: 18px;
-      }
-
-      .header-controls .print-controls button {
-        padding: 6px 10px;
-        font-size: 11px;
-      }
-    }
-
-    .meals-table-container .meals-table {
-      thead th {
-        padding: 12px 10px;
-        font-size: 12px;
-      }
-
-      tbody td {
-        padding: 12px 10px;
-        font-size: 12px;
-
-        &.meal-name {
-          font-size: 13px;
-          gap: 8px;
-
-          .meal-checkbox {
-            width: 16px;
-            height: 16px;
-          }
-        }
-      }
-    }
-
-    .print-preview-container {
-      min-width: 300px;
-
-      .print-preview-content .print-document {
-        padding: 15px;
-
-        .print-header h1 {
-          font-size: 16px;
-        }
-      }
-    }
-  }
-}
-
-@media screen and (max-width: 1024px) and (min-width: 769px) {
-  .print-all-meals {
-    padding: 15px;
-
-    .main-content {
-      gap: 15px;
-    }
-
-    .meals-header {
-      h2 {
-        font-size: 18px;
+        font-size: 16px;
+        text-align: left;
       }
 
       .header-controls {
+        flex-direction: column;
+        align-items: flex-end;
+
+        .meals-count {
+          font-size: 12px;
+        }
+
         .print-controls {
+          flex-direction: row;
+          width: auto;
+
           button {
+            width: auto;
             padding: 6px 10px;
             font-size: 11px;
           }
@@ -521,209 +643,160 @@
     }
 
     .meals-table-container {
-      .meals-table {
-        min-width: 350px;
+      .table-controls {
+        padding: 10px 15px;
 
-        thead th {
-          padding: 10px 8px;
-          font-size: 11px;
+        .page-size-control {
+          label {
+            font-size: 11px;
+          }
 
-          &:first-child { width: 40%; }
-          &:nth-child(2) { width: 35%; }
-          &:last-child { width: 25%; }
-        }
-
-        tbody td {
-          padding: 10px 8px;
-          font-size: 11px;
-
-          &.meal-name {
-            font-size: 12px;
-            gap: 6px;
-
-            .meal-checkbox {
-              width: 14px;
-              height: 14px;
-            }
+          select {
+            padding: 4px 6px;
+            font-size: 11px;
           }
         }
-      }
-    }
 
-    .print-preview-container {
-      min-width: 280px;
-
-      .print-preview-content-wrapper .print-preview-header {
-        padding: 12px 15px;
-
-        h3 {
-          font-size: 14px;
-        }
-
-        .preview-controls button {
-          padding: 6px 10px;
-          font-size: 11px;
-        }
-      }
-
-      .print-preview-placeholder .placeholder-content {
-        h4 {
-          font-size: 16px;
-        }
-
-        p {
-          font-size: 12px;
-        }
-      }
-    }
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .print-all-meals {
-    padding: 10px;
-
-    .meals-header {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
-      padding: 12px;
-
-      h2 {
-        font-size: 16px;
-        text-align: center;
-      }
-
-      .header-controls {
-        align-items: center;
-
-        .meals-count {
-          font-size: 12px;
-        }
-
-        .print-controls {
-          flex-direction: column;
-          width: 100%;
+        .selection-controls {
           gap: 6px;
 
           button {
-            width: 100%;
-            padding: 10px;
-            font-size: 12px;
+            padding: 5px 8px;
+            font-size: 10px;
           }
         }
       }
-    }
-
-    .main-content {
-      flex-direction: column;
-      height: auto;
-      gap: 10px;
-    }
-
-    .meals-table-container {
-      max-height: 40vh;
 
       .meals-table {
-        min-width: 320px;
-
         thead th {
-          padding: 8px 6px;
+          padding: 10px 8px;
           font-size: 11px;
 
-          &:first-child { width: 50%; }
-          &:nth-child(2) { width: 30%; }
+          &:first-child { width: 6%; }
+          &:nth-child(2) { width: 44%; }
+          &:nth-child(3) { width: 30%; }
           &:last-child { width: 20%; }
         }
 
         tbody td {
-          padding: 8px 6px;
-          font-size: 10px;
+          padding: 10px 8px;
+          font-size: 11px;
 
-          &.meal-name {
-            font-size: 11px;
-            gap: 4px;
+          &.meal-checkbox {
+            padding: 10px 6px;
 
-            .meal-checkbox {
-              width: 12px;
-              height: 12px;
+            input[type="checkbox"] {
+              width: 14px;
+              height: 14px;
             }
           }
 
-          &.meal-time, &.day-cycle {
+          &.meal-name {
+            font-size: 12px;
+          }
+        }
+      }
+
+      .pagination-container {
+        padding: 10px 15px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        .pagination-info {
+          font-size: 11px;
+        }
+
+        .pagination-controls {
+          .btn-page {
+            padding: 4px 8px;
+            font-size: 10px;
+            min-width: 28px;
+            height: 28px;
+          }
+        }
+
+        .jump-to-page {
+          gap: 6px;
+
+          label {
+            font-size: 11px;
+          }
+
+          input {
+            width: 50px;
+            padding: 4px 6px;
+            font-size: 10px;
+          }
+
+          .btn-go {
+            padding: 4px 8px;
             font-size: 10px;
           }
         }
       }
     }
 
-    .print-preview-container {
-      max-height: 50vh;
+    .print-modal-overlay {
+      .print-modal-content {
+        max-width: 85vw;
+        width: 900px;
 
-      .print-preview-content-wrapper {
-        .print-preview-header {
-          flex-direction: column;
-          gap: 10px;
-          padding: 10px;
+        .print-modal-header {
+          padding: 18px 25px;
 
           h3 {
-            font-size: 14px;
+            font-size: 18px;
           }
 
-          .preview-controls {
-            width: 100%;
+          .modal-controls {
+            gap: 12px;
 
-            button {
-              flex: 1;
-              padding: 8px;
-              font-size: 11px;
+            .btn-print {
+              padding: 10px 15px;
+              font-size: 13px;
+            }
+
+            .btn-close {
+              font-size: 22px;
+              padding: 6px 10px;
             }
           }
         }
 
-        .print-preview-content {
-          padding: 10px;
+        .print-modal-body {
+          padding: 25px;
 
-          .print-document {
-            padding: 15px;
+          .print-preview-content {
+            .print-document {
+              padding: 25px;
 
-            .print-header {
-              h1 {
-                font-size: 14px;
+              .print-header {
+                h1 {
+                  font-size: 22px;
+                }
+
+                p {
+                  font-size: 13px;
+                }
               }
 
-              p {
-                font-size: 10px;
+              .print-table {
+                font-size: 11px;
+
+                th, td {
+                  padding: 8px 6px;
+                }
+
+                th {
+                  font-size: 11px;
+                }
+
+                td {
+                  font-size: 10px;
+                }
               }
             }
-
-            .print-table {
-              font-size: 8px;
-
-              th, td {
-                padding: 4px 2px;
-                font-size: 8px;
-              }
-            }
-          }
-        }
-      }
-
-      .print-preview-placeholder {
-        padding: 20px 10px;
-
-        .placeholder-content {
-          .placeholder-icon {
-            font-size: 32px;
-          }
-
-          h4 {
-            font-size: 14px;
-          }
-
-          p {
-            font-size: 11px;
-            max-width: 220px;
           }
         }
       }
@@ -731,57 +804,241 @@
   }
 }
 
-@media screen and (max-width: 480px) {
+// 1024px (Standard Desktop)
+@media screen and (min-width: 1024px) {
   .print-all-meals {
-    padding: 8px;
 
     .meals-header {
-      padding: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
 
       h2 {
-        font-size: 14px;
+        font-size: 18px;
       }
-    }
 
-    .meals-table-container {
-      max-height: 35vh;
+      .header-controls {
+        gap: 10px;
 
-      .meals-table {
-        min-width: 280px;
-
-        thead th {
-          padding: 6px 4px;
-          font-size: 10px;
+        .meals-count {
+          font-size: 14px;
         }
 
-        tbody td {
-          padding: 6px 4px;
-          font-size: 9px;
+        .print-controls {
+          gap: 8px;
 
-          &.meal-name {
-            font-size: 10px;
-            gap: 3px;
-
-            .meal-checkbox {
-              width: 10px;
-              height: 10px;
-            }
+          button {
+            padding: 8px 12px;
+            font-size: 12px;
           }
         }
       }
     }
 
-    .print-preview-container {
-      max-height: 45vh;
+    .meals-table-container {
+      .table-controls {
+        padding: 12px 20px;
 
-      .print-preview-content-wrapper .print-preview-content .print-document {
-        padding: 10px;
+        .page-size-control {
+          label {
+            font-size: 12px;
+          }
 
-        .print-table {
-          font-size: 7px;
+          select {
+            padding: 6px 8px;
+            font-size: 12px;
+          }
+        }
 
-          th, td {
-            padding: 3px 2px;
+        .selection-controls {
+          gap: 8px;
+
+          button {
+            padding: 6px 10px;
+            font-size: 11px;
+          }
+        }
+      }
+
+      .meals-table {
+        thead th {
+          padding: 12px 10px;
+          font-size: 12px;
+
+          &:first-child { width: 5%; }
+          &:nth-child(2) { width: 40%; }
+          &:nth-child(3) { width: 35%; }
+          &:last-child { width: 20%; }
+        }
+
+        tbody td {
+          padding: 12px 10px;
+          font-size: 12px;
+
+          &.meal-checkbox {
+            padding: 12px 8px;
+
+            input[type="checkbox"] {
+              width: 16px;
+              height: 16px;
+            }
+          }
+
+          &.meal-name {
+            font-size: 13px;
+          }
+
+          &.meal-time, &.day-cycle {
+            font-size: 12px;
+          }
+        }
+      }
+
+      .pagination-container {
+        padding: 15px 20px;
+
+        .pagination-info {
+          font-size: 12px;
+        }
+
+        .pagination-controls {
+          .btn-page {
+            padding: 6px 10px;
+            font-size: 11px;
+            min-width: 32px;
+            height: 32px;
+          }
+        }
+
+        .jump-to-page {
+          gap: 8px;
+
+          label {
+            font-size: 12px;
+          }
+
+          input {
+            width: 60px;
+            padding: 6px 8px;
+            font-size: 11px;
+          }
+
+          .btn-go {
+            padding: 6px 10px;
+            font-size: 11px;
+          }
+        }
+      }
+    }
+
+    .print-modal-overlay {
+      .print-modal-content {
+        max-width: 80vw;
+        width: 1000px;
+
+        .print-modal-header {
+          padding: 20px 30px;
+
+          h3 {
+            font-size: 20px;
+          }
+
+          .modal-controls {
+            gap: 15px;
+
+            .btn-print {
+              padding: 12px 18px;
+              font-size: 14px;
+            }
+
+            .btn-close {
+              font-size: 24px;
+              padding: 8px 12px;
+            }
+          }
+        }
+
+        .print-modal-body {
+          padding: 30px;
+
+          .print-preview-content {
+            .print-document {
+              padding: 30px;
+
+              .print-header {
+                margin-bottom: 25px;
+                padding-bottom: 20px;
+
+                h1 {
+                  font-size: 24px;
+                }
+
+                p {
+                  font-size: 14px;
+                }
+              }
+
+              .print-table {
+                font-size: 12px;
+                margin-top: 20px;
+
+                th, td {
+                  padding: 10px 8px;
+                }
+
+                th {
+                  font-size: 12px;
+                }
+
+                td {
+                  font-size: 11px;
+                  line-height: 1.3;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Large Desktop (1280px and up)
+@media screen and (min-width: 1280px) {
+  .print-all-meals {
+    padding: 20px;
+
+    .meals-header {
+      h2 {
+        font-size: 20px;
+      }
+    }
+
+    .meals-table-container {
+      .meals-table {
+        thead th {
+          padding: 15px 12px;
+          font-size: 14px;
+        }
+
+        tbody td {
+          padding: 15px 12px;
+          font-size: 13px;
+
+          &.meal-checkbox {
+            padding: 15px 10px;
+
+            input[type="checkbox"] {
+              width: 18px;
+              height: 18px;
+            }
+          }
+
+          &.meal-name {
+            font-size: 14px;
+          }
+
+          &.meal-time, &.day-cycle {
+            font-size: 13px;
           }
         }
       }
