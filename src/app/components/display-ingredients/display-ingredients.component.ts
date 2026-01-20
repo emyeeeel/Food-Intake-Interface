@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { IngredientsCardComponent } from "../ingredients-card/ingredients-card.component";
@@ -8,7 +8,7 @@ import { Ingredient } from '../../models/ingredient.model';
 
 @Component({
   selector: 'app-display-ingredients',
-  imports: [CommonModule, RouterModule, IngredientsCardComponent],
+  imports: [RouterModule, IngredientsCardComponent],
   templateUrl: './display-ingredients.component.html',
   styleUrl: './display-ingredients.component.scss'
 })

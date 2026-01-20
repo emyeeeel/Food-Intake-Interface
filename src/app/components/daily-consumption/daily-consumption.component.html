@@ -1,13 +1,15 @@
 <div class="main-container">
-    <div class="content">
-        <div class="text">
-            <h2>每日摘要</h2>
-            <span>*每 000 位住民</span>
-        </div>
-        <div class="chart">
-            <div class="bar-item" *ngFor="let percentage of dailyPercentages; let i = index">
-                <app-consumption-bar [percentage]="percentage"></app-consumption-bar>
-              </div>
-        </div>
+  <div class="content">
+    <div class="text">
+      <h2>每日摘要</h2>
+      <span>*每 000 位住民</span>
     </div>
+    <div class="chart">
+      @for (percentage of dailyPercentages; track percentage; let i = $index) {
+        <div class="bar-item">
+          <app-consumption-bar [percentage]="percentage"></app-consumption-bar>
+        </div>
+      }
+    </div>
+  </div>
 </div>

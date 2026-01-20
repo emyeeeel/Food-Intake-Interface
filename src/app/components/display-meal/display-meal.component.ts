@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MealsService } from '../../services/meals.service';
@@ -8,7 +8,7 @@ import { MealItemComponent } from '../meal-item/meal-item.component'; // Import 
 
 @Component({
   selector: 'app-display-meal',
-  imports: [CommonModule, FormsModule, RouterModule, MealItemComponent], // Add MealItemComponent
+  imports: [FormsModule, RouterModule, MealItemComponent], // Add MealItemComponent
   templateUrl: './display-meal.component.html',
   styleUrl: './display-meal.component.scss'
 })

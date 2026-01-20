@@ -6,38 +6,37 @@ import { MealCatalogComponent } from './pages/meal-catalog/meal-catalog.componen
 import { IngredientsComponent } from './pages/ingredients/ingredients.component';
 import { PatientInfoComponent } from './pages/patient-info/patient-info.component';
 import { SettingsComponent } from './pages/settings/settings.component';
-import { MealAssignmentComponent } from './components/meal-assignment/meal-assignment.component';
-import { DailyConsumptionComponent } from './components/daily-consumption/daily-consumption.component';
-import { QrTestComponent } from './components/qr-test/qr-test.component';
-import { PatientDetailsComponent } from './components/patient-details/patient-details.component';
 import { PrintAllMealsComponent } from './components/print-all-meals/print-all-meals.component';
 
+import { authGuard } from './guards/auth.guard';
+import { rootGuard } from './guards/root.guard';
+
 export const routes: Routes = [
-    { path: '', redirectTo: '/login', pathMatch: 'full' },
+    { path: '', canActivate: [rootGuard], children: [] },
     { path: 'login', component: LogInComponent },
-    { path: 'home', component: HomepageComponent },
+    { path: 'home', canActivate: [authGuard], component: HomepageComponent },
 
-    { path: 'meal-intake', component: MealIntakeComponent },
-    { path: 'meal-intake/add', component: MealIntakeComponent },
-    { path: 'meal-intake/all', component: MealIntakeComponent },
-    { path: 'meal-intake/print', component: MealIntakeComponent },
+    { path: 'meal-intake', canActivate: [authGuard], component: MealIntakeComponent },
+    { path: 'meal-intake/add', canActivate: [authGuard], component: MealIntakeComponent },
+    { path: 'meal-intake/all', canActivate: [authGuard], component: MealIntakeComponent },
+    { path: 'meal-intake/print', canActivate: [authGuard], component: MealIntakeComponent },
     
-    { path: 'meal-catalog', component: MealCatalogComponent },
-    { path: 'meal-catalog/add', component: MealCatalogComponent },
-    { path: 'meal-catalog/all', component: MealCatalogComponent },
-    { path: 'meal-catalog/print', component: MealCatalogComponent },
+    { path: 'meal-catalog', canActivate: [authGuard], component: MealCatalogComponent },
+    { path: 'meal-catalog/add', canActivate: [authGuard], component: MealCatalogComponent },
+    { path: 'meal-catalog/all', canActivate: [authGuard], component: MealCatalogComponent },
+    { path: 'meal-catalog/print', canActivate: [authGuard], component: MealCatalogComponent },
 
-    { path: 'ingredients', component: IngredientsComponent },
-    { path: 'ingredients/add', component: IngredientsComponent },
-    { path: 'ingredients/all', component: IngredientsComponent },
-    { path: 'ingredients/print', component: IngredientsComponent },
+    { path: 'ingredients', canActivate: [authGuard], component: IngredientsComponent },
+    { path: 'ingredients/add', canActivate: [authGuard], component: IngredientsComponent },
+    { path: 'ingredients/all', canActivate: [authGuard], component: IngredientsComponent },
+    { path: 'ingredients/print', canActivate: [authGuard], component: IngredientsComponent },
 
-    { path: 'patient-info', component: PatientInfoComponent },
-    { path: 'patient-info/add', component: PatientInfoComponent },
-    { path: 'patient-info/all', component: PatientInfoComponent },
-    { path: 'patient-info/print', component: PatientInfoComponent },
-    { path: 'patient-info/:id', component: PatientInfoComponent },
+    { path: 'patient-info', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/add', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/all', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/print', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/:id', canActivate: [authGuard], component: PatientInfoComponent },
 
-    { path: 'settings', component: SettingsComponent },
+    { path: 'settings', canActivate: [authGuard], component: SettingsComponent },
     { path: 'test', component: PrintAllMealsComponent },
 ];

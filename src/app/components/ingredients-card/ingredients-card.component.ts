@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Ingredient } from '../../models/ingredient.model';
 import { FoodGroupService } from '../../services/food-group.service';
 import { FoodGroup } from '../../models/food-group.model';
@@ -8,7 +8,7 @@ import { Nutrient } from '../../models/nutrient.model';
 
 @Component({
   selector: 'app-ingredients-card',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './ingredients-card.component.html',
   styleUrls: ['./ingredients-card.component.scss']
 })

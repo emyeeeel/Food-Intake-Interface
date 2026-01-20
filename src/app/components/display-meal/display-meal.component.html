@@ -1,53 +1,63 @@
 <div class="display-meal-container">
-    <div class="header">
-      <h2>所有餐點</h2>
-      <div class="header-actions">
-        <span class="total-count" *ngIf="!isLoading && !error">
+  <div class="header">
+    <h2>所有餐點</h2>
+    <div class="header-actions">
+      @if (!isLoading && !error) {
+        <span class="total-count">
           總計: {{ totalMeals }} 道餐點
         </span>
-        <button 
-          type="button" 
-          class="btn-refresh"
-          (click)="refreshMeals()"
-          [disabled]="isLoading"
+      }
+      <button
+        type="button"
+        class="btn-refresh"
+        (click)="refreshMeals()"
+        [disabled]="isLoading"
         >
-          <span *ngIf="!isLoading">重新整理</span>
-          <span *ngIf="isLoading">載入中...</span>
-        </button>
-      </div>
+        @if (!isLoading) {
+          <span>重新整理</span>
+        }
+        @if (isLoading) {
+          <span>載入中...</span>
+        }
+      </button>
     </div>
-  
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="loading-state">
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-state">
       <div class="loading-spinner"></div>
       <p>正在載入餐點...</p>
     </div>
-  
-    <!-- Error State -->
-    <div *ngIf="error && !isLoading" class="error-state">
+  }
+
+  <!-- Error State -->
+  @if (error && !isLoading) {
+    <div class="error-state">
       <div class="error-icon">❌</div>
       <p class="error-message">{{ error }}</p>
       <button type="button" class="btn-retry" (click)="refreshMeals()">
         再試一次
       </button>
     </div>
-  
-    <!-- Meals Grid with Pagination -->
-    <div *ngIf="!isLoading && !error && meals.length > 0" class="meals-grid-container">
+  }
+
+  <!-- Meals Grid with Pagination -->
+  @if (!isLoading && !error && meals.length > 0) {
+    <div class="meals-grid-container">
       <!-- Current Page Info -->
       <div class="page-info">
         <span class="page-indicator">
           第 {{ currentPage }} 頁，共 {{ totalPages }} 頁
         </span>
         <!-- <span class="showing-info">
-          Showing {{ getStartIndex() }} - {{ getEndIndex() }} of {{ totalMeals }} meals
-        </span> -->
-      </div>
-  
-      <!-- Meals Grid using app-meal-item -->
-      <div class="meals-grid">
-        <app-meal-item 
-          *ngFor="let meal of paginatedMeals; trackBy: trackByMealId; let i = index"
+        Showing {{ getStartIndex() }} - {{ getEndIndex() }} of {{ totalMeals }} meals
+      </span> -->
+    </div>
+    <!-- Meals Grid using app-meal-item -->
+    <div class="meals-grid">
+      @for (meal of paginatedMeals; track trackByMealId(i, meal); let i = $index) {
+        <app-meal-item
           [mealImageSrc]="meal.image || ''"
           [mealCode]="getMealCode(meal)"
           [dayCycleValue]="'第' + (meal.day_cycle || '') + '天'"
@@ -55,44 +65,41 @@
           [plateTypeValue]="meal.plate_type || 'Standard'"
           [plateTypeValue]="meal.plate_type || ''"
           class="meal-item-wrapper"
-        >
+          >
         </app-meal-item>
+      }
+    </div>
+    <!-- Pagination Controls -->
+    <div class="pagination-container">
+      <div class="pagination-info">
+        <span>
+          顯示 {{ paginatedMeals.length }} / {{ totalMeals }} 道餐點
+        </span>
       </div>
-  
-      <!-- Pagination Controls -->
-      <div class="pagination-container">
-        <div class="pagination-info">
-          <span>
-            顯示 {{ paginatedMeals.length }} / {{ totalMeals }} 道餐點
-          </span>
-        </div>
-        
-        <div class="pagination-controls">
-          <div class="nav-buttons">
-            <button 
+      <div class="pagination-controls">
+        <div class="nav-buttons">
+          <button
             type="button"
             class="btn-page btn-first"
             [disabled]="currentPage === 1"
             (click)="goToFirstPage()"
             title="First Page"
-          >
-          <<
+            >
+            <<
           </button>
-          
-          <button 
+          <button
             type="button"
             class="btn-page btn-prev"
             [disabled]="currentPage === 1"
             (click)="goToPreviousPage()"
             title="Previous Page"
-          >
-          <
+            >
+            <
           </button>
-          </div>
-          
-          <div class="page-numbers">
+        </div>
+        <div class="page-numbers">
+          @for (page of getVisiblePages(); track page) {
             <button
-              *ngFor="let page of getVisiblePages()"
               type="button"
               class="btn-page-number"
               [class.active]="page === currentPage"
@@ -100,42 +107,44 @@
               [disabled]="page === '...'"
               (click)="goToPage(page)"
               [title]="page === '...' ? '' : 'Go to page ' + page"
-            >
+              >
               {{ page }}
             </button>
-          </div>
-          
-          <div class="nav-buttons">
-            <button 
+          }
+        </div>
+        <div class="nav-buttons">
+          <button
             type="button"
             class="btn-page btn-next"
             [disabled]="currentPage === totalPages"
             (click)="goToNextPage()"
-          >
-          >
+            >
+            >
           </button>
-          
-          <button 
+          <button
             type="button"
             class="btn-page btn-last"
             [disabled]="currentPage === totalPages"
             (click)="goToLastPage()"
             title="Last Page"
-          >
-          >>
+            >
+            >>
           </button>
-          </div>
         </div>
       </div>
     </div>
-  
-    <!-- Empty State -->
-    <div *ngIf="!isLoading && !error && meals.length === 0" class="empty-state">
-      <div class="empty-icon">🍽️</div>
-      <h3>尚無餐點</h3>
-      <p>資料庫中目前沒有任何餐點</p>
-      <button type="button" class="btn-primary" routerLink="/add-meal">
-        新增第一道餐點
-      </button>
-    </div>
   </div>
+}
+
+<!-- Empty State -->
+@if (!isLoading && !error && meals.length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">🍽️</div>
+    <h3>尚無餐點</h3>
+    <p>資料庫中目前沒有任何餐點</p>
+    <button type="button" class="btn-primary" routerLink="/add-meal">
+      新增第一道餐點
+    </button>
+  </div>
+}
+</div>

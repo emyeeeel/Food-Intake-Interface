@@ -1,10 +1,10 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-back',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './back.component.html',
   styleUrl: './back.component.scss'
 })

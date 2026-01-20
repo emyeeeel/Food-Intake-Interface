@@ -11,7 +11,7 @@ import { PatientCardComponent } from "../../components/patient-card/patient-card
 import { BmiCardComponent } from "../../components/bmi-card/bmi-card.component";
 import { BpCardComponent } from "../../components/bp-card/bp-card.component";
 import { MealAssignmentComponent } from "../../components/meal-assignment/meal-assignment.component";
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs';
 import { PatientDetailsComponent } from '../../components/patient-details/patient-details.component';
@@ -20,11 +20,19 @@ import { CloudTestService } from '../../services/cloud-test.service';
 @Component({
   selector: 'app-patient-info',
   imports: [
-    MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent,
-    MainOptionsComponent, DateContainerComponent, PatientCardComponent,
-    BmiCardComponent, BpCardComponent, MealAssignmentComponent, CommonModule, 
-    FormsModule, PatientDetailsComponent
-  ],
+    MenuBarComponent,
+    BackComponent,
+    SearchBarComponent,
+    NotifComponent,
+    MainOptionsComponent,
+    DateContainerComponent,
+    PatientCardComponent,
+    BmiCardComponent,
+    BpCardComponent,
+    MealAssignmentComponent,
+    FormsModule,
+    PatientDetailsComponent
+],
   templateUrl: './patient-info.component.html',
   styleUrls: ['./patient-info.component.scss']
 })

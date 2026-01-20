@@ -1,80 +1,82 @@
 <div class="meal-catalog-container">
-    <app-menu-bar (mobileMenuToggle)="onMobileMenuToggle($event)"></app-menu-bar>
-    <div class="main-container">
-        <div class="row-1">
-            <app-back></app-back>
-            <div class="search-bar">
-                <app-search-bar></app-search-bar>
-            </div>
-            <app-notif></app-notif>
-        </div>
-        <ng-container *ngIf="currentView === 'default'">
-            <div class="row-2">
-                <app-filter-icon></app-filter-icon>
-                <app-filter-options 
-                    *ngFor="let filterOption of filterOptions" 
-                    [filterText]="filterOption">
-                </app-filter-options>
-            </div>
-            <div class="row-3">
-                <app-main-options 
-                    iconSrc="assets/icons/add-icon.svg"
-                    optionText="新增膳食"
-                    altText="Add Meal Icon"
-                    backgroundColor="#00313C"
-                    textColor="#E6FEF9"
-                    (clicked)="navigateToAddMeal()"> 
-                </app-main-options>
-                <app-main-options 
-                    iconSrc="assets/icons/all-icon.svg"
-                    optionText="查看所有膳食"
-                    altText="See All Meals Icon"
-                    backgroundColor="#40C1AC"
-                    textColor="#E6FEF9"
-                    (clicked)="navigateToAllMeals()">
-                </app-main-options>
-                <app-main-options 
-                    iconSrc="assets/icons/print-icon.svg"
-                    optionText="列印膳食"
-                    altText="Print Meal Icon"
-                    backgroundColor="#E6FEF9"
-                    textColor="#00313C"
-                    (clicked)="navigateToPrintMeal()">
-                </app-main-options>
-            </div>
-            <div class="row-4">
-                <div class="text-title">
-                    本日膳食
-                </div>
-                <app-date-container></app-date-container>
-            </div>
-            <div class="row-5" *ngIf="meals.length >= 2; else noMeals">
-                <ng-container *ngFor="let meal of meals.slice(0, 2)">
-                  <app-meal-item
-                    [mealImageSrc]="meal.image || ''"
-                    [mealCode]="getMealCode(meal)"
-                    [dayCycleValue]="'第' + (meal.day_cycle || '') + '天'"
-                    [mealTimeValue]="meal.meal_time || ''"
-                    [plateTypeValue]="meal.plate_type || ''">
-                  </app-meal-item>
-                </ng-container>
-            </div>
-            <ng-template #noMeals>
-                <p>沒有提供餐點.</p>
-              </ng-template>
-        </ng-container>
-
-        <ng-container *ngIf="currentView === 'add-meal'">
-            <app-add-meal></app-add-meal>
-        </ng-container>
-
-        <ng-container *ngIf="currentView === 'all-meals'">
-            <app-display-meal></app-display-meal>
-        </ng-container>
-
-        <ng-container *ngIf="currentView === 'print-meal'">
-            <app-print-all-meals></app-print-all-meals>
-        </ng-container>
+  <app-menu-bar (mobileMenuToggle)="onMobileMenuToggle($event)"></app-menu-bar>
+  <div class="main-container">
+    <div class="row-1">
+      <app-back></app-back>
+      <div class="search-bar">
+        <app-search-bar></app-search-bar>
+      </div>
+      <app-notif></app-notif>
     </div>
+    @if (currentView === 'default') {
+      <div class="row-2">
+        <app-filter-icon></app-filter-icon>
+        @for (filterOption of filterOptions; track filterOption) {
+          <app-filter-options
+            [filterText]="filterOption">
+          </app-filter-options>
+        }
+      </div>
+      <div class="row-3">
+        <app-main-options
+          iconSrc="assets/icons/add-icon.svg"
+          optionText="新增膳食"
+          altText="Add Meal Icon"
+          backgroundColor="#00313C"
+          textColor="#E6FEF9"
+          (clicked)="navigateToAddMeal()">
+        </app-main-options>
+        <app-main-options
+          iconSrc="assets/icons/all-icon.svg"
+          optionText="查看所有膳食"
+          altText="See All Meals Icon"
+          backgroundColor="#40C1AC"
+          textColor="#E6FEF9"
+          (clicked)="navigateToAllMeals()">
+        </app-main-options>
+        <app-main-options
+          iconSrc="assets/icons/print-icon.svg"
+          optionText="列印膳食"
+          altText="Print Meal Icon"
+          backgroundColor="#E6FEF9"
+          textColor="#00313C"
+          (clicked)="navigateToPrintMeal()">
+        </app-main-options>
+      </div>
+      <div class="row-4">
+        <div class="text-title">
+          本日膳食
+        </div>
+        <app-date-container></app-date-container>
+      </div>
+      @if (meals.length >= 2) {
+        <div class="row-5">
+          @for (meal of meals.slice(0, 2); track meal) {
+            <app-meal-item
+              [mealImageSrc]="meal.image || ''"
+              [mealCode]="getMealCode(meal)"
+              [dayCycleValue]="'第' + (meal.day_cycle || '') + '天'"
+              [mealTimeValue]="meal.meal_time || ''"
+              [plateTypeValue]="meal.plate_type || ''">
+            </app-meal-item>
+          }
+        </div>
+      } @else {
+        <p>沒有提供餐點.</p>
+      }
+    }
+
+    @if (currentView === 'add-meal') {
+      <app-add-meal></app-add-meal>
+    }
+
+    @if (currentView === 'all-meals') {
+      <app-display-meal></app-display-meal>
+    }
+
+    @if (currentView === 'print-meal') {
+      <app-print-all-meals></app-print-all-meals>
+    }
+  </div>
 </div>
 

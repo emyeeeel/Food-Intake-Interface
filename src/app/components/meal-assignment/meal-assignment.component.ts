@@ -4,11 +4,11 @@ import { Meal } from '../../models/meal.model';
 import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { MealsService } from '../../services/meals.service';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-meal-assignment',
-  imports: [TagsComponent, FormsModule, CommonModule],
+  imports: [TagsComponent, FormsModule],
   templateUrl: './meal-assignment.component.html',
   styleUrls: ['./meal-assignment.component.scss']
 })

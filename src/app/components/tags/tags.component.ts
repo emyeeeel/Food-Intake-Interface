@@ -1,9 +1,9 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-tags',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './tags.component.html',
   styleUrl: './tags.component.scss'
 })

@@ -1,13 +1,11 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, ElementRef, ViewChild, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import jsQR from 'jsqr';
-import { QrTestComponent } from "../qr-test/qr-test.component";
 
 @Component({
   selector: 'app-add-intake',
-  imports: [CommonModule, QrTestComponent],
   templateUrl: './add-intake.component.html',
   styleUrl: './add-intake.component.scss'
 })

@@ -23,7 +23,7 @@ interface ApiResult {
 
 @Component({
   selector: 'app-display-intake',
-  imports: [CommonModule, AddIntakeComponent],
+  imports: [CommonModule],
   templateUrl: './display-intake.component.html',
   styleUrls: ['./display-intake.component.scss']
 })

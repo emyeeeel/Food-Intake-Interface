@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { ConsumptionBarComponent } from "../consumption-bar/consumption-bar.component";
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-daily-consumption',
-  imports: [ConsumptionBarComponent, CommonModule],
+  imports: [ConsumptionBarComponent],
   templateUrl: './daily-consumption.component.html',
   styleUrl: './daily-consumption.component.scss'
 })

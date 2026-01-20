@@ -6,7 +6,7 @@ import { SearchBarComponent } from "../../components/search-bar/search-bar.compo
 import { NotifComponent } from "../../components/notif/notif.component";
 import { FilterIconComponent } from "../../components/filter-icon/filter-icon.component";
 import { FilterOptionsComponent } from "../../components/filter-options/filter-options.component";
-import { CommonModule } from '@angular/common';
+
 import { MainOptionsComponent } from "../../components/main-options/main-options.component";
 import { IngredientsCategoriesComponent } from "../../components/ingredients-categories/ingredients-categories.component";
 import { filter } from 'rxjs';
@@ -14,7 +14,7 @@ import { DisplayIngredientsComponent } from "../../components/display-ingredient
 
 @Component({
   selector: 'app-ingredients',
-  imports: [CommonModule, MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent, FilterIconComponent, FilterOptionsComponent, MainOptionsComponent, IngredientsCategoriesComponent, DisplayIngredientsComponent],
+  imports: [MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent, FilterIconComponent, FilterOptionsComponent, MainOptionsComponent, IngredientsCategoriesComponent, DisplayIngredientsComponent],
   templateUrl: './ingredients.component.html',
   styleUrl: './ingredients.component.scss'
 })

@@ -3,14 +3,14 @@ import { PatientService } from '../../services/patient.service';
 import { RecommendedIntakeService } from '../../services/recommended-intake.service';
 import { Patient } from '../../models/patient.model';
 import { RecommendedIntake } from '../../models/recommended-intake.model';
-import { CommonModule } from '@angular/common';
+
 import { Meal } from '../../models/meal.model';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-patient-card',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './patient-card.component.html',
   styleUrls: ['./patient-card.component.scss']
 })

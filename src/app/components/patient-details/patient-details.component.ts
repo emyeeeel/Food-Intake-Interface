@@ -6,7 +6,7 @@ import { RecommendedIntakeService } from '../../services/recommended-intake.serv
 import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { Patient } from '../../models/patient.model';
 import { RecommendedIntake } from '../../models/recommended-intake.model';
-import { CommonModule } from '@angular/common';
+
 import jsQR from 'jsqr';
 import { GetAnalysisService } from '../../services/get-analysis.service';
 import { MealAssignment } from '../../models/meal-assignment.mode';
@@ -16,7 +16,7 @@ import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-patient-details',
-  imports: [QrTestComponent, CommonModule],
+  imports: [QrTestComponent],
   templateUrl: './patient-details.component.html',
   styleUrls: ['./patient-details.component.scss']
 })

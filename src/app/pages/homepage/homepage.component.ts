@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { MenuBarComponent } from '../../components/menu-bar/menu-bar.component';
 import { NotifComponent } from "../../components/notif/notif.component";
@@ -8,12 +8,12 @@ import { SearchBarComponent } from "../../components/search-bar/search-bar.compo
 import { DateContainerComponent } from "../../components/date-container/date-container.component";
 import { DailyConsumptionComponent } from "../../components/daily-consumption/daily-consumption.component";
 import { NutrientIntakeComponent } from "../../components/nutrient-intake/nutrient-intake.component";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-homepage',
   imports: [
     MenuBarComponent,
-    CommonModule,
     FormsModule,
     NotifComponent,
     WelcomeUserComponent,
@@ -21,7 +21,7 @@ import { NutrientIntakeComponent } from "../../components/nutrient-intake/nutrie
     DateContainerComponent,
     DailyConsumptionComponent,
     NutrientIntakeComponent
-  ],
+],
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.scss']
 })

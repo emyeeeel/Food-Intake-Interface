@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { SeeHistoryButtonComponent } from "../see-history-button/see-history-button.component";
 import { IntakeLegendComponent } from "../intake-legend/intake-legend.component";
-import { CommonModule } from '@angular/common';
+
 import { PieChartComponent } from "../pie-chart/pie-chart.component";
 import { FoodGroupService } from '../../services/food-group.service';
 
 @Component({
   selector: 'app-nutrient-intake',
-  imports: [SeeHistoryButtonComponent, IntakeLegendComponent, CommonModule, PieChartComponent],
+  imports: [SeeHistoryButtonComponent, IntakeLegendComponent, PieChartComponent],
   templateUrl: './nutrient-intake.component.html',
   styleUrls: ['./nutrient-intake.component.scss']
 })

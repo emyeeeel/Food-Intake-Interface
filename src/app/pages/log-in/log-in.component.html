@@ -4,12 +4,15 @@
             <img src="assets/logo/SpoonFull_Logo.png" alt="SpoonFull Logo" />
         </div>
         <div class="input-containers">
-            <input type="email" placeholder="Email Address" class="email-input" />
-            <input type="password" placeholder="密碼" class="password-input" />
+            <input type="email" placeholder="Email Address" class="email-input" [(ngModel)]="email"/>
+            <input type="password" placeholder="密碼" class="password-input" [(ngModel)]="password"/>
         </div>
         <div class="button-container" (click)="login()">
             <button type="submit" class="login-button">登入</button>
         </div>
+        <p class="error" *ngIf="errorMessage">
+            {{ errorMessage }}
+        </p>
         <div class="text-container">
             <p>重設密碼</p>
             <div class="checkbox-container">

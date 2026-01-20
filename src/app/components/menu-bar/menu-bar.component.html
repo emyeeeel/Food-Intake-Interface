@@ -22,5 +22,7 @@
   </div>
 
   <!-- Overlay for mobile menu -->
-  <div class="mobile-overlay" *ngIf="isMobileOpen" (click)="toggleMobileMenu()"></div>
+  @if (isMobileOpen) {
+    <div class="mobile-overlay" (click)="toggleMobileMenu()"></div>
+  }
 </div>

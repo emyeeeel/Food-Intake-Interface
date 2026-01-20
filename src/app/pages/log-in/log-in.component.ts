@@ -1,19 +1,40 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-log-in',
-  imports: [],
+  imports: [FormsModule, CommonModule],
   templateUrl: './log-in.component.html',
   styleUrl: './log-in.component.scss'
 })
 export class LogInComponent {
-  constructor(private router: Router) {}
+  email = '';
+  password = '';
+  errorMessage = '';
 
-  login() {
-    // Start session storage perhaps
-    
-    // Redirect to home page
-    this.router.navigate(['/home']);
+  constructor(
+    private auth: Auth,
+    private router: Router
+  ) {}
+
+  async login() {
+    try {
+      await signInWithEmailAndPassword(
+        this.auth,
+        this.email,
+        this.password
+      );
+
+      // Optional: session persistence
+      // await setPersistence(this.auth, browserSessionPersistence);
+
+      this.router.navigate(['/home']);
+    } catch (error: any) {
+      this.errorMessage = 'Login failed: Invalid credentials. Please try again.';
+      console.error(error.errorMessage);
+    }
   }
 }

@@ -1,9 +1,9 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-day-cycle',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './day-cycle.component.html',
   styleUrl: './day-cycle.component.scss'
 })

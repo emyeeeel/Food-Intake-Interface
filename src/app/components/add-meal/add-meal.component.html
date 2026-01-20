@@ -1,106 +1,116 @@
 <div class="main-container">
-    <div class="add-meal-container">
-      <h3>新增餐點</h3>
-      
-      <form class="meal-form" *ngIf="!showFullForm" (ngSubmit)="onInitialSubmit()" #initialForm="ngForm">
+  <div class="add-meal-container">
+    <h3>新增餐點</h3>
+
+    @if (!showFullForm) {
+      <form class="meal-form" (ngSubmit)="onInitialSubmit()" #initialForm="ngForm">
         <div class="form-group">
           <label for="mealName">餐點名稱</label>
-          <input 
-            type="text" 
-            id="mealName" 
+          <input
+            type="text"
+            id="mealName"
             name="mealName"
             [(ngModel)]="meal.meal_name"
             class="form-input"
             placeholder="在這裡輸入餐點名稱"
             required
-          />
-        </div>
-  
-        <div class="form-group">
-          <label>餐點圖片</label>
-
-          <button
-            type="button"
-            class="btn-secondary"
-            (click)="captureMealImage()"
-            [disabled]="isLoading"
-          >
-          拍攝影像
-          </button>
-
-          <div *ngIf="isCapturing" class="loading-state">
-            <div class="loading-spinner"></div>
-            <p>拍攝影像...</p>
+            />
           </div>
-
-          <div class="image-preview" *ngIf="mealImagePreview">
-            <img [src]="mealImagePreview" alt="Meal Image Preview">
+          <div class="form-group">
+            <label>餐點圖片</label>
+            <button
+              type="button"
+              class="btn-secondary"
+              (click)="captureMealImage()"
+              [disabled]="isLoading"
+              >
+              拍攝影像
+            </button>
+            @if (isCapturing) {
+              <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>拍攝影像...</p>
+              </div>
+            }
+            @if (mealImagePreview) {
+              <div class="image-preview">
+                <img [src]="mealImagePreview" alt="Meal Image Preview">
+              </div>
+            }
           </div>
-        </div>
-  
-        <div *ngIf="isLoading" class="loading-state">
-          <div class="loading-spinner"></div>
-          <p>正在處理中...</p>
-        </div>
-  
-        <div class="form-actions" *ngIf="!isLoading">
-          <button type="submit" class="btn-primary" [disabled]="!initialForm.valid">繼續</button>
-        </div>
-      </form>
-  
-        <form class="meal-form" *ngIf="showFullForm" (ngSubmit)="onSubmit()" #mealForm="ngForm">
+          @if (isLoading) {
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <p>正在處理中...</p>
+            </div>
+          }
+          @if (!isLoading) {
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" [disabled]="!initialForm.valid">繼續</button>
+            </div>
+          }
+        </form>
+      }
 
+      @if (showFullForm) {
+        <form class="meal-form" (ngSubmit)="onSubmit()" #mealForm="ngForm">
           <div class="row-1 meal-name">
             <h2>{{meal.meal_name}}</h2>
           </div>
-
-            <div class="form-row">
+          <div class="form-row">
             <div class="form-col meal-info">
-                <img [src]="meal.image" alt="Meal Image" class="meal-image">
+              <img [src]="meal.image" alt="Meal Image" class="meal-image">
             </div>
-        
             <div class="form-col dropdowns">
-                <div class="dropdown-wrapper">
-                  <label for="mealTime">用餐時間</label>
-                  <select id="mealTime" name="mealTime" [(ngModel)]="meal.meal_time" class="form-select" required>
-                      <option value="" disabled>選擇用餐時間</option>
-                      <option *ngFor="let option of mealTimeOptions" [value]="option.value">{{ option.label }}</option>
-                  </select>
-                </div>
-        
-                <div class="dropdown-wrapper">
+              <div class="dropdown-wrapper">
+                <label for="mealTime">用餐時間</label>
+                <select id="mealTime" name="mealTime" [(ngModel)]="meal.meal_time" class="form-select" required>
+                  <option value="" disabled>選擇用餐時間</option>
+                  @for (option of mealTimeOptions; track option) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </div>
+              <div class="dropdown-wrapper">
                 <label for="dayCycle">日循環</label>
                 <select id="dayCycle" name="dayCycle" [(ngModel)]="meal.day_cycle" class="form-select" required>
-                    <option value="" disabled>選擇日期周期</option>
-                    <option *ngFor="let option of dayCycleOptions" [value]="option.value">{{ option.label }}</option>
+                  <option value="" disabled>選擇日期周期</option>
+                  @for (option of dayCycleOptions; track option) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
                 </select>
-                </div>
-        
-                <div class="dropdown-wrapper">
+              </div>
+              <div class="dropdown-wrapper">
                 <label for="plateType">餐盤類型</label>
                 <select id="plateType" name="plateType" [(ngModel)]="meal.plate_type" class="form-select" required>
-                    <option value="" disabled>選擇餐盤類型</option>
-                    <option *ngFor="let option of plateTypeOptions" [value]="option.value">{{ option.label }}</option>
+                  <option value="" disabled>選擇餐盤類型</option>
+                  @for (option of plateTypeOptions; track option) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
                 </select>
-                </div>
+              </div>
             </div>
-            </div>
-        
-            <div class="form-row ingredients-row">
+          </div>
+          <div class="form-row ingredients-row">
             <label>成分</label>
             <div class="meal-ingredients">
-                <app-tags *ngFor="let ingredientName of generatedIngredients" [tagText]="ingredientName.name"></app-tags>
+              @for (ingredientName of generatedIngredients; track ingredientName) {
+                <app-tags [tagText]="ingredientName.name"></app-tags>
+              }
             </div>
-            </div>
-        
-            <div class="form-row form-actions-row">
+          </div>
+          <div class="form-row form-actions-row">
             <button type="button" class="btn-secondary" (click)="onCancel()">取消</button>
             <button type="submit" class="btn-primary" [disabled]="!mealForm.valid || isSubmitting">
-                <span *ngIf="isSubmitting">添加...</span>
-                <span *ngIf="!isSubmitting">新增餐點</span>
+              @if (isSubmitting) {
+                <span>添加...</span>
+              }
+              @if (!isSubmitting) {
+                <span>新增餐點</span>
+              }
             </button>
-            </div>
-      </form>
+          </div>
+        </form>
+      }
     </div>
   </div>
-  

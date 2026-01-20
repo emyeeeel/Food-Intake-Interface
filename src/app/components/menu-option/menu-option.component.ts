@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -13,7 +13,7 @@ interface MenuOption {
 
 @Component({
   selector: 'app-menu-option',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './menu-option.component.html',
   styleUrl: './menu-option.component.scss'
 })

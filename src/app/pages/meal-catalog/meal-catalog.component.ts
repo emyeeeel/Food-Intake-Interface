@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Add this import
+import { FormsModule } from '@angular/forms'; 
 import { Router, ActivatedRoute } from '@angular/router';
 import { MenuBarComponent } from '../../components/menu-bar/menu-bar.component';
 import { BackComponent } from '../../components/back/back.component';
@@ -9,12 +8,8 @@ import { SearchBarComponent } from '../../components/search-bar/search-bar.compo
 import { FilterIconComponent } from '../../components/filter-icon/filter-icon.component';
 import { FilterOptionsComponent } from '../../components/filter-options/filter-options.component';
 import { MainOptionsComponent } from '../../components/main-options/main-options.component';
-import { ClearAllButtonComponent } from '../../components/clear-all-button/clear-all-button.component';
-import { DarkButtonComponent } from '../../components/dark-button/dark-button.component';
 import { DateContainerComponent } from '../../components/date-container/date-container.component';
 import { MealItemComponent } from '../../components/meal-item/meal-item.component';
-import { ServingTimeComponent } from '../../components/serving-time/serving-time.component';
-import { DayCycleComponent } from '../../components/day-cycle/day-cycle.component';
 import { MealsService } from '../../services/meals.service';
 import { Meal } from '../../models/meal.model';
 import { AddMealComponent } from '../../components/add-meal/add-meal.component';
@@ -24,7 +19,6 @@ import { PrintAllMealsComponent } from "../../components/print-all-meals/print-a
 @Component({
   selector: 'app-meal-catalog',
   imports: [
-    CommonModule,
     FormsModule,
     MenuBarComponent,
     BackComponent,
@@ -33,12 +27,8 @@ import { PrintAllMealsComponent } from "../../components/print-all-meals/print-a
     FilterIconComponent,
     FilterOptionsComponent,
     MainOptionsComponent,
-    ClearAllButtonComponent,
-    DarkButtonComponent,
     DateContainerComponent,
     MealItemComponent,
-    ServingTimeComponent,
-    DayCycleComponent,
     AddMealComponent,
     DisplayMealComponent,
     PrintAllMealsComponent

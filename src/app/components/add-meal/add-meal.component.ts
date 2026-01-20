@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Meal } from '../../models/meal.model';
 import { Ingredient } from '../../models/ingredient.model';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { MealsService } from '../../services/meals.service';
 import { TagsComponent } from "../tags/tags.component";
@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-meal',
-  imports: [CommonModule, FormsModule, TagsComponent],
+  imports: [FormsModule, TagsComponent],
   templateUrl: './add-meal.component.html',
   styleUrl: './add-meal.component.scss'
 })

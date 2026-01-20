@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Add this import
+ // Add this import
 import { NavigationEnd, Router } from '@angular/router'; // Add this import
 import { MenuBarComponent } from "../../components/menu-bar/menu-bar.component";
 import { MainOptionsComponent } from "../../components/main-options/main-options.component";
@@ -17,7 +17,6 @@ import { DisplayIntakeComponent } from '../../components/display-intake/display-
 @Component({
   selector: 'app-meal-intake',
   imports: [
-    CommonModule,
     MenuBarComponent,
     MainOptionsComponent,
     DateContainerComponent,

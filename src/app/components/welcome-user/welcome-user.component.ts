@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-welcome-user',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './welcome-user.component.html',
   styleUrl: './welcome-user.component.scss'
 })
