@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import jsQR from 'jsqr';
@@ -11,12 +11,16 @@ import { QrTestComponent } from "../qr-test/qr-test.component";
   templateUrl: './add-intake.component.html',
   styleUrl: './add-intake.component.scss'
 })
-export class AddIntakeComponent implements OnDestroy {
+export class AddIntakeComponent implements OnInit, OnDestroy {
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
-  showQRCode = false;
+
+  // Scanner state
   showScanner = false;
   scanResult: string | null = null;
-  error: string | null = null;
+  
+  // Meal selection state
+  mealSelectionStep = true; // Show selection first
+  selectedMealType: 'Before' | 'After' | null = null;
 
   private stream: MediaStream | null = null;
   private scanInterval: any;
@@ -31,40 +35,104 @@ export class AddIntakeComponent implements OnDestroy {
     private http: HttpClient
   ) {}
 
-  ngOnDestroy() {
-    this.stopCamera();
+  ngOnInit(): void {
+    // Initialize component
   }
 
+  ngOnDestroy(): void {
+    this.stopScanner();
+  }
+
+  // Meal type selection
+  selectMealType(type: 'Before' | 'After'): void {
+    this.selectedMealType = type;
+    this.mealSelectionStep = false; // Hide selection buttons
+    console.log(`Selected meal type: ${type}`);
+  }
+
+  // Go back to meal selection
+  goBackToSelection(): void {
+    this.mealSelectionStep = true;
+    this.selectedMealType = null;
+    this.stopScanner(); // Stop scanner if running
+  }
+
+  // Scanner methods
   toggleScanner(): void {
     if (this.showScanner) {
-      this.stopCamera();
+      this.stopScanner();
     } else {
-      this.startCamera();
+      this.startScanner();
     }
-    this.showScanner = !this.showScanner;
   }
 
-  private async startCamera(): Promise<void> {
-    try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'environment',
-          width: { ideal: 300 },
-          height: { ideal: 300 }
-        }
-      });
-
-      if (this.videoElement) {
-        this.videoElement.nativeElement.srcObject = this.stream;
-        await this.videoElement.nativeElement.play();
-        
-        // Start QR code detection after camera is ready
+  startScanner(): void {
+    this.showScanner = true;
+    this.scanResult = null;
+    
+    navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'environment', // Use back camera if available
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+    })
+    .then(stream => {
+      if (this.videoElement?.nativeElement) {
+        this.videoElement.nativeElement.srcObject = stream;
+        this.videoElement.nativeElement.play();
+        console.log('Camera started successfully');
+        // Here you would typically initialize your QR scanner library
+        // For example, using jsQR or QuaggaJS
         this.startQRDetection();
       }
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-      this.error = 'Unable to access camera. Please check permissions.';
+    })
+    .catch(err => {
+      console.error('Error accessing camera:', err);
+      this.showScanner = false;
+      // Handle camera permission denied or not available
+    });
+  }
+
+  stopScanner(): void {
+    this.showScanner = false;
+    
+    if (this.videoElement?.nativeElement?.srcObject) {
+      const stream = this.videoElement.nativeElement.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      
+      tracks.forEach(track => {
+        track.stop();
+      });
+      
+      this.videoElement.nativeElement.srcObject = null;
+      console.log('Camera stopped');
     }
+
+    console.log("SCAN RESULT BEFORE UPLOAD:", this.scanResult);
+  }
+
+  // Handle QR scan result
+  onQRScanned(result: string): void {
+    this.scanResult = result;
+    console.log(`QR Code scanned for ${this.selectedMealType} meal:`, result);
+    
+    // Process the scanned result based on meal type
+    this.processIntakeRecord(result, this.selectedMealType!);
+  }
+
+  processIntakeRecord(qrData: string, mealType: 'Before' | 'After'): void {
+    // Implement your intake record processing logic here
+    console.log(`Processing ${mealType} meal intake:`, qrData);
+    
+    // Example: Parse QR data and create intake record
+    // You might want to navigate to another component or show a form
+    this.handleQRCodeDetected(qrData);
+  }
+
+  // Helper method to get display text
+  getMealTypeDisplayText(): string {
+    return this.selectedMealType === 'Before' ? '餐前' : '餐後';
   }
 
   private startQRDetection(): void {
@@ -85,7 +153,7 @@ export class AddIntakeComponent implements OnDestroy {
             const qrResult = this.detectQRCode(imageData);
             
             if (qrResult) {
-              this.handleQRCodeDetected(qrResult);
+              this.onQRScanned(qrResult);
             }
           } catch (error) {
             console.error('QR detection error:', error);
@@ -105,7 +173,7 @@ export class AddIntakeComponent implements OnDestroy {
     console.log('QR Code detected:', qrData);
     
     // Stop the camera
-    this.stopCamera();
+    this.stopScanner();
     this.showScanner = false;
 
     // Start loading state
@@ -154,7 +222,6 @@ export class AddIntakeComponent implements OnDestroy {
     this.loadingMessage = '';
     this.uploadCompleted = false;
     this.redirectStarted = false;
-    this.error = null;
     this.scanResult = null;
     this.showScanner = false;
   }
@@ -179,27 +246,7 @@ export class AddIntakeComponent implements OnDestroy {
       }
     } catch (error) {
       console.error('Error handling QR redirect:', error);
-      this.error = 'Invalid QR code format';
     }
-  }
-
-  private stopCamera(): void {
-    // Clear the scan interval
-    if (this.scanInterval) {
-      clearInterval(this.scanInterval);
-      this.scanInterval = null;
-    }
-    
-    if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
-      this.stream = null;
-    }
-    
-    if (this.videoElement) {
-      this.videoElement.nativeElement.srcObject = null;
-    }
-
-    console.log("SCAN RESULT BEFORE UPLOAD:", this.scanResult);
   }
 
   private capture(): Promise<any> {

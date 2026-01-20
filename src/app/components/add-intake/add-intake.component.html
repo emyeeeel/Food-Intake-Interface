@@ -1,37 +1,71 @@
 <div class="main-container">
-    <h3>新增食物攝取紀錄</h3>
+  <h3>新增食物攝取紀錄</h3>
 
-    <!--Add for before meal and after meal and utilize qr for capturing -->
+  <!-- Meal Type Selection Step -->
+  <div *ngIf="mealSelectionStep" class="meal-selection-container">
+    <div class="selection-header">
+      <h4>請選擇用餐時間</h4>
+      <p>選擇您要記錄的用餐階段</p>
+    </div>
+    
+    <div class="meal-type-buttons">
+      <button 
+        class="meal-type-btn before-meal" 
+        (click)="selectMealType('Before')">
+        <div class="btn-text">
+          <span class="main-text">餐前</span>
+          <span class="sub-text">Before Meal</span>
+        </div>
+      </button>
+      
+      <button 
+        class="meal-type-btn after-meal" 
+        (click)="selectMealType('After')">
+        <div class="btn-text">
+          <span class="main-text">餐後</span>
+          <span class="sub-text">After Meal</span>
+        </div>
+      </button>
+    </div>
+  </div>
 
-    <!-- QR Camera Scanner Section -->
-    <div class="qr-scanner-container">
-        <div class="scanner-section">
-          <button class="start-scanner-btn" (click)="toggleScanner()">
-            {{ showScanner ? '停止攝影機' : '掃描 QR 碼' }}
-          </button>
-          <div *ngIf="showScanner" class="camera-container">
-            <div class="camera-viewport">
-              <video #videoElement autoplay playsinline></video>
-              <div class="scanner-overlay">
-                <div class="scanner-frame"></div>
-              </div>
-            </div>
-            <div class="scanner-result" *ngIf="scanResult">
-              <p>Scanned: {{ scanResult }}</p>
+  <!-- Scanner Header (moved above scanner container) -->
+  <div *ngIf="!mealSelectionStep" class="scanner-header">
+    <button class="back-btn" (click)="goBackToSelection()">
+      ← 返回選擇
+    </button>
+    <div class="selected-meal-info">
+      <span class="meal-type-indicator">{{ getMealTypeDisplayText() }}</span>
+      <span class="meal-type-subtitle">掃描 QR 碼記錄</span>
+    </div>
+  </div>
+
+  <!-- QR Scanner Section (shown after meal type selection) -->
+  <div *ngIf="!mealSelectionStep" class="qr-scanner-container">
+    <div class="scanner-section">
+      <button class="start-scanner-btn" (click)="toggleScanner()">
+        {{ showScanner ? '停止攝影機' : '開始掃描 QR 碼' }}
+      </button>
+      
+      <div *ngIf="showScanner" class="camera-container">
+        <div class="camera-viewport">
+          <video #videoElement autoplay playsinline></video>
+          <div class="scanner-overlay">
+            <div class="scanner-frame"></div>
+            <div class="scanner-instructions">
+              <p>將 QR 碼對準框內</p>
             </div>
           </div>
+        </div>
+        
+        <div class="scanner-result" *ngIf="scanResult">
+          <div class="result-success">
+            <h5>掃描成功!</h5>
+            <p>{{ scanResult }}</p>
+            <p class="meal-type-info">記錄類型: {{ getMealTypeDisplayText() }}</p>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <!-- Redirected Output -->
-    <!-- <div class="intake-record">
-    </div> -->
-
-    <!-- <div class="test-QR">
-      <h1>Before Meal</h1>
-      <app-qr-test type="Before"></app-qr-test>
-    </div>
-    <div class="test-QR">
-      <h1>After Meal</h1>
-      <app-qr-test type="After"></app-qr-test>
-    </div> -->
+  </div>
 </div>
