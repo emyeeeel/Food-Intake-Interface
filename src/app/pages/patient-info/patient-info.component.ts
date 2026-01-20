@@ -106,7 +106,6 @@ onDinnerStatus(status: boolean) {
     // Anchor: Jan 5, 2026 (Monday) = Day 1
     const anchorDate = new Date('2026-01-05T00:00:00');
     
-    // Reset hours to ensure clean day calculation
     const cleanTarget = new Date(targetDate);
     cleanTarget.setHours(0,0,0,0);
     anchorDate.setHours(0,0,0,0);
@@ -115,9 +114,8 @@ onDinnerStatus(status: boolean) {
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) {
-      this.currentDayCycle = 1; // Fallback for dates before Jan 5
+      this.currentDayCycle = 1; 
     } else {
-      // (TotalDays % 14) + 1 gives range 1-14
       this.currentDayCycle = (diffDays % 14) + 1;
     }
     
