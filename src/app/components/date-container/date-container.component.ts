@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
@@ -19,6 +19,7 @@ export class DateContainerComponent implements OnInit, OnDestroy {
   isHomePage: boolean = false;
   showPopup: boolean = false;
 
+  @Output() dateSelected: EventEmitter<Date> = new EventEmitter<Date>();
   private routerSubscription: Subscription = new Subscription();
 
   constructor(private router: Router) {}
@@ -54,6 +55,8 @@ export class DateContainerComponent implements OnInit, OnDestroy {
     }
   
     this.showPopup = false;
+
+    this.dateSelected.emit(date);
   }
 
   private updateWeekRangeFromDate(date: Date) {

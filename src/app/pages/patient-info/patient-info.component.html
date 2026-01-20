@@ -42,22 +42,22 @@
             </div>
 
             <div class="row-4">
-                <div class="text-title">膳食安排</div>
-                <app-date-container></app-date-container>
+                <div class="text-title">膳食安排 <span style="font-size: 12px; color: grey;">(Cycle Day {{currentDayCycle}})</span></div>
+                <app-date-container (dateSelected)="onDateChange($event)"></app-date-container>
             </div>
 
             <div class="row-5">
                 <app-meal-assignment
                     mealType="lunch"
                     [patientId]="patientId"
-                    [dayCycle]="1"
+                    [dayCycle]="currentDayCycle"
                     (mealsStatus)="onLunchStatus($event)">
                 </app-meal-assignment>
 
                 <app-meal-assignment
                     mealType="dinner"
                     [patientId]="patientId"
-                    [dayCycle]="1"
+                    [dayCycle]="currentDayCycle"
                     (mealsStatus)="onDinnerStatus($event)">
                 </app-meal-assignment>
 

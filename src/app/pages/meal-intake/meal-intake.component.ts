@@ -13,6 +13,7 @@ import { IntakeLogComponent } from "../../components/intake-log/intake-log.compo
 
 @Component({
   selector: 'app-meal-intake',
+  standalone: true,
   imports: [
     CommonModule, // Add CommonModule here
     MenuBarComponent,

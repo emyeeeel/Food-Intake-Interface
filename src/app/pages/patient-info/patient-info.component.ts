@@ -26,7 +26,7 @@ import { CloudTestService } from '../../services/cloud-test.service';
     FormsModule, PatientDetailsComponent
   ],
   templateUrl: './patient-info.component.html',
-  styleUrls: ['./patient-info.component.scss']
+  styleUrls: ['./patient-info.component.scss'],
 })
 export class PatientInfoComponent implements OnInit {
   patientId: number = 1;  
@@ -36,7 +36,9 @@ export class PatientInfoComponent implements OnInit {
   currentView: string = 'default'; 
 
   lunchHasMeal: boolean = false;
-dinnerHasMeal: boolean = false;
+  dinnerHasMeal: boolean = false;
+
+  currentDayCycle: number = 1;
 
 onLunchStatus(status: boolean) {
   this.lunchHasMeal = status;
@@ -54,6 +56,8 @@ onDinnerStatus(status: boolean) {
   constructor(private router: Router, private cloudTestService: CloudTestService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
+    this.calculateCycle(new Date());
+
     this.patientId = this.getPatientIdFromRoute() || 1;
     console.log('Patient ID:',this.patientId)
     
@@ -91,6 +95,33 @@ onDinnerStatus(status: boolean) {
         this.updateCurrentView(path);
       });
     this.updateCurrentView(this.router.url);
+  }
+
+  onDateChange(newDate: Date): void {
+    console.log("User picked a new date:", newDate);
+    this.calculateCycle(newDate);
+  }
+
+  calculateCycle(targetDate: Date): void {
+    // Anchor: Jan 5, 2026 (Monday) = Day 1
+    const anchorDate = new Date('2026-01-05T00:00:00');
+    
+    // Reset hours to ensure clean day calculation
+    const cleanTarget = new Date(targetDate);
+    cleanTarget.setHours(0,0,0,0);
+    anchorDate.setHours(0,0,0,0);
+
+    const diffTime = cleanTarget.getTime() - anchorDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+      this.currentDayCycle = 1; // Fallback for dates before Jan 5
+    } else {
+      // (TotalDays % 14) + 1 gives range 1-14
+      this.currentDayCycle = (diffDays % 14) + 1;
+    }
+    
+    console.log(`Date: ${cleanTarget.toDateString()} | Cycle Day: ${this.currentDayCycle}`);
   }
 
   private updateCurrentView(path: string): void {
