@@ -1,111 +1,118 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter, Subscription } from 'rxjs';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-date-container',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, MatDatepickerModule, MatNativeDateModule],
   templateUrl: './date-container.component.html',
   styleUrl: './date-container.component.scss'
 })
-export class DateContainerComponent implements OnInit {
-  @Input() isHomePage: boolean = false;
-  
-  selectedDate: string = '';
-  showPopup: boolean = false;
+export class DateContainerComponent implements OnInit, OnDestroy {
   currentWeekRange: string = '';
   currentDay: string = '';
+  selectedDate: string = '';      // for the input[type="date"]
+  isHomePage: boolean = false;
+  showPopup: boolean = false;
 
-  constructor() {
-    // Set today's date as default
-    const today = new Date();
-    this.selectedDate = today.toISOString().split('T')[0];
-    this.updateDateDisplays();
-  }
+  private routerSubscription: Subscription = new Subscription();
+
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
-    this.updateDateDisplays();
+    this.setCurrentWeekRange();
+    this.setCurrentDay();
+
+    this.selectedDate = this.formatDate(new Date());
+
+    this.checkCurrentRoute(this.router.url);
+
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.checkCurrentRoute(event.url);
+      });
   }
 
-  togglePopup(): void {
+  ngOnDestroy(): void {
+    this.routerSubscription.unsubscribe();
+  }
+
+  togglePopup() {
     this.showPopup = !this.showPopup;
   }
 
-  closePopup(): void {
+  onCalendarSelected(date: Date) {
+    if (this.isHomePage) {
+      this.updateWeekRangeFromDate(date);
+    } else {
+      this.updateDayFromDate(date);
+    }
+  
     this.showPopup = false;
   }
 
-  onDateSelected(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.selectedDate = target.value;
-    this.updateDateDisplays();
-    console.log('Date selected from popup:', this.selectedDate);
-  }
-
-  selectToday(): void {
-    const today = new Date();
-    this.selectedDate = today.toISOString().split('T')[0];
-    this.updateDateDisplays();
-    console.log('Today selected:', this.selectedDate);
-  }
-
-  confirmSelection(): void {
-    this.closePopup();
-    console.log('Date confirmed:', this.selectedDate);
-  }
-
-  private updateDateDisplays(): void {
-    if (!this.selectedDate) return;
-
-    const date = new Date(this.selectedDate + 'T00:00:00'); // Avoid timezone issues
-    
-    // Update current day display
-    this.currentDay = date.toLocaleDateString('zh-TW', {
-      month: 'short',
-      day: 'numeric',
-      weekday: 'short'
-    });
-
-    // Calculate week range (Sunday to Saturday)
-    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
-    
+  private updateWeekRangeFromDate(date: Date) {
+    const dayIndex = date.getDay();
+  
     const startOfWeek = new Date(date);
-    startOfWeek.setDate(date.getDate() - dayOfWeek);
-    
+    startOfWeek.setDate(date.getDate() - dayIndex);
+  
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+  
+    const startMonth = (startOfWeek.getMonth() + 1).toString().padStart(2, '0');
+    const startDay = startOfWeek.getDate().toString().padStart(2, '0');
+  
+    const endMonth = (endOfWeek.getMonth() + 1).toString().padStart(2, '0');
+    const endDay = endOfWeek.getDate().toString().padStart(2, '0');
+  
+    this.currentWeekRange = `${startMonth}/${startDay} - ${endMonth}/${endDay}`;
+  }
+
+  private updateDayFromDate(date: Date) {
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+  
+    this.currentDay = `${month}/${day}`;
+  }
+
+  private checkCurrentRoute(url: string): void {
+    const path = url.replace(/^\//, '');
+    this.isHomePage = path === 'homepage' || path === 'home' || path === '';
+  }
+
+  private setCurrentWeekRange(): void {
+    const today = new Date();
+    const currentDayIndex = today.getDay();
+
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - currentDayIndex);
+
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-    this.currentWeekRange = `${startOfWeek.toLocaleDateString('zh-TW', {
-      month: 'short',
-      day: 'numeric'
-    })} - ${endOfWeek.toLocaleDateString('zh-TW', {
-      month: 'short',
-      day: 'numeric'
-    })}`;
+    const startMonth = (startOfWeek.getMonth() + 1).toString().padStart(2, '0');
+    const startDay = startOfWeek.getDate().toString().padStart(2, '0');
+    const endMonth = (endOfWeek.getMonth() + 1).toString().padStart(2, '0');
+    const endDay = endOfWeek.getDate().toString().padStart(2, '0');
+
+    this.currentWeekRange = `${startMonth}/${startDay} - ${endMonth}/${endDay}`;
   }
 
-  // Helper method to get formatted date (if needed elsewhere)
-  getFormattedDate(): string {
-    if (!this.selectedDate) return '';
-    
-    const date = new Date(this.selectedDate + 'T00:00:00');
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long'
-    });
+  private setCurrentDay(): void {
+    const today = new Date();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+
+    this.currentDay = `${month}/${day}`;
   }
 
-  // Get selected date value (for parent components)
-  getSelectedDate(): string {
-    return this.selectedDate;
-  }
-
-  // Set date from parent component (if needed)
-  setDate(dateString: string): void {
-    this.selectedDate = dateString;
-    this.updateDateDisplays();
+  private formatDate(date: Date): string {
+    return date.toISOString().split("T")[0];
   }
 }

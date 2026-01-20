@@ -287,3 +287,49 @@
     }
   }
 }
+
+@media (min-width: 1024px) and (max-width: 1024px) and (min-height: 600px) and (max-height: 600px) {
+  // Add this with higher specificity
+.patient-info-container .main-container .row-4 {
+  ::ng-deep app-date-container {
+    .main-container .popup-container {
+      position: absolute !important;
+      top: auto !important;
+      bottom: calc(100% + 10px) !important; // Position above with 10px gap
+      left: 0 !important;
+      right: auto !important;
+      width: 200px !important;
+      z-index: 99999 !important;
+      
+      // Ensure it shows above everything
+      transform: none !important;
+      
+      // Animation
+      animation: popupSlideUp 0.3s ease-out !important;
+    }
+  }
+}
+
+@keyframes popupSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Adjust row-4 spacing
+.row-4 {
+  // Add to existing styles
+  position: relative;
+  margin-top: 50px; // Space for popup above
+  
+  @media (max-width: 480px) {
+    margin-top: 45px;
+  }
+}
+
+}

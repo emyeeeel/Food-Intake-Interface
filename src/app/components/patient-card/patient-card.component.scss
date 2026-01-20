@@ -17,6 +17,9 @@
         justify-content: space-between;
 
         .name{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             span{
                 font-family: 'Quicksand', sans-serif;
                 font-weight: 500;
@@ -48,12 +51,15 @@
 
     .row-2{
         height: 62px;
-
         display: flex;
         flex-direction: row;
         gap: 32px;
 
         div{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            
             span{
                 font-family: 'Quicksand', sans-serif;
                 font-weight: 500;
@@ -61,19 +67,30 @@
                 color: #F5F4F2;
             }
 
+            // Target the h2.value element specifically
+            h2.value,
             .value{
                 font-family: 'Quicksand', sans-serif;
                 font-weight: bold;
                 font-size: 40px;
                 color: #F5F4F2;
+                margin: 0; // Remove default h2 margins
+                padding: 0; // Remove default h2 padding
+                line-height: 1; // Consistent line height
+                display: flex;
+                align-items: baseline; // Align number and unit baselines
+                gap: 2px; // Small gap between number and unit
 
-                .unit {
+                // Target the unit span inside value
+                .unit,
+                span.unit {
                     font-family: 'Onest', sans-serif;
                     font-size: 20px; 
                     font-weight: 500; 
                     color: #40C1AC;
-                    margin-left: 2px; 
-                  }
+                    margin-left: 0; // Remove margin, use gap instead
+                    line-height: 1; // Match parent line height
+                }
             }
         }
     }
@@ -155,13 +172,29 @@
                 height: 50px; // scale down row height
                 gap: 24px; // reduce gap between columns
                 div {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+
                     span {
                         font-size: 14px; // smaller label
                     }
+                    
+                    h2.value,
                     .value {
-                        font-size: 32px; // smaller value
-                        .unit {
-                            font-size: 16px; // smaller unit
+                        font-size: 32px;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        line-height: 1;
+                        display: flex;
+                        align-items: baseline;
+                        gap: 2px;
+                        
+                        .unit,
+                        span.unit {
+                            font-size: 16px;
+                            line-height: 1;
+                            margin-left: 0;
                         }
                     }
                 }
@@ -199,9 +232,28 @@
 
         .row-2 { height: 62px; gap: 32px;
             div {
+                display: flex;
+            flex-direction: column;
+            justify-content: space-between;
                 span { font-size: 16px; }
-                .value { font-size: 40px; }
-                .unit { font-size: 20px; }
+                
+                h2.value,
+                .value { 
+                    font-size: 40px;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    line-height: 1;
+                    display: flex;
+                    align-items: baseline;
+                    gap: 2px;
+                    
+                    .unit,
+                    span.unit { 
+                        font-size: 20px;
+                        line-height: 1;
+                        margin-left: 0;
+                    }
+                }
             }
         }
 
@@ -264,4 +316,3 @@
       background: #f5f5f5;
     }
   }
-  
