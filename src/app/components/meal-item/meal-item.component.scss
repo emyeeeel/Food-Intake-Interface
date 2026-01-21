@@ -27,7 +27,7 @@
             min-height: 225px;
             object-fit: cover;
             border-radius: 12px;
-          }
+        }
     }
 
     .col-2{
@@ -37,20 +37,32 @@
 
         .row-1{
             height: 8px;
+            position: relative;
 
             .circles {
                 display: flex;
                 gap: 4px; 
                 align-items: center;
                 justify-content: right;
+                cursor: pointer;
+                transition: all 0.3s ease;
                 
-                .circle {
-                  width: 7.24px;
-                  height: 7.24px;
-                  border-radius: 50%; 
-                  background-color: #00313C; 
+                &:hover {
+                    transform: scale(1.1);
                 }
-              }
+
+                .circle {
+                    width: 7.24px;
+                    height: 7.24px;
+                    border-radius: 50%; 
+                    background-color: #00313C; 
+                    transition: background-color 0.3s ease;
+                }
+
+                &:hover .circle {
+                    background-color: #40C1AC;
+                }
+            }
         }
 
         .row-2{
@@ -74,7 +86,6 @@
         .row-3{
             height: 50px;
             margin-top: 30px;
-
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -98,7 +109,6 @@
         .row-4{
             height: 35px;
             margin-top: 25px;
-
             display: flex;
             flex-direction: row;
             justify-content: space-between;
@@ -119,7 +129,6 @@
                 height: 100%;
                 border-radius: 24px;
                 background-color: #00313C;
-
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -137,7 +146,7 @@
         }
     }
 
-    //for 1024x600
+    // Media queries for responsive design
     @media (min-width: 1024px){
         min-width: 350px;
         max-height: 260px;
@@ -152,6 +161,17 @@
 
         .col-2{
             width: 167px;
+
+            .row-1{
+                .circles {
+                    gap: 2px;
+                    
+                    .circle {
+                        width: 6px;
+                        height: 6px;
+                    }
+                }
+            }
 
             .row-2{
                 margin-top: 25px;
@@ -197,6 +217,15 @@
         .col-2{
             max-width: 170px;
 
+            .row-1{
+                .circles {
+                    .circle {
+                        width: 7.24px;
+                        height: 7.24px;
+                    }
+                }
+            }
+
             .row-2{
                 margin-top: 45px;
                 h1{
@@ -227,5 +256,122 @@
                 }
             }
         }
+    }
+}
+
+/* Wrapper controls positioning */
+.option-wrapper {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+}
+
+/* Dropdown - Following Patient Card Styling */
+.options-dropdown {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 120px;
+    max-width: 160px;
+    
+    background: linear-gradient(135deg, #40C1AC, #2FA695);
+    border-radius: 12px 0 12px 12px;
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(64, 193, 172, 0.2);
+    z-index: 100;
+    
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    animation: fadeInDown 0.3s ease;
+
+    button {
+        width: 100%;
+        padding: 12px 14px;
+        background: none;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 400;
+        font-size: 15px;
+        color: #F5F4F2;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background: rgba(245, 245, 245, 0.1);
+            color: #FFFFFF;
+        }
+
+        &:first-child {
+            &:hover {
+                background: rgba(255, 255, 255, 0.15);
+            }
+        }
+
+        &:last-child {
+            &:hover {
+                background: rgba(255, 193, 7, 0.2);
+            }
+        }
+    }
+
+    // Responsive adjustments
+    @media (min-width: 1024px) {
+        min-width: 110px;
+        max-width: 140px;
+
+        button {
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        min-width: 120px;
+        max-width: 160px;
+
+        button {
+            padding: 12px 14px;
+            font-size: 15px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        min-width: 140px;
+        right: -10px;
+
+        button {
+            padding: 14px 16px;
+            font-size: 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        right: auto;
+        transform: translate(-50%, -50%);
+        min-width: 200px;
+        border-radius: 12px;
+
+        button {
+            padding: 16px 20px;
+            font-size: 16px;
+        }
+    }
+}
+
+// Animation keyframes
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

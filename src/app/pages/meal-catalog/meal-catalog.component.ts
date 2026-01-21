@@ -15,6 +15,8 @@ import { Meal } from '../../models/meal.model';
 import { AddMealComponent } from '../../components/add-meal/add-meal.component';
 import { DisplayMealComponent } from "../../components/display-meal/display-meal.component";
 import { PrintAllMealsComponent } from "../../components/print-all-meals/print-all-meals.component";
+import { EditMealComponent } from "../../components/edit-meal/edit-meal.component";
+import { ShowMealComponent } from "../../components/show-meal/show-meal.component";
 
 @Component({
   selector: 'app-meal-catalog',
@@ -31,7 +33,9 @@ import { PrintAllMealsComponent } from "../../components/print-all-meals/print-a
     MealItemComponent,
     AddMealComponent,
     DisplayMealComponent,
-    PrintAllMealsComponent
+    PrintAllMealsComponent,
+    EditMealComponent,
+    ShowMealComponent
 ],
   templateUrl: './meal-catalog.component.html',
   styleUrl: './meal-catalog.component.scss'
@@ -88,6 +92,10 @@ export class MealCatalogComponent implements OnInit {
       this.currentView = 'all-meals';
     } else if (path.endsWith('/print') || path === 'print') {
       this.currentView = 'print-meal';
+    }else if (path.endsWith('/edit') || path === 'edit') {
+      this.currentView = 'edit-meal';
+    }else if (path.endsWith('/view') || path === 'view') {
+      this.currentView = 'view-meal';
     } else if (path === 'meal-catalog' || path === '') {
       this.currentView = 'default';
     } else {

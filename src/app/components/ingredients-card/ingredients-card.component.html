@@ -27,7 +27,7 @@
         <!-- Nutrients List -->
         @if (nutrients && nutrients.length > 0) {
           <div class="nutrients-section">
-            <h4 class="section-title">Nutritional Components</h4>
+            <h4 class="section-title">營養成分</h4>
             <div class="nutrients-list">
               @for (nutrient of nutrients; track nutrient) {
                 <span class="nutrient-tag">
@@ -40,7 +40,7 @@
         <!-- No nutrients message -->
         @if (!ingredient.nutrients || ingredient.nutrients.length === 0) {
           <div class="no-data">
-            <p>No nutritional data available</p>
+            <p>沒有可用的營養數據.</p>
           </div>
         }
       </div>

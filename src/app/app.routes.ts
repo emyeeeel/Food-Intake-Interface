@@ -25,6 +25,8 @@ export const routes: Routes = [
     { path: 'meal-catalog/add', canActivate: [authGuard], component: MealCatalogComponent },
     { path: 'meal-catalog/all', canActivate: [authGuard], component: MealCatalogComponent },
     { path: 'meal-catalog/print', canActivate: [authGuard], component: MealCatalogComponent },
+    { path: 'meal-catalog/edit', canActivate: [authGuard], component: MealCatalogComponent },
+    { path: 'meal-catalog/view', canActivate: [authGuard], component: MealCatalogComponent },
 
     { path: 'ingredients', canActivate: [authGuard], component: IngredientsComponent },
     { path: 'ingredients/add', canActivate: [authGuard], component: IngredientsComponent },

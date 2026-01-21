@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment';
 export class QrTestComponent implements AfterViewInit {
   @Input() patientId: number = 1;
   @Input() type: 'Details' | 'Intake' | 'Before' | 'After' = 'Details'; 
-  @Input() qrSize: number = 150;
+  @Input() qrSize: number = 100;
   @ViewChild('qrCanvas') qrCanvas!: ElementRef<HTMLCanvasElement>;
 
   ngAfterViewInit() {

@@ -6,7 +6,6 @@ import { RecommendedIntake } from '../../models/recommended-intake.model';
 
 import { Meal } from '../../models/meal.model';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-patient-card',

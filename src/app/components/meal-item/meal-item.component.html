@@ -4,11 +4,19 @@
     </div>
     <div class="col-2">
         <div class="row-1">
-            <div class="circles">
+            <div class="circles" (click)="toggleOptions()">
                 <div class="circle"></div>
                 <div class="circle"></div>
                 <div class="circle"></div>
             </div>
+            
+            <!-- Dropdown menu -->
+            @if (optionsOpen) {
+              <div class="options-dropdown">
+                <button (click)="onViewMeal()">查看詳情</button>
+                <button (click)="onEditMeal()">編輯詳情</button>
+              </div>
+            }
         </div>
         <div class="row-2">
             <h1>{{ mealCode }}</h1>

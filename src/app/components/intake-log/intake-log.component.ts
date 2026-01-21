@@ -30,4 +30,5 @@ export class IntakeLogComponent implements OnInit {
     const timeKey = this.time.toLowerCase();
     this.iconSrc = timeToIconMap[timeKey] || 'assets/icons/lunch-time.svg';
   }
+  
 }
