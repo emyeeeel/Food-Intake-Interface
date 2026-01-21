@@ -16,6 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs';
 import { PatientDetailsComponent } from '../../components/patient-details/patient-details.component';
 import { CloudTestService } from '../../services/cloud-test.service';
+import { EditPatientComponent } from "../../components/edit-patient/edit-patient.component";
 
 @Component({
   selector: 'app-patient-info',
@@ -31,7 +32,8 @@ import { CloudTestService } from '../../services/cloud-test.service';
     BpCardComponent,
     MealAssignmentComponent,
     FormsModule,
-    PatientDetailsComponent
+    PatientDetailsComponent,
+    EditPatientComponent
 ],
   templateUrl: './patient-info.component.html',
   styleUrls: ['./patient-info.component.scss']
@@ -112,20 +114,53 @@ export class PatientInfoComponent implements OnInit {
     } else if (path.endsWith('/print') || path === 'print') {
       this.currentView = 'printRecord';
 
-    } else if (/\/patient-info\/\d+$/.test(path)) {
-      // Matches /patient-info/1, /patient-info/25, etc.
+    } else if (/\/patient-info\/view\/\d+$/.test(path)) {
+      // Matches patient-info/view/:id format
       this.currentView = 'patientRecord';
+      // Extract patient ID from view URL
+      const viewMatch = path.match(/\/patient-info\/view\/(\d+)$/);
+      if (viewMatch) {
+        this.patientId = parseInt(viewMatch[1], 10);
+      }
 
-    } else {
+    } else if (/\/patient-info\/edit\/\d+$/.test(path)) {
+      // Matches patient-info/edit/:id format
+      this.currentView = 'editRecord';
+      // Extract patient ID from edit URL
+      const editMatch = path.match(/\/patient-info\/edit\/(\d+)$/);
+      if (editMatch) {
+        this.patientId = parseInt(editMatch[1], 10);
+      }
+
+    }  else {
       this.currentView = 'default';
     }
-  }
 
+    console.log('Current view updated to:', this.currentView, 'Patient ID:', this.patientId);
+  }
 
   getPatientIdFromRoute(): number | null {
     const url = this.router.url;
-    const match = url.match(/\/patient-info\/(\d+)/);
-    return match ? parseInt(match[1], 10) : null;
+    
+    // Try view format first
+    let match = url.match(/\/patient-info\/view\/(\d+)/);
+    if (match) {
+      return parseInt(match[1], 10);
+    }
+    
+    // Try edit format
+    match = url.match(/\/patient-info\/edit\/(\d+)/);
+    if (match) {
+      return parseInt(match[1], 10);
+    }
+    
+    // Try legacy format
+    match = url.match(/\/patient-info\/(\d+)/);
+    if (match) {
+      return parseInt(match[1], 10);
+    }
+    
+    return null;
   }
 
   onPatientIdChange(newPatientId: number): void {
@@ -149,7 +184,12 @@ export class PatientInfoComponent implements OnInit {
 
   navigateToPatientRecord(): void {
     console.log('Navigate to Patient Record');
-    this.router.navigate(['/patient-info/' + this.patientId]);
+    this.router.navigate(['/patient-info/view' + this.patientId]);
+  }
+
+  navigateToEditPatient(): void {
+    console.log('Navigate to Edit Patient');
+    this.router.navigate(['/patient-info/edit' + this.patientId]);
   }
 
   // Called by MenuBar to toggle main content dimming

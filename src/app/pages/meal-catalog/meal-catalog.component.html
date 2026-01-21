@@ -53,6 +53,7 @@
         <div class="row-5">
           @for (meal of meals.slice(0, 2); track meal) {
             <app-meal-item
+              [mealId]="meal.id"
               [mealImageSrc]="meal.image || ''"
               [mealCode]="getMealCode(meal)"
               [dayCycleValue]="'第' + (meal.day_cycle || '') + '天'"
@@ -79,11 +80,11 @@
     }
 
     @if (currentView === 'edit-meal') {
-      <app-edit-meal></app-edit-meal>
+      <app-edit-meal [mealId]="mealId"></app-edit-meal>
     }
 
     @if (currentView === 'view-meal') {
-      <app-show-meal></app-show-meal>
+      <app-show-meal [mealId]="mealId"></app-show-meal>
     }
   </div>
 </div>

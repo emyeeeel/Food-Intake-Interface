@@ -25,8 +25,8 @@ export const routes: Routes = [
     { path: 'meal-catalog/add', canActivate: [authGuard], component: MealCatalogComponent },
     { path: 'meal-catalog/all', canActivate: [authGuard], component: MealCatalogComponent },
     { path: 'meal-catalog/print', canActivate: [authGuard], component: MealCatalogComponent },
-    { path: 'meal-catalog/edit', canActivate: [authGuard], component: MealCatalogComponent },
-    { path: 'meal-catalog/view', canActivate: [authGuard], component: MealCatalogComponent },
+    { path: 'meal-catalog/edit/:id', canActivate: [authGuard], component: MealCatalogComponent },
+    { path: 'meal-catalog/view/:id', canActivate: [authGuard], component: MealCatalogComponent }, 
 
     { path: 'ingredients', canActivate: [authGuard], component: IngredientsComponent },
     { path: 'ingredients/add', canActivate: [authGuard], component: IngredientsComponent },
@@ -37,7 +37,8 @@ export const routes: Routes = [
     { path: 'patient-info/add', canActivate: [authGuard], component: PatientInfoComponent },
     { path: 'patient-info/all', canActivate: [authGuard], component: PatientInfoComponent },
     { path: 'patient-info/print', canActivate: [authGuard], component: PatientInfoComponent },
-    { path: 'patient-info/:id', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/edit/:id', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/view/:id', canActivate: [authGuard], component: PatientInfoComponent },
 
     { path: 'settings', canActivate: [authGuard], component: SettingsComponent },
     { path: 'test', component: PrintAllMealsComponent },

@@ -44,6 +44,7 @@ export class MealCatalogComponent implements OnInit {
   currentView: string = 'default';
   mealDescription: string = ''; 
   meals: Meal[] = [];
+  mealId: number | null = null; // Add this property to store the meal ID
 
   isMobileMenuOpen = false; 
 
@@ -86,21 +87,57 @@ export class MealCatalogComponent implements OnInit {
   }
 
   private updateCurrentView(path: string): void {
-    if (path.endsWith('/add') || path === 'add') {
+    console.log('Updating current view for path:', path);
+    
+    if (path.includes('/add') || path.endsWith('add')) {
       this.currentView = 'add-meal';
-    } else if (path.endsWith('/all') || path === 'all') {
+      this.mealId = null;
+
+    } else if (path.includes('/all') || path.endsWith('all')) {
       this.currentView = 'all-meals';
-    } else if (path.endsWith('/print') || path === 'print') {
+      this.mealId = null;
+
+    } else if (path.includes('/print') || path.endsWith('print')) {
       this.currentView = 'print-meal';
-    }else if (path.endsWith('/edit') || path === 'edit') {
+      this.mealId = null;
+
+    } else if (/meal-catalog\/edit\/\d+/.test(path)) {
+      // Remove leading slash from regex - matches both /meal-catalog/edit/123 and meal-catalog/edit/123
       this.currentView = 'edit-meal';
-    }else if (path.endsWith('/view') || path === 'view') {
+      const editMatch = path.match(/meal-catalog\/edit\/(\d+)/);
+      if (editMatch) {
+        this.mealId = parseInt(editMatch[1], 10);
+        console.log('Edit meal ID extracted:', this.mealId);
+      }
+
+    } else if (/meal-catalog\/view\/\d+/.test(path)) {
+      // Remove leading slash from regex - matches both /meal-catalog/view/123 and meal-catalog/view/123
       this.currentView = 'view-meal';
-    } else if (path === 'meal-catalog' || path === '') {
+      const viewMatch = path.match(/meal-catalog\/view\/(\d+)/);
+      if (viewMatch) {
+        this.mealId = parseInt(viewMatch[1], 10);
+        console.log('View meal ID extracted:', this.mealId);
+      }
+
+    } else if (path.endsWith('/edit') || path === 'edit') {
+      this.currentView = 'edit-meal';
+      this.mealId = null;
+
+    } else if (path.endsWith('/view') || path === 'view') {
+      this.currentView = 'view-meal';
+      this.mealId = null;
+
+    } else if (path === '/meal-catalog' || path === 'meal-catalog' || path === '') {
       this.currentView = 'default';
+      this.mealId = null;
+
     } else {
+      console.log('No matching route pattern found, setting to default');
       this.currentView = 'default';
+      this.mealId = null;
     }
+
+    console.log('Current view updated to:', this.currentView, 'Meal ID:', this.mealId);
   }
 
   navigateToAddMeal(): void {
@@ -113,6 +150,14 @@ export class MealCatalogComponent implements OnInit {
 
   navigateToPrintMeal(): void {
     this.router.navigate(['/meal-catalog/print']);
+  }
+
+  navigateToEditMeal(mealId: number): void {
+    this.router.navigate(['/meal-catalog/edit' + mealId]);
+  }
+
+  navigateToViewMeal(mealId: number): void {
+    this.router.navigate(['/meal-catalog/view' + mealId]);
   }
 
   clearDescription(): void {
@@ -141,5 +186,24 @@ export class MealCatalogComponent implements OnInit {
   // Called by MenuBar to toggle main content dimming
   onMobileMenuToggle(isOpen: boolean) {
     this.isMobileMenuOpen = isOpen;
+  }
+
+  // Helper method to get meal ID from route
+  getMealIdFromRoute(): number | null {
+    const url = this.router.url;
+    
+    // Try edit format first
+    let match = url.match(/\/meal-catalog\/edit\/(\d+)/);
+    if (match) {
+      return parseInt(match[1], 10);
+    }
+    
+    // Try view format
+    match = url.match(/\/meal-catalog\/view\/(\d+)/);
+    if (match) {
+      return parseInt(match[1], 10);
+    }
+    
+    return null;
   }
 }

@@ -156,13 +156,18 @@ export class PatientCardComponent implements OnInit {
   onEditPatient(): void {
     console.log('Edit patient', this.patientId);
     this.closeOptions();
+
+    this.router.navigate(['/patient-info/edit', this.patientId]).catch(error => {
+      console.error('Navigation failed:', error);
+      alert('Failed to navigate to edit patient details. Please try again.');
+    });
   }
   
   onViewPatient(): void {
     console.log('View patient', this.patientId);
     this.closeOptions();
 
-    this.router.navigate(['/patient-info', this.patientId]).catch(error => {
+    this.router.navigate(['/patient-info/view', this.patientId]).catch(error => {
       console.error('Navigation failed:', error);
       alert('Failed to navigate to patient details. Please try again.');
     });

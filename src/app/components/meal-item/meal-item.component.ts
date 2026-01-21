@@ -20,6 +20,8 @@ export class MealItemComponent {
   @Input() plateTypeLabel: string = '樣式';
   @Input() plateTypeValue: string = '';
 
+  @Input() mealId: number | null = null;
+
   // Dropdown state
   optionsOpen: boolean = false;
 
@@ -36,24 +38,35 @@ export class MealItemComponent {
   }
 
   onViewMeal(): void {
-    console.log('View meal');
+    console.log('View meal with ID:', this.mealId);
     this.closeOptions();
 
-    this.router.navigate(['/meal-catalog/view']).catch(error => { 
-      console.error('Navigation failed:', error);
-    });
-  }
-  closeOptions(): void {
-    this.optionsOpen = false;
+    // Check if mealId is valid before navigation
+    if (this.mealId) {
+      this.router.navigate(['/meal-catalog/view', this.mealId]).catch(error => { 
+        console.error('Navigation failed:', error);
+      });
+    } else {
+      console.error('Cannot navigate: mealId is null or undefined');
+    }
   }
 
   onEditMeal(): void {
-    console.log('Edit meal');
+    console.log('Edit meal with ID:', this.mealId);
     this.closeOptions();
 
-    this.router.navigate(['/meal-catalog/edit']).catch(error => { 
-      console.error('Navigation failed:', error);
-    });
+    // Check if mealId is valid before navigation
+    if (this.mealId) {
+      this.router.navigate(['/meal-catalog/edit', this.mealId]).catch(error => { 
+        console.error('Navigation failed:', error);
+      });
+    } else {
+      console.error('Cannot navigate: mealId is null or undefined');
+    }
+  }
+
+  closeOptions(): void {
+    this.optionsOpen = false;
   }
 
   // Close dropdown when clicking outside

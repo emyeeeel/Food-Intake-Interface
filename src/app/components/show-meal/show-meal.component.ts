@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-show-meal',
@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './show-meal.component.scss',
 })
 export class ShowMealComponent {
-
+  @Input() mealId: number | null = null;
 }
