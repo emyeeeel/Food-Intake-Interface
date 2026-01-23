@@ -59,7 +59,7 @@
       @for (meal of paginatedMeals; track trackByMealId(i, meal); let i = $index) {
         <app-meal-item
           [mealId]="meal.id"
-          [mealImageSrc]="meal.image || ''"
+          [mealImageSrc]="meal.image || 'assets/images/meals/meal_placeholder.jpg'"
           [mealCode]="getMealCode(meal)"
           [dayCycleValue]="'第' + (meal.day_cycle || '') + '天'"
           [mealTimeValue]="meal.meal_time || ''"

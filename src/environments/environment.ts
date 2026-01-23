@@ -9,5 +9,10 @@ export const environment = {
     messagingSenderId: "724789313096",
     appId: "1:724789313096:web:5f4b51833ba4a9467fe27d",
     measurementId: "G-XEDNNSLN49"
-  }
+  },
+  mealCycle: {
+    startDate: '2026-01-19', 
+    cycleLength: 14 
+  },
+  careCenterName: '嘉義國泰綜合長照機構'
 };

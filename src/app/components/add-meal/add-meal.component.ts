@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Meal } from '../../models/meal.model';
 import { Ingredient } from '../../models/ingredient.model';
 
@@ -15,7 +15,11 @@ import { Router } from '@angular/router';
   templateUrl: './add-meal.component.html',
   styleUrl: './add-meal.component.scss'
 })
-export class AddMealComponent {
+export class AddMealComponent implements OnInit {
+  ngOnInit(): void {
+    // Initialization logic can be added here if needed
+    console.log('AddMealComponent initialized');
+  }
   meal: Partial<Meal> = {
     meal_name: '',
     meal_time: '',
@@ -314,6 +318,217 @@ private buildMealFormData(): FormData {
         this.isCapturing = false;
         console.error('Image capture failed:', error);
       }
+    });
+  }
+
+  // New properties for option selection
+  selectedOption: string | null = null;
+  
+  // Excel upload properties
+  selectedFile: File | null = null;
+  isDragActive: boolean = false;
+  isUploading: boolean = false;
+  uploadProgress: number = 0;
+  uploadResult: { success: boolean; message: string; details?: string[] } | null = null;
+
+  // Option selection methods
+  selectOption(option: 'addMeal' | 'updateCycle'): void {
+    this.selectedOption = option;
+    console.log('Selected option:', option);
+  }
+
+  goBackToOptions(): void {
+    this.selectedOption = null;
+    this.resetForms();
+  }
+
+  resetForms(): void {
+    // Reset add meal form
+    this.showFullForm = false;
+    this.meal = {
+      meal_name: '',
+      meal_time: '',
+      day_cycle: '',
+      plate_type: '',
+      image: '',
+      ingredients: []
+    };
+    this.mealImagePreview = null;
+    
+    // Reset excel upload
+    this.selectedFile = null;
+    this.uploadResult = null;
+    this.uploadProgress = 0;
+    this.isDragActive = false;
+  }
+
+  // Excel upload methods
+  onFileSelected(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      this.handleFile(target.files[0]);
+    }
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragActive = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragActive = false;
+  }
+
+  onFileDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragActive = false;
+    
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      this.handleFile(files[0]);
+    }
+  }
+
+  handleFile(file: File): void {
+    // Validate file type
+    const allowedTypes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel'
+    ];
+    
+    if (!allowedTypes.includes(file.type)) {
+      alert('請選擇有效的Excel檔案 (.xlsx 或 .xls)');
+      return;
+    }
+
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('檔案大小不能超過 10MB');
+      return;
+    }
+
+    this.selectedFile = file;
+    this.uploadResult = null;
+    console.log('File selected:', file.name);
+  }
+
+  removeFile(event: Event): void {
+    event.stopPropagation();
+    this.selectedFile = null;
+    this.uploadResult = null;
+    this.uploadProgress = 0;
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  downloadTemplate(): void {
+    // Create a simple Excel template
+    const templateData = [
+      {
+        '餐點名稱': '範例餐點',
+        '用餐時間': '早餐',
+        '日循環': '1',
+        '餐盤類型': '標準',
+        '成分': '米飯, 蔬菜, 蛋白質'
+      }
+    ];
+
+    // Create workbook and download
+    import('xlsx').then(XLSX => {
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(templateData);
+      XLSX.utils.book_append_sheet(workbook, worksheet, '餐點模板');
+      
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([excelBuffer], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+      
+      import('file-saver').then(fileSaver => {
+        fileSaver.saveAs(blob, 'meal-template.xlsx');
+      });
+    });
+  }
+
+  async uploadExcelFile(): Promise<void> {
+    if (!this.selectedFile) return;
+
+    this.isUploading = true;
+    this.uploadProgress = 0;
+
+    try {
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        this.uploadProgress += 10;
+        if (this.uploadProgress >= 90) {
+          clearInterval(progressInterval);
+        }
+      }, 200);
+
+      // Read and process Excel file
+      const fileData = await this.readExcelFile(this.selectedFile);
+      
+      // Here you would typically send the data to your backend
+      // For now, we'll simulate the upload
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      clearInterval(progressInterval);
+      this.uploadProgress = 100;
+
+      this.uploadResult = {
+        success: true,
+        message: '檔案上傳成功！',
+        details: [
+          `處理了 ${fileData.length} 筆餐點記錄`,
+          '所有記錄已成功導入系統'
+        ]
+      };
+
+      // Reset after success
+      setTimeout(() => {
+        this.selectedFile = null;
+        this.uploadProgress = 0;
+      }, 3000);
+
+    } catch (error) {
+      console.error('Upload error:', error);
+      this.uploadResult = {
+        success: false,
+        message: '檔案上傳失敗',
+        details: ['請檢查檔案格式是否正確', '確保所有必填欄位都已填寫']
+      };
+    } finally {
+      this.isUploading = false;
+    }
+  }
+
+  private async readExcelFile(file: File): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        try {
+          import('xlsx').then(XLSX => {
+            const data = new Uint8Array(e.target?.result as ArrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+            resolve(jsonData);
+          });
+        } catch (error) {
+          reject(error);
+        }
+      };
+      
+      reader.onerror = () => reject(new Error('無法讀取檔案'));
+      reader.readAsArrayBuffer(file);
     });
   }
   

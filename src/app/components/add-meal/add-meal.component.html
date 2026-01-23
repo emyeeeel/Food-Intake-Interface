@@ -1,20 +1,44 @@
 <div class="main-container">
-  <div class="add-meal-container">
-    <h3>新增餐點</h3>
+  <!-- Initial Option Selection -->
+  @if (!selectedOption) {
+    <div class="option-selection-container">
+      <h3>選擇操作方式</h3>
+      <div class="options-grid">
+        <button class="option-card" (click)="selectOption('addMeal')">
+          <div class="option-icon">➕</div>
+          <h4>新增單一餐點</h4>
+          <p>手動輸入餐點資訊</p>
+        </button>
+        <button class="option-card" (click)="selectOption('updateCycle')">
+          <div class="option-icon">📊</div>
+          <h4>更新循環菜單使用Excel</h4>
+          <p>批量上傳餐點資料</p>
+        </button>
+      </div>
+    </div>
+  }
 
-    @if (!showFullForm) {
-      <form class="meal-form" (ngSubmit)="onInitialSubmit()" #initialForm="ngForm">
-        <div class="form-group">
-          <label for="mealName">餐點名稱</label>
-          <input
-            type="text"
-            id="mealName"
-            name="mealName"
-            [(ngModel)]="meal.meal_name"
-            class="form-input"
-            placeholder="在這裡輸入餐點名稱"
-            required
-            />
+  <!-- Add Meal Container (existing content) -->
+  @if (selectedOption === 'addMeal') {
+    <div class="add-meal-container">
+      <div class="header-with-back">
+        <button class="btn-back" (click)="goBackToOptions()">← 返回</button>
+        <h3>新增餐點</h3>
+      </div>
+
+      @if (!showFullForm) {
+        <form class="meal-form" (ngSubmit)="onInitialSubmit()" #initialForm="ngForm">
+          <div class="form-group">
+            <label for="mealName">餐點名稱</label>
+            <input
+              type="text"
+              id="mealName"
+              name="mealName"
+              [(ngModel)]="meal.meal_name"
+              class="form-input"
+              placeholder="在這裡輸入餐點名稱"
+              required
+              />
           </div>
           <div class="form-group">
             <label>餐點圖片</label>
@@ -113,4 +137,97 @@
         </form>
       }
     </div>
-  </div>
+  }
+
+  <!-- Excel Upload Container -->
+  @if (selectedOption === 'updateCycle') {
+    <div class="excel-upload-container">
+      <div class="header-with-back">
+        <button class="btn-back" (click)="goBackToOptions()">← 返回</button>
+        <h3>更新循環菜單使用Excel</h3>
+      </div>
+      
+      <div class="upload-section">
+        <div class="upload-instructions">
+          <h4>上傳說明</h4>
+          <ul>
+            <li>請使用提供的Excel模板</li>
+            <li>確保所有必填欄位都已填寫</li>
+            <li>檔案格式必須為 .xlsx 或 .xls</li>
+            <li>最大檔案大小: 10MB</li>
+          </ul>
+        </div>
+
+        <div class="file-upload-area">
+          <input 
+            type="file" 
+            #fileInput 
+            accept=".xlsx,.xls" 
+            (change)="onFileSelected($event)"
+            style="display: none;">
+          
+          <div class="upload-dropzone" 
+               (click)="fileInput.click()"
+               (dragover)="onDragOver($event)"
+               (dragleave)="onDragLeave($event)"
+               (drop)="onFileDrop($event)"
+               [class.drag-active]="isDragActive">
+            <div class="upload-content">
+              @if (!selectedFile) {
+                <div class="upload-icon">📁</div>
+                <p class="upload-text">點擊選擇檔案或拖放Excel檔案到此處</p>
+                <p class="upload-subtext">支援 .xlsx, .xls 格式</p>
+              }
+              @if (selectedFile) {
+                <div class="file-info">
+                  <div class="file-icon">📄</div>
+                  <div class="file-details">
+                    <p class="file-name">{{ selectedFile.name }}</p>
+                    <p class="file-size">{{ formatFileSize(selectedFile.size) }}</p>
+                  </div>
+                  <button class="btn-remove" (click)="removeFile($event)">✕</button>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="upload-actions">
+          <button class="btn-secondary" (click)="downloadTemplate()">
+            📥 下載Excel模板
+          </button>
+          <button class="btn-primary" 
+                  (click)="uploadExcelFile()" 
+                  [disabled]="!selectedFile || isUploading">
+            @if (isUploading) {
+              <span>上傳中...</span>
+            }
+            @if (!isUploading) {
+              <span>上傳檔案</span>
+            }
+          </button>
+        </div>
+
+        @if (uploadProgress > 0) {
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+          </div>
+        }
+
+        @if (uploadResult) {
+          <div class="upload-result" [class.success]="uploadResult.success" [class.error]="!uploadResult.success">
+            <h4>{{ uploadResult.success ? '上傳成功' : '上傳失敗' }}</h4>
+            <p>{{ uploadResult.message }}</p>
+            @if (uploadResult.details) {
+              <ul>
+                @for (detail of uploadResult.details; track detail) {
+                  <li>{{ detail }}</li>
+                }
+              </ul>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

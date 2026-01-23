@@ -49,8 +49,12 @@ export class MealsService {
     return this.http.post<Meal>(this.apiUrl, meal); 
   }
 
-
   updateMeal(id: number, data: FormData): Observable<Meal> {
     return this.http.put<Meal>(`${this.apiUrl}${id}/`, data);
+  }
+
+  updateMealCycle(){
+    const url = `${this.baseUrl}/api/add_meal_cycle/`;
+    // api/add_meal_cycle/
   }
 }
