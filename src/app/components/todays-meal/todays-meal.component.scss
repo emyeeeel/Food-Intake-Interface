@@ -1,0 +1,345 @@
+.intake-container {
+    width: 100%;
+    max-width: 100%;
+    background-color: #E6FEF9;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    box-sizing: border-box;
+  
+    // ==================================================
+    // ROW 1 — ICON, TIME, OPTIONS
+    // ==================================================
+    .row-1 {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+  
+      .icon {
+        width: 32px;
+        height: 32px;
+        background-color: #00313C;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 16px;
+        flex-shrink: 0;
+  
+        img {
+          width: 55%;
+          height: 55%;
+        }
+      }
+  
+      .time {
+        font-family: "Quicksand", sans-serif;
+        font-weight: bold;
+        font-size: 20px;
+        color: #00313C;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+  
+      .option {
+        display: flex;
+        gap: 2px;
+  
+        .circle {
+          width: 5px;
+          height: 5px;
+          background-color: #00313C;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+      }
+    }
+  
+    // ==================================================
+    // ROW 2 — MEAL DETAILS TABLE
+    // ==================================================
+    .row-2{
+      width: 100%;
+      height: 100%;
+      margin-bottom: 16px;
+    
+      .meal-details-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: "Quicksand", sans-serif;
+    
+        thead {
+          th {
+            font-weight: bold;
+            font-size: 12px;
+            color: #677578;
+            border-bottom: 1px solid #B8E6DC;
+            text-align: left; 
+          }
+        }
+    
+        tbody {
+          tr {
+            &:first-child {
+              td {
+                padding-top: 6px;
+              }
+            }
+          }
+    
+          td {
+            padding: 6px 12px 6px 0;
+            // vertical-align: top;
+            text-align: left; // Center align all table data
+    
+            &.value {
+              font-weight: bold;
+              font-size: 14px;
+              color: #00313C;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              text-align: left; // Explicitly center value cells
+            }
+    
+            &.tags-cell {
+              padding-right: 0;
+              text-align: left; // Center align tags cell
+            }
+          }
+        }
+      }
+    }
+  
+    // ==================================================
+    // RESPONSIVE BREAKPOINTS
+    // ==================================================
+  
+    @media (min-width: 480px) {
+      padding: 18px;
+  
+      .row-1 .time { font-size: 22px; }
+  
+      .row-1 .icon { width: 36px; height: 36px; }
+  
+      .row-2 .meal-details-table {
+        thead th { 
+          font-size: 15px; 
+          text-align: left; // Center align headers
+        }
+        tbody td {
+          &.value { 
+            font-size: 18px;
+            text-align: left; // Center align values
+          }
+        }
+      }
+    }
+  
+    @media (min-width: 768px) {
+      max-width: 220px;
+      padding: 22px;
+  
+      .row-1 .time { font-size: 24px; }
+      .row-1 .icon { width: 40px; height: 40px; }
+      
+      .row-2 .meal-details-table {
+        thead th { 
+          font-size: 16px;
+          text-align: left; // Center align headers
+        }
+        tbody td {
+          &.value { 
+            font-size: 20px;
+            text-align: left; // Center align values
+          }
+        }
+      }
+  
+      .row-1 .option .circle { width: 6px; height: 6px; }
+    }
+  
+    @media (min-width: 1024px) {
+      max-width: 450px;
+      padding: 14px;          // tighter padding to fit content
+      height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between; // ensures rows do not overflow
+    
+      // ------------------------------
+      // ROW 1
+      // ------------------------------
+      .row-1 {
+        margin-bottom: 10px;         // reduce vertical spacing
+        .time { font-size: 20px; }   // slightly smaller to avoid pushing content down
+        .icon { width: 38px; height: 38px;  border-radius: 12px;}
+    
+        .option .circle { 
+          width: 6px; 
+          height: 6px; 
+        }
+      }
+    
+      // ------------------------------
+      // ROW 2
+      // ------------------------------
+      .row-2{
+        margin-bottom: 8px;          // reduce spacing so total rows fit
+    
+        .meal-details-table {
+          thead th { 
+            font-size: 13px;
+            text-align: left; // Center align headers
+          }
+          tbody td {
+            &.value { 
+              font-size: 16px;
+              line-height: 1.1;
+              text-align: left; // Center align values
+            }
+          }
+        }
+      }
+    }
+    
+  
+    @media (min-width: 1280px) {
+      width: 430px;
+      height: 350px;
+      border-radius: 24px;
+      background-color: #E6FEF9;
+      padding: 25px;
+    
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    
+      // ------------------------------------------------
+      // ROW 1
+      // ------------------------------------------------
+      .row-1 {
+        width: 100%;
+        height: 48px;
+        margin-bottom: 32px;
+    
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    
+        .icon {
+          width: 48px;
+          height: 48px;
+          background-color: #00313C;
+          border-radius: 16px;
+          margin-right: 20px;
+    
+          display: flex;
+          justify-content: center;
+          align-items: center;
+    
+          img {
+            width: 55%;
+            height: 55%;
+          }
+        }
+    
+        .time {
+          font-family: 'Quicksand', sans-serif;
+          font-weight: bold;
+          font-size: 32px;
+          color: #00313C;
+          flex: 1;
+          display: flex;
+          align-items: center;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+    
+        .option {
+          display: flex;
+          gap: 2px;
+    
+          .circle {
+            width: 7.24px;
+            height: 7.24px;
+            background-color: #00313C;
+            border-radius: 50%;
+            flex-shrink: 0;
+          }
+        }
+      }
+    
+      // ------------------------------------------------
+      // ROW 2 — MEAL DETAILS TABLE (LARGE SCREEN)
+      // ------------------------------------------------
+      .row-2 {
+        width: 100%;
+        margin-bottom: 21px;
+    
+        .meal-details-table {
+          width: 100%;
+          
+          thead th { 
+            font-size: 18px;
+            padding: 10px 15px 10px 0;
+            text-align: left; // Center align headers
+          }
+          
+          tbody td {
+            padding: 8px 15px 8px 0;
+            text-align: left; // Center align all cells
+            
+            &.value { 
+              font-size: 22px;
+              line-height: 1.2;
+              text-align: left; // Explicitly center value cells
+            }
+            
+            &.tags-cell {
+              padding-top: 15px;
+              text-align: left; // Center align tags cell
+            }
+          }
+        }
+      }
+    }
+    
+  }
+
+  .view-more {
+    font-family: "Quicksand", sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    color: rgb(230, 254, 249);;
+    background-color: rgb(64, 193, 172);
+    padding: 0 8px;
+    border-radius: 7px;
+    text-align: center;
+    max-width: 75px;
+    margin: 0 auto; // Center the view-more div within its cell
+  }
+
+  .no-meals {
+  text-align: center;
+  font-style: italic;
+  color: #677578;
+  padding: 20px;
+  font-size: 14px;
+}
+
+.view-more {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}

@@ -642,7 +642,7 @@ export class PrintAllMealsComponent implements OnInit {
       'Meal Name': meal.meal_name || 'N/A',
       'Meal Time': meal.meal_time || 'N/A',
       'Day Cycle': meal.day_cycle ? `${meal.day_cycle}` : 'N/A',
-      'Date': this.calculateDateFromDayCycle(meal.day_cycle ? parseInt(meal.day_cycle, 10) : null),
+      'Date': this.calculateDateFromDayCycle(meal.day_cycle ?? null),
       'Plate Type': meal.plate_type || 'N/A',
     }));
   }
@@ -653,7 +653,7 @@ export class PrintAllMealsComponent implements OnInit {
   
     // Group meals by date and meal time
     mealsArray.forEach(meal => {
-      const date = this.calculateDateFromDayCycle(meal.day_cycle ? parseInt(meal.day_cycle, 10) : null);
+      const date = this.calculateDateFromDayCycle(meal.day_cycle);
       const mealTime = meal.meal_time || 'Unknown';
   
       // Skip meals with invalid dates
@@ -768,8 +768,11 @@ export class PrintAllMealsComponent implements OnInit {
       
       // Generate filename
       const currentDate = new Date();
-      const dateString = currentDate.toISOString().split('T')[0];
-      const filename = `grouped-meal-records-${dateString}.xlsx`;
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const dateString = `${year}${month}${day}`;
+      const filename = `${environment.careCenterName}-循環選單-${dateString}.xlsx`;
       
       // Save the file
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
@@ -780,12 +783,12 @@ export class PrintAllMealsComponent implements OnInit {
       saveAs(blob, filename);
       
       console.log(`Grouped Excel file exported successfully: ${filename}`);
-      const uniqueDates = new Set(this.meals.map(m => this.calculateDateFromDayCycle(m.day_cycle ? parseInt(m.day_cycle, 10) : null)));
-      alert(`Successfully exported grouped meal records for ${uniqueDates.size} dates!`);
+      const uniqueDates = new Set(this.meals.map(m => this.calculateDateFromDayCycle(m.day_cycle ?? null)));
+      // alert(`Successfully exported grouped meal records for ${uniqueDates.size} dates!`);
       
     } catch (error) {
       console.error('Error exporting grouped meals to Excel:', error);
-      alert('Failed to export Excel file. Please try again.');
+      // alert('Failed to export Excel file. Please try again.');
     }
   }
 

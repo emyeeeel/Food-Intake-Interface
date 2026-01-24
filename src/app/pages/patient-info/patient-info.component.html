@@ -46,7 +46,7 @@
       </div>
       <div class="row-4">
         <div class="text-title">膳食安排</div>
-        <app-date-container></app-date-container>
+        <app-date-container [isHomePage]="false"></app-date-container>
       </div>
       <div class="row-5">
         <app-meal-assignment
@@ -82,8 +82,7 @@
         </div>
         <app-notif></app-notif>
       </div>
-      <!-- Add your add-record form content here -->
-      <h2>Add Record</h2>
+      <app-add-patient/>
     </div>
   }
 

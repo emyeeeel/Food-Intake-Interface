@@ -1,0 +1,36 @@
+<div class="intake-container">
+    <div class="row-1">
+        <div class="icon">
+            <img [src]="iconSrc" [alt]="time + ' Icon'">
+        </div>
+        <span class="time">{{ time }}</span>
+    </div>
+    <div class="row-2">
+        <table class="meal-details-table">
+            <thead>
+                <tr>
+                    <th>Meal Code</th>
+                    <th>Meal Name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic rows based on meals filtered by day cycle and time serving -->
+                <tr *ngFor="let meal of getMealsForDisplay(); let i = index">
+                    <td class="value">{{ getMealCode(meal) }}</td>
+                    <td class="value">{{ meal.meal_name }}</td>
+                    <td class="tags-cell">
+                        <div class="view-more">View More</div>
+                    </td>
+                </tr>
+                
+                <!-- Show message if no meals found -->
+                <tr *ngIf="getMealsForDisplay().length === 0">
+                    <td colspan="3" class="no-meals">
+                        No meals available for {{ time }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

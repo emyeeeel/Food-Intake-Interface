@@ -17,6 +17,7 @@ import { DisplayMealComponent } from "../../components/display-meal/display-meal
 import { PrintAllMealsComponent } from "../../components/print-all-meals/print-all-meals.component";
 import { EditMealComponent } from "../../components/edit-meal/edit-meal.component";
 import { ShowMealComponent } from "../../components/show-meal/show-meal.component";
+import { TodaysMealComponent } from '../../components/todays-meal/todays-meal.component';
 
 @Component({
   selector: 'app-meal-catalog',
@@ -30,12 +31,12 @@ import { ShowMealComponent } from "../../components/show-meal/show-meal.componen
     FilterOptionsComponent,
     MainOptionsComponent,
     DateContainerComponent,
-    MealItemComponent,
     AddMealComponent,
     DisplayMealComponent,
     PrintAllMealsComponent,
     EditMealComponent,
-    ShowMealComponent
+    ShowMealComponent,
+    TodaysMealComponent
 ],
   templateUrl: './meal-catalog.component.html',
   styleUrl: './meal-catalog.component.scss'

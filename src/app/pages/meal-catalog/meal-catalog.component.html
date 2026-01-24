@@ -49,22 +49,10 @@
         </div>
         <app-date-container></app-date-container>
       </div>
-      @if (meals.length >= 2) {
-        <div class="row-5">
-          @for (meal of meals.slice(0, 2); track meal) {
-            <app-meal-item
-              [mealId]="meal.id"
-              [mealImageSrc]="meal.image || 'assets/images/meals/meal_placeholder.jpg'"
-              [mealCode]="getMealCode(meal)"
-              [dayCycleValue]="'第' + (meal.day_cycle || '') + '天'"
-              [mealTimeValue]="meal.meal_time || ''"
-              [plateTypeValue]="meal.plate_type || ''">
-            </app-meal-item>
-          }
-        </div>
-      } @else {
-        <p>沒有提供餐點.</p>
-      }
+      <div class="row-5">
+        <app-todays-meal time="午餐"></app-todays-meal>
+        <app-todays-meal time="晚餐"></app-todays-meal>
+      </div>
     }
 
     @if (currentView === 'add-meal') {

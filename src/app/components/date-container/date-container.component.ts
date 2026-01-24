@@ -4,10 +4,10 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { DateService } from '../../services/date.service';
 
 @Component({
   selector: 'app-date-container',
-  standalone: true,
   imports: [CommonModule, MatDatepickerModule, MatNativeDateModule],
   templateUrl: './date-container.component.html',
   styleUrl: './date-container.component.scss'
@@ -15,19 +15,27 @@ import { MatNativeDateModule } from '@angular/material/core';
 export class DateContainerComponent implements OnInit, OnDestroy {
   currentWeekRange: string = '';
   currentDay: string = '';
-  selectedDate: string = '';      // for the input[type="date"]
+  selectedDate: string = '';      
   isHomePage: boolean = false;
   showPopup: boolean = false;
 
   private routerSubscription: Subscription = new Subscription();
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private dateService: DateService // Inject the DateService
+  ) {}
 
   ngOnInit(): void {
     this.setCurrentWeekRange();
     this.setCurrentDay();
 
-    this.selectedDate = this.formatDate(new Date());
+    // Set initial date
+    const initialDate = new Date();
+    this.selectedDate = this.formatDate(initialDate);
+    
+    // Use DateService instead of emitting
+    this.dateService.setSelectedDate(initialDate);
 
     this.checkCurrentRoute(this.router.url);
 
@@ -47,6 +55,11 @@ export class DateContainerComponent implements OnInit, OnDestroy {
   }
 
   onCalendarSelected(date: Date) {
+    this.selectedDate = this.formatDate(date);
+    
+    // Use DateService to broadcast the date change instead of emitting
+    this.dateService.setSelectedDate(date);
+    
     if (this.isHomePage) {
       this.updateWeekRangeFromDate(date);
     } else {

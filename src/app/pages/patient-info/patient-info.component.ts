@@ -17,6 +17,7 @@ import { filter } from 'rxjs';
 import { PatientDetailsComponent } from '../../components/patient-details/patient-details.component';
 import { CloudTestService } from '../../services/cloud-test.service';
 import { EditPatientComponent } from "../../components/edit-patient/edit-patient.component";
+import { AddPatientComponent } from "../../components/add-patient/add-patient.component";
 
 @Component({
   selector: 'app-patient-info',
@@ -33,7 +34,8 @@ import { EditPatientComponent } from "../../components/edit-patient/edit-patient
     MealAssignmentComponent,
     FormsModule,
     PatientDetailsComponent,
-    EditPatientComponent
+    EditPatientComponent,
+    AddPatientComponent
 ],
   templateUrl: './patient-info.component.html',
   styleUrls: ['./patient-info.component.scss']
@@ -67,33 +69,6 @@ export class PatientInfoComponent implements OnInit {
   ngOnInit(): void {
     this.patientId = this.getPatientIdFromRoute() || 1;
     console.log('Patient ID:',this.patientId)
-    
-    // this.cloudTestService.getPatientData().subscribe({
-    //   next: (data) => {
-    //     console.log('Patient data:', data);
-    //   },
-    //   error: (err) => {
-    //     console.error('CloudTestService error:', err);
-    //   }
-    // });
-
-    // this.cloudTestService.getFoodData().subscribe({
-    //   next: (data) => {
-    //     console.log('Food data:', data);
-    //   },
-    //   error: (err) => {
-    //     console.error('CloudTestService error:', err);
-    //   }
-    // });
-
-    // this.cloudTestService.getMealData('1').subscribe({
-    //   next: (data) => {
-    //     console.log('Meal data:', data);
-    //   },
-    //   error: (err) => {
-    //     console.error('CloudTestService error:', err);
-    //   }
-    // });
 
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -115,18 +90,14 @@ export class PatientInfoComponent implements OnInit {
       this.currentView = 'printRecord';
 
     } else if (/\/patient-info\/view\/\d+$/.test(path)) {
-      // Matches patient-info/view/:id format
       this.currentView = 'patientRecord';
-      // Extract patient ID from view URL
       const viewMatch = path.match(/\/patient-info\/view\/(\d+)$/);
       if (viewMatch) {
         this.patientId = parseInt(viewMatch[1], 10);
       }
 
     } else if (/\/patient-info\/edit\/\d+$/.test(path)) {
-      // Matches patient-info/edit/:id format
       this.currentView = 'editRecord';
-      // Extract patient ID from edit URL
       const editMatch = path.match(/\/patient-info\/edit\/(\d+)$/);
       if (editMatch) {
         this.patientId = parseInt(editMatch[1], 10);
@@ -142,19 +113,16 @@ export class PatientInfoComponent implements OnInit {
   getPatientIdFromRoute(): number | null {
     const url = this.router.url;
     
-    // Try view format first
     let match = url.match(/\/patient-info\/view\/(\d+)/);
     if (match) {
       return parseInt(match[1], 10);
     }
     
-    // Try edit format
     match = url.match(/\/patient-info\/edit\/(\d+)/);
     if (match) {
       return parseInt(match[1], 10);
     }
-    
-    // Try legacy format
+  
     match = url.match(/\/patient-info\/(\d+)/);
     if (match) {
       return parseInt(match[1], 10);
@@ -192,7 +160,6 @@ export class PatientInfoComponent implements OnInit {
     this.router.navigate(['/patient-info/edit' + this.patientId]);
   }
 
-  // Called by MenuBar to toggle main content dimming
   onMobileMenuToggle(isOpen: boolean) {
     this.isMobileMenuOpen = isOpen;
   }

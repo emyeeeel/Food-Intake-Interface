@@ -23,7 +23,7 @@ export class AddMealComponent implements OnInit {
   meal: Partial<Meal> = {
     meal_name: '',
     meal_time: '',
-    day_cycle: '',
+    day_cycle: undefined, // Changed from empty string to undefined
     meal_description: '',
     plate_type: '',
     ingredients: [] as number[]
@@ -170,35 +170,35 @@ export class AddMealComponent implements OnInit {
 
   // Generate ingredients using MealsService
   private generateIngredientsFromMeal(mealName: string): Promise<any> {
-  return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
 
-    const formData = new FormData();
+      const formData = new FormData();
 
-    formData.append('meal_name', mealName);
-    formData.append('meal', mealName);
+      formData.append('meal_name', mealName);
+      formData.append('meal', mealName);
 
-    if (this.meal.meal_time) {
-      formData.append('meal_time', this.meal.meal_time);
-    }
+      if (this.meal.meal_time) {
+        formData.append('meal_time', this.meal.meal_time);
+      }
 
-    if (this.meal.day_cycle) {
-      formData.append('day_cycle', this.meal.day_cycle);
-    }
+      if (this.meal.day_cycle) {
+        formData.append('day_cycle', String(this.meal.day_cycle)); // Convert number to string for FormData
+      }
 
-    if (this.meal.plate_type) {
-      formData.append('plate_type', this.meal.plate_type);
-    }
+      if (this.meal.plate_type) {
+        formData.append('plate_type', this.meal.plate_type);
+      }
 
-    if (this.mealImage) {
-      formData.append('image', this.mealImage, this.mealImage.name);
-    }
+      if (this.mealImage) {
+        formData.append('image', this.mealImage, this.mealImage.name);
+      }
 
-    this.mealsService.generateIngredientsFromMeal(formData).subscribe({
-      next: resolve,
-      error: reject
+      this.mealsService.generateIngredientsFromMeal(formData).subscribe({
+        next: resolve,
+        error: reject
+      });
     });
-  });
-}
+  }
 
 
 private buildMealFormData(): FormData {
@@ -207,7 +207,7 @@ private buildMealFormData(): FormData {
   formData.append('meal_name', this.meal.meal_name!);
   formData.append('meal_description', this.meal.meal_description!);
   formData.append('meal_time', this.meal.meal_time!);
-  formData.append('day_cycle', this.meal.day_cycle!);
+  formData.append('day_cycle', String(this.meal.day_cycle!)); // Convert number to string for FormData
   formData.append('plate_type', this.meal.plate_type!);
 
   console.log('Ingredients List: ', this.generatedIngredients)
@@ -276,7 +276,7 @@ private buildMealFormData(): FormData {
     this.meal = {
       meal_name: '',
       meal_time: '',
-      day_cycle: '',
+      day_cycle: undefined, // Changed from empty string to undefined
       meal_description: '',
       plate_type: '',
       ingredients: []
@@ -348,7 +348,7 @@ private buildMealFormData(): FormData {
     this.meal = {
       meal_name: '',
       meal_time: '',
-      day_cycle: '',
+      day_cycle: undefined, // Changed from empty string to undefined
       plate_type: '',
       image: '',
       ingredients: []

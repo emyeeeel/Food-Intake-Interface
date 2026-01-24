@@ -265,22 +265,25 @@ app-show-meal{
     flex-direction: column;
     gap: 15px;
     width: 100%;
-  
-    /* MOBILE – full width stacked */
-    > app-meal-item {
-      flex: 1 1 100%;
-      min-width: 0; 
+
+    > * {
+      flex: 1 1 0;
+      min-width: 0;
     }
-  
-    /* TABLET – two items side-by-side evenly */
+
     @media (min-width: 481px) {
       flex-direction: row;
-      flex-wrap: wrap;
       gap: 15px;
-  
-      > app-meal-item {
-        flex: 1 1 calc(50% - 15px);
-        min-width: 0;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 1025px) {
+      gap: 20px;
+      flex-wrap: nowrap;
+
+      > * {
+        /* Optional: clamp log card height similar to homepage row-4 */
+        height: clamp(150px, 20vh, 220px);
       }
     }
   
