@@ -20,6 +20,22 @@
           <span>載入中...</span>
         }
       </button>
+      <button
+        type="button"
+        class="btn-download-excel"
+        (click)="downloadMealCycleAsExcel()"
+        [disabled]="isLoading || meals.length === 0"
+        title="下載餐點週期 Excel 檔案"
+      >
+        @if (!isDownloading) {
+          <span class="download-icon">📊</span>
+          <span>下載 Excel</span>
+        }
+        @if (isDownloading) {
+          <span class="download-spinner"></span>
+          <span>準備中...</span>
+        }
+      </button>
     </div>
   </div>
 

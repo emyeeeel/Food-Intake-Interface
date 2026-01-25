@@ -53,8 +53,12 @@ export class MealsService {
     return this.http.put<Meal>(`${this.apiUrl}${id}/`, data);
   }
 
-  updateMealCycle(){
-    const url = `${this.baseUrl}/api/add_meal_cycle/`;
-    // api/add_meal_cycle/
+  updateMealCycle(excelFile: File): Observable<any> {
+    const url = `${this.baseUrl}/api/add_ltc_meal_cycle/`;
+    
+    const formData = new FormData();
+    formData.append('excel_file', excelFile, excelFile.name);
+    
+    return this.http.post<any>(url, formData);
   }
 }

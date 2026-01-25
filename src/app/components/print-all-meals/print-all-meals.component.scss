@@ -257,10 +257,10 @@
         z-index: 10;
 
         th {
-          padding: 8px 6px;
+          padding: 6px 4px; // Reduced from 8px 6px
           text-align: left;
           font-weight: 700;
-          font-size: 10px;
+          font-size: 9px; // Reduced from 10px
           white-space: nowrap;
 
           &:first-child { 
@@ -297,18 +297,19 @@
         }
 
         td {
-          padding: 8px 6px;
+          padding: 6px 4px; // Reduced from 8px 6px
           color: #01262E;
-          font-size: 10px;
+          font-size: 9px; // Reduced from 10px
           vertical-align: middle;
+          line-height: 1.2; // Added for tighter spacing
 
           &.meal-checkbox {
             text-align: center;
-            padding: 8px 4px;
+            padding: 6px 3px; // Reduced from 8px 4px
 
             input[type="checkbox"] {
-              width: 12px;
-              height: 12px;
+              width: 10px; // Reduced from 12px
+              height: 10px; // Reduced from 12px
               accent-color: #40C1AC;
               margin: 0;
             }
@@ -317,19 +318,19 @@
           &.meal-name {
             font-weight: 600;
             color: #00313C;
-            font-size: 11px;
+            font-size: 10px; // Reduced from 11px
           }
 
           &.meal-time {
             font-weight: 500;
             color: #01262E;
-            font-size: 10px;
+            font-size: 9px; // Same as base
           }
     
           &.day-cycle {
             font-weight: 600;
             color: #40C1AC;
-            font-size: 10px;
+            font-size: 9px; // Same as base
             text-align: center;
           }
         }
@@ -669,8 +670,8 @@
 
       .meals-table {
         thead th {
-          padding: 10px 8px;
-          font-size: 11px;
+          padding: 7px 5px; // Reduced from 10px 8px
+          font-size: 10px; // Reduced from 11px
 
           &:first-child { width: 6%; }
           &:nth-child(2) { width: 44%; }
@@ -679,20 +680,21 @@
         }
 
         tbody td {
-          padding: 10px 8px;
-          font-size: 11px;
+          padding: 7px 5px; // Reduced from 10px 8px
+          font-size: 10px; // Reduced from 11px
+          line-height: 1.2;
 
           &.meal-checkbox {
-            padding: 10px 6px;
+            padding: 7px 4px; // Reduced from 10px 6px
 
             input[type="checkbox"] {
-              width: 14px;
-              height: 14px;
+              width: 12px; // Reduced from 14px
+              height: 12px; // Reduced from 14px
             }
           }
 
           &.meal-name {
-            font-size: 12px;
+            font-size: 11px; // Reduced from 12px
           }
         }
       }
@@ -861,8 +863,8 @@
 
       .meals-table {
         thead th {
-          padding: 12px 10px;
-          font-size: 12px;
+          padding: 8px 6px; // Reduced from 12px 10px
+          font-size: 11px; // Reduced from 12px
 
           &:first-child { width: 5%; }
           &:nth-child(2) { width: 40%; }
@@ -871,24 +873,25 @@
         }
 
         tbody td {
-          padding: 12px 10px;
-          font-size: 12px;
+          padding: 8px 6px; // Reduced from 12px 10px
+          font-size: 11px; // Reduced from 12px
+          line-height: 1.2;
 
           &.meal-checkbox {
-            padding: 12px 8px;
+            padding: 8px 5px; // Reduced from 12px 8px
 
             input[type="checkbox"] {
-              width: 16px;
-              height: 16px;
+              width: 14px; // Reduced from 16px
+              height: 14px; // Reduced from 16px
             }
           }
 
           &.meal-name {
-            font-size: 13px;
+            font-size: 12px; // Reduced from 13px
           }
 
           &.meal-time, &.day-cycle {
-            font-size: 12px;
+            font-size: 11px; // Same as base
           }
         }
       }
@@ -1016,29 +1019,29 @@
     .meals-table-container {
       .meals-table {
         thead th {
-          padding: 15px 12px;
-          font-size: 14px;
+          padding: 12px 10px; // Restore larger padding for big screens
+          font-size: 13px; // Slightly reduced from 14px
         }
 
         tbody td {
-          padding: 15px 12px;
-          font-size: 13px;
+          padding: 12px 10px; // Restore larger padding for big screens
+          font-size: 12px; // Reduced from 13px
 
           &.meal-checkbox {
-            padding: 15px 10px;
+            padding: 12px 8px; // Restore larger padding
 
             input[type="checkbox"] {
-              width: 18px;
-              height: 18px;
+              width: 16px; // Reduced from 18px
+              height: 16px; // Reduced from 16px
             }
           }
 
           &.meal-name {
-            font-size: 14px;
+            font-size: 13px; // Reduced from 14px
           }
 
           &.meal-time, &.day-cycle {
-            font-size: 13px;
+            font-size: 12px; // Reduced from 13px
           }
         }
       }

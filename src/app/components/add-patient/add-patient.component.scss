@@ -1,0 +1,18 @@
+.patient-form-container{
+  border: 1px solid red;
+  width: 100%;
+  font-family: 'Quicksand', sans-serif;
+
+  .form-header{
+    border: 1px solid blue;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.form-content{
+  display: flex;
+  flex-direction: row;
+}

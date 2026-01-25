@@ -3,8 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MealsService } from '../../services/meals.service';
+import { DateService } from '../../services/date.service'; // Add DateService import
 import { Meal } from '../../models/meal.model';
-import { MealItemComponent } from '../meal-item/meal-item.component'; // Import meal-item component
+import { MealItemComponent } from '../meal-item/meal-item.component'; 
+import { environment } from '../../../environments/environment';
+
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-display-meal',
@@ -17,7 +22,8 @@ export class DisplayMealComponent implements OnInit {
   paginatedMeals: Meal[] = [];
   isLoading = false;
   error: string | null = null;
-  
+  isDownloading: boolean = false; // Add this property
+
   // Pagination properties - Default to 4 items per page
   currentPage = 1;
   pageSize = 2;
@@ -25,7 +31,10 @@ export class DisplayMealComponent implements OnInit {
   totalPages = 0;
   targetPage: number | null = null;
 
-  constructor(private mealsService: MealsService) {}
+  constructor(
+    private mealsService: MealsService,
+    private dateService: DateService // Add DateService to constructor
+  ) {}
 
   ngOnInit(): void {
     this.getMeals();
@@ -260,5 +269,172 @@ export class DisplayMealComponent implements OnInit {
 
   trackByMealId(index: number, meal: Meal): number {
     return meal.id;
+  }
+
+  downloadMealCycleAsExcel(): void {
+    console.log('Downloading meal cycle as Excel...');
+    
+    if (this.meals.length === 0) {
+      alert('No meals available to export');
+      return;
+    }
+
+    this.isDownloading = true;
+
+    try {
+      // Use the grouped format with day cycle
+      const excelData = this.prepareExcelDataFromArray2(this.meals);
+      
+      // Create workbook and worksheet
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      
+      // Set column widths for better formatting - Updated for 4 columns
+      const columnWidths = [
+        { wch: 12 },  // 日期 (Date)
+        { wch: 10 },  // 日週期 (Day Cycle)
+        { wch: 15 },  // 用餐時間 (Meal Time)
+        { wch: 60 },  // 菜色名稱 (Meals - wider for multiple meal names)
+      ];
+      worksheet['!cols'] = columnWidths;
+      
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Meal Cycle Menu');
+      
+      // Generate filename using environment and DateService
+      const today = this.dateService.getTodayDate();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      const dateString = `${year}${month}${day}`;
+      const filename = `${environment.careCenterName}-循環選單-${dateString}.xlsx`;
+      
+      // Save the file
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([excelBuffer], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+      
+      saveAs(blob, filename);
+      
+      console.log(`Meal cycle Excel file exported successfully: ${filename}`);
+      
+    } catch (error) {
+      console.error('Error exporting meal cycle to Excel:', error);
+      alert('Failed to export Excel file. Please try again.');
+    } finally {
+      this.isDownloading = false;
+    }
+  }
+
+  private prepareExcelDataFromArray2(mealsArray: any[]): any[] {
+    // Create a map to group meals by day cycle and meal time
+    const groupedMeals = new Map<number, Map<string, any[]>>();
+
+    // Group meals by day cycle and meal time
+    mealsArray.forEach(meal => {
+      const dayCycle = meal.day_cycle;
+      const mealTime = meal.meal_time || 'Unknown';
+
+      // Skip meals with invalid day cycles
+      if (!dayCycle || dayCycle < 1) return;
+
+      // Create day cycle group if it doesn't exist
+      if (!groupedMeals.has(dayCycle)) {
+        groupedMeals.set(dayCycle, new Map<string, any[]>());
+      }
+
+      const dayCycleGroup = groupedMeals.get(dayCycle)!;
+
+      // Create meal time group if it doesn't exist
+      if (!dayCycleGroup.has(mealTime)) {
+        dayCycleGroup.set(mealTime, []);
+      }
+
+      // Add meal to the appropriate group
+      dayCycleGroup.get(mealTime)!.push(meal);
+    });
+
+    // Convert grouped data to Excel format
+    const excelData: any[] = [];
+
+    // Sort day cycles in ascending order (1, 2, 3, ..., 14)
+    const sortedDayCycles = Array.from(groupedMeals.keys()).sort((a, b) => a - b);
+
+    sortedDayCycles.forEach(dayCycle => {
+      const dayCycleGroup = groupedMeals.get(dayCycle)!;
+      
+      // Define meal time order for consistent display
+      const mealTimeOrder = ['早餐', '午餐', '晚餐', '點心'];
+      
+      // Get all meal times for this day cycle and sort them
+      const sortedMealTimes = Array.from(dayCycleGroup.keys()).sort((a, b) => {
+        const indexA = mealTimeOrder.indexOf(a);
+        const indexB = mealTimeOrder.indexOf(b);
+        
+        // If both are in the order array, sort by their position
+        if (indexA !== -1 && indexB !== -1) {
+          return indexA - indexB;
+        }
+        // If one is not in the order array, put it at the end
+        if (indexA === -1 && indexB !== -1) return 1;
+        if (indexA !== -1 && indexB === -1) return -1;
+        // If neither is in the order array, sort alphabetically
+        return a.localeCompare(b);
+      });
+
+      sortedMealTimes.forEach(mealTime => {
+        const meals = dayCycleGroup.get(mealTime)!;
+        
+        // Create meal names string
+        const mealNames = meals
+          .map(meal => meal.meal_name || 'Unknown Meal')
+          .join(', ');
+
+        // Calculate date for this day cycle
+        const dateString = this.calculateDateFromDayCycle(dayCycle);
+        const formattedDate = this.formatDateForDisplay(dateString);
+
+        // Add row with 4 columns: 日期, 日週期, 用餐時間, 菜色名稱
+        excelData.push({
+          '日期': formattedDate,
+          '日週期': dayCycle, // Add day cycle column (1-14)
+          '用餐時間': mealTime,
+          '菜色名稱': mealNames,
+        });
+      });
+    });
+
+    return excelData;
+  }
+
+  private calculateDateFromDayCycle(dayCycle: number | null): string {
+    if (!dayCycle || dayCycle < 1) {
+      return 'N/A';
+    }
+
+    try {
+      // Use DateService to get the date for the cycle day
+      const date = this.dateService.getDateForCycleDay(dayCycle);
+      
+      // Format as YYYYMMDD
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      
+      return `${year}${month}${day}`;
+    } catch (error) {
+      console.error('Error calculating date from day cycle:', error);
+      return 'N/A';
+    }
+  }
+
+  private formatDateForDisplay(dateString: string): string {
+    if (dateString === 'N/A' || dateString.length !== 8) {
+      return dateString;
+    }
+
+    // Return as-is since calculateDateFromDayCycle already provides YYYYMMDD format
+    return dateString;
   }
 }

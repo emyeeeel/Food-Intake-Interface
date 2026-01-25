@@ -9,9 +9,6 @@
         <button class="btn-print-selected" (click)="printSelectedMeals()" [disabled]="selectedMeals.size === 0">
           Print Selected ({{ selectedMeals.size }})
         </button>
-        <button class="btn-print-current" (click)="downloadGroupedMealsAsExcel()" [disabled]="meals.length === 0">
-          Download as Excel
-        </button>
         <button class="btn-clear-selection" (click)="clearSelection()" [disabled]="selectedMeals.size === 0">
           Clear Selection
         </button>

@@ -158,20 +158,18 @@
           </ul>
         </div>
 
+        <!-- File Upload Area -->
         <div class="file-upload-area">
-          <input 
-            type="file" 
-            #fileInput 
-            accept=".xlsx,.xls" 
-            (change)="onFileSelected($event)"
-            style="display: none;">
-          
           <div class="upload-dropzone" 
-               (click)="fileInput.click()"
+               [class.drag-active]="isDragActive"
                (dragover)="onDragOver($event)"
                (dragleave)="onDragLeave($event)"
                (drop)="onFileDrop($event)"
-               [class.drag-active]="isDragActive">
+               (click)="fileInput.click()">
+            <input #fileInput type="file" 
+                   accept=".xlsx,.xls" 
+                   (change)="onFileSelected($event)" 
+                   style="display: none;">
             <div class="upload-content">
               @if (!selectedFile) {
                 <div class="upload-icon">📁</div>
@@ -192,11 +190,12 @@
           </div>
         </div>
 
+        <!-- Upload Actions -->
         <div class="upload-actions">
           <button class="btn-secondary" (click)="downloadTemplate()">
             📥 下載Excel模板
           </button>
-          <button class="btn-primary" 
+          <button class="btn-secondary" 
                   (click)="uploadExcelFile()" 
                   [disabled]="!selectedFile || isUploading">
             @if (isUploading) {
@@ -207,26 +206,6 @@
             }
           </button>
         </div>
-
-        @if (uploadProgress > 0) {
-          <div class="progress-bar">
-            <div class="progress-fill" [style.width.%]="uploadProgress"></div>
-          </div>
-        }
-
-        @if (uploadResult) {
-          <div class="upload-result" [class.success]="uploadResult.success" [class.error]="!uploadResult.success">
-            <h4>{{ uploadResult.success ? '上傳成功' : '上傳失敗' }}</h4>
-            <p>{{ uploadResult.message }}</p>
-            @if (uploadResult.details) {
-              <ul>
-                @for (detail of uploadResult.details; track detail) {
-                  <li>{{ detail }}</li>
-                }
-              </ul>
-            }
-          </div>
-        }
       </div>
     </div>
   }

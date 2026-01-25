@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Meal } from '../../models/meal.model';
 import { Ingredient } from '../../models/ingredient.model';
 
@@ -7,11 +7,13 @@ import { MealsService } from '../../services/meals.service';
 import { TagsComponent } from "../tags/tags.component";
 import { IngredientsService } from '../../services/ingredients.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { DateService } from '../../services/date.service';
 
 
 @Component({
   selector: 'app-add-meal',
-  imports: [FormsModule, TagsComponent],
+  imports: [FormsModule, TagsComponent, CommonModule],
   templateUrl: './add-meal.component.html',
   styleUrl: './add-meal.component.scss'
 })
@@ -57,7 +59,13 @@ export class AddMealComponent implements OnInit {
 ];
 
 
-  constructor(private mealsService: MealsService, private ingredientsService: IngredientsService, private router: Router) {}
+  constructor(
+    private mealsService: MealsService,
+    private ingredientsService: IngredientsService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private dateService: DateService // Add this
+  ) {}
 
   mealImage: File | null = null;
   mealImagePreview: string | null = null;
@@ -429,84 +437,195 @@ private buildMealFormData(): FormData {
   }
 
   downloadTemplate(): void {
-    // Create a simple Excel template
-    const templateData = [
-      {
-        '餐點名稱': '範例餐點',
-        '用餐時間': '早餐',
-        '日循環': '1',
-        '餐盤類型': '標準',
-        '成分': '米飯, 蔬菜, 蛋白質'
+  // Get today's date and cycle day
+  const today = this.dateService.getTodayDate();
+  const todaysCycleDay = this.dateService.getTodaysCycleDay();
+  
+  // Format today's date as YYYYMMDD
+  const todayFormatted = today.getFullYear() +
+    String(today.getMonth() + 1).padStart(2, '0') +
+    String(today.getDate()).padStart(2, '0');
+
+  console.log(`Today is cycle day ${todaysCycleDay}, formatted date: ${todayFormatted}`);
+
+  // Fetch meals for today's cycle day using MealsService
+  this.mealsService.getMeals().subscribe({
+    next: (allMeals: Meal[]) => {
+      // Filter meals for today's cycle day
+      const todayMeals = allMeals.filter(meal => meal.day_cycle === todaysCycleDay);
+      
+      console.log('Meals for today:', todayMeals);
+
+      let templateData: any[] = [];
+
+      if (todayMeals.length > 0) {
+        // Group meals by meal_time and combine meal names
+        const mealGroups = todayMeals.reduce((groups: any, meal) => {
+          const mealTime = meal.meal_time || '午餐';
+          if (!groups[mealTime]) {
+            groups[mealTime] = [];
+          }
+          groups[mealTime].push(meal.meal_name || '');
+          return groups;
+        }, {});
+
+        // Create template data with 4 columns including day cycle
+        templateData = Object.keys(mealGroups).map(mealTime => ({
+          '日期': todayFormatted,
+          '日週期': todaysCycleDay, // Add day cycle column
+          '用餐時間': mealTime,
+          '菜色名稱': mealGroups[mealTime].filter((name: string) => name.trim()).join(', ')
+        }));
+      } else {
+        // Fallback template if no meals found for today - Updated with 4 columns
+        templateData = [
+          {
+            '日期': todayFormatted,
+            '日週期': todaysCycleDay, // Add day cycle column
+            '用餐時間': '午餐',
+            '菜色名稱': '請填入午餐菜色名稱'
+          },
+          {
+            '日期': todayFormatted,
+            '日週期': todaysCycleDay, // Add day cycle column
+            '用餐時間': '晚餐',
+            '菜色名稱': '請填入晚餐菜色名稱'
+          }
+        ];
+        
+        console.log('No meals found for today, using fallback template');
       }
-    ];
 
-    // Create workbook and download
-    import('xlsx').then(XLSX => {
-      const workbook = XLSX.utils.book_new();
-      const worksheet = XLSX.utils.json_to_sheet(templateData);
-      XLSX.utils.book_append_sheet(workbook, worksheet, '餐點模板');
-      
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([excelBuffer], { 
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      // Create workbook and download - Updated column widths for 4 columns
+      import('xlsx').then(XLSX => {
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.json_to_sheet(templateData);
+        
+        // Set column widths for better formatting - Updated for 4 columns
+        const columnWidths = [
+          { wch: 12 },  // 日期 (Date)
+          { wch: 10 },  // 日週期 (Day Cycle)
+          { wch: 15 },  // 用餐時間 (Meal Time)
+          { wch: 60 }   // 菜色名稱 (Meal Names - wider for multiple dishes)
+        ];
+        worksheet['!cols'] = columnWidths;
+        
+        XLSX.utils.book_append_sheet(workbook, worksheet, `第${todaysCycleDay}天餐點模板`);
+        
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { 
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+        });
+        
+        import('file-saver').then(fileSaver => {
+          fileSaver.saveAs(blob, `膳食週期模板-${todayFormatted}.xlsx`); // Meal Cycle Template
+        });
       });
+    },
+    error: (error) => {
+      console.error('Error fetching meals:', error);
       
-      import('file-saver').then(fileSaver => {
-        fileSaver.saveAs(blob, 'meal-template.xlsx');
-      });
-    });
-  }
+      // Create fallback template on error - Updated with 4 columns
+      const fallbackData = [
+        {
+          '日期': todayFormatted,
+          '日週期': todaysCycleDay, // Add day cycle column
+          '用餐時間': '午餐',
+          '菜色名稱': '請填入午餐菜色名稱'
+        },
+        {
+          '日期': todayFormatted,
+          '日週期': todaysCycleDay, // Add day cycle column
+          '用餐時間': '晚餐',
+          '菜色名稱': '請填入晚餐菜色名稱'
+        }
+      ];
 
-  async uploadExcelFile(): Promise<void> {
+      // Create workbook and download with fallback data - Updated column widths
+      import('xlsx').then(XLSX => {
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.json_to_sheet(fallbackData);
+        
+        // Updated column widths for 4 columns
+        const columnWidths = [
+          { wch: 12 },  // 日期
+          { wch: 10 },  // 日週期  
+          { wch: 15 },  // 用餐時間
+          { wch: 60 }   // 菜色名稱
+        ];
+        worksheet['!cols'] = columnWidths;
+        
+        XLSX.utils.book_append_sheet(workbook, worksheet, `第${todaysCycleDay}天餐點模板`);
+        
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { 
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+        });
+        
+        import('file-saver').then(fileSaver => {
+          fileSaver.saveAs(blob, `膳食週期模板-${todayFormatted}.xlsx`);
+        });
+      });
+    }
+  });
+}
+
+  uploadExcelFile(): void {
     if (!this.selectedFile) return;
 
+    // Initialize upload state
     this.isUploading = true;
-    this.uploadProgress = 0;
+    console.log('Starting upload...');
 
-    try {
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        this.uploadProgress += 10;
-        if (this.uploadProgress >= 90) {
-          clearInterval(progressInterval);
+    // Use MealsService updateMealCycle() to post the Excel file
+    this.mealsService.updateMealCycle(this.selectedFile).subscribe({
+      next: (response) => {
+        console.log('Upload successful:', response);
+        
+        this.isUploading = false;
+
+        // Show success alert
+        let successMessage = '檔案上傳成功！\n\n';
+        successMessage += '餐點週期已更新\n';
+        
+        if (response.created_count) {
+          successMessage += `新增了 ${response.created_count} 個餐點\n`;
         }
-      }, 200);
+        if (response.updated_count) {
+          successMessage += `更新了 ${response.updated_count} 個餐點\n`;
+        }
+        if (response.skipped_count) {
+          successMessage += `跳過了 ${response.skipped_count} 個餐點\n`;
+        }
+        
+        const totalProcessed = (response.updated_count || 0) + (response.created_count || 0);
+        successMessage += `\n總共處理了 ${totalProcessed} 筆記錄`;
+        
+        alert(successMessage);
 
-      // Read and process Excel file
-      const fileData = await this.readExcelFile(this.selectedFile);
-      
-      // Here you would typically send the data to your backend
-      // For now, we'll simulate the upload
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      clearInterval(progressInterval);
-      this.uploadProgress = 100;
-
-      this.uploadResult = {
-        success: true,
-        message: '檔案上傳成功！',
-        details: [
-          `處理了 ${fileData.length} 筆餐點記錄`,
-          '所有記錄已成功導入系統'
-        ]
-      };
-
-      // Reset after success
-      setTimeout(() => {
-        this.selectedFile = null;
-        this.uploadProgress = 0;
-      }, 3000);
-
-    } catch (error) {
-      console.error('Upload error:', error);
-      this.uploadResult = {
-        success: false,
-        message: '檔案上傳失敗',
-        details: ['請檢查檔案格式是否正確', '確保所有必填欄位都已填寫']
-      };
-    } finally {
-      this.isUploading = false;
-    }
+        // Redirect after user closes alert
+        setTimeout(() => {
+          console.log('Redirecting to meal-catalog...');
+          this.router.navigate(['/meal-catalog']);
+        }, 1000);
+      },
+      error: (error) => {
+        console.error('Upload error:', error);
+        
+        this.isUploading = false;
+        
+        // Show error alert
+        let errorMessage = '檔案上傳失敗！\n\n';
+        
+        if (error.error && error.error.message) {
+          errorMessage += error.error.message;
+        } else {
+          errorMessage += '請檢查檔案格式是否正確\n確保所有必填欄位都已填寫';
+        }
+        
+        alert(errorMessage);
+      }
+    });
   }
 
   private async readExcelFile(file: File): Promise<any[]> {
