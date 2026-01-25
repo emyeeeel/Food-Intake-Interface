@@ -234,6 +234,137 @@ fieldset {
       text-align: center;
       padding: 4px;
     }
+
+    .meal-assignments-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+
+      h2 {
+        margin: 0;
+      }
+
+      .btn-add-assignment {
+        background: linear-gradient(135deg, #40C1AC, #2FA695);
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, #2FA695, #258B7A);
+          transform: translateY(-1px);
+        }
+
+        &:disabled {
+          background: #B8D8D3;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .meal-assignments-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 160px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #B8D8D3 transparent;
+
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #B8D8D3;
+        border-radius: 2px;
+      }
+    }
+
+    .meal-assignment-item {
+      background: rgba(248, 255, 254, 0.8);
+      border: 1px solid #E0F7F4;
+      border-radius: 6px;
+      padding: 6px;
+      
+      .assignment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+        padding-bottom: 4px;
+        border-bottom: 1px dashed #B8D8D3;
+
+        .assignment-label {
+          font-size: 10px;
+          font-weight: 600;
+          color: #2FA695;
+        }
+
+        .btn-remove-assignment {
+          background: rgba(231, 76, 60, 0.1);
+          color: #e74c3c;
+          border: 1px solid rgba(231, 76, 60, 0.3);
+          padding: 2px 6px;
+          border-radius: 3px;
+          font-size: 9px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover:not(:disabled) {
+            background: rgba(231, 76, 60, 0.2);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+      }
+
+      .form-group {
+        margin-bottom: 4px;
+      }
+    }
+  }
+}
+
+// Mobile responsiveness for multiple assignments
+@media screen and (max-width: 767px) {
+  .meal-assignments {
+    .meal-assignments-header {
+      flex-direction: column;
+      gap: 6px;
+      align-items: stretch;
+
+      .btn-add-assignment {
+        padding: 8px;
+        font-size: 12px;
+      }
+    }
+
+    .meal-assignments-list {
+      max-height: 200px;
+    }
+
+    .meal-assignment-item {
+      .assignment-header {
+        .assignment-label {
+          font-size: 12px;
+        }
+
+        .btn-remove-assignment {
+          padding: 4px 8px;
+          font-size: 10px;
+        }
+      }
+    }
   }
 }
 

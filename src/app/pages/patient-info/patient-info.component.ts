@@ -18,6 +18,8 @@ import { PatientDetailsComponent } from '../../components/patient-details/patien
 import { CloudTestService } from '../../services/cloud-test.service';
 import { EditPatientComponent } from "../../components/edit-patient/edit-patient.component";
 import { AddPatientComponent } from "../../components/add-patient/add-patient.component";
+import { WaterIntakeComponent } from "../../components/water-intake/water-intake.component";
+import { ProteinIntakeComponent } from "../../components/protein-intake/protein-intake.component";
 
 @Component({
   selector: 'app-patient-info',
@@ -35,7 +37,9 @@ import { AddPatientComponent } from "../../components/add-patient/add-patient.co
     FormsModule,
     PatientDetailsComponent,
     EditPatientComponent,
-    AddPatientComponent
+    AddPatientComponent,
+    WaterIntakeComponent,
+    ProteinIntakeComponent
 ],
   templateUrl: './patient-info.component.html',
   styleUrls: ['./patient-info.component.scss']

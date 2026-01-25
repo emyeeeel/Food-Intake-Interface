@@ -3,25 +3,43 @@ import { CommonModule } from '@angular/common';
 import { MealsService } from '../../services/meals.service';
 import { PatientService } from '../../services/patient.service';
 import { Meal } from '../../models/meal.model';
+import { FormsModule } from '@angular/forms';
 
-interface SelectedMeal {
-  mealType: string;
-  meal: Meal;
+export interface MealAssignment {
+  id: string;
+  dayId: string;
+  lunchMeals: any[];
+  dinnerMeals: any[];
+  selectedLunchMeals: number[];
+  selectedDinnerMeals: number[];
 }
 
 @Component({
   selector: 'app-add-patient',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './add-patient.component.html',
   styleUrl: './add-patient.component.scss',
 })
 export class AddPatientComponent implements OnInit {
   
-  selectedDay: number | null = null;
+  mealAssignments: MealAssignment[] = [];
+  availableDays = [
+    { value: '1', label: 'Day 1' },
+    { value: '2', label: 'Day 2' },
+    { value: '3', label: 'Day 3' },
+    { value: '4', label: 'Day 4' },
+    { value: '5', label: 'Day 5' },
+    { value: '6', label: 'Day 6' },
+    { value: '7', label: 'Day 7' },
+    { value: '8', label: 'Day 8' },
+    { value: '9', label: 'Day 9' },
+    { value: '10', label: 'Day 10' },
+    { value: '11', label: 'Day 11' },
+    { value: '12', label: 'Day 12' },
+    { value: '13', label: 'Day 13' },
+    { value: '14', label: 'Day 14' }
+  ];
   allMeals: Meal[] = [];
-  lunchMeals: Meal[] = [];
-  dinnerMeals: Meal[] = [];
-  selectedMeals: SelectedMeal[] = [];
 
   constructor(
     private mealsService: MealsService,
@@ -31,6 +49,8 @@ export class AddPatientComponent implements OnInit {
   ngOnInit(): void {
     // Load all meals on component initialization
     this.loadMeals();
+    // Initialize with one assignment
+    this.addMealAssignment();
   }
 
   private loadMeals(): void {
@@ -45,96 +65,84 @@ export class AddPatientComponent implements OnInit {
     });
   }
 
-  // Handle day selection change
-  onDayChange(event: any): void {
-    const selectedDayValue = event.target.value;
-    this.selectedDay = selectedDayValue ? parseInt(selectedDayValue) : null;
+  addMealAssignment(): void {
+    const newAssignment: MealAssignment = {
+      id: this.generateId(),
+      dayId: '',
+      lunchMeals: [],
+      dinnerMeals: [],
+      selectedLunchMeals: [],
+      selectedDinnerMeals: []
+    };
     
-    if (this.selectedDay) {
-      console.log('Selected day:', this.selectedDay);
-      this.populateMealsForDay(this.selectedDay);
-    } else {
-      this.clearMeals();
+    this.mealAssignments.push(newAssignment);
+  }
+
+  removeMealAssignment(index: number): void {
+    if (this.mealAssignments.length > 1) {
+      this.mealAssignments.splice(index, 1);
     }
   }
 
-  // Populate meals for the selected day
-  private populateMealsForDay(dayNumber: number): void {
-    // Filter meals for the selected day and lunch time
-    this.lunchMeals = this.allMeals.filter(meal => 
-      meal.day_cycle === dayNumber && meal.meal_time === '午餐'
+  onDayChange(event: any, assignmentIndex: number): void {
+    const dayId = event.target.value;
+    const assignment = this.mealAssignments[assignmentIndex];
+    
+    assignment.dayId = dayId;
+    assignment.selectedLunchMeals = [];
+    assignment.selectedDinnerMeals = [];
+    
+    // Load meals for this day
+    this.loadMealsForDay(dayId, assignmentIndex);
+  }
+
+  onMealSelection(mealType: 'lunch' | 'dinner', meal: any, event: any, assignmentIndex: number): void {
+    const assignment = this.mealAssignments[assignmentIndex];
+    const mealId = meal.id;
+    
+    if (mealType === 'lunch') {
+      if (event.target.checked) {
+        assignment.selectedLunchMeals.push(mealId);
+      } else {
+        assignment.selectedLunchMeals = assignment.selectedLunchMeals.filter(id => id !== mealId);
+      }
+    } else {
+      if (event.target.checked) {
+        assignment.selectedDinnerMeals.push(mealId);
+      } else {
+        assignment.selectedDinnerMeals = assignment.selectedDinnerMeals.filter(id => id !== mealId);
+      }
+    }
+  }
+
+  trackByAssignment(index: number, assignment: MealAssignment): string {
+    return assignment.id;
+  }
+
+  private generateId(): string {
+    return Date.now().toString() + Math.random().toString(36).substr(2, 9);
+  }
+
+  private loadMealsForDay(dayId: string, assignmentIndex: number): void {
+    const assignment = this.mealAssignments[assignmentIndex];
+    assignment.lunchMeals = this.allMeals.filter(meal => 
+      meal.day_cycle.toString() === dayId && meal.meal_time === '午餐'
+    );
+    assignment.dinnerMeals = this.allMeals.filter(meal => 
+      meal.day_cycle.toString() === dayId && meal.meal_time === '晚餐'
     );
 
-    // Filter meals for the selected day and dinner time
-    this.dinnerMeals = this.allMeals.filter(meal => 
-      meal.day_cycle === dayNumber && meal.meal_time === '晚餐'
-    );
-
-    console.log(`Lunch meals for day ${dayNumber}:`, this.lunchMeals);
-    console.log(`Dinner meals for day ${dayNumber}:`, this.dinnerMeals);
-
-    // Clear previously selected meals when changing day
-    this.selectedMeals = [];
+    console.log(`Lunch meals for day ${dayId}:`, assignment.lunchMeals);
+    console.log(`Dinner meals for day ${dayId}:`, assignment.dinnerMeals);
   }
 
-  // Handle meal selection
-  onMealSelection(mealType: string, meal: Meal, event: any): void {
-    if (event.target.checked) {
-      // Add meal to selected meals
-      this.selectedMeals.push({
-        mealType: mealType,
-        meal: meal
-      });
-      console.log(`Added ${mealType} meal:`, meal.meal_name);
-    } else {
-      // Remove meal from selected meals
-      this.selectedMeals = this.selectedMeals.filter(
-        selectedMeal => !(selectedMeal.mealType === mealType && selectedMeal.meal.id === meal.id)
-      );
-      console.log(`Removed ${mealType} meal:`, meal.meal_name);
-    }
-    
-    console.log('Currently selected meals:', this.selectedMeals);
-  }
-
-  // Remove a selected meal
-  removeMeal(mealToRemove: SelectedMeal): void {
-    this.selectedMeals = this.selectedMeals.filter(selectedMeal => selectedMeal !== mealToRemove);
-    
-    // Uncheck the corresponding checkbox
-    const checkboxId = `${mealToRemove.mealType}-${mealToRemove.meal.id}`;
-    const checkbox = document.getElementById(checkboxId) as HTMLInputElement;
-    if (checkbox) {
-      checkbox.checked = false;
-    }
-    
-    console.log('Removed meal:', mealToRemove.meal.meal_name);
-  }
-
-  // Clear meals arrays
-  private clearMeals(): void {
-    this.lunchMeals = [];
-    this.dinnerMeals = [];
-    this.selectedMeals = [];
-  }
-
-  // Clear entire form
-  clearForm(): void {
-    this.selectedDay = null;
-    this.clearMeals();
-    
-    // Reset form elements
-    const form = document.getElementById('patientForm') as HTMLFormElement;
-    if (form) {
-      form.reset();
-    }
-    
-    console.log('Form cleared');
-  }
-
-  // Submit form
   submitForm(): void {
-    console.log('Submitting form with selected meals:', this.selectedMeals);
-    // Add form submission logic here
+    // Add your form submission logic here
+    console.log('Form submitted');
+  }
+
+  clearForm(): void {
+    // Add your form submission logic here
+    console.log('Form Cleared');
   }
 }
