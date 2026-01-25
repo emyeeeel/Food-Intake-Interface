@@ -1,147 +1,191 @@
 <div class="patient-form-container">
-    <div class="form-header">
-      <h2>Add New Patient</h2>
-      <p>Please fill in the patient information below</p>
-    </div>
-  
-    <form class="patient-form" [class.form-loading]="isLoading" [class.form-success]="isSuccess" (ngSubmit)="onSubmit()">
-      <!-- Required Information Section -->
-      <div class="form-content">
-        <div class="form-section">
-            <div class="section-header">
-              <h3>Basic Information</h3>
-              <div class="required-badge">Required</div>
-            </div>
-            
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="roomNumber">
-                  Room Number
-                  <span class="required-asterisk">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  id="roomNumber" 
-                  name="roomNumber" 
-                  [(ngModel)]="patient.roomNumber"
-                  placeholder="e.g. 101, A-204"
-                  required>
-                <div class="field-hint">Enter the patient's room number</div>
-              </div>
-      
-              <div class="form-group">
-                <label for="bedNumber">
-                  Bed Number
-                  <span class="required-asterisk">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  id="bedNumber" 
-                  name="bedNumber" 
-                  [(ngModel)]="patient.bedNumber"
-                  placeholder="e.g. A, B, 1, 2"
-                  required>
-                <div class="field-hint">Enter the bed identifier</div>
-              </div>
-            </div>
-          </div>
-      
-          <!-- Optional Information Section -->
-          <div class="form-section">
-            <div class="section-header">
-              <h3>Additional Details</h3>
-              <div class="optional-badge">Optional</div>
-            </div>
-            
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="age">
-                  Age
-                </label>
-                <input 
-                  type="number" 
-                  id="age" 
-                  name="age" 
-                  [(ngModel)]="patient.age"
-                  placeholder="Enter age in years"
-                  min="0" 
-                  max="150">
-                <div class="field-hint">Age in years</div>
-              </div>
-
-              <div class="form-group">
-                <label for="sex">
-                  Sex
-                </label>
-                <select id="sex" name="sex" [(ngModel)]="patient.sex">
-                  <option value="">Select Sex</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                  <option value="prefer-not-to-say">Prefer not to say</option>
-                </select>
-                <div class="field-hint">Biological sex for medical purposes</div>
-              </div>
-      
-              <div class="form-group">
-                <label for="height">
-                  Height (cm)
-                </label>
-                <input 
-                  type="number" 
-                  id="height" 
-                  name="height" 
-                  [(ngModel)]="patient.height"
-                  placeholder="e.g. 170"
-                  min="50" 
-                  max="250"
-                  step="0.1">
-                <div class="field-hint">Height in centimeters</div>
-              </div>
-      
-              <div class="form-group">
-                <label for="weight">
-                  Weight (kg)
-                </label>
-                <input 
-                  type="number" 
-                  id="weight" 
-                  name="weight" 
-                  [(ngModel)]="patient.weight"
-                  placeholder="e.g. 65.5"
-                  min="1" 
-                  max="500"
-                  step="0.1">
-                <div class="field-hint">Weight in kilograms</div>
-              </div>
-      
-              <div class="form-group">
-                <label for="activityLevel">
-                  Activity Level
-                </label>
-                <select id="activityLevel" name="activityLevel" [(ngModel)]="patient.activityLevel">
-                  <option value="">Select Activity Level</option>
-                  <option value="sedentary">Sedentary (Little to no exercise)</option>
-                  <option value="lightly-active">Lightly Active (Light exercise 1-3 days/week)</option>
-                  <option value="moderately-active">Moderately Active (Moderate exercise 3-5 days/week)</option>
-                  <option value="very-active">Very Active (Hard exercise 6-7 days/week)</option>
-                  <option value="extra-active">Extra Active (Very hard exercise, physical job)</option>
-                </select>
-                <div class="field-hint">Patient's typical physical activity level</div>
-              </div>
-            </div>
-          </div>
-      </div>
-  
-      <!-- Form Actions -->
-      <div class="form-actions">
-        <button type="button" class="btn-secondary" (click)="onReset()" [disabled]="isLoading">
-          Reset Form
-        </button>
-        <button type="submit" class="btn-primary" [disabled]="isLoading || !isFormValid()">
-          <span *ngIf="!isLoading">Add Patient</span>
-          <span *ngIf="isLoading">Adding...</span>
-        </button>
-      </div>
-    </form>
+  <div class="header-info">
+    <h2>Add Patient Information</h2>
   </div>
+  <form class="form-container" id="patientForm">
+    <div class="form-content">
+      
+      <!-- REQUIRED SECTION -->
+      <fieldset class="required">
+        <legend>Required Information</legend>
+
+        <!-- Patient Identifier -->
+        <div class="patient-identifier">
+          <h2>Patient Identifier</h2>
+          <div class="form-group">
+            <label for="roomNumber">Room Number</label>
+            <input type="text" id="roomNumber" name="roomNumber" required />
+          </div>
+
+          <div class="form-group">
+            <label for="bedNumber">Bed Number</label>
+            <input type="text" id="bedNumber" name="bedNumber" required />
+          </div>
+        </div>
+
+        <!-- Meal Assignments -->
+        <div class="meal-assignments">
+          <h2>Patient Meal Assignments</h2>
+          <div class="form-group">
+            <label for="dayCycle">Day Cycle</label>
+            <select id="dayCycle" name="dayCycle" required (change)="onDayChange($event)">
+              <option value="" disabled selected>Select day</option>
+              <!-- 1–14 day cycle -->
+              <option value="1">Day 1</option>
+              <option value="2">Day 2</option>
+              <option value="3">Day 3</option>
+              <option value="4">Day 4</option>
+              <option value="5">Day 5</option>
+              <option value="6">Day 6</option>
+              <option value="7">Day 7</option>
+              <option value="8">Day 8</option>
+              <option value="9">Day 9</option>
+              <option value="10">Day 10</option>
+              <option value="11">Day 11</option>
+              <option value="12">Day 12</option>
+              <option value="13">Day 13</option>
+              <option value="14">Day 14</option>
+            </select>
+          </div>
+
+          <!-- Meals populated dynamically based on selected day -->
+          <div class="form-group meals-container" *ngIf="selectedDay">
+            
+            <!-- Lunch Meals -->
+            <div class="meal-time-section" *ngIf="lunchMeals.length > 0">
+              <h4>Lunch Meals</h4>
+              <div class="meals-grid">
+                <div *ngFor="let meal of lunchMeals" class="meal-option">
+                  <input 
+                    type="checkbox" 
+                    [id]="'lunch-' + meal.id" 
+                    [value]="meal.id"
+                    (change)="onMealSelection('lunch', meal, $event)"
+                  >
+                  <label [for]="'lunch-' + meal.id" class="meal-label">
+                    {{ meal.meal_name }}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dinner Meals -->
+            <div class="meal-time-section" *ngIf="dinnerMeals.length > 0">
+              <h4>Dinner Meals</h4>
+              <div class="meals-grid">
+                <div *ngFor="let meal of dinnerMeals" class="meal-option">
+                  <input 
+                    type="checkbox" 
+                    [id]="'dinner-' + meal.id" 
+                    [value]="meal.id"
+                    (change)="onMealSelection('dinner', meal, $event)"
+                  >
+                  <label [for]="'dinner-' + meal.id" class="meal-label">
+                    {{ meal.meal_name }}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- No meals message -->
+            <div *ngIf="lunchMeals.length === 0 && dinnerMeals.length === 0" class="no-meals">
+              <p>No meals available for Day {{ selectedDay }}</p>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- OPTIONAL SECTION -->
+      <fieldset class="optional">
+        <legend>Optional Information</legend>
+        
+        <!-- Patient Demographics Row 1 -->
+        <div class="form-row">
+          <div class="col-1">
+            <div class="form-group">
+              <label for="age">Age</label>
+              <input 
+                type="number" 
+                id="age" 
+                name="age" 
+                min="0" 
+                max="120"
+                placeholder="Enter age"
+              />
+            </div>
+  
+            <div class="form-group">
+              <label for="sex">Sex</label>
+              <select id="sex" name="sex">
+                <option value="" disabled selected>Select sex</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-2">
+            <div class="form-group">
+              <label for="height">Height (cm)</label>
+              <input 
+                type="number" 
+                id="height" 
+                name="height" 
+                min="50" 
+                max="250"
+                step="0.1"
+                placeholder="Enter height in cm"
+              />
+            </div>
+  
+            <div class="form-group">
+              <label for="weight">Weight (kg)</label>
+              <input 
+                type="number" 
+                id="weight" 
+                name="weight" 
+                min="10" 
+                max="300"
+                step="0.1"
+                placeholder="Enter weight in kg"
+              />
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="form-group">
+              <label for="activityLevel">Activity Level</label>
+              <select id="activityLevel" name="activityLevel">
+                <option value="" disabled selected>Select activity level</option>
+                <option value="inactive">Inactive</option>
+                <option value="low_active">Low Active</option>
+                <option value="active">Active</option>
+                <option value="very_active">Very Active</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Level and Dietary Restrictions -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="dietaryRestrictions">Dietary Restrictions</label>
+            <textarea 
+              id="dietaryRestrictions" 
+              name="dietaryRestrictions" 
+              rows="4"
+              placeholder="Enter any dietary restrictions or special requirements..."
+            ></textarea>
+          </div>
+        </div>
+      </fieldset>
+
+    </div>
+
+    <!-- FORM ACTIONS -->
+    <div class="form-buttons">
+      <button type="reset" class="btn-clear" (click)="clearForm()">Clear All</button>
+      <button type="submit" class="btn-submit" (click)="submitForm()">Submit</button>
+    </div>
+
+  </form>
+</div>

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { Patient } from '../models/patient.model';
 import { environment } from '../../environments/environment';
+import { LTCPatient } from '../models/ltc-patient.model';
 
 @Injectable({
   providedIn: 'root'
@@ -22,5 +23,17 @@ export class PatientService {
     return this.http.get<Patient[]>(this.apiUrl).pipe(
       map(patients => patients.length)
     );
+  }
+
+  getLTCPatients(): Observable<LTCPatient[]> {
+    return this.http.get<LTCPatient[]>(`${this.baseUrl}/api/ltc-patients`);
+  }
+
+  postLTCPatient(ltcPatient: LTCPatient): Observable<LTCPatient> {
+    return this.http.post<LTCPatient>(`${this.baseUrl}/api/ltc-patients`, ltcPatient);
+  }
+
+  getLTCPatient(id: number): Observable<LTCPatient> {
+    return this.http.get<LTCPatient>(`${this.baseUrl}/api/ltc-patients/${id}`);
   }
 }
