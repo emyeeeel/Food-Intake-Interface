@@ -1,1 +1,242 @@
-<p>edit-patient works!</p>
+<div class="patient-form-container">
+    <div class="header-info">
+      <h2>Edit Patient Information</h2>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <p>Loading patient information...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-container">
+      <p class="error-message">{{ error }}</p>
+      <button type="button" class="btn-retry" (click)="loadPatientData()">Retry</button>
+    </div>
+
+    <!-- Form -->
+    <form class="form-container" id="patientForm" *ngIf="!loading && !error">
+      <div class="form-content">
+        
+        <!-- REQUIRED SECTION -->
+        <fieldset class="required">
+          <legend>Required Information</legend>
+  
+          <!-- Patient Identifier -->
+          <div class="patient-identifier">
+            <h2>Patient Identifier</h2>
+            <div class="form-group">
+              <label for="roomNumber">Room Number</label>
+              <input type="text" id="roomNumber" name="roomNumber" [(ngModel)]="roomNumber" required />
+            </div>
+  
+            <div class="form-group">
+              <label for="bedNumber">Bed Number</label>
+              <input type="text" id="bedNumber" name="bedNumber" [(ngModel)]="bedNumber" required />
+            </div>
+          </div>
+  
+          <!-- Multiple Meal Assignments Container -->
+          <div class="meal-assignments">
+            <div class="meal-assignments-header">
+              <h2>Patient Meal Assignments</h2>
+              <button 
+                type="button" 
+                class="btn-add-assignment" 
+                (click)="addMealAssignment()"
+                [disabled]="mealAssignments.length >= 5"
+              >
+                + Add Assignment
+              </button>
+            </div>
+  
+            <!-- Dynamic Meal Assignment Sections -->
+            <div class="meal-assignments-list">
+              <div 
+                *ngFor="let assignment of mealAssignments; let i = index; trackBy: trackByAssignment" 
+                class="meal-assignment-item"
+                [attr.data-assignment-index]="i"
+              >
+                <!-- Assignment Header with Remove Button -->
+                <div class="assignment-header">
+                  <span class="assignment-label">Assignment {{ i + 1 }}</span>
+                  <button 
+                    type="button" 
+                    class="btn-remove-assignment"
+                    (click)="removeMealAssignment(i)"
+                    [disabled]="mealAssignments.length === 1"
+                    title="Remove Assignment"
+                  >
+                    ✕
+                  </button>
+                </div>
+  
+                <!-- Day Cycle Selection -->
+                <div class="form-group">
+                  <label [for]="'dayCycle-' + i">Day Cycle</label>
+                  <select 
+                    [id]="'dayCycle-' + i" 
+                    [name]="'dayCycle-' + i" 
+                    [(ngModel)]="assignment.dayId"
+                    (change)="onDayChange($event, i)"
+                    required
+                  >
+                    <option value="" disabled>Select day</option>
+                    <option *ngFor="let day of availableDays" [value]="day.value">
+                      {{ day.label }}
+                    </option>
+                  </select>
+                </div>
+  
+                <!-- Meals Container for this assignment -->
+                <div class="form-group meals-container" *ngIf="assignment.dayId">
+                  
+                  <!-- Lunch Meals -->
+                  <div class="meal-time-section" *ngIf="assignment.lunchMeals && assignment.lunchMeals.length > 0">
+                    <h4>Lunch Meals</h4>
+                    <div class="meals-grid">
+                      <div *ngFor="let meal of assignment.lunchMeals" class="meal-option">
+                        <input 
+                          type="checkbox" 
+                          [id]="'lunch-' + meal.id + '-' + i" 
+                          [value]="meal.id"
+                          [checked]="assignment.selectedLunchMeals.includes(meal.id)"
+                          (change)="onMealSelection('lunch', meal, $event, i)"
+                        >
+                        <label [for]="'lunch-' + meal.id + '-' + i" class="meal-label">
+                          {{ meal.meal_name }}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+  
+                  <!-- Dinner Meals -->
+                  <div class="meal-time-section" *ngIf="assignment.dinnerMeals && assignment.dinnerMeals.length > 0">
+                    <h4>Dinner Meals</h4>
+                    <div class="meals-grid">
+                      <div *ngFor="let meal of assignment.dinnerMeals" class="meal-option">
+                        <input 
+                          type="checkbox" 
+                          [id]="'dinner-' + meal.id + '-' + i" 
+                          [value]="meal.id"
+                          [checked]="assignment.selectedDinnerMeals.includes(meal.id)"
+                          (change)="onMealSelection('dinner', meal, $event, i)"
+                        >
+                        <label [for]="'dinner-' + meal.id + '-' + i" class="meal-label">
+                          {{ meal.meal_name }}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+  
+                  <!-- No meals message -->
+                  <div *ngIf="(!assignment.lunchMeals || assignment.lunchMeals.length === 0) && 
+                             (!assignment.dinnerMeals || assignment.dinnerMeals.length === 0)" 
+                       class="no-meals">
+                    <p>No meals available for Day {{ assignment.dayId }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+  
+        <!-- OPTIONAL SECTION -->
+        <fieldset class="optional">
+          <legend>Optional Information</legend>
+          
+          <!-- Patient Demographics Row 1 -->
+          <div class="form-row">
+            <div class="col-1">
+              <div class="form-group">
+                <label for="age">Age</label>
+                <input 
+                  type="number" 
+                  id="age" 
+                  name="age"
+                  [(ngModel)]="age" 
+                  min="0" 
+                  max="120"
+                  placeholder="Enter age"
+                />
+              </div>
+    
+              <div class="form-group">
+                <label for="sex">Sex</label>
+                <select id="sex" name="sex" [(ngModel)]="sex">
+                  <option value="" disabled>Select sex</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+  
+            <div class="col-2">
+              <div class="form-group">
+                <label for="height">Height (cm)</label>
+                <input 
+                  type="number" 
+                  id="height" 
+                  name="height"
+                  [(ngModel)]="height" 
+                  min="50" 
+                  max="250"
+                  step="0.1"
+                  placeholder="Enter height in cm"
+                />
+              </div>
+    
+              <div class="form-group">
+                <label for="weight">Weight (kg)</label>
+                <input 
+                  type="number" 
+                  id="weight" 
+                  name="weight" 
+                  [(ngModel)]="weight"
+                  min="10" 
+                  max="300"
+                  step="0.1"
+                  placeholder="Enter weight in kg"
+                />
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="activityLevel">Activity Level</label>
+                <select id="activityLevel" name="activityLevel" [(ngModel)]="activityLevel">
+                  <option value="" disabled>Select activity level</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="low_active">Low Active</option>
+                  <option value="active">Active</option>
+                  <option value="very_active">Very Active</option>
+                </select>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Activity Level and Dietary Restrictions -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="dietaryRestrictions">Dietary Restrictions</label>
+              <textarea 
+                id="dietaryRestrictions" 
+                name="dietaryRestrictions"
+                [(ngModel)]="dietaryRestrictions"
+                rows="4"
+                placeholder="Enter any dietary restrictions or special requirements..."
+              ></textarea>
+            </div>
+          </div>
+        </fieldset>
+  
+      </div>
+  
+      <!-- FORM ACTIONS -->
+      <div class="form-buttons">
+        <button type="button" class="btn-cancel" (click)="cancelEdit()">Cancel</button>
+        <button type="button" class="btn-clear" (click)="resetForm()">Reset</button>
+        <button type="button" class="btn-submit" (click)="updatePatient()" [disabled]="!isFormValid()">Update Patient</button>
+      </div>
+  
+    </form>
+</div>

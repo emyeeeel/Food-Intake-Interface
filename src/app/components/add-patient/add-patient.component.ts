@@ -2,11 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MealsService } from '../../services/meals.service';
 import { PatientService } from '../../services/patient.service';
+import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { Meal } from '../../models/meal.model';
 import { LTCPatient } from '../../models/ltc-patient.model';
+import { MealAssignment } from '../../models/meal-assignment.model';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
-export interface MealAssignment {
+export interface MealAssignmentForm {
   id: string;
   dayId: string;
   lunchMeals: any[];
@@ -33,7 +36,7 @@ export class AddPatientComponent implements OnInit {
   activityLevel: string = '';
   dietaryRestrictions: string = '';
   
-  mealAssignments: MealAssignment[] = [];
+  mealAssignments: MealAssignmentForm[] = [];
   availableDays = [
     { value: '1', label: 'Day 1' },
     { value: '2', label: 'Day 2' },
@@ -58,7 +61,8 @@ export class AddPatientComponent implements OnInit {
 
   constructor(
     private mealsService: MealsService,
-    private patientService: PatientService
+    private patientService: PatientService,
+    private mealAssignmentService: MealAssignmentService
   ) {}
 
   ngOnInit(): void {
@@ -81,7 +85,7 @@ export class AddPatientComponent implements OnInit {
   }
 
   addMealAssignment(): void {
-    const newAssignment: MealAssignment = {
+    const newAssignment: MealAssignmentForm = {
       id: this.generateId(),
       dayId: '',
       lunchMeals: [],
@@ -130,7 +134,7 @@ export class AddPatientComponent implements OnInit {
     }
   }
 
-  trackByAssignment(index: number, assignment: MealAssignment): string {
+  trackByAssignment(index: number, assignment: MealAssignmentForm): string {
     return assignment.id;
   }
 
@@ -172,23 +176,18 @@ export class AddPatientComponent implements OnInit {
         sex: this.sex,
         height_cm: this.height || 0,
         weight_kg: this.weight || 0,
-        activity_level: this.activityLevel
+        activity_level: this.activityLevel,
       };
 
       console.log('Submitting LTC Patient:', ltcPatient);
 
-      // Submit to service
+      // Submit patient to service
       this.patientService.postLTCPatient(ltcPatient).subscribe({
         next: (response) => {
           console.log('Patient created successfully:', response);
-          console.log('Current meal assignments: ', this.mealAssignments);
-          this.isSubmitting = false;
           
-          // Show success message
-          alert('Patient added successfully!');
-          
-          // Clear form after successful submission
-          this.clearForm();
+          // Now create meal assignments using the created patient's ID
+          this.createMealAssignments(response.id);
         },
         error: (error) => {
           console.error('Error creating patient:', error);
@@ -206,6 +205,110 @@ export class AddPatientComponent implements OnInit {
       this.submitError = 'An unexpected error occurred.';
       alert('An unexpected error occurred. Please try again.');
     }
+  }
+
+  /**
+   * Create meal assignments for the newly created patient
+   */
+  private createMealAssignments(patientId: number): void {
+    console.log('Creating meal assignments for patient ID:', patientId);
+    console.log('Current meal assignments: ', this.mealAssignments);
+
+    // Process meal assignments into the format expected by the service
+    const mealAssignmentsToCreate = this.processMealAssignments(patientId);
+    
+    if (mealAssignmentsToCreate.length === 0) {
+      console.log('No meal assignments to create');
+      this.onMealAssignmentsComplete(patientId, []);
+      return;
+    }
+
+    console.log('Processed meal assignments:', mealAssignmentsToCreate);
+
+    // Create all meal assignments using forkJoin for parallel execution
+    const assignmentObservables = mealAssignmentsToCreate.map(assignment => 
+      this.mealAssignmentService.createMealAssignment(assignment)
+    );
+
+    forkJoin(assignmentObservables).subscribe({
+      next: (createdAssignments) => {
+        console.log('All meal assignments created successfully:', createdAssignments);
+        this.onMealAssignmentsComplete(patientId, createdAssignments);
+      },
+      error: (error) => {
+        console.error('Error creating meal assignments:', error);
+        
+        // Patient was created but meal assignments failed
+        alert(`Patient created successfully, but there was an error creating meal assignments: ${error.message || 'Unknown error'}`);
+        this.onMealAssignmentsComplete(patientId, [], error);
+      }
+    });
+  }
+
+  /**
+   * Process form meal assignments into service format
+   */
+  private processMealAssignments(patientId: number): any[] {
+    const assignmentsToCreate: any[] = [];
+
+    this.mealAssignments
+      .filter(assignment => 
+        assignment.dayId && 
+        (assignment.selectedLunchMeals.length > 0 || assignment.selectedDinnerMeals.length > 0)
+      )
+      .forEach(assignment => {
+        const dayCycle = parseInt(assignment.dayId);
+
+        // Create lunch assignments
+        assignment.selectedLunchMeals.forEach(mealId => {
+          assignmentsToCreate.push({
+            ltc_patient: patientId,
+            meal: mealId,
+            day_cycle: dayCycle.toString(),
+            meal_type: '午餐'
+          });
+        });
+
+        // Create dinner assignments
+        assignment.selectedDinnerMeals.forEach(mealId => {
+          assignmentsToCreate.push({
+            ltc_patient: patientId,
+            meal: mealId,
+            day_cycle: dayCycle.toString(),
+            meal_type: '晚餐'
+          });
+        });
+      });
+
+    return assignmentsToCreate;
+  }
+
+  /**
+   * Handle completion of meal assignment creation
+   */
+  private onMealAssignmentsComplete(patientId: number, createdAssignments: any[], error?: any): void {
+    this.isSubmitting = false;
+
+    if (error) {
+      // Patient created but meal assignments failed
+      console.error('Meal assignment creation failed:', error);
+    } else {
+      // Everything successful
+      console.log(`Patient ${patientId} created with ${createdAssignments.length} meal assignments`);
+    }
+
+    // Show success message
+    const message = error 
+      ? 'Patient added successfully! However, some meal assignments could not be created.'
+      : 'Patient and meal assignments added successfully!';
+    
+    alert(message);
+    
+    // Clear form after completion
+    this.clearForm();
+
+    // Optional: Navigate to the patient's page
+    // this.router.navigate(['/patient-info', patientId]);
   }
 
   private validateForm(): boolean {
@@ -239,19 +342,6 @@ export class AddPatientComponent implements OnInit {
     return true;
   }
 
-  private processMealAssignments(): any[] {
-    return this.mealAssignments
-      .filter(assignment => 
-        assignment.dayId && 
-        (assignment.selectedLunchMeals.length > 0 || assignment.selectedDinnerMeals.length > 0)
-      )
-      .map(assignment => ({
-        day_cycle: parseInt(assignment.dayId),
-        lunch_meal_ids: assignment.selectedLunchMeals,
-        dinner_meal_ids: assignment.selectedDinnerMeals
-      }));
-  }
-
   clearForm(): void {
     // Reset form data
     this.roomNumber = '';
@@ -272,5 +362,32 @@ export class AddPatientComponent implements OnInit {
     this.submitError = '';
 
     console.log('Form cleared');
+  }
+
+  /**
+   * Get summary of current meal assignments for display/debugging
+   */
+  getMealAssignmentsSummary(): any {
+    return {
+      totalAssignments: this.mealAssignments.length,
+      assignmentsWithMeals: this.mealAssignments.filter(a => 
+        a.dayId && (a.selectedLunchMeals.length > 0 || a.selectedDinnerMeals.length > 0)
+      ).length,
+      details: this.mealAssignments.map(assignment => ({
+        day: assignment.dayId,
+        lunchCount: assignment.selectedLunchMeals.length,
+        dinnerCount: assignment.selectedDinnerMeals.length
+      }))
+    };
+  }
+
+  /**
+   * Check if form has any meal assignments
+   */
+  hasMealAssignments(): boolean {
+    return this.mealAssignments.some(assignment => 
+      assignment.dayId && 
+      (assignment.selectedLunchMeals.length > 0 || assignment.selectedDinnerMeals.length > 0)
+    );
   }
 }

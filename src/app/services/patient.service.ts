@@ -37,6 +37,10 @@ export class PatientService {
     return this.http.get<LTCPatient>(`${this.baseUrl}/api/ltc-patients/${id}`);
   }
 
+  updateLTCPatient(id: number, ltcPatient: LTCPatient): Observable<LTCPatient> {
+    return this.http.put<LTCPatient>(`${this.baseUrl}/api/ltc-patients/${id}`, ltcPatient);
+  }
+
   getLTCPatientCount(): Observable<number> {
     return this.http.get<LTCPatient[]>(`${this.baseUrl}/api/ltc-patients`).pipe(
       map(ltcPatients => ltcPatients.length)

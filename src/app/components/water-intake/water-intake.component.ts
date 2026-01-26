@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './water-intake.component.scss',
 })
 export class WaterIntakeComponent {
-
+  recommendedWaterIntake: string = '00';
 }
