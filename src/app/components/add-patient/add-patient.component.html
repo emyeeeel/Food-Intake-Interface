@@ -14,12 +14,12 @@
           <h2>Patient Identifier</h2>
           <div class="form-group">
             <label for="roomNumber">Room Number</label>
-            <input type="text" id="roomNumber" name="roomNumber" required />
+            <input type="text" id="roomNumber" name="roomNumber" [(ngModel)]="roomNumber" required />
           </div>
 
           <div class="form-group">
             <label for="bedNumber">Bed Number</label>
-            <input type="text" id="bedNumber" name="bedNumber" required />
+            <input type="text" id="bedNumber" name="bedNumber" [(ngModel)]="bedNumber" required />
           </div>
         </div>
 
@@ -140,7 +140,8 @@
               <input 
                 type="number" 
                 id="age" 
-                name="age" 
+                name="age"
+                [(ngModel)]="age" 
                 min="0" 
                 max="120"
                 placeholder="Enter age"
@@ -149,7 +150,7 @@
   
             <div class="form-group">
               <label for="sex">Sex</label>
-              <select id="sex" name="sex">
+              <select id="sex" name="sex" [(ngModel)]="sex">
                 <option value="" disabled selected>Select sex</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -163,7 +164,8 @@
               <input 
                 type="number" 
                 id="height" 
-                name="height" 
+                name="height"
+                [(ngModel)]="height" 
                 min="50" 
                 max="250"
                 step="0.1"
@@ -177,6 +179,7 @@
                 type="number" 
                 id="weight" 
                 name="weight" 
+                [(ngModel)]="weight"
                 min="10" 
                 max="300"
                 step="0.1"
@@ -187,7 +190,7 @@
           <div class="col-3">
             <div class="form-group">
               <label for="activityLevel">Activity Level</label>
-              <select id="activityLevel" name="activityLevel">
+              <select id="activityLevel" name="activityLevel" [(ngModel)]="activityLevel">
                 <option value="" disabled selected>Select activity level</option>
                 <option value="inactive">Inactive</option>
                 <option value="low_active">Low Active</option>

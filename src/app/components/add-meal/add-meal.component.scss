@@ -377,6 +377,52 @@
       background: linear-gradient(135deg, #F0FBF9, #E6FEF9);
     }
   }
+
+  // Primary button - filled background
+  .btn-primary {
+    padding: 12px 16px;
+    border: 2px solid #40C1AC;
+    border-radius: 12px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-width: 160px;
+    
+    // Primary styling - filled background
+    color: white;
+    background: linear-gradient(135deg, #40C1AC, #2FA695);
+    
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #2FA695, #268B7A);
+      border-color: #2FA695;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(64, 193, 172, 0.3);
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: #40C1AC;
+      box-shadow: 0 0 0 3px rgba(64, 193, 172, 0.2);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(64, 193, 172, 0.2);
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: linear-gradient(135deg, #B8D8D3, #9EC2BD);
+      color: white;
+      border-color: #B8D8D3;
+      transform: none;
+      box-shadow: none;
+    }
+  }
   
   .form-group {
     &.capturing {
@@ -403,6 +449,45 @@
         &:hover:not(:disabled) {
           background: linear-gradient(135deg, #059669, #047857);
           border-color: #059669;
+        }
+      }
+    }
+
+    &.loading {
+      .btn-primary {
+        background: linear-gradient(135deg, #B8D8D3, #9EC2BD);
+        color: white;
+        border-color: #B8D8D3;
+        cursor: not-allowed;
+        
+        &:disabled {
+          opacity: 0.8;
+        }
+      }
+    }
+    
+    &.success {
+      .btn-primary {
+        background: linear-gradient(135deg, #10B981, #059669);
+        color: white;
+        border-color: #10B981;
+        
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, #059669, #047857);
+          border-color: #059669;
+        }
+      }
+    }
+    
+    &.error {
+      .btn-primary {
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+        color: white;
+        border-color: #EF4444;
+        
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, #DC2626, #B91C1C);
+          border-color: #DC2626;
         }
       }
     }
@@ -574,6 +659,18 @@
       min-width: unset;
       padding: 12px 20px;
     }
+
+    .btn-primary {
+      flex: 1;
+      min-width: unset;
+      padding: 12px 20px;
+    }
+  }
+
+  .btn-primary {
+    min-width: 140px;
+    font-size: 13px;
+    padding: 10px 14px;
   }
 }
 
@@ -582,6 +679,12 @@
     flex-direction: column;
     
     .btn-secondary {
+      width: 100%;
+      padding: 12px 24px;
+      font-size: 13px;
+    }
+
+    .btn-primary {
       width: 100%;
       padding: 12px 24px;
       font-size: 13px;
@@ -671,6 +774,19 @@
       min-width: 100px;
       border-radius: 8px;
     }
+
+    .btn-primary {
+      padding: 10px 20px;
+      font-size: 12px;
+      min-width: 100px;
+      border-radius: 8px;
+    }
+  }
+
+  .btn-primary {
+    min-width: 100px;
+    font-size: 11px;
+    padding: 8px 10px;
   }
 }
 
@@ -804,6 +920,14 @@
       margin-top: 8px;
 
       .btn-secondary {
+        padding: 10px 24px !important;
+        font-size: 12px;
+        min-width: 120px !important;
+        height: 36px;
+        border-radius: 8px;
+      }
+
+      .btn-primary {
         padding: 10px 24px !important;
         font-size: 12px;
         min-width: 120px !important;
@@ -1052,6 +1176,20 @@
       font-size: 11px;
       height: 34px;
     }
+
+    .btn-primary {
+      padding: 9px 20px !important;
+      font-size: 11px;
+      height: 34px;
+    }
+  }
+
+  .btn-primary {
+    padding: 10px 14px;
+    font-size: 12px;
+    min-width: 140px;
+    margin-bottom: 12px;
+    border-radius: 8px;
   }
 }
 
@@ -1463,6 +1601,19 @@
         &:hover:not(:disabled) {
           color: #2FA695;
           background: linear-gradient(135deg, #F0FBF9, #E6FEF9);
+        }
+      }
+
+      .btn-primary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        
+        span {
+          display: flex;
+          align-items: center;
+          gap: 6px;
         }
       }
     }

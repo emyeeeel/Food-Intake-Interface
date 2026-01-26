@@ -8,8 +8,6 @@ import { NotifComponent } from "../../components/notif/notif.component";
 import { MainOptionsComponent } from "../../components/main-options/main-options.component";
 import { DateContainerComponent } from "../../components/date-container/date-container.component";
 import { PatientCardComponent } from "../../components/patient-card/patient-card.component";
-import { BmiCardComponent } from "../../components/bmi-card/bmi-card.component";
-import { BpCardComponent } from "../../components/bp-card/bp-card.component";
 import { MealAssignmentComponent } from "../../components/meal-assignment/meal-assignment.component";
 
 import { FormsModule } from '@angular/forms';
@@ -31,8 +29,6 @@ import { ProteinIntakeComponent } from "../../components/protein-intake/protein-
     MainOptionsComponent,
     DateContainerComponent,
     PatientCardComponent,
-    BmiCardComponent,
-    BpCardComponent,
     MealAssignmentComponent,
     FormsModule,
     PatientDetailsComponent,

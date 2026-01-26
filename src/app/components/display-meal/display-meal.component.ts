@@ -61,7 +61,6 @@ export class DisplayMealComponent implements OnInit {
           console.log(`Meal ${index + 1}:`, {
             id: meal.id,
             name: meal.meal_name,
-            description: meal.meal_description,
             mealTime: meal.meal_time,
             dayCycle: meal.day_cycle,
             plateType: meal.plate_type,

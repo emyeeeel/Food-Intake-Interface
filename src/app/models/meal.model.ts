@@ -3,7 +3,6 @@ export interface Meal {
   meal_name: string;
   meal_time: '午餐' | '晚餐' | '晚餐' | string; 
   day_cycle: number;
-  meal_description: string;
   plate_type: '金属板' | '金属碗' | '陶瓷碗' | string;
   ingredients: number[]; 
   image?: string | null; 

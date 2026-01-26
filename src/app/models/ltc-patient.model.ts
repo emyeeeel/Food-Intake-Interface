@@ -6,9 +6,6 @@ export interface LTCPatient {
     sex: string;
     height_cm: number;
     weight_kg: number;
-    bmi: number;
     activity_level: string;
-    created_at: string;
-    updated_at: string;
 }
   

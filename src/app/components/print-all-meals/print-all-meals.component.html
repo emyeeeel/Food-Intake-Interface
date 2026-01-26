@@ -38,16 +38,6 @@
       <div class="meals-table-container">
         <!-- Table Controls -->
         <div class="table-controls">
-          <div class="page-size-control">
-            <label for="pageSize">Items per page:</label>
-            <select id="pageSize" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
-              <option value="20">20</option>
-              <option value="25">25</option>
-            </select>
-          </div>
           <div class="selection-controls">
             <button class="btn-select-all"
               (click)="selectAllCurrentPage()"

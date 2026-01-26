@@ -26,7 +26,6 @@ export class AddMealComponent implements OnInit {
     meal_name: '',
     meal_time: '',
     day_cycle: undefined, // Changed from empty string to undefined
-    meal_description: '',
     plate_type: '',
     ingredients: [] as number[]
   };
@@ -110,10 +109,6 @@ export class AddMealComponent implements OnInit {
         if (response && response.meal) {
           const apiMeal = response.meal;
           
-          // Auto-fill fields from API response if they exist and current fields are empty
-          if (apiMeal.meal_description && !this.meal.meal_description?.trim()) {
-            this.meal.meal_description = apiMeal.meal_description;
-          }
           
           if (apiMeal.meal_time && !this.meal.meal_time) {
             this.meal.meal_time = apiMeal.meal_time;
@@ -213,7 +208,6 @@ private buildMealFormData(): FormData {
   const formData = new FormData();
 
   formData.append('meal_name', this.meal.meal_name!);
-  formData.append('meal_description', this.meal.meal_description!);
   formData.append('meal_time', this.meal.meal_time!);
   formData.append('day_cycle', String(this.meal.day_cycle!)); // Convert number to string for FormData
   formData.append('plate_type', this.meal.plate_type!);
@@ -273,7 +267,6 @@ private buildMealFormData(): FormData {
   private isValidMeal(): boolean {
     return !!(
       this.meal.meal_name?.trim() &&
-      this.meal.meal_description?.trim() &&
       this.meal.meal_time &&
       this.meal.day_cycle &&
       this.meal.plate_type
@@ -285,7 +278,6 @@ private buildMealFormData(): FormData {
       meal_name: '',
       meal_time: '',
       day_cycle: undefined, // Changed from empty string to undefined
-      meal_description: '',
       plate_type: '',
       ingredients: []
     };

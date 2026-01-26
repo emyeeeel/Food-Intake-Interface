@@ -72,7 +72,6 @@ export class PrintAllMealsComponent implements OnInit {
           console.log(`Meal ${index + 1}:`, {
             id: meal.id,
             name: meal.meal_name,
-            description: meal.meal_description,
             mealTime: meal.meal_time,
             dayCycle: meal.day_cycle,
             plateType: meal.plate_type,
@@ -143,15 +142,6 @@ export class PrintAllMealsComponent implements OnInit {
       this.goToPage(this.targetPage);
       this.targetPage = null; // Clear input after navigation
     }
-  }
-
-  onPageSizeChange(): void {
-    console.log(`Page size changed to: ${this.pageSize}`);
-    this.currentPage = 1;
-    this.calculatePagination();
-    this.updatePaginatedMeals();
-    // Clear selections when page size changes
-    this.clearSelection();
   }
 
   getVisiblePages(): (number | string)[] {

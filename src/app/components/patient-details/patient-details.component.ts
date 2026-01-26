@@ -9,10 +9,8 @@ import { RecommendedIntake } from '../../models/recommended-intake.model';
 
 import jsQR from 'jsqr';
 import { GetAnalysisService } from '../../services/get-analysis.service';
-import { MealAssignment } from '../../models/meal-assignment.mode';
-import { Meal } from '../../models/meal.model';
+import { MealAssignment } from '../../models/meal-assignment.model';
 import { MealsService } from '../../services/meals.service';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-patient-details',
@@ -27,7 +25,6 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
   patient: Patient | null = null;
   recommendedIntake: RecommendedIntake | null = null;
   mealAssignments: MealAssignment[] = [];
-  private mealMap: Map<number, Meal> = new Map();
   recommendedAnalysis: string | null = null;
   loading: boolean = true;
   showQRCode = false;
@@ -45,84 +42,82 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
       return ''; // Return empty or default if data not ready
     }
   
-    // Generate random intake (grams) for each meal (e.g., 150g - 700g)
+    // Use meal details directly from meal assignments (no need for separate meal map)
     const mealText = this.mealAssignments
-    .map((meal, index) => {
-      const intakeGrams = Math.floor(Math.random() * (700 - 150 + 1)) + 150;
-      const mealName = this.mealMap.get(meal.meal)?.meal_name || 'Unknown Meal'; // <-- get name
-      return `Meal ${index + 1}: ${meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1)}, ${mealName}, ${intakeGrams} g`;
-    })
-    .join('\n');
+      .map((assignment, index) => {
+        const intakeGrams = Math.floor(Math.random() * (700 - 150 + 1)) + 150;
+        const mealName = assignment.meal_detail?.meal_name || 'Unknown Meal';
+        return `Meal ${index + 1}: ${assignment.meal_type.charAt(0).toUpperCase() + assignment.meal_type.slice(1)}, ${mealName}, ${intakeGrams} g`;
+      })
+      .join('\n');
 
-  
     return `
-  You are a clinical nutrition assistant writing guidance for non-medical caregivers.
-  
-  TASK:
-  Review the patient information, recommended daily intake, and meals, then provide clear dietary guidance that compares actual intake patterns against recommended needs.
-  
-  CRITICAL OUTPUT RULES:
-  - Output PLAIN TEXT only
-  - Do NOT use JSON
-  - Do NOT use markdown
-  - Do NOT use bullet symbols other than the ones shown below
-  - Do NOT use code blocks or backticks
-  - Do NOT include medical disclaimers
-  - Do NOT include any introductory or closing remarks
-  
-  FORMAT RULES (MUST FOLLOW EXACTLY):
-  
-  Summary:
-  (2 short sentences describing overall diet vs recommended intake)
-  
-  Key Health Concerns:
-  - Line 1
-  - Line 2
-  
-  Dietary Issues Observed:
-  - Line 1
-  - Line 2
-  
-  Caregiver Action Steps:
-  1. Step one
-  2. Step two
-  3. Step three
-  
-  CONTENT LIMITS:
-  - Keep total length under 140 words
-  - Use simple, supportive language
-  - Focus on food choices, portion size, and balance
-  - Reference recommended intake only when helpful for guidance
-  
-  PATIENT DETAILS:
-  Patient Name: ${this.patient.name}
-  Age: ${this.patient.age}
-  Gender: ${this.patient.sex}
-  Height: ${this.patient.height_cm} cm
-  Weight: ${this.patient.weight_kg} kg
-  BMI: ${this.patient.bmi}
-  Heart Rate: ${this.patient.heart_rate} bpm
-  Blood Pressure: ${this.patient.systolic_bp}/${this.patient.diastolic_bp} mmHg
-  Activity Level: ${this.patient.activity_level}
-  
-  RECOMMENDED DAILY INTAKE:
-  Calories: ${this.recommendedIntake.daily_caloric_needs} kcal
-  Protein: ${this.recommendedIntake.protein} g
-  Carbohydrates: ${this.recommendedIntake.carbohydrate} g
-  Fat: ${this.recommendedIntake.fat} g
-  Total Fiber: ${this.recommendedIntake.total_fiber} g
-  Alpha Linolenic Acid: ${this.recommendedIntake.alpha_linolenic_acid} g
-  Linoleic Acid: ${this.recommendedIntake.linoleic_acid} g
-  Total Water: ${this.recommendedIntake.total_water} L
-  
-  MEAL INTAKES:
-  ${mealText}
-  
-  FINAL CHECK:
-  Return ONLY the formatted text exactly as specified above. No extra text. 
+You are a clinical nutrition assistant writing guidance for non-medical caregivers.
+
+TASK:
+Review the patient information, recommended daily intake, and meals, then provide clear dietary guidance that compares actual intake patterns against recommended needs.
+
+CRITICAL OUTPUT RULES:
+- Output PLAIN TEXT only
+- Do NOT use JSON
+- Do NOT use markdown
+- Do NOT use bullet symbols other than the ones shown below
+- Do NOT use code blocks or backticks
+- Do NOT include medical disclaimers
+- Do NOT include any introductory or closing remarks
+
+FORMAT RULES (MUST FOLLOW EXACTLY):
+
+Summary:
+(2 short sentences describing overall diet vs recommended intake)
+
+Key Health Concerns:
+- Line 1
+- Line 2
+
+Dietary Issues Observed:
+- Line 1
+- Line 2
+
+Caregiver Action Steps:
+1. Step one
+2. Step two
+3. Step three
+
+CONTENT LIMITS:
+- Keep total length under 140 words
+- Use simple, supportive language
+- Focus on food choices, portion size, and balance
+- Reference recommended intake only when helpful for guidance
+
+PATIENT DETAILS:
+Patient Name: ${this.patient.name}
+Age: ${this.patient.age}
+Gender: ${this.patient.sex}
+Height: ${this.patient.height_cm} cm
+Weight: ${this.patient.weight_kg} kg
+BMI: ${this.patient.bmi}
+Heart Rate: ${this.patient.heart_rate} bpm
+Blood Pressure: ${this.patient.systolic_bp}/${this.patient.diastolic_bp} mmHg
+Activity Level: ${this.patient.activity_level}
+
+RECOMMENDED DAILY INTAKE:
+Calories: ${this.recommendedIntake.daily_caloric_needs} kcal
+Protein: ${this.recommendedIntake.protein} g
+Carbohydrates: ${this.recommendedIntake.carbohydrate} g
+Fat: ${this.recommendedIntake.fat} g
+Total Fiber: ${this.recommendedIntake.total_fiber} g
+Alpha Linolenic Acid: ${this.recommendedIntake.alpha_linolenic_acid} g
+Linoleic Acid: ${this.recommendedIntake.linoleic_acid} g
+Total Water: ${this.recommendedIntake.total_water} L
+
+MEAL INTAKES:
+${mealText}
+
+FINAL CHECK:
+Return ONLY the formatted text exactly as specified above. No extra text. 
     `;
   }
-  
   
   constructor(
     private patientService: PatientService,
@@ -136,8 +131,6 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
   ngOnInit() {
     this.loadAllDataAndAnalyze(this.patientId);
   }
-
-  
 
   private loadAllDataAndAnalyze(patientId: number) {
     this.loading = true;
@@ -153,56 +146,57 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
           next: (recData) => {
             this.recommendedIntake = recData.nutritional_recommendations;
   
-            // Load meal assignments
-            this.mealAssignmentService.getAssignmentsByPatient(patientId).subscribe({
+            // Load meal assignments using the updated service method
+            this.mealAssignmentService.getMealAssignmentsByPatient(patientId).subscribe({
               next: (assignments) => {
                 this.mealAssignments = assignments;
+                
+                // Log the assignments to check structure
+                console.log('Meal assignments:', assignments);
   
                 // All data loaded, now build query
                 this.query = this.buildQuery();
-
-                console.log(this.query)
+                console.log('Query:', this.query);
   
                 // Call analysis service
                 this.getAnalysisService.getAnalysis(this.query).subscribe({
                   next: (response: { recommendation: string }) => {
-                    this.recommendedAnalysis = this.formatAnalysisForUI(response.recommendation)
-                    console.log(this.recommendedAnalysis)
+                    this.recommendedAnalysis = this.formatAnalysisForUI(response.recommendation);
+                    console.log('Analysis:', this.recommendedAnalysis);
                     this.loading = false;
                   },
                   error: (err) => {
-                    console.error(err);
+                    console.error('Analysis error:', err);
                     this.recommendedAnalysis = '載入分析失敗.'; //Failed to load analysis
                     this.loading = false;
                   }
                 });
               },
               error: (err) => {
-                console.error(err);
+                console.error('Meal assignments error:', err);
                 this.error = '膳食分配加載失敗.'; //Failed to load meal assignments
                 this.loading = false;
               }
             });
           },
           error: (err) => {
-            console.error(err);
+            console.error('Recommended intake error:', err);
             this.error = '加載建議攝取量失敗.'; //Failed to load recommended intake
             this.loading = false;
           }
         });
       },
       error: (err) => {
-        console.error(err);
+        console.error('Patient error:', err);
         this.error = '加載患者詳細資料失敗.'; //Failed to load patient details
         this.loading = false;
       }
     });
   }
-  
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['patientId'] && changes['patientId'].currentValue) {
-      this.loadPatient(changes['patientId'].currentValue);
+      this.loadAllDataAndAnalyze(changes['patientId'].currentValue);
     }
   }
 
@@ -210,65 +204,9 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
     this.stopCamera();
   }
 
-  private loadPatient(patientId: number) {
-    this.loading = true;
-    this.error = null;
-
-    this.patientService.getPatient(patientId).subscribe({
-      next: (data) => {
-        this.patient = data;
-        this.loading = false;
-        console.log('Patient:', this.patient);
-        this.loadRecommendedIntake(patientId);
-        this.loadMealAssignments(patientId);
-      },
-      error: (err) => {
-        this.error = '加載患者詳細資料失敗.'; //Failed to load patient details
-        this.loading = false;
-        console.error('Error loading patient:', err);
-      }
-    });
-  }
-
-  private loadRecommendedIntake(patientId: number) {
-    this.recommendedIntakeService.getRecommendedIntake(patientId).subscribe({
-      next: (data) => {
-        this.recommendedIntake = data.nutritional_recommendations;
-        console.log('Recommended Intake:', this.recommendedIntake);
-      },
-      error: (err) => {
-        console.error('Error loading recommended intake:', err);
-      }
-    });
-  }
-
-  private loadMealAssignments(patientId: number) {
-    this.mealAssignmentService.getAssignmentsByPatient(patientId).subscribe({
-      next: (assignments) => {
-        this.mealAssignments = assignments;
-  
-        // Prepare observables for all meals
-        const mealRequests = this.mealAssignments.map(a =>
-          this.mealsService.getMeal(a.meal)
-        );
-  
-        forkJoin(mealRequests).subscribe({
-          next: (meals) => {
-            meals.forEach(meal => this.mealMap.set(meal.id, meal));
-            console.log(meals) //this returns 
-          },
-          error: (err) => console.error('Failed to load meals', err)
-        });
-      },
-      error: (err) => console.error('Error loading meal assignments:', err)
-    });
-  }
-
   private formatAnalysisForUI(rawText: string): string {
     let text = rawText.replace(/[*_#`]/g, '').trim();
-  
     text = text.replace(/\n{2,}/g, '\n\n');
-  
     return text;
   }
 

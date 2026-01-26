@@ -162,7 +162,7 @@
     // Table Controls
     .table-controls {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
       padding: 8px 10px;
       background: linear-gradient(135deg, #F8FFFE, #E6FEF9);
