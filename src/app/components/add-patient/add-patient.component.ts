@@ -5,7 +5,7 @@ import { PatientService } from '../../services/patient.service';
 import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { Meal } from '../../models/meal.model';
 import { LTCPatient } from '../../models/ltc-patient.model';
-import { MealAssignment } from '../../models/meal-assignment.model';
+import { MealAssignment } from '../../models/meal-assignment.mode';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 

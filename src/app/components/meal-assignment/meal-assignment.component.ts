@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { TagsComponent } from "../tags/tags.component";
 import { Meal } from '../../models/meal.model';
-import { MealAssignment } from '../../models/meal-assignment.model';
+import { MealAssignment } from '../../models/meal-assignment.mode';
 import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { MealsService } from '../../services/meals.service';
 import { DateService } from '../../services/date.service';

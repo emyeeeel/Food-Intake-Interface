@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MealAssignment, CreateMealAssignment, MealAssignmentRequest } from '../models/meal-assignment.model';
+import { MealAssignment, CreateMealAssignment, MealAssignmentRequest } from '../models/meal-assignment.mode';
 import { environment } from '../../environments/environment';
 
 @Injectable({

@@ -14,6 +14,17 @@
       <button type="button" class="btn-retry" (click)="loadPatientData()">Retry</button>
     </div>
 
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="success-container">
+      <div class="success-message">
+        <span class="success-icon">✓</span>
+        <span class="success-text">{{ successMessage }}</span>
+        <button type="button" class="btn-close-success" (click)="clearSuccessMessage()" title="Close">
+          ✕
+        </button>
+      </div>
+    </div>
+
     <!-- Form -->
     <form class="form-container" id="patientForm" *ngIf="!loading && !error">
       <div class="form-content">
@@ -44,7 +55,7 @@
                 type="button" 
                 class="btn-add-assignment" 
                 (click)="addMealAssignment()"
-                [disabled]="mealAssignments.length >= 5"
+                [disabled]="mealAssignments.length >= availableDays.length"
               >
                 + Add Assignment
               </button>

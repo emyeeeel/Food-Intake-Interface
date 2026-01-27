@@ -10,7 +10,7 @@ import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { MealsService } from '../../services/meals.service';
 import { LTCPatient } from '../../models/ltc-patient.model';
 import { Meal } from '../../models/meal.model';
-import { MealAssignment } from '../../models/meal-assignment.model';
+import { MealAssignment } from '../../models/meal-assignment.mode';
 
 interface MealAssignmentForm {
   dayId: string;
@@ -69,6 +69,8 @@ export class EditPatientComponent implements OnInit, OnDestroy {
   ];
 
   private subscriptions: Subscription = new Subscription();
+
+  successMessage: string = '';
 
   constructor(
     private patientService: PatientService,
@@ -255,7 +257,7 @@ export class EditPatientComponent implements OnInit, OnDestroy {
    * Add new meal assignment
    */
   addMealAssignment(): void {
-    if (this.mealAssignments.length < 5) {
+    if (this.mealAssignments.length < this.availableDays.length) {
       this.mealAssignments.push({
         dayId: '',
         lunchMeals: [],
@@ -347,7 +349,9 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     const updateSub = this.patientService.updateLTCPatient(this.patientId, updatedPatient).subscribe({
       next: (updated: LTCPatient) => {
         console.log('Patient updated successfully:', updated);
-        this.updateMealAssignments();
+        // Use smart update instead of complete replacement
+        this.updateMealAssignmentsSmartly();
+        this.showSuccessMessage('Patient information updated successfully!');
       },
       error: (err) => {
         console.error('Error updating patient:', err);
@@ -360,136 +364,146 @@ export class EditPatientComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Update meal assignments after patient update
+   * Process meal assignments into a format suitable for comparison or updates
    */
-  private updateMealAssignments(): void {
+  private processMealAssignments(): any[] {
+    if (!this.patientId) {
+      console.error('Patient ID is required for meal assignments');
+      return [];
+    }
+    
+    return this.mealAssignments.flatMap(assignment => {
+      if (!assignment.dayId) return []; // Skip assignments without day selected
+      
+      const dayCycle = assignment.dayId;
+      const lunchAssignments = assignment.selectedLunchMeals.map(mealId => ({
+        meal: mealId,
+        day_cycle: dayCycle,
+        meal_type: '午餐',
+        ltc_patient: this.patientId
+      }));
+      const dinnerAssignments = assignment.selectedDinnerMeals.map(mealId => ({
+        meal: mealId,
+        day_cycle: dayCycle,
+        meal_type: '晚餐',
+        ltc_patient: this.patientId
+      }));
+      return [...lunchAssignments, ...dinnerAssignments];
+    });
+  }
+
+  /**
+   * Smart update meal assignments - only update what changed
+   */
+  private updateMealAssignmentsSmartly(): void {
     if (!this.patientId) {
       this.completeUpdate();
       return;
     }
 
-    console.log('Starting meal assignment update process...');
+    const currentAssignments = this.processMealAssignments();
+    const existingAssignments = this.existingMealAssignments;
 
-    // Step 1: Delete all existing meal assignments
-    this.deleteExistingMealAssignments()
-      .pipe(
-        // Step 2: Create new meal assignments
-        switchMap(() => this.createNewMealAssignments()),
-        catchError(error => {
-          console.error('Error in meal assignment update process:', error);
-          this.error = 'Patient updated, but there was an error updating meal assignments.';
-          return of([]);
-        })
-      )
+    // Compare and categorize changes
+    const changes = this.compareMealAssignments(existingAssignments, currentAssignments);
+    
+    console.log('Assignment changes:', changes);
+
+    if (changes.toDelete.length === 0 && changes.toCreate.length === 0) {
+      console.log('No meal assignment changes detected');
+      this.completeUpdate();
+      return;
+    }
+
+    // Execute only necessary operations
+    this.executeSmartMealAssignmentUpdates(changes)
       .subscribe({
-        next: (result) => {
-          console.log('Meal assignment update completed:', result);
+        next: () => {
+          console.log('Smart meal assignment update completed');
           this.completeUpdate();
         },
         error: (error) => {
-          console.error('Final error in meal assignment update:', error);
-          this.error = 'Patient updated, but meal assignments could not be updated.';
+          console.error('Error in smart meal assignment update:', error);
+          this.error = 'Failed to update meal assignments';
           this.completeUpdate();
         }
       });
   }
 
   /**
-   * Delete existing meal assignments
+   * Compare existing and new assignments to determine changes needed
    */
-  private deleteExistingMealAssignments() {
-    if (this.existingMealAssignments.length === 0) {
-      console.log('No existing meal assignments to delete');
-      return of(true);
-    }
+  private compareMealAssignments(existing: MealAssignment[], newAssignments: any[]) {
+    const toDelete: MealAssignment[] = [];
+    const toCreate: any[] = [];
 
-    console.log(`Deleting ${this.existingMealAssignments.length} existing meal assignments`);
+    // Create lookup maps for comparison
+    const existingMap = new Map();
+    existing.forEach(assignment => {
+      const key = `${assignment.meal}-${assignment.day_cycle}-${assignment.meal_type}`;
+      existingMap.set(key, assignment);
+    });
 
-    const deleteObservables = this.existingMealAssignments.map(assignment =>
-      this.mealAssignmentService.deleteMealAssignment(assignment.id).pipe(
-        catchError(error => {
-          console.error(`Error deleting meal assignment ${assignment.id}:`, error);
-          return of(null); // Continue with other deletions
-        })
-      )
-    );
+    const newMap = new Map();
+    newAssignments.forEach(assignment => {
+      const key = `${assignment.meal}-${assignment.day_cycle}-${assignment.meal_type}`;
+      newMap.set(key, assignment);
+    });
 
-    return forkJoin(deleteObservables).pipe(
-      switchMap(results => {
-        const successCount = results.filter(result => result !== null).length;
-        console.log(`Successfully deleted ${successCount} out of ${results.length} meal assignments`);
-        return of(true);
-      })
-    );
+    // Find assignments to delete (exist in old but not in new)
+    existingMap.forEach((assignment, key) => {
+      if (!newMap.has(key)) {
+        toDelete.push(assignment);
+      }
+    });
+
+    // Find assignments to create (exist in new but not in old)
+    newMap.forEach((assignment, key) => {
+      if (!existingMap.has(key)) {
+        toCreate.push(assignment);
+      }
+    });
+
+    return { toDelete, toCreate };
   }
 
   /**
-   * Create new meal assignments
+   * Execute smart updates - only delete and create what's necessary
    */
-  private createNewMealAssignments() {
-    const newAssignments = this.processMealAssignments();
-    
-    if (newAssignments.length === 0) {
-      console.log('No new meal assignments to create');
+  private executeSmartMealAssignmentUpdates(changes: { toDelete: MealAssignment[], toCreate: any[] }) {
+    const operations = [];
+
+    // Add deletion operations
+    if (changes.toDelete.length > 0) {
+      const deleteOps = changes.toDelete.map(assignment =>
+        this.mealAssignmentService.deleteMealAssignment(assignment.id).pipe(
+          catchError(error => {
+            console.error(`Error deleting meal assignment ${assignment.id}:`, error);
+            return of(null);
+          })
+        )
+      );
+      operations.push(...deleteOps);
+    }
+
+    // Add creation operations
+    if (changes.toCreate.length > 0) {
+      const createOps = changes.toCreate.map(assignment =>
+        this.mealAssignmentService.createMealAssignment(assignment).pipe(
+          catchError(error => {
+            console.error('Error creating meal assignment:', error);
+            return of(null);
+          })
+        )
+      );
+      operations.push(...createOps);
+    }
+
+    if (operations.length === 0) {
       return of([]);
     }
 
-    console.log(`Creating ${newAssignments.length} new meal assignments`);
-
-    const createObservables = newAssignments.map(assignment =>
-      this.mealAssignmentService.createMealAssignment(assignment).pipe(
-        catchError(error => {
-          console.error('Error creating meal assignment:', error, assignment);
-          return of(null); // Continue with other creations
-        })
-      )
-    );
-
-    return forkJoin(createObservables).pipe(
-      switchMap(results => {
-        const successCount = results.filter(result => result !== null).length;
-        console.log(`Successfully created ${successCount} out of ${results.length} meal assignments`);
-        return of(results);
-      })
-    );
-  }
-
-  /**
-   * Process meal assignments into service format
-   */
-  private processMealAssignments(): any[] {
-    const assignmentsToCreate: any[] = [];
-
-    this.mealAssignments
-      .filter(assignment => 
-        assignment.dayId && 
-        (assignment.selectedLunchMeals.length > 0 || assignment.selectedDinnerMeals.length > 0)
-      )
-      .forEach(assignment => {
-        const dayCycle = assignment.dayId;
-
-        // Create lunch assignments
-        assignment.selectedLunchMeals.forEach(mealId => {
-          assignmentsToCreate.push({
-            ltc_patient: this.patientId!,
-            meal: mealId,
-            day_cycle: dayCycle,
-            meal_type: '午餐'
-          });
-        });
-
-        // Create dinner assignments
-        assignment.selectedDinnerMeals.forEach(mealId => {
-          assignmentsToCreate.push({
-            ltc_patient: this.patientId!,
-            meal: mealId,
-            day_cycle: dayCycle,
-            meal_type: '晚餐'
-          });
-        });
-      });
-
-    return assignmentsToCreate;
+    return forkJoin(operations);
   }
 
   /**
@@ -502,11 +516,11 @@ export class EditPatientComponent implements OnInit, OnDestroy {
       ? 'Patient information updated, but there were issues with meal assignments.'
       : 'Patient information and meal assignments updated successfully!';
     
-    alert(message);
+    this.showSuccessMessage(message);
     
     if (!this.error) {
       // Navigate back to patient info page
-      this.router.navigate(['/patient-info', this.patientId]);
+      this.router.navigate(['/patient-info']);
     }
   }
 
@@ -529,7 +543,7 @@ export class EditPatientComponent implements OnInit, OnDestroy {
    * Cancel editing and navigate back
    */
   cancelEdit(): void {
-    this.router.navigate(['/patient-info', this.patientId]);
+    this.router.navigate(['/patient-info']);
   }
 
   /**
@@ -586,5 +600,23 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     const mealAssignmentsChanged = JSON.stringify(this.mealAssignments) !== JSON.stringify(this.originalMealAssignments);
 
     return patientDataChanged || mealAssignmentsChanged;
+  }
+
+  /**
+   * Show success message
+   */
+  showSuccessMessage(message: string): void {
+    this.successMessage = message;
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      this.clearSuccessMessage();
+    }, 5000);
+  }
+
+  /**
+   * Clear success message
+   */
+  clearSuccessMessage(): void {
+    this.successMessage = '';
   }
 }

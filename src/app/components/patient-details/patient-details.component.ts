@@ -4,12 +4,12 @@ import { QrTestComponent } from '../qr-test/qr-test.component';
 import { PatientService } from '../../services/patient.service';
 import { RecommendedIntakeService } from '../../services/recommended-intake.service';
 import { MealAssignmentService } from '../../services/meal-assignment.service';
-import { Patient } from '../../models/patient.model';
+import { LTCPatient } from '../../models/ltc-patient.model';
 import { RecommendedIntake } from '../../models/recommended-intake.model';
 
 import jsQR from 'jsqr';
 import { GetAnalysisService } from '../../services/get-analysis.service';
-import { MealAssignment } from '../../models/meal-assignment.model';
+import { MealAssignment } from '../../models/meal-assignment.mode';
 import { MealsService } from '../../services/meals.service';
 
 @Component({
@@ -22,7 +22,7 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
   @Input() patientId: number = 1;
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
 
-  patient: Patient | null = null;
+  ltcPatient: LTCPatient | null = null;
   recommendedIntake: RecommendedIntake | null = null;
   mealAssignments: MealAssignment[] = [];
   recommendedAnalysis: string | null = null;
@@ -38,7 +38,7 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
   query: string = '';
 
   private buildQuery(): string {
-    if (!this.patient || !this.recommendedIntake || !this.mealAssignments.length) {
+    if (!this.ltcPatient || !this.recommendedIntake || !this.mealAssignments.length) {
       return ''; // Return empty or default if data not ready
     }
   
@@ -50,6 +50,15 @@ export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
         return `Meal ${index + 1}: ${assignment.meal_type.charAt(0).toUpperCase() + assignment.meal_type.slice(1)}, ${mealName}, ${intakeGrams} g`;
       })
       .join('\n');
+
+    // Calculate BMI if height and weight are available
+    const calculateBMI = (weight: number | null, height: number | null): number | null => {
+      if (!weight || !height || height <= 0) return null;
+      return Number((weight / Math.pow(height / 100, 2)).toFixed(1));
+    };
+
+    const bmi = calculateBMI(this.ltcPatient.weight_kg, this.ltcPatient.height_cm);
+    const patientIdentifier = `${this.ltcPatient.room_number}-${this.ltcPatient.bed_number}` || `LTC Patient ${this.patientId}`;
 
     return `
 You are a clinical nutrition assistant writing guidance for non-medical caregivers.
@@ -90,16 +99,16 @@ CONTENT LIMITS:
 - Focus on food choices, portion size, and balance
 - Reference recommended intake only when helpful for guidance
 
-PATIENT DETAILS:
-Patient Name: ${this.patient.name}
-Age: ${this.patient.age}
-Gender: ${this.patient.sex}
-Height: ${this.patient.height_cm} cm
-Weight: ${this.patient.weight_kg} kg
-BMI: ${this.patient.bmi}
-Heart Rate: ${this.patient.heart_rate} bpm
-Blood Pressure: ${this.patient.systolic_bp}/${this.patient.diastolic_bp} mmHg
-Activity Level: ${this.patient.activity_level}
+LTC PATIENT DETAILS:
+Patient ID: ${patientIdentifier}
+Room: ${this.ltcPatient.room_number || 'N/A'}
+Bed: ${this.ltcPatient.bed_number || 'N/A'}
+Age: ${this.ltcPatient.age || 'Unknown'} years
+Gender: ${this.ltcPatient.sex || 'Unknown'}
+Height: ${this.ltcPatient.height_cm || 'N/A'} cm
+Weight: ${this.ltcPatient.weight_kg || 'N/A'} kg
+BMI: ${bmi || 'N/A'}
+Activity Level: ${this.ltcPatient.activity_level || 'Unknown'}
 
 RECOMMENDED DAILY INTAKE:
 Calories: ${this.recommendedIntake.daily_caloric_needs} kcal
@@ -130,39 +139,47 @@ Return ONLY the formatted text exactly as specified above. No extra text.
 
   ngOnInit() {
     this.loadAllDataAndAnalyze(this.patientId);
+    this.getAnalysisService.testPing('Test prompt').subscribe({
+      next: (response) => {
+        console.log('Test ping response:', response);
+      },
+      error: (error) => {
+        console.error('Test ping error:', error);
+      }
+    });
   }
 
   private loadAllDataAndAnalyze(patientId: number) {
     this.loading = true;
     this.error = null;
   
-    // Load patient
-    this.patientService.getPatient(patientId).subscribe({
-      next: (patientData) => {
-        this.patient = patientData;
+    // Load LTC patient instead of regular patient
+    this.patientService.getLTCPatient(patientId).subscribe({
+      next: (ltcPatientData) => {
+        this.ltcPatient = ltcPatientData;
+        console.log('LTC Patient loaded:', ltcPatientData);
   
-        // Load recommended intake
+        // Load recommended intake for LTC patient
         this.recommendedIntakeService.getRecommendedIntake(patientId).subscribe({
           next: (recData) => {
             this.recommendedIntake = recData.nutritional_recommendations;
+            console.log('Recommended intake loaded:', recData);
   
-            // Load meal assignments using the updated service method
-            this.mealAssignmentService.getMealAssignmentsByPatient(patientId).subscribe({
+            // Load meal assignments for LTC patient
+            this.mealAssignmentService.getMealAssignmentsByLTCPatient(patientId).subscribe({
               next: (assignments) => {
                 this.mealAssignments = assignments;
-                
-                // Log the assignments to check structure
-                console.log('Meal assignments:', assignments);
+                console.log('LTC Meal assignments loaded:', assignments);
   
                 // All data loaded, now build query
                 this.query = this.buildQuery();
-                console.log('Query:', this.query);
+                console.log('Query built:', this.query);
   
                 // Call analysis service
                 this.getAnalysisService.getAnalysis(this.query).subscribe({
                   next: (response: { recommendation: string }) => {
                     this.recommendedAnalysis = this.formatAnalysisForUI(response.recommendation);
-                    console.log('Analysis:', this.recommendedAnalysis);
+                    console.log('Analysis completed:', this.recommendedAnalysis);
                     this.loading = false;
                   },
                   error: (err) => {
@@ -173,22 +190,22 @@ Return ONLY the formatted text exactly as specified above. No extra text.
                 });
               },
               error: (err) => {
-                console.error('Meal assignments error:', err);
+                console.error('LTC meal assignments error:', err);
                 this.error = '膳食分配加載失敗.'; //Failed to load meal assignments
                 this.loading = false;
               }
             });
           },
           error: (err) => {
-            console.error('Recommended intake error:', err);
+            console.error('LTC recommended intake error:', err);
             this.error = '加載建議攝取量失敗.'; //Failed to load recommended intake
             this.loading = false;
           }
         });
       },
       error: (err) => {
-        console.error('Patient error:', err);
-        this.error = '加載患者詳細資料失敗.'; //Failed to load patient details
+        console.error('LTC patient error:', err);
+        this.error = '加載LTC患者詳細資料失敗.'; //Failed to load LTC patient details
         this.loading = false;
       }
     });
@@ -297,7 +314,7 @@ Return ONLY the formatted text exactly as specified above. No extra text.
       } else {
         const patientId = parseInt(qrData);
         if (!isNaN(patientId)) {
-          this.router.navigate(['/patient', patientId]);
+          this.router.navigate(['/patient-info', patientId]);
         } else {
           console.log('QR Code contains:', qrData);
           alert(`QR Code detected: ${qrData}`);
@@ -326,5 +343,67 @@ Return ONLY the formatted text exactly as specified above. No extra text.
     }
     
     this.scanResult = null;
+  }
+
+  /**
+   * Get LTC patient display name/identifier
+   */
+  getPatientDisplayName(): string {
+    if (!this.ltcPatient) return `LTC Patient ${this.patientId}`;
+    return `${this.ltcPatient.room_number}-${this.ltcPatient.bed_number}` || `LTC Patient ${this.patientId}`;
+  }
+
+  /**
+   * Get patient BMI if calculable
+   */
+  getPatientBMI(): string {
+    if (!this.ltcPatient?.weight_kg || !this.ltcPatient?.height_cm || this.ltcPatient.height_cm <= 0) {
+      return 'N/A';
+    }
+    
+    const bmi = this.ltcPatient.weight_kg / Math.pow(this.ltcPatient.height_cm / 100, 2);
+    return bmi.toFixed(1);
+  }
+
+  /**
+   * Get patient age display
+   */
+  getPatientAge(): string {
+    return this.ltcPatient?.age?.toString() || 'Unknown';
+  }
+
+  /**
+   * Get patient activity level display
+   */
+  getActivityLevelDisplay(): string {
+    const activityLevel = this.ltcPatient?.activity_level;
+    
+    switch (activityLevel) {
+      case 'inactive':
+        return 'Inactive';
+      case 'low_active':
+        return 'Low Active';
+      case 'active':
+        return 'Active';
+      case 'very_active':
+        return 'Very Active';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  /**
+   * Get debug info for current state
+   */
+  getDebugInfo(): any {
+    return {
+      patientId: this.patientId,
+      hasLTCPatient: !!this.ltcPatient,
+      hasRecommendedIntake: !!this.recommendedIntake,
+      mealAssignmentsCount: this.mealAssignments.length,
+      hasAnalysis: !!this.recommendedAnalysis,
+      loading: this.loading,
+      error: this.error
+    };
   }
 }

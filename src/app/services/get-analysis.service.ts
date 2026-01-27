@@ -22,4 +22,15 @@ export class GetAnalysisService {
   
     return this.http.post<{ recommendation: string }>(this.apiUrl, body, { headers });
   }
+
+  testPing(prompt: string){
+    const testUrl = `${this.baseUrl}/api/groq/chat`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+    
+    const body = { prompt: prompt }; // Use the actual prompt parameter
+    
+    return this.http.post<any>(testUrl, body, { headers });
+  }
 }
