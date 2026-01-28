@@ -39,6 +39,8 @@ export const routes: Routes = [
     { path: 'patient-info/print', canActivate: [authGuard], component: PatientInfoComponent },
     { path: 'patient-info/edit/:id', canActivate: [authGuard], component: PatientInfoComponent },
     { path: 'patient-info/view/:id', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/meals/:id', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/intakes/:id', canActivate: [authGuard], component: PatientInfoComponent },
 
     { path: 'settings', canActivate: [authGuard], component: SettingsComponent },
     { path: 'test', component: PrintAllMealsComponent },

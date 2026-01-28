@@ -18,6 +18,10 @@ import { EditPatientComponent } from "../../components/edit-patient/edit-patient
 import { AddPatientComponent } from "../../components/add-patient/add-patient.component";
 import { WaterIntakeComponent } from "../../components/water-intake/water-intake.component";
 import { ProteinIntakeComponent } from "../../components/protein-intake/protein-intake.component";
+import { PatientMealsComponent } from "../../components/patient-meals/patient-meals.component";
+import { PatientIntakeComponent } from "../../components/patient-intake/patient-intake.component";
+import { DisplayPatientComponent } from "../../components/display-patient/display-patient.component";
+import { PrintAllPatientsComponent } from "../../components/print-all-patients/print-all-patients.component";
 
 @Component({
   selector: 'app-patient-info',
@@ -35,7 +39,11 @@ import { ProteinIntakeComponent } from "../../components/protein-intake/protein-
     EditPatientComponent,
     AddPatientComponent,
     WaterIntakeComponent,
-    ProteinIntakeComponent
+    ProteinIntakeComponent,
+    PatientMealsComponent,
+    PatientIntakeComponent,
+    DisplayPatientComponent,
+    PrintAllPatientsComponent
 ],
   templateUrl: './patient-info.component.html',
   styleUrls: ['./patient-info.component.scss']
@@ -102,7 +110,20 @@ export class PatientInfoComponent implements OnInit {
       if (editMatch) {
         this.patientId = parseInt(editMatch[1], 10);
       }
-
+    } else if (/\/patient-info\/meals\/\d+$/.test(path)) {
+      this.currentView = 'mealsRecord';
+      const mealsMatch = path.match(/\/patient-info\/meals\/(\d+)$/);
+      if (mealsMatch) {
+        this.patientId = parseInt(mealsMatch[1], 10);
+      }
+      
+    } else if (/\/patient-info\/intakes\/\d+$/.test(path)) {
+      this.currentView = 'intakesRecord';
+      const intakesMatch = path.match(/\/patient-info\/intakes\/(\d+)$/);
+      if (intakesMatch) {
+        this.patientId = parseInt(intakesMatch[1], 10);
+      }
+      
     }  else {
       this.currentView = 'default';
     }

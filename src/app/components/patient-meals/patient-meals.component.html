@@ -1,0 +1,96 @@
+<div class="patient-meals-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h2>患者膳食分配</h2>
+    <p class="patient-info" *ngIf="ltcPatient">
+      <strong>Patient:</strong> {{ getPatientDisplayName() }}
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>載入膳食分配中...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <p class="error-message">{{ error }}</p>
+    <button (click)="loadPatientMeals(patientId)" class="retry-button">重試</button>
+  </div>
+
+  <!-- Meals Content -->
+  <div *ngIf="!loading && !error && mealAssignments.length > 0" class="meals-content">
+    <!-- Group meals by day cycle -->
+    <div *ngFor="let dayGroup of getMealsByDayCycle() | keyvalue" class="day-section">
+      <h3 class="day-header">第 {{ dayGroup.key }} 天</h3>
+      
+      <!-- Lunch Meals -->
+      <div class="meal-type-section">
+        <h4 class="meal-type-header">午餐</h4>
+        <div class="meals-grid">
+          <div *ngFor="let assignment of getMealsByType(dayGroup.value, '午餐')" 
+               class="meal-card">
+            <div class="meal-image" *ngIf="assignment.meal_detail?.image">
+              <img [src]="assignment.meal_detail.image" 
+                   [alt]="assignment.meal_detail.meal_name">
+            </div>
+            <div class="meal-image placeholder" *ngIf="!assignment.meal_detail?.image">
+              <span class="meal-icon">🍽️</span>
+            </div>
+            <div class="meal-info">
+              <h5 class="meal-name">{{ assignment.meal_detail?.meal_name || assignment.meal_name }}</h5>
+              <p class="meal-type">{{ assignment.meal_type }}</p>
+              <p class="meal-day">第 {{ assignment.day_cycle }} 天</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dinner Meals -->
+      <div class="meal-type-section">
+        <h4 class="meal-type-header">晚餐</h4>
+        <div class="meals-grid">
+          <div *ngFor="let assignment of getMealsByType(dayGroup.value, '晚餐')" 
+               class="meal-card">
+            <div class="meal-image" *ngIf="assignment.meal_detail?.image">
+              <img [src]="assignment.meal_detail.image" 
+                   [alt]="assignment.meal_detail.meal_name">
+            </div>
+            <div class="meal-image placeholder" *ngIf="!assignment.meal_detail?.image">
+              <span class="meal-icon">🍽️</span>
+            </div>
+            <div class="meal-info">
+              <h5 class="meal-name">{{ assignment.meal_detail?.meal_name || assignment.meal_name }}</h5>
+              <p class="meal-type">{{ assignment.meal_type }}</p>
+              <p class="meal-day">第 {{ assignment.day_cycle }} 天</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Meals State -->
+  <div *ngIf="!loading && !error && mealAssignments.length === 0" class="no-meals-container">
+    <div class="no-meals-icon">🍽️</div>
+    <h3>尚未分配膳食</h3>
+    <p>此患者目前沒有分配的膳食。</p>
+    <button (click)="navigateToEditPatient()" class="assign-meals-button">
+      分配膳食
+    </button>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="navigation-section">
+    <button (click)="navigateToPatientDetails()" class="nav-button secondary">
+      返回患者詳情
+    </button>
+    <button (click)="navigateToEditPatient()" class="nav-button primary">
+      編輯患者
+    </button>
+    <button (click)="navigateToPatientIntakes()" class="nav-button primary">
+      查看攝取量
+    </button>
+  </div>
+</div>

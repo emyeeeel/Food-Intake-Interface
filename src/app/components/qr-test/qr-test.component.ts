@@ -9,33 +9,35 @@ import { environment } from '../../../environments/environment';
 })
 export class QrTestComponent implements AfterViewInit {
   @Input() patientId: number = 1;
-  @Input() type: 'Details' | 'Intake' | 'Before' | 'After' = 'Details'; 
+  @Input() type: 'Details' | 'Intake' | 'Before' | 'After' | 'PatientID' = 'Details'; 
   @Input() qrSize: number = 100;
   @ViewChild('qrCanvas') qrCanvas!: ElementRef<HTMLCanvasElement>;
 
   ngAfterViewInit() {
-    // const detailsUrl = `https://h3vkhzth-4200.asse.devtunnels.ms/patient-info/${this.patientId}`;
-    // const intakeUrl = `https://h3vkhzth-8000.asse.devtunnels.ms/api/patients/${this.patientId}/recommended-intake/`;
-
+    let qrData: string;
+  
+  if (this.type === 'PatientID') {
+    // Just the patient ID
+    qrData = this.patientId.toString();
+  } else {
+    // Your existing URL logic
     const detailsUrl = `https://h3vkhzth-4200.asse.devtunnels.ms/patient-info/${this.patientId}`;
     const intakeUrl = `https://h3vkhzth-8000.asse.devtunnels.ms/api/patients/${this.patientId}/recommended-intake/`;
     const captureBeforeUrl = `https://h3vkhzth-8000.asse.devtunnels.ms/api/segment/before`;
     const captureAfterUrl = `https://h3vkhzth-8000.asse.devtunnels.ms//api/segment/after`;
     
-    // Updated to handle Capture type
-    const apiUrl = this.type === 'Intake' ? intakeUrl : 
-                   this.type === 'Before' ? captureBeforeUrl : 
-                   this.type === 'After' ? captureAfterUrl : 
-                   detailsUrl;
-    
-    // const apiUrl = 'https://h3vkhzth-4200.asse.devtunnels.ms/home';
+    qrData = this.type === 'Intake' ? intakeUrl : 
+             this.type === 'Before' ? captureBeforeUrl : 
+             this.type === 'After' ? captureAfterUrl : 
+             detailsUrl;
+  }
 
-    QRCode.toCanvas(this.qrCanvas.nativeElement, apiUrl, {
-      width: this.qrSize,
-      margin: 2
-    }, (error: any) => {
-      if (error) console.error('QR generation error:', error);
-    });
+  QRCode.toCanvas(this.qrCanvas.nativeElement, qrData, {
+    width: this.qrSize,
+    margin: 2
+  }, (error: any) => {
+    if (error) console.error('QR generation error:', error);
+  });
 
     // const ws = new WebSocket("wss://mr7661km-8000.asse.devtunnels.ms/ws/test/"); 
     // //"ws://192.168.0.100:8000/ws/test/" this only works if angular endpoint is currently running on http 

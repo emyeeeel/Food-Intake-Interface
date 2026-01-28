@@ -44,8 +44,8 @@
         </div>
 
         <div class="intake-assignment">
-          <button>患者就診歷史</button>
-          <button>病人膳食安排</button>
+          <button (click)="navigateToPatientIntakes()">患者食物攝取量</button>
+          <button (click)="navigateToPatientMeals()">病人膳食安排</button>
         </div>
 
         <!-- QR Code Container -->
@@ -53,7 +53,7 @@
           <h3>病人 QR 碼</h3>
           <div class="qr-section">
             <div class="qr-code-container">
-              <app-qr-test [patientId]="ltcPatient.id" type="Intake"></app-qr-test>
+              <app-qr-test [patientId]="ltcPatient.id" type="PatientID"></app-qr-test>
             </div>
           </div>
         </div>

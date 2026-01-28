@@ -406,4 +406,28 @@ Return ONLY the formatted text exactly as specified above. No extra text.
       error: this.error
     };
   }
+
+  /**
+   * Navigate to patient meals view
+   */
+  navigateToPatientMeals(): void {
+    if (this.patientId) {
+      this.router.navigate(['/patient-info/meals', this.patientId]);
+    } else {
+      console.error('Patient ID is required to navigate to meals');
+      this.error = 'Unable to navigate: Patient ID not found';
+    }
+  }
+
+  /**
+   * Navigate to patient intakes view
+   */
+  navigateToPatientIntakes(): void {
+    if (this.patientId) {
+      this.router.navigate(['/patient-info/intakes', this.patientId]);
+    } else {
+      console.error('Patient ID is required to navigate to intakes');
+      this.error = 'Unable to navigate: Patient ID not found';
+    }
+  }
 }
