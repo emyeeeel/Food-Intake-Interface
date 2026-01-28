@@ -18,7 +18,7 @@ import { MealsService } from '../../services/meals.service';
   templateUrl: './patient-details.component.html',
   styleUrls: ['./patient-details.component.scss']
 })
-export class PatientDetailsComponent implements OnInit, OnChanges, OnDestroy {
+export class PatientDetailsComponent implements OnInit, OnChanges{
   @Input() patientId: number = 1;
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
 
@@ -217,133 +217,12 @@ Return ONLY the formatted text exactly as specified above. No extra text.
     }
   }
 
-  ngOnDestroy() {
-    this.stopCamera();
-  }
-
   private formatAnalysisForUI(rawText: string): string {
     let text = rawText.replace(/[*_#`]/g, '').trim();
     text = text.replace(/\n{2,}/g, '\n\n');
     return text;
   }
 
-  toggleQRCode(): void {
-    this.showQRCode = !this.showQRCode;
-  }
-
-  toggleScanner(): void {
-    if (this.showScanner) {
-      this.stopCamera();
-    } else {
-      this.startCamera();
-    }
-    this.showScanner = !this.showScanner;
-  }
-
-  private async startCamera(): Promise<void> {
-    try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'environment',
-          width: { ideal: 300 },
-          height: { ideal: 300 }
-        }
-      });
-
-      if (this.videoElement) {
-        this.videoElement.nativeElement.srcObject = this.stream;
-        await this.videoElement.nativeElement.play();
-        
-        this.startQRDetection();
-      }
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-      this.error = '無法存取攝影機。請檢查權限。'; //Unable to access camera. Please check permissions.
-    }
-  }
-
-  private startQRDetection(): void {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    
-    this.scanInterval = setInterval(() => {
-      if (this.videoElement && this.videoElement.nativeElement.readyState === 4) {
-        const video = this.videoElement.nativeElement;
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        
-        if (context) {
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          
-          try {
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            const qrResult = this.detectQRCode(imageData);
-            
-            if (qrResult) {
-              this.handleQRCodeDetected(qrResult);
-            }
-          } catch (error) {
-            console.error('QR detection error:', error);
-          }
-        }
-      }
-    }, 100);
-  }
-
-  private detectQRCode(imageData: ImageData): string | null {
-    const code = jsQR(imageData.data, imageData.width, imageData.height);
-    return code ? code.data : null;
-  }
-
-  private handleQRCodeDetected(qrData: string): void {
-    this.scanResult = qrData;
-    console.log('QR Code detected:', qrData);
-    
-    this.stopCamera();
-    this.showScanner = false;
-    
-    this.redirectToQRLink(qrData);
-  }
-
-  private redirectToQRLink(qrData: string): void {
-    try {
-      if (qrData.startsWith('http://') || qrData.startsWith('https://')) {
-        window.open(qrData, '_blank');
-      } else if (qrData.startsWith('/')) {
-        this.router.navigate([qrData]);
-      } else {
-        const patientId = parseInt(qrData);
-        if (!isNaN(patientId)) {
-          this.router.navigate(['/patient-info', patientId]);
-        } else {
-          console.log('QR Code contains:', qrData);
-          alert(`QR Code detected: ${qrData}`);
-        }
-      }
-    } catch (error) {
-      console.error('Error handling QR redirect:', error);
-      this.error = 'Invalid QR code format';
-    }
-  }
-
-  private stopCamera(): void {
-    // Clear the scan interval
-    if (this.scanInterval) {
-      clearInterval(this.scanInterval);
-      this.scanInterval = null;
-    }
-    
-    if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
-      this.stream = null;
-    }
-    
-    if (this.videoElement) {
-      this.videoElement.nativeElement.srcObject = null;
-    }
-    
-    this.scanResult = null;
-  }
 
   /**
    * Get LTC patient display name/identifier

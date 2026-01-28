@@ -15,12 +15,12 @@ import { Subscription } from 'rxjs';
 })
 export class PatientMealsComponent implements OnInit, OnChanges, OnDestroy {
   @Input() patientId: number = 0;
-  
+
   ltcPatient: LTCPatient | null = null;
   mealAssignments: MealAssignment[] = [];
   loading: boolean = true;
   error: string | null = null;
-  
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -31,7 +31,6 @@ export class PatientMealsComponent implements OnInit, OnChanges, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Get patient ID from route if not provided via Input
     if (!this.patientId) {
       const routePatientId = this.route.snapshot.paramMap.get('id');
       if (routePatientId) {
@@ -57,38 +56,31 @@ export class PatientMealsComponent implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  /**
-   * Load patient meals data
-   */
   public loadPatientMeals(patientId: number): void {
     this.loading = true;
     this.error = null;
 
-    // Load LTC patient data first
     const patientSub = this.patientService.getLTCPatient(patientId).subscribe({
       next: (ltcPatientData) => {
         this.ltcPatient = ltcPatientData;
-        console.log('LTC Patient loaded:', ltcPatientData);
 
-        // Load meal assignments for LTC patient
-        const mealsSub = this.mealAssignmentService.getMealAssignmentsByLTCPatient(patientId).subscribe({
-          next: (assignments) => {
-            this.mealAssignments = assignments;
-            console.log('LTC Meal assignments loaded:', assignments);
-            this.loading = false;
-          },
-          error: (err) => {
-            console.error('LTC meal assignments error:', err);
-            this.error = '膳食分配加載失敗.'; // Failed to load meal assignments
-            this.loading = false;
-          }
-        });
+        const mealsSub = this.mealAssignmentService
+          .getMealAssignmentsByLTCPatient(patientId)
+          .subscribe({
+            next: (assignments) => {
+              this.mealAssignments = assignments;
+              this.loading = false;
+            },
+            error: () => {
+              this.error = '膳食分配加載失敗.';
+              this.loading = false;
+            }
+          });
 
         this.subscriptions.add(mealsSub);
       },
-      error: (err) => {
-        console.error('LTC patient error:', err);
-        this.error = '加載LTC患者詳細資料失敗.'; // Failed to load LTC patient details
+      error: () => {
+        this.error = '加載LTC患者詳細資料失敗.';
         this.loading = false;
       }
     });
@@ -96,12 +88,9 @@ export class PatientMealsComponent implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.add(patientSub);
   }
 
-  /**
-   * Get LTC patient display name/identifier
-   */
   getPatientDisplayName(): string {
     if (!this.ltcPatient) return `LTC Patient ${this.patientId}`;
-    return `${this.ltcPatient.room_number}-${this.ltcPatient.bed_number}` || `LTC Patient ${this.patientId}`;
+    return `${this.ltcPatient.room_number}-${this.ltcPatient.bed_number}`;
   }
 
   /**
@@ -109,7 +98,7 @@ export class PatientMealsComponent implements OnInit, OnChanges, OnDestroy {
    */
   getMealsByDayCycle(): { [key: string]: MealAssignment[] } {
     const grouped: { [key: string]: MealAssignment[] } = {};
-    
+
     this.mealAssignments.forEach(assignment => {
       const day = assignment.day_cycle?.toString() || 'Unknown';
       if (!grouped[day]) {
@@ -117,38 +106,36 @@ export class PatientMealsComponent implements OnInit, OnChanges, OnDestroy {
       }
       grouped[day].push(assignment);
     });
-    
+
     return grouped;
   }
 
   /**
-   * Get meals by type for a specific day
+   * 🔑 Numeric sort for keyvalue pipe (prevents 1,10,11,2...)
    */
+  dayCycleSort = (
+    a: { key: string; value: MealAssignment[] },
+    b: { key: string; value: MealAssignment[] }
+  ): number => {
+    return Number(a.key) - Number(b.key);
+  };
+
   getMealsByType(dayAssignments: MealAssignment[], mealType: string): MealAssignment[] {
-    return dayAssignments.filter(assignment => assignment.meal_type === mealType);
+    return dayAssignments.filter(a => a.meal_type === mealType);
   }
 
-  /**
-   * Navigate back to patient details
-   */
   navigateToPatientDetails(): void {
     if (this.patientId) {
       this.router.navigate(['/patient-info/view', this.patientId]);
     }
   }
 
-  /**
-   * Navigate to edit patient
-   */
   navigateToEditPatient(): void {
     if (this.patientId) {
       this.router.navigate(['/patient-info/edit', this.patientId]);
     }
   }
 
-  /**
-   * Navigate to patient intakes
-   */
   navigateToPatientIntakes(): void {
     if (this.patientId) {
       this.router.navigate(['/patient-info/intakes', this.patientId]);

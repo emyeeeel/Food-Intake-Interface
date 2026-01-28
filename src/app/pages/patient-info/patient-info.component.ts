@@ -22,6 +22,7 @@ import { PatientMealsComponent } from "../../components/patient-meals/patient-me
 import { PatientIntakeComponent } from "../../components/patient-intake/patient-intake.component";
 import { DisplayPatientComponent } from "../../components/display-patient/display-patient.component";
 import { PrintAllPatientsComponent } from "../../components/print-all-patients/print-all-patients.component";
+import { IntakeService } from '../../services/intake.service';
 
 @Component({
   selector: 'app-patient-info',
@@ -72,7 +73,7 @@ export class PatientInfoComponent implements OnInit {
     console.log("Dinner meal assigned?", status);
   }
 
-  constructor(private router: Router, private cloudTestService: CloudTestService, private cdr: ChangeDetectorRef) {}
+  constructor(private router: Router, private cloudTestService: CloudTestService, private cdr: ChangeDetectorRef, private intakeService: IntakeService) {}
 
   ngOnInit(): void {
     this.patientId = this.getPatientIdFromRoute() || 1;
@@ -85,6 +86,9 @@ export class PatientInfoComponent implements OnInit {
         this.updateCurrentView(path);
       });
     this.updateCurrentView(this.router.url);
+    this.intakeService.getIntakeByLtcPatientId(1).subscribe(records => {
+      console.log(records);
+    });
   }
 
   private updateCurrentView(path: string): void {
