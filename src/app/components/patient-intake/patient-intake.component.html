@@ -49,6 +49,7 @@
               <th>日期</th>
               <th>重量 (g)</th>
               <th>體積 (ml)</th>
+              <th>影像</th>
               <th>紀錄時間</th>
             </tr>
           </thead>
@@ -60,6 +61,20 @@
               <td class="day-cycle">{{ getDateForDayCycle(intake.meal_detail!.day_cycle) }}</td>
               <td>{{ intake.weight_g || '-' }}</td>
               <td>{{ intake.volume_ml || '-' }}</td>
+              <td class="image-cell">
+                <ng-container *ngIf="intake.image; else noImage">
+                  <img
+                    [src]="intake.image"
+                    alt="餐點影像"
+                    class="intake-image"
+                    loading="lazy"
+                  />
+                </ng-container>
+              
+                <ng-template #noImage>
+                  <span>--</span>
+                </ng-template>
+              </td>              
               <td>{{ intake.recorded_at | date:'MMM d, y • h:mm a' }}</td>
             </tr>
           </tbody>

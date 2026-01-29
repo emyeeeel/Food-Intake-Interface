@@ -225,3 +225,17 @@
   }
 }
 
+.image-cell {
+  vertical-align: middle;
+}
+
+.intake-image {
+  max-width: 80px;
+  max-height: 80px;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+}

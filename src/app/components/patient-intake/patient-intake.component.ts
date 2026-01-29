@@ -74,6 +74,7 @@ export class PatientIntakeComponent implements OnInit, OnChanges, OnDestroy {
           .subscribe({
             next: (data) => {
               this.intakes = data;
+              console.log(this.intakes)
               this.loading = false;
             },
             error: () => {
