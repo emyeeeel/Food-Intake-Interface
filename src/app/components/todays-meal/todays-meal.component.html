@@ -9,8 +9,8 @@
         <table class="meal-details-table">
             <thead>
                 <tr>
-                    <th>Meal Code</th>
-                    <th>Meal Name</th>
+                    <th>膳食代碼</th>
+                    <th>餐點名稱</th>
                     <th></th>
                 </tr>
             </thead>
@@ -20,14 +20,14 @@
                     <td class="value">{{ getMealCode(meal) }}</td>
                     <td class="value">{{ meal.meal_name }}</td>
                     <td class="tags-cell">
-                        <div class="view-more">View More</div>
+                        <div class="view-more">看更多</div>
                     </td>
                 </tr>
                 
                 <!-- Show message if no meals found -->
                 <tr *ngIf="getMealsForDisplay().length === 0">
                     <td colspan="3" class="no-meals">
-                        No meals available for {{ time }}
+                        不提供餐食 {{ time }}
                     </td>
                 </tr>
             </tbody>

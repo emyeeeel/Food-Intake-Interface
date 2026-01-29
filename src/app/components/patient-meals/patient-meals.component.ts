@@ -7,6 +7,9 @@ import { MealAssignment } from '../../models/meal-assignment.mode';
 import { LTCPatient } from '../../models/ltc-patient.model';
 import { Subscription } from 'rxjs';
 
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 @Component({
   selector: 'app-patient-meals',
   imports: [CommonModule],
@@ -136,9 +139,38 @@ export class PatientMealsComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  navigateToPatientIntakes(): void {
-    if (this.patientId) {
-      this.router.navigate(['/patient-info/intakes', this.patientId]);
+  public exportMealAssignmentsToExcel(): void {
+    if (this.mealAssignments.length === 0) {
+      alert('沒有膳食分配可導出。');
+      return;
     }
+
+    // Sort mealAssignments by day_cycle, then by meal_type (optional)
+    const sortedAssignments = [...this.mealAssignments].sort((a, b) => {
+      return (Number(a.day_cycle) || 0) - (Number(b.day_cycle) || 0);
+    });
+  
+    // Map data for Excel
+    const excelData = sortedAssignments.map(assignment => ({
+      '天數': assignment.day_cycle ?? '-',
+      '餐別': assignment.meal_type ?? '-',
+      '餐名': assignment.meal_detail?.meal_name || assignment.meal_name || '-',
+    }));
+  
+    // Create worksheet and workbook
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook: XLSX.WorkBook = {
+      Sheets: { '膳食分配': worksheet },
+      SheetNames: ['膳食分配']
+    };
+  
+    // Write and save
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+  
+    const fileName = `${this.mealAssignments[0].patient_identifier}-用餐安排.xlsx`;
+  
+    saveAs(blob, fileName);
   }
+  
 }

@@ -9,15 +9,15 @@
       <button (click)="navigateToEditPatient()" class="nav-button primary">
         編輯患者
       </button>
-      <button (click)="navigateToPatientIntakes()" class="nav-button primary">
-        患者食物攝取量
+      <button (click)="exportMealAssignmentsToExcel()" class="nav-button primary" [disabled]="mealAssignments.length === 0">
+        📊 下載 Excel
       </button>
     </div>
   </div>
 
   <div *ngIf="loading" class="loading-container">
     <div class="loading-spinner"></div>
-    <p>Loading meal assignments...</p>
+    <p>加載膳食分配...</p>
   </div>
 
   <div *ngIf="error && !loading" class="error-container">

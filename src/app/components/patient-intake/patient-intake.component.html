@@ -1,48 +1,71 @@
 <div class="patient-intake">
-
-    <!-- Loading -->
-    <div *ngIf="loading" class="loading">
-      Loading food intake records...
-    </div>
-  
-    <!-- Error -->
-    <div *ngIf="error" class="error">
-      {{ error }}
-    </div>
-  
-    <!-- Content -->
-    <ng-container *ngIf="!loading && !error">
-  
-      <!-- Patient Info -->
-      <h2 *ngIf="ltcPatient">
-        Room {{ ltcPatient!.room_number }} - Bed {{ ltcPatient!.bed_number }}
-      </h2>
-  
-      <p *ngIf="intakes.length === 0">No intake records found.</p>
-  
-      <!-- Intake Table -->
-      <table *ngIf="intakes.length > 0" class="intake-table">
-        <thead>
-          <tr>
-            <th>Meal</th>
-            <th>Time</th>
-            <th>Day</th>
-            <th>Weight (g)</th>
-            <th>Volume (ml)</th>
-            <th>Recorded</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let intake of intakes">
-            <td>{{ intake.meal_detail!.meal_name }}</td>
-            <td>{{ intake.meal_detail!.meal_time }}</td>
-            <td>Day {{ intake.meal_detail!.day_cycle }}</td>
-            <td>{{ intake.weight_g || '-' }}</td>
-            <td>{{ intake.volume_ml || '-' }}</td>
-            <td>{{ intake.recorded_at | date:'MMM d, y • h:mm a' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </ng-container>
+  <div class="header">
+    <h2>患者食物攝取量</h2>
+    <button
+      class="btn-download-excel"
+      (click)="exportIntakesToExcel()"
+      [disabled]="loading || intakes.length === 0"
+    >
+    <span class="download-icon">📊</span>
+          <span>下載 Excel</span>
+    </button>
   </div>
+
+   <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <span>正在載入食物攝取紀錄...</span>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error" class="main-content">
+
+    <!-- Patient Info Card -->
+    <div class="patient-info" *ngIf="ltcPatient">
+      <h3>
+        房號 {{ ltcPatient.room_number }} – 床號 {{ ltcPatient.bed_number }}
+      </h3>
+    </div>
+
+    <!-- No Records -->
+    <div class="no-meals" *ngIf="intakes.length === 0">
+      <p>未找到攝取紀錄.</p>
+    </div>
+
+    <!-- Intake Table -->
+    <div class="meals-table-container" *ngIf="intakes.length > 0">
+      <div class="table-wrapper">
+        <table class="meals-table">
+          <thead>
+            <tr>
+              <th>餐別</th>
+              <th>時間</th>
+              <th>天數</th>
+              <th>日期</th>
+              <th>重量 (g)</th>
+              <th>體積 (ml)</th>
+              <th>紀錄時間</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let intake of intakes">
+              <td class="meal-name">{{ intake.meal_detail!.meal_name }}</td>
+              <td class="meal-time">{{ intake.meal_detail!.meal_time }}</td>
+              <td class="day-cycle">第 {{ intake.meal_detail!.day_cycle }} 天</td>
+              <td class="day-cycle">{{ getDateForDayCycle(intake.meal_detail!.day_cycle) }}</td>
+              <td>{{ intake.weight_g || '-' }}</td>
+              <td>{{ intake.volume_ml || '-' }}</td>
+              <td>{{ intake.recorded_at | date:'MMM d, y • h:mm a' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
   
