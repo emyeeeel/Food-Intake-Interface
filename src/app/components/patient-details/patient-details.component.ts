@@ -139,14 +139,14 @@ Return ONLY the formatted text exactly as specified above. No extra text.
 
   ngOnInit() {
     this.loadAllDataAndAnalyze(this.patientId);
-    this.getAnalysisService.testPing('Test prompt').subscribe({
-      next: (response) => {
-        console.log('Test ping response:', response);
-      },
-      error: (error) => {
-        console.error('Test ping error:', error);
-      }
-    });
+    // this.getAnalysisService.testPing('Test prompt').subscribe({
+    //   next: (response) => {
+    //     console.log('Test ping response:', response);
+    //   },
+    //   error: (error) => {
+    //     console.error('Test ping error:', error);
+    //   }
+    // });
   }
 
   private loadAllDataAndAnalyze(patientId: number) {

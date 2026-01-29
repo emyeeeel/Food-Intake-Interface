@@ -148,7 +148,6 @@
     object-fit: cover;
     display: block;
     border-radius: 6px;
-    border: 1px solid green;
   }
 }
 
@@ -306,4 +305,31 @@ button:focus-visible {
 .no-meals-container .assign-meals-button {
   margin-top: 10px;
   min-width: 120px;
+}
+
+
+
+@media (max-width: 768px) {
+  .meals-content {
+    max-height: 70vh;   /* taller, relative to viewport */
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .header-section h2 {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .header-section .navigation-section {
+    justify-content: center;
+  }
 }

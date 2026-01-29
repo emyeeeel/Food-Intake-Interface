@@ -1,5 +1,4 @@
 <div class="main-container">
-  <h3>新增食物攝取紀錄</h3>
 
   <!-- Meal Type Selection Step -->
   @if (mealSelectionStep) {
@@ -30,7 +29,7 @@
   }
 
   <!-- Scanner Header (moved above scanner container) -->
-  @if (!mealSelectionStep) {
+  @if (!mealSelectionStep && !scanResult) {
     <div class="scanner-header">
       <button class="back-btn" (click)="goBackToSelection()">
         ← 返回選擇
@@ -43,7 +42,7 @@
   }
 
   <!-- QR Scanner Section (shown after meal type selection) -->
-  @if (!mealSelectionStep) {
+  @if (!mealSelectionStep && !scanResult) {
     <div class="qr-scanner-container">
       <div class="scanner-section">
         <button class="start-scanner-btn" (click)="toggleScanner()">
@@ -60,7 +59,7 @@
                 </div>
               </div>
             </div>
-            @if (scanResult) {
+            <!-- @if (scanResult) {
               <div class="scanner-result">
                 <div class="result-success">
                   <h5>掃描成功!</h5>
@@ -68,10 +67,92 @@
                   <p class="meal-type-info">記錄類型: {{ getMealTypeDisplayText() }}</p>
                 </div>
               </div>
-            }
+            } -->
           </div>
         }
       </div>
     </div>
   }
+
+  @if (scanResult && mealAssignments.length > 0) {
+    <div class="header-section">
+      <h2>新增食物攝取紀錄</h2>
+      <button class="nav-button primary" (click)="capture()">
+        Upload Food Intake
+      </button>
+    </div>
+
+    <div class="meals-content">
+
+      <h4 class="patient-title">
+        病人 ID: {{ scannedPatientId }}
+      </h4>
+  
+      @for (dayGroup of getMealsByDayCycle() | keyvalue: dayCycleSort; track dayGroup.key) {
+        <div class="day-section">
+  
+          <h3 class="day-header">第 {{ dayGroup.key }} 天</h3>
+  
+          <div class="meals">
+  
+            <!-- Lunch -->
+            <div class="meal-type-section">
+              <div class="meals-grid">
+                @for (assignment of getMealsByType(dayGroup.value, '午餐'); track assignment.id) {
+                  <div
+                    class="meal-card"
+                    [class.selected]="selectedMealAssignmentId === assignment.id"
+                    (click)="selectMealAssignment(assignment)"
+                  >
+                    <div class="meal-image">
+                      <img
+                        [src]="assignment.meal_detail!.image || 'assets/images/meals/meal_placeholder.jpg'"
+                        [alt]="assignment.meal_detail!.meal_name"
+                      />
+                    </div>
+  
+                    <div class="meal-info">
+                      <h4 class="meal-type-header">午餐</h4>
+                      <p class="meal-name">
+                        {{ assignment.meal_detail!.meal_name || assignment.meal_name }}
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+  
+            <!-- Dinner -->
+            <div class="meal-type-section">
+              <div class="meals-grid">
+                @for (assignment of getMealsByType(dayGroup.value, '晚餐'); track assignment.id) {
+                  <div
+                    class="meal-card"
+                    [class.selected]="selectedMealAssignmentId === assignment.id"
+                    (click)="selectMealAssignment(assignment)"
+                  >
+                    <div class="meal-image">
+                      <img
+                        [src]="assignment.meal_detail!.image || 'assets/images/meals/meal_placeholder.jpg'"
+                        [alt]="assignment.meal_detail!.meal_name"
+                      />
+                    </div>
+  
+                    <div class="meal-info">
+                      <h4 class="meal-type-header">晚餐</h4>
+                      <p class="meal-name">
+                        {{ assignment.meal_detail!.meal_name || assignment.meal_name }}
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+  
+          </div>
+        </div>
+      }
+    </div>
+  }
+  
 </div>

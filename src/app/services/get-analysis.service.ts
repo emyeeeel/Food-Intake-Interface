@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class GetAnalysisService {
   private baseUrl = `https://jqh2g82b-8000.asse.devtunnels.ms`;
-  private apiUrl = `${this.baseUrl}/api/rag/query/`;
+  private apiUrl = `${this.baseUrl}/api/recommendations/generate`;
 
   constructor(private http: HttpClient) { }
 

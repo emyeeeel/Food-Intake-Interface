@@ -18,5 +18,19 @@ export class IntakeService {
 
     return this.http.get<IntakeRecord[]>(this.apiUrl, { params });
   }
-    
+  
+  createIntake(intake: Partial<IntakeRecord>): Observable<IntakeRecord> {
+    const formData = new FormData();
+    formData.append('meal', intake.meal?.toString() || '');
+    formData.append('ltc_patient', intake.ltc_patient?.toString() || '');
+    formData.append('weight_g', intake.weight_g?.toString() || '');
+    formData.append('volume_ml', intake.volume_ml?.toString() || '');
+    formData.append('recorded_at', intake.recorded_at || '');
+    if (intake.image instanceof File) {
+      formData.append('image', intake.image);
+    }
+    return this.http.post<IntakeRecord>(this.apiUrl, formData);
+  }
+  
+  
 }

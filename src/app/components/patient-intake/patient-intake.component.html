@@ -1,1 +1,48 @@
-<p>patient-intake works!</p>
+<div class="patient-intake">
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading">
+      Loading food intake records...
+    </div>
+  
+    <!-- Error -->
+    <div *ngIf="error" class="error">
+      {{ error }}
+    </div>
+  
+    <!-- Content -->
+    <ng-container *ngIf="!loading && !error">
+  
+      <!-- Patient Info -->
+      <h2 *ngIf="ltcPatient">
+        Room {{ ltcPatient!.room_number }} - Bed {{ ltcPatient!.bed_number }}
+      </h2>
+  
+      <p *ngIf="intakes.length === 0">No intake records found.</p>
+  
+      <!-- Intake Table -->
+      <table *ngIf="intakes.length > 0" class="intake-table">
+        <thead>
+          <tr>
+            <th>Meal</th>
+            <th>Time</th>
+            <th>Day</th>
+            <th>Weight (g)</th>
+            <th>Volume (ml)</th>
+            <th>Recorded</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let intake of intakes">
+            <td>{{ intake.meal_detail!.meal_name }}</td>
+            <td>{{ intake.meal_detail!.meal_time }}</td>
+            <td>Day {{ intake.meal_detail!.day_cycle }}</td>
+            <td>{{ intake.weight_g || '-' }}</td>
+            <td>{{ intake.volume_ml || '-' }}</td>
+            <td>{{ intake.recorded_at | date:'MMM d, y • h:mm a' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+  </div>
+  

@@ -14,4 +14,5 @@ export interface IntakeRecord {
     ltc_patient_detail: LTCPatient | null;
     meal_detail: Meal;
     patient_identifier: string;
+    image: File | null;
 }

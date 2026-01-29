@@ -3,14 +3,31 @@ import { Component, ElementRef, ViewChild, OnDestroy, OnInit } from '@angular/co
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import jsQR from 'jsqr';
+import { MealAssignment } from '../../models/meal-assignment.mode';
+import { MealAssignmentService } from '../../services/meal-assignment.service';
+import { PatientService } from '../../services/patient.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IntakeRecord } from '../../models/food-intake.model';
+import { IntakeService } from '../../services/intake.service';
+import JSZip from 'jszip';
 
 @Component({
   selector: 'app-add-intake',
   templateUrl: './add-intake.component.html',
-  styleUrl: './add-intake.component.scss'
+  styleUrl: './add-intake.component.scss',
+  imports: [CommonModule, FormsModule]
 })
 export class AddIntakeComponent implements OnInit, OnDestroy {
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
+
+  scannedPatientId: number | null = null;
+
+  mealAssignments: MealAssignment[] = [];
+  selectedMealAssignmentId: number | null = null;
+
+  loadingAssignments = false;
+  assignmentError: string | null = null;
 
   // Scanner state
   showScanner = false;
@@ -30,7 +47,10 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private mealAssignmentService: MealAssignmentService,
+    private patientService: PatientService,
+    private intakeService: IntakeService
   ) {}
 
   ngOnInit(): void {
@@ -113,20 +133,39 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
   // Handle QR scan result
   onQRScanned(result: string): void {
     this.scanResult = result;
-    console.log(`QR Code scanned for ${this.selectedMealType} meal:`, result);
-    
-    // Process the scanned result based on meal type
-    this.processIntakeRecord(result, this.selectedMealType!);
-  }
+  
+    const patientId = parseInt(result, 10);
+    if (isNaN(patientId)) {
+      console.warn('QR does not contain a patient ID');
+      return;
+    }
+  
+    this.scannedPatientId = patientId;
+    this.loadMealAssignments(patientId);
 
-  processIntakeRecord(qrData: string, mealType: 'Before' | 'After'): void {
-    // Implement your intake record processing logic here
-    console.log(`Processing ${mealType} meal intake:`, qrData);
-    
-    // Example: Parse QR data and create intake record
-    // You might want to navigate to another component or show a form
-    this.handleQRCodeDetected(qrData);
+    this.stopScanner();
   }
+  
+  private loadMealAssignments(patientId: number): void {
+    this.loadingAssignments = true;
+    this.assignmentError = null;
+    this.mealAssignments = [];
+  
+    this.mealAssignmentService
+      .getMealAssignmentsByLTCPatient(patientId)
+      .subscribe({
+        next: (assignments) => {
+          this.mealAssignments = assignments;
+          this.loadingAssignments = false;
+        },
+        error: () => {
+          this.assignmentError = '無法加載該患者的膳食分配';
+          this.loadingAssignments = false;
+        }
+      });
+  }
+  
+
 
   // Helper method to get display text
   getMealTypeDisplayText(): string {
@@ -166,54 +205,78 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     return code ? code.data : null;
   }
 
-  private async handleQRCodeDetected(qrData: string): Promise<void> {
-    this.scanResult = qrData; 
-    console.log('QR Code detected:', qrData);
-    
-    // Stop the camera
-    this.stopScanner();
-    this.showScanner = false;
-
-    // Start loading state
-    this.isProcessing = true;
-    this.loadingMessage = 'QR Code detected, processing...';
-    this.uploadCompleted = false;
-    this.redirectStarted = false;
-
-    try {
-      // Wait for test upload to complete before proceeding
-      this.loadingMessage = 'Uploading data to server...';
-      console.log('Uploading data before redirect...');
-      
-      await this.capture();
-      
-      this.uploadCompleted = true;
-      this.loadingMessage = 'Upload successful, preparing to redirect...';
-      console.log('Upload completed, now redirecting...');
-      
-      // Small delay to show the completed state
-      setTimeout(() => {
-        this.redirectStarted = true;
-        this.loadingMessage = 'Redirecting to patient information...';
-        
-        // After successful upload, redirect to the hardcoded URL
-        const redirectUrl = `/meal-intake/all`; 
-        this.router.navigate([redirectUrl]);
-      }, 1000);
-      
-    } catch (error) {
-      console.error('Upload failed, but still redirecting:', error);
-      this.loadingMessage = 'Upload failed, but continuing to redirect...';
-      
-      setTimeout(() => {
-        this.redirectStarted = true;
-        this.loadingMessage = 'Redirecting to patient information...';
-        
-        const redirectUrl = `/meal-intake/all`;
-        this.router.navigate([redirectUrl]);
-      }, 1000);
-    }
+  getMealsByDayCycle(): { [key: string]: MealAssignment[] } {
+    const grouped: { [key: string]: MealAssignment[] } = {};
+    this.mealAssignments.forEach(a => {
+      const day = a.day_cycle?.toString() || 'Unknown';
+      if (!grouped[day]) grouped[day] = [];
+      grouped[day].push(a);
+    });
+    return grouped;
   }
+  
+  dayCycleSort = (
+    a: { key: string; value: MealAssignment[] },
+    b: { key: string; value: MealAssignment[] }
+  ): number => Number(a.key) - Number(b.key);
+  
+  getMealsByType(assignments: MealAssignment[], type: string): MealAssignment[] {
+    return assignments.filter(a => a.meal_type === type);
+  }
+
+  selectMealAssignment(assignment: MealAssignment): void {
+    this.selectedMealAssignmentId = assignment.id;
+    console.log('Selected assignment:', assignment);
+  }
+
+  // private async handleQRCodeDetected(qrData: string): Promise<void> {
+  //   this.scanResult = qrData; 
+  //   console.log('QR Code detected:', qrData);
+    
+  //   // Stop the camera
+  //   this.stopScanner();
+  //   this.showScanner = false;
+
+  //   // Start loading state
+  //   this.isProcessing = true;
+  //   this.loadingMessage = 'QR Code detected, processing...';
+  //   this.uploadCompleted = false;
+  //   this.redirectStarted = false;
+
+  //   try {
+  //     // Wait for test upload to complete before proceeding
+  //     this.loadingMessage = 'Uploading data to server...';
+  //     console.log('Uploading data before redirect...');
+      
+  //     await this.capture();
+      
+  //     this.uploadCompleted = true;
+  //     this.loadingMessage = 'Upload successful, preparing to redirect...';
+  //     console.log('Upload completed, now redirecting...');
+      
+  //     // Small delay to show the completed state
+  //     setTimeout(() => {
+  //       this.redirectStarted = true;
+  //       this.loadingMessage = 'Redirecting to patient information...';
+        
+  //       // After successful upload, redirect to the hardcoded URL
+  //       const redirectUrl = `/meal-intake/all`; 
+  //       this.router.navigate([redirectUrl]);
+  //     }, 1000);
+      
+  //   } catch (error) {
+  //     console.error('Upload failed, but still redirecting:', error);
+  //     this.loadingMessage = 'Upload failed, but continuing to redirect...';
+      
+  //     setTimeout(() => {
+  //       this.redirectStarted = true;
+  //       this.loadingMessage = 'Redirecting to patient information...';
+        
+  //       const redirectUrl = `/meal-intake/all`;
+  //       this.router.navigate([redirectUrl]);
+  //     }, 1000);
+  //   }
+  // }
 
   resetState(): void {
     this.isProcessing = false;
@@ -222,6 +285,7 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     this.redirectStarted = false;
     this.scanResult = null;
     this.showScanner = false;
+    this.scannedPatientId = null;
   }
 
   private redirectToQRLink(qrData: string): void {
@@ -247,38 +311,66 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     }
   }
 
-  private capture(): Promise<any> {
+  public capture(): Promise<any> {
     return new Promise((resolve, reject) => {
-      const apiUrl = 'http://127.0.0.1:8000/api/capture/';  //let this receive qr url link
-      
-      const testData = {
-        message: 'QR Code scanned - uploading intake data',
-        timestamp: new Date().toISOString(),
-        segment_url: this.scanResult, 
-        data: {
-          test: true,
-          value: 123,
-          source: 'qr_scanner'
-        }
-      };
-
-      console.log('Sending test data to API:', testData);
-
-      this.http.post(apiUrl, testData).subscribe({
-        next: (response) => {
-          console.log('API Response:', response);
-          console.log('Test upload successful!');
-          resolve(response);
+      const apiUrl = 'http://127.0.0.1:8081/api/capture/meal/'; // Use TX2 IP
+  
+      this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
+        next: async (zipBlob) => {
+          try {
+            if (!this.selectedMealAssignmentId) {
+              throw new Error('No meal assignment selected');
+            }
+  
+            // Find selected assignment
+            const assignment = this.mealAssignments.find(a => a.id === this.selectedMealAssignmentId);
+            if (!assignment) {
+              throw new Error('Selected meal assignment not found');
+            }
+  
+            // Load ZIP
+            const jszip = new JSZip();
+            const zip = await jszip.loadAsync(zipBlob);
+  
+            // Extract RGB image as Blob
+            const rgbFileData = await zip.file("rgb_image.png")?.async("blob");
+            if (!rgbFileData) {
+              throw new Error("RGB image not found in ZIP");
+            }
+  
+            const imageFile = new File([rgbFileData], `intake_${Date.now()}.png`, { type: 'image/png' });
+  
+            // Optional: extract inpainted depth image or CSV if needed
+            // const inpaintBlob = await zip.file("inpainted_depth_image.png")?.async("blob");
+            // const csvText = await zip.file("depth.csv")?.async("text");
+  
+            // Prepare IntakeRecord payload
+            const intakePayload = {
+              meal: assignment.meal,
+              ltc_patient: assignment.ltc_patient || 0,
+              weight_g: 0, // You may update this from your logic if TX2 provides weight
+              volume_ml: 0, // Same for volume
+              recorded_at: new Date().toISOString(),
+              image: imageFile // send actual file if your backend accepts multipart/form-data
+            };
+  
+            // Post to backend using IntakeService
+            const createdRecord = await this.intakeService.createIntake(intakePayload).toPromise();
+            console.log('Intake record created successfully:', createdRecord);
+  
+            resolve(createdRecord);
+  
+          } catch (err) {
+            console.error('Failed to create intake record:', err);
+            reject(err);
+          }
         },
         error: (error) => {
           console.error('API Error:', error);
-          console.log('Test upload failed:', error.message);
           reject(error);
-        },
-        complete: () => {
-          console.log('Test upload request completed');
         }
       });
     });
   }
+  
 }
