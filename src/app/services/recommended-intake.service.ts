@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
 })
 export class RecommendedIntakeService {
   private baseUrl = environment.apiBaseUrl;
-  private apiUrl = `${this.baseUrl}/api/patients/`;
+  private apiUrl = `${this.baseUrl}/api/ltc-patients/`;
 
   constructor(private http: HttpClient) {}
 

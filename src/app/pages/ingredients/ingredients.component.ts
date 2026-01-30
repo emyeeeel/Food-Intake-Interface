@@ -11,10 +11,11 @@ import { MainOptionsComponent } from "../../components/main-options/main-options
 import { IngredientsCategoriesComponent } from "../../components/ingredients-categories/ingredients-categories.component";
 import { filter } from 'rxjs';
 import { DisplayIngredientsComponent } from "../../components/display-ingredients/display-ingredients.component";
+import { PrintAllIngredientsComponent } from '../../components/print-all-ingredients/print-all-ingredients.component';
 
 @Component({
   selector: 'app-ingredients',
-  imports: [MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent, FilterIconComponent, FilterOptionsComponent, MainOptionsComponent, IngredientsCategoriesComponent, DisplayIngredientsComponent],
+  imports: [MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent, FilterIconComponent, FilterOptionsComponent, MainOptionsComponent, IngredientsCategoriesComponent, DisplayIngredientsComponent, PrintAllIngredientsComponent],
   templateUrl: './ingredients.component.html',
   styleUrl: './ingredients.component.scss'
 })

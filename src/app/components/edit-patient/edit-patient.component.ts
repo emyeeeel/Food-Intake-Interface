@@ -52,20 +52,20 @@ export class EditPatientComponent implements OnInit, OnDestroy {
   existingMealAssignments: MealAssignment[] = [];
   originalMealAssignments: MealAssignmentForm[] = []; // For reset functionality
   availableDays = [
-    { value: '1', label: 'Day 1' },
-    { value: '2', label: 'Day 2' },
-    { value: '3', label: 'Day 3' },
-    { value: '4', label: 'Day 4' },
-    { value: '5', label: 'Day 5' },
-    { value: '6', label: 'Day 6' },
-    { value: '7', label: 'Day 7' },
-    { value: '8', label: 'Day 8' },
-    { value: '9', label: 'Day 9' },
-    { value: '10', label: 'Day 10' },
-    { value: '11', label: 'Day 11' },
-    { value: '12', label: 'Day 12' },
-    { value: '13', label: 'Day 13' },
-    { value: '14', label: 'Day 14' }
+    { value: '1', label: '第1天' },
+    { value: '2', label: '第2天' },
+    { value: '3', label: '第3天' },
+    { value: '4', label: '第4天' },
+    { value: '5', label: '第5天' },
+    { value: '6', label: '第6天' },
+    { value: '7', label: '第7天' },
+    { value: '8', label: '第8天' },
+    { value: '9', label: '第9天' },
+    { value: '10', label: '第10天' },
+    { value: '11', label: '第11天' },
+    { value: '12', label: '第12天' },
+    { value: '13', label: '第13天' },
+    { value: '14', label: '第14天' }
   ];
 
   private subscriptions: Subscription = new Subscription();
@@ -93,7 +93,7 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     if (this.patientId) {
       this.loadPatientData();
     } else {
-      this.error = 'No patient ID provided';
+      this.error = '未提供病患 ID';
       this.loading = false;
     }
   }
@@ -120,7 +120,7 @@ export class EditPatientComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error loading patient data:', err);
-        this.error = 'Failed to load patient information. Please try again.';
+        this.error = '載入病患資料失敗。請再試一次。';
         this.loading = false;
       }
     });
@@ -351,11 +351,11 @@ export class EditPatientComponent implements OnInit, OnDestroy {
         console.log('Patient updated successfully:', updated);
         // Use smart update instead of complete replacement
         this.updateMealAssignmentsSmartly();
-        this.showSuccessMessage('Patient information updated successfully!');
+        this.showSuccessMessage('病患資料已更新成功！');
       },
       error: (err) => {
         console.error('Error updating patient:', err);
-        this.error = 'Failed to update patient information. Please try again.';
+        this.error = '更新病患資料失敗。請再試一次。';
         this.loading = false;
       }
     });
@@ -424,7 +424,7 @@ export class EditPatientComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error in smart meal assignment update:', error);
-          this.error = 'Failed to update meal assignments';
+          this.error = '更新餐點分配失敗。';
           this.completeUpdate();
         }
       });
@@ -513,8 +513,8 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     this.loading = false;
     
     const message = this.error 
-      ? 'Patient information updated, but there were issues with meal assignments.'
-      : 'Patient information and meal assignments updated successfully!';
+      ? '病患資料已更新，但餐點分配發生問題。'
+      : '病患資料與餐點分配已更新成功！';
     
     this.showSuccessMessage(message);
     

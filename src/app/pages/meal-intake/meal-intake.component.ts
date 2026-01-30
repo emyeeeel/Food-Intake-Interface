@@ -13,7 +13,7 @@ import { IntakeLogComponent } from "../../components/intake-log/intake-log.compo
 import { filter } from 'rxjs';
 import { AddIntakeComponent } from "../../components/add-intake/add-intake.component";
 import { DisplayIntakeComponent } from '../../components/display-intake/display-intake.component';
-import { TodaysMealComponent } from "../../components/todays-meal/todays-meal.component";
+import { PrintAllIntakesComponent } from '../../components/print-all-intakes/print-all-intakes.component';
 
 @Component({
   selector: 'app-meal-intake',
@@ -29,6 +29,7 @@ import { TodaysMealComponent } from "../../components/todays-meal/todays-meal.co
     IntakeLogComponent,
     AddIntakeComponent,
     DisplayIntakeComponent,
+    PrintAllIntakesComponent
 ],
   templateUrl: './meal-intake.component.html',
   styleUrl: './meal-intake.component.scss'

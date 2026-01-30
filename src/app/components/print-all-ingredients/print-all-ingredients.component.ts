@@ -1,140 +1,140 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IntakeRecord } from '../../models/food-intake.model';
-import { IntakeService } from '../../services/intake.service';
+import { Ingredient } from '../../models/ingredient.model';
+import { IngredientsService } from '../../services/ingredients.service';
 
 @Component({
-  selector: 'app-print-all-intakes',
+  selector: 'app-print-all-ingredients',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './print-all-intakes.component.html',
-  styleUrl: './print-all-intakes.component.scss',
+  templateUrl: './print-all-ingredients.component.html',
+  styleUrl: './print-all-ingredients.component.scss',
 })
-export class PrintAllIntakesComponent implements OnInit {
-  intakes: IntakeRecord[] = [];
-  paginatedIntakes: IntakeRecord[] = [];
+export class PrintAllIngredientsComponent implements OnInit {
+  ingredients: Ingredient[] = [];
+  paginatedIngredients: Ingredient[] = [];
   loading: boolean = true;
   error: string | null = null;
 
   // Pagination properties
   currentPage = 1;
-  pageSize = 10; // Items per page
-  totalIntakes = 0;
+  pageSize = 5; // Items per page
+  totalIngredients = 0;
   totalPages = 0;
   targetPage: number | null = null;
 
   // Selection
-  selectedIntakes: Set<number> = new Set();
+  selectedIngredients: Set<number> = new Set();
 
-  constructor(private intakeService: IntakeService) {}
+  constructor(private ingredientsService: IngredientsService) {}
 
   ngOnInit(): void {
-    this.loadAllIntakes();
+    this.loadAllIngredients();
   }
 
-  loadAllIntakes(): void {
+  loadAllIngredients(): void {
     this.loading = true;
     this.error = null;
 
-    this.intakeService.getIntakes().subscribe({
+    this.ingredientsService.getIngredients().subscribe({
       next: (response) => {
-        this.intakes = response;
-        this.totalIntakes = response.length;
+        this.ingredients = response;
+        this.totalIngredients = response.length;
         this.calculatePagination();
-        this.updatePaginatedIntakes();
+        this.updatePaginatedIngredients();
         this.loading = false;
       },
       error: (err) => {
-        console.error('Error loading intakes:', err);
-        this.error = 'Failed to load intakes';
+        console.error('Error loading ingredients:', err);
+        this.error = 'Failed to load ingredients';
         this.loading = false;
       }
     });
   }
 
   calculatePagination(): void {
-    this.totalPages = Math.ceil(this.totalIntakes / this.pageSize);
+    this.totalPages = Math.ceil(this.totalIngredients / this.pageSize);
     if (this.currentPage > this.totalPages && this.totalPages > 0) {
       this.currentPage = this.totalPages;
     }
   }
 
-  updatePaginatedIntakes(): void {
+  updatePaginatedIngredients(): void {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    this.paginatedIntakes = this.intakes.slice(startIndex, endIndex);
+    this.paginatedIngredients = this.ingredients.slice(startIndex, endIndex);
   }
 
   // Selection Methods
-  toggleIntakeSelection(intakeId: number, event?: any): void {
-    if (this.selectedIntakes.has(intakeId)) {
-      this.selectedIntakes.delete(intakeId);
+  toggleIngredientSelection(ingredientId: number, event?: any): void {
+    if (this.selectedIngredients.has(ingredientId)) {
+      this.selectedIngredients.delete(ingredientId);
     } else {
-      this.selectedIntakes.add(intakeId);
+      this.selectedIngredients.add(ingredientId);
     }
   }
 
   selectAllCurrentPage(): void {
-    this.paginatedIntakes.forEach(intake => {
-      this.selectedIntakes.add(intake.id);
+    this.paginatedIngredients.forEach(ingredient => {
+      this.selectedIngredients.add(ingredient.id);
     });
   }
 
   deselectAllCurrentPage(): void {
-    this.paginatedIntakes.forEach(intake => {
-      this.selectedIntakes.delete(intake.id);
+    this.paginatedIngredients.forEach(ingredient => {
+      this.selectedIngredients.delete(ingredient.id);
     });
   }
 
   isAllCurrentPageSelected(): boolean {
-    return this.paginatedIntakes.every(intake => this.selectedIntakes.has(intake.id));
+    return this.paginatedIngredients.every(ingredient => this.selectedIngredients.has(ingredient.id));
   }
 
   isAnyCurrentPageSelected(): boolean {
-    return this.paginatedIntakes.some(intake => this.selectedIntakes.has(intake.id));
+    return this.paginatedIngredients.some(ingredient => this.selectedIngredients.has(ingredient.id));
   }
 
   clearSelection(): void {
-    this.selectedIntakes.clear();
+    this.selectedIngredients.clear();
   }
 
   // Pagination Methods
   goToFirstPage(): void {
     this.currentPage = 1;
-    this.updatePaginatedIntakes();
+    this.updatePaginatedIngredients();
   }
 
   goToPreviousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.updatePaginatedIntakes();
+      this.updatePaginatedIngredients();
     }
   }
 
   goToNextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.updatePaginatedIntakes();
+      this.updatePaginatedIngredients();
     }
   }
 
   goToLastPage(): void {
     this.currentPage = this.totalPages;
-    this.updatePaginatedIntakes();
+    this.updatePaginatedIngredients();
   }
 
   goToPage(page: any): void {
     if (typeof page === 'number' && page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.updatePaginatedIntakes();
+      this.updatePaginatedIngredients();
     }
   }
 
   goToTargetPage(): void {
     if (this.targetPage && this.targetPage >= 1 && this.targetPage <= this.totalPages) {
       this.currentPage = this.targetPage;
-      this.updatePaginatedIntakes();
+      this.updatePaginatedIngredients();
       this.targetPage = null;
     }
   }
@@ -175,28 +175,25 @@ export class PrintAllIntakesComponent implements OnInit {
   }
 
   getEndIndex(): number {
-    return Math.min(this.currentPage * this.pageSize, this.totalIntakes);
+    return Math.min(this.currentPage * this.pageSize, this.totalIngredients);
   }
 
   // Print Methods
-  printAllIntakes(): void {
+  printAllIngredients(): void {
     const printWindow = window.open('', '', 'height=600,width=800');
     if (printWindow) {
-      const intakeRows = this.intakes.map(i => `
+      const ingredientRows = this.ingredients.map(i => `
         <tr>
-          <td>${i.ltc_patient_detail?.room_number || '-'}</td>
-          <td>${i.ltc_patient_detail?.bed_number || '-'}</td>
-          <td>${i.meal_detail?.meal_name || '-'}</td>
-          <td>${i.weight_g || '-'}</td>
-          <td>${i.volume_ml || '-'}</td>
-          <td>${new Date(i.recorded_at).toLocaleString()}</td>
+          <td>${i.id}</td>
+          <td>${i.name}</td>
+          <td>${i.food_group || '-'}</td>
         </tr>
       `).join('');
 
       const html = `
         <html>
           <head>
-            <title>Intake Report</title>
+            <title>Ingredient Report</title>
             <style>
               table { width: 100%; border-collapse: collapse; }
               th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
@@ -205,21 +202,17 @@ export class PrintAllIntakesComponent implements OnInit {
             </style>
           </head>
           <body>
-            <h2>Intake Report - ${new Date().toLocaleDateString()}</h2>
+            <h2>Ingredient Report - ${new Date().toLocaleDateString()}</h2>
             <table>
               <thead>
                 <tr>
-                  <th>Room</th>
-                  <th>Bed</th>
-                  <th>Patient</th>
-                  <th>Meal</th>
-                  <th>Weight (g)</th>
-                  <th>Volume (ml)</th>
-                  <th>Recorded At</th>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Food Group</th>
                 </tr>
               </thead>
               <tbody>
-                ${intakeRows}
+                ${ingredientRows}
               </tbody>
             </table>
           </body>
@@ -235,27 +228,24 @@ export class PrintAllIntakesComponent implements OnInit {
     }
   }
 
-  printSelectedIntakes(): void {
-    const selected = Array.from(this.selectedIntakes);
-    const intakesToPrint = this.intakes.filter(i => selected.includes(i.id));
+  printSelectedIngredients(): void {
+    const selected = Array.from(this.selectedIngredients);
+    const ingredientsToPrint = this.ingredients.filter(i => selected.includes(i.id));
 
     const printWindow = window.open('', '', 'height=600,width=800');
     if (printWindow) {
-      const intakeRows = intakesToPrint.map(i => `
+      const ingredientRows = ingredientsToPrint.map(i => `
         <tr>
-          <td>${i.ltc_patient_detail?.room_number || '-'}</td>
-          <td>${i.ltc_patient_detail?.bed_number || '-'}</td>
-          <td>${i.meal_detail?.meal_name || '-'}</td>
-          <td>${i.weight_g || '-'}</td>
-          <td>${i.volume_ml || '-'}</td>
-          <td>${new Date(i.recorded_at).toLocaleString()}</td>
+          <td>${i.id}</td>
+          <td>${i.name}</td>
+          <td>${i.food_group || '-'}</td>
         </tr>
       `).join('');
 
       const html = `
         <html>
           <head>
-            <title>Intake Report - Selected</title>
+            <title>Ingredient Report - Selected</title>
             <style>
               table { width: 100%; border-collapse: collapse; }
               th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
@@ -264,21 +254,17 @@ export class PrintAllIntakesComponent implements OnInit {
             </style>
           </head>
           <body>
-            <h2>Selected Intakes - ${new Date().toLocaleDateString()}</h2>
+            <h2>Selected Ingredients - ${new Date().toLocaleDateString()}</h2>
             <table>
               <thead>
                 <tr>
-                  <th>Room</th>
-                  <th>Bed</th>
-                  <th>Patient</th>
-                  <th>Meal</th>
-                  <th>Weight (g)</th>
-                  <th>Volume (ml)</th>
-                  <th>Recorded At</th>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Food Group</th>
                 </tr>
               </thead>
               <tbody>
-                ${intakeRows}
+                ${ingredientRows}
               </tbody>
             </table>
           </body>

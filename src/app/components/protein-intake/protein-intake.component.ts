@@ -8,5 +8,5 @@ import { SeeHistoryButtonComponent } from "../see-history-button/see-history-but
   styleUrl: './protein-intake.component.scss',
 })
 export class ProteinIntakeComponent {
-  recommendedProteinIntake: string = '00';
+  recommendedProteinIntake: string = '75';
 }

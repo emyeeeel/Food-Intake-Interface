@@ -1,4 +1,4 @@
-.print-all-intakes {
+.print-all-ingredients {
   // Mobile First (Base styles for 320px and up)
   width: 100%;
   background-color: #CAECE5;
@@ -10,7 +10,7 @@
   flex-direction: column;
   position: relative;
 
-  .intakes-header {
+  .ingredients-header {
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -36,7 +36,7 @@
       gap: 8px;
       align-items: center;
 
-      .intakes-count {
+      .ingredients-count {
         color: #40C1AC;
         font-weight: 600;
         font-size: 11px;
@@ -123,7 +123,7 @@
     margin-bottom: 10px;
   }
 
-  .no-intakes {
+  .no-ingredients {
     text-align: center;
     padding: 30px 15px;
     color: #7A9B96;
@@ -144,8 +144,8 @@
     overflow: hidden;
   }
 
-  // Intakes Table Section
-  .intakes-table-container {
+  // Ingredients Table Section
+  .ingredients-table-container {
     height: 100%;
     background: white;
     border-radius: 8px;
@@ -214,7 +214,7 @@
       }
     }
 
-    .intakes-table {
+    .ingredients-table {
       width: 100%;
       border-collapse: collapse;
 
@@ -236,18 +236,14 @@
             width: 8%;
             text-align: center;
           }
-          &:nth-child(2) { width: 8%; }
-          &:nth-child(3) { width: 8%; }
-          &:nth-child(4) { width: 15%; }
-          &:nth-child(5) { width: 12%; }
-          &:nth-child(6) { width: 10%; }
-          &:nth-child(7) { width: 10%; }
-          &:nth-child(8) { width: 23%; }
+          &:nth-child(2) { width: 10%; }
+          &:nth-child(3) { width: 50%; }
+          &:nth-child(4) { width: 32%; }
         }
       }
 
       tbody {
-        tr.intake-row {
+        tr.ingredient-row {
           border-bottom: 1px solid #E0F7F4;
           cursor: pointer;
           transition: all 0.3s ease;
@@ -273,7 +269,7 @@
           vertical-align: middle;
           line-height: 1.2;
 
-          &.intake-checkbox {
+          &.ingredient-checkbox {
             text-align: center;
             padding: 6px 3px;
 
@@ -286,32 +282,22 @@
             }
           }
 
-          &.intake-room,
-          &.intake-bed {
+          &.ingredient-id {
             font-weight: 600;
             color: #00313C;
             font-size: 10px;
             text-align: center;
           }
 
-          &.intake-patient {
+          &.ingredient-name {
             font-weight: 500;
             color: #01262E;
           }
 
-          &.intake-meal {
-            font-weight: 500;
-            color: #40C1AC;
-          }
-
-          &.intake-weight,
-          &.intake-volume {
+          &.ingredient-food-group {
             text-align: center;
-          }
-
-          &.intake-recorded-at {
-            font-size: 8px;
-            color: #666;
+            color: #40C1AC;
+            font-weight: 500;
           }
         }
       }
@@ -437,9 +423,9 @@
 
 // 600px (Small Desktop/Large Tablet)
 @media screen and (min-width: 600px) {
-  .print-all-intakes {
+  .print-all-ingredients {
 
-    .intakes-header {
+    .ingredients-header {
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
@@ -454,7 +440,7 @@
         flex-direction: column;
         align-items: flex-end;
 
-        .intakes-count {
+        .ingredients-count {
           font-size: 12px;
         }
 
@@ -471,7 +457,7 @@
       }
     }
 
-    .intakes-table-container {
+    .ingredients-table-container {
       .table-controls {
         padding: 10px 15px;
 
@@ -485,10 +471,15 @@
         }
       }
 
-      .intakes-table {
+      .ingredients-table {
         thead th {
           padding: 7px 5px;
           font-size: 10px;
+
+          &:first-child { width: 6%; }
+          &:nth-child(2) { width: 12%; }
+          &:nth-child(3) { width: 45%; }
+          &:nth-child(4) { width: 37%; }
         }
 
         tbody td {
@@ -496,7 +487,7 @@
           font-size: 10px;
           line-height: 1.2;
 
-          &.intake-checkbox {
+          &.ingredient-checkbox {
             padding: 7px 4px;
 
             input[type="checkbox"] {
@@ -505,10 +496,8 @@
             }
           }
 
-          &.intake-room,
-          &.intake-bed,
-          &.intake-recorded-at {
-            font-size: 9px;
+          &.ingredient-id {
+            font-size: 11px;
           }
         }
       }
@@ -557,9 +546,9 @@
 
 // 1024px (Standard Desktop)
 @media screen and (min-width: 1024px) {
-  .print-all-intakes {
+  .print-all-ingredients {
 
-    .intakes-header {
+    .ingredients-header {
       padding: 15px;
       margin-bottom: 15px;
 
@@ -570,7 +559,7 @@
       .header-controls {
         gap: 10px;
 
-        .intakes-count {
+        .ingredients-count {
           font-size: 14px;
         }
 
@@ -585,7 +574,7 @@
       }
     }
 
-    .intakes-table-container {
+    .ingredients-table-container {
       .table-controls {
         padding: 12px 20px;
 
@@ -599,10 +588,15 @@
         }
       }
 
-      .intakes-table {
+      .ingredients-table {
         thead th {
           padding: 8px 6px;
           font-size: 11px;
+
+          &:first-child { width: 5%; }
+          &:nth-child(2) { width: 10%; }
+          &:nth-child(3) { width: 50%; }
+          &:nth-child(4) { width: 35%; }
         }
 
         tbody td {
@@ -610,7 +604,7 @@
           font-size: 11px;
           line-height: 1.2;
 
-          &.intake-checkbox {
+          &.ingredient-checkbox {
             padding: 8px 5px;
 
             input[type="checkbox"] {
@@ -619,20 +613,13 @@
             }
           }
 
-          &.intake-room,
-          &.intake-bed {
+          &.ingredient-id {
             font-size: 12px;
           }
 
-          &.intake-patient,
-          &.intake-meal,
-          &.intake-weight,
-          &.intake-volume {
+          &.ingredient-name,
+          &.ingredient-food-group {
             font-size: 11px;
-          }
-
-          &.intake-recorded-at {
-            font-size: 10px;
           }
         }
       }
@@ -678,17 +665,17 @@
 
 // Large Desktop (1280px and up)
 @media screen and (min-width: 1280px) {
-  .print-all-intakes {
+  .print-all-ingredients {
     padding: 20px;
 
-    .intakes-header {
+    .ingredients-header {
       h2 {
         font-size: 20px;
       }
     }
 
-    .intakes-table-container {
-      .intakes-table {
+    .ingredients-table-container {
+      .ingredients-table {
         thead th {
           padding: 12px 10px;
           font-size: 13px;
@@ -698,7 +685,7 @@
           padding: 12px 10px;
           font-size: 12px;
 
-          &.intake-checkbox {
+          &.ingredient-checkbox {
             padding: 12px 8px;
 
             input[type="checkbox"] {
@@ -707,20 +694,13 @@
             }
           }
 
-          &.intake-room,
-          &.intake-bed {
+          &.ingredient-id {
             font-size: 13px;
           }
 
-          &.intake-patient,
-          &.intake-meal,
-          &.intake-weight,
-          &.intake-volume {
+          &.ingredient-name,
+          &.ingredient-food-group {
             font-size: 12px;
-          }
-
-          &.intake-recorded-at {
-            font-size: 11px;
           }
         }
       }
@@ -730,8 +710,8 @@
 
 // Small screens (max-width: 768px)
 @media (max-width: 768px) {
-  .print-all-intakes {
-    .intakes-header {
+  .print-all-ingredients {
+    .ingredients-header {
       h2 {
         font-size: 12px;
       }
@@ -746,8 +726,8 @@
       }
     }
 
-    .intakes-table-container {
-      .intakes-table {
+    .ingredients-table-container {
+      .ingredients-table {
         thead th {
           font-size: 8px;
           padding: 4px 2px;

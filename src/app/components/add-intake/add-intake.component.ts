@@ -313,7 +313,7 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
 
   public capture(): Promise<any> {
     return new Promise((resolve, reject) => {
-      const apiUrl = 'http://127.0.0.1:8081/api/capture/meal/'; // Use TX2 IP
+      const apiUrl = 'http://127.0.0.1:8000/api/capture/meal/'; // Use TX2 IP
   
       this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
         next: async (zipBlob) => {
@@ -357,6 +357,11 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
             // Post to backend using IntakeService
             const createdRecord = await this.intakeService.createIntake(intakePayload).toPromise();
             console.log('Intake record created successfully:', createdRecord);
+  
+            // Navigate to patient intakes page
+            if (this.scannedPatientId) {
+              this.router.navigate(['/patient-info/intakes', this.scannedPatientId]);
+            }
   
             resolve(createdRecord);
   

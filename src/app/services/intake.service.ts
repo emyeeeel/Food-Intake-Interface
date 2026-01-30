@@ -13,6 +13,10 @@ export class IntakeService {
   
   constructor(private http: HttpClient) {}
 
+  getIntakes(): Observable<IntakeRecord[]> {
+    return this.http.get<IntakeRecord[]>(this.apiUrl);
+  }
+
   getIntakeByLtcPatientId(ltcPatientId: number): Observable<IntakeRecord[]> {
     const params = new HttpParams().set('ltc_patient_id', ltcPatientId.toString());
 

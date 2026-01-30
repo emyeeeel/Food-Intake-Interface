@@ -1,5 +1,154 @@
-<div class="display-meal-container">
-    <div class="header">
-      <h2>所有患者</h2>
+<div class="display-patient-container">
+  <div class="header">
+    <h2>所有患者</h2>
+    <div class="header-actions">
+      @if (!isLoading && !error) {
+        <span class="total-count">
+          總計: {{ totalPatients }} 患者
+        </span>
+      }
+      <button
+        type="button"
+        class="btn-refresh"
+        (click)="getPatients()"
+        [disabled]="isLoading"
+        >
+        @if (!isLoading) {
+          <span>重新整理</span>
+        }
+        @if (isLoading) {
+          <span>載入中...</span>
+        }
+      </button>
     </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>正在載入患者...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error && !isLoading) {
+    <div class="error-state">
+      <div class="error-icon">❌</div>
+      <p class="error-message">{{ error }}</p>
+      <button type="button" class="btn-retry" (click)="getPatients()">
+        再試一次
+      </button>
+    </div>
+  }
+
+  <!-- Patients Grid with Pagination -->
+  @if (!isLoading && !error && patients.length > 0) {
+    <div class="patients-grid-container">
+      <!-- Current Page Info -->
+      <div class="page-info">
+        <span class="page-indicator">
+          第 {{ currentPage }} 頁，共 {{ totalPages }} 頁
+        </span>
+      </div>
+      <!-- Patients Grid -->
+      <div class="patients-grid">
+        @for (patient of paginatedPatients; track patient.id) {
+          <div class="patient-item">
+            <div class="patient-header">
+              <span class="room-bed">{{ patient.room_number }}-{{ patient.bed_number }}</span>
+              <span class="sex-badge" [attr.data-sex]="patient.sex">{{ patient.sex === 'M' ? '男' : patient.sex === 'F' ? '女' : patient.sex }}</span>
+            </div>
+            <div class="patient-info">
+              <div class="info-item">
+                <span class="label">年齡:</span>
+                <span class="value">{{ patient.age }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">身高:</span>
+                <span class="value">{{ patient.height_cm }}cm</span>
+              </div>
+              <div class="info-item">
+                <span class="label">體重:</span>
+                <span class="value">{{ patient.weight_kg }}kg</span>
+              </div>
+              <div class="info-item">
+                <span class="label">活動:</span>
+                <span class="value">{{ patient.activity_level }}</span>
+              </div>
+            </div>
+            <div class="patient-actions">
+              <a [routerLink]="['/patient-info/view', patient.id]" class="btn-action view">查看</a>
+              <a [routerLink]="['/patient-info/edit', patient.id]" class="btn-action edit">編輯</a>
+            </div>
+          </div>
+        }
+      </div>
+      <!-- Pagination Controls -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          <span>
+            顯示 {{ paginatedPatients.length }} / {{ totalPatients }} 患者
+          </span>
+        </div>
+        <div class="pagination-controls">
+          <div class="nav-buttons">
+            <button
+              type="button"
+              class="btn-page btn-first"
+              [disabled]="currentPage === 1"
+              (click)="goToPage(1)"
+              title="First Page"
+              >
+              ⏮
+            </button>
+            <button
+              type="button"
+              class="btn-page btn-prev"
+              [disabled]="currentPage === 1"
+              (click)="previousPage()"
+              >
+              ◀
+            </button>
+            <div class="page-numbers">
+              @for (page of getPageNumbers(); track page) {
+                <button
+                  type="button"
+                  class="btn-page"
+                  [class.active]="page === currentPage"
+                  (click)="goToPage(page)"
+                  >
+                  {{ page }}
+                </button>
+              }
+            </div>
+            <button
+              type="button"
+              class="btn-page btn-next"
+              [disabled]="currentPage === totalPages"
+              (click)="nextPage()"
+              >
+              ▶
+            </button>
+            <button
+              type="button"
+              class="btn-page btn-last"
+              [disabled]="currentPage === totalPages"
+              (click)="goToPage(totalPages)"
+              title="Last Page"
+              >
+              ⏭
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading && !error && patients.length === 0) {
+    <div class="empty-state">
+      <p>無患者數據</p>
+    </div>
+  }
 </div>

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MealsService } from '../../services/meals.service';
 import { PatientService } from '../../services/patient.service';
 import { MealAssignmentService } from '../../services/meal-assignment.service';
@@ -38,20 +39,20 @@ export class AddPatientComponent implements OnInit {
   
   mealAssignments: MealAssignmentForm[] = [];
   availableDays = [
-    { value: '1', label: 'Day 1' },
-    { value: '2', label: 'Day 2' },
-    { value: '3', label: 'Day 3' },
-    { value: '4', label: 'Day 4' },
-    { value: '5', label: 'Day 5' },
-    { value: '6', label: 'Day 6' },
-    { value: '7', label: 'Day 7' },
-    { value: '8', label: 'Day 8' },
-    { value: '9', label: 'Day 9' },
-    { value: '10', label: 'Day 10' },
-    { value: '11', label: 'Day 11' },
-    { value: '12', label: 'Day 12' },
-    { value: '13', label: 'Day 13' },
-    { value: '14', label: 'Day 14' }
+    { value: '1', label: '第1天' },
+    { value: '2', label: '第2天' },
+    { value: '3', label: '第3天' },
+    { value: '4', label: '第4天' },
+    { value: '5', label: '第5天' },
+    { value: '6', label: '第6天' },
+    { value: '7', label: '第7天' },
+    { value: '8', label: '第8天' },
+    { value: '9', label: '第9天' },
+    { value: '10', label: '第10天' },
+    { value: '11', label: '第11天' },
+    { value: '12', label: '第12天' },
+    { value: '13', label: '第13天' },
+    { value: '14', label: '第14天' }
   ];
   allMeals: Meal[] = [];
 
@@ -62,7 +63,8 @@ export class AddPatientComponent implements OnInit {
   constructor(
     private mealsService: MealsService,
     private patientService: PatientService,
-    private mealAssignmentService: MealAssignmentService
+    private mealAssignmentService: MealAssignmentService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -192,18 +194,18 @@ export class AddPatientComponent implements OnInit {
         error: (error) => {
           console.error('Error creating patient:', error);
           this.isSubmitting = false;
-          this.submitError = 'Failed to create patient. Please try again.';
+          this.submitError = '建立病患失敗。請再試一次。';
           
           // Show error message to user
-          alert(`Error: ${error.message || 'Failed to create patient'}`);
+          alert(`錯誤：${error.message || '建立病患失敗'}`);
         }
       });
 
     } catch (error) {
       console.error('Form submission error:', error);
       this.isSubmitting = false;
-      this.submitError = 'An unexpected error occurred.';
-      alert('An unexpected error occurred. Please try again.');
+      this.submitError = '發生未預期的錯誤。';
+      alert('發生未預期的錯誤。請再試一次。');
     }
   }
 
@@ -239,7 +241,7 @@ export class AddPatientComponent implements OnInit {
         console.error('Error creating meal assignments:', error);
         
         // Patient was created but meal assignments failed
-        alert(`Patient created successfully, but there was an error creating meal assignments: ${error.message || 'Unknown error'}`);
+        alert(`病患建立成功，但建立餐點分配時發生錯誤：${error.message || '未知錯誤'}`);
         this.onMealAssignmentsComplete(patientId, [], error);
       }
     });
@@ -299,43 +301,43 @@ export class AddPatientComponent implements OnInit {
 
     // Show success message
     const message = error 
-      ? 'Patient added successfully! However, some meal assignments could not be created.'
-      : 'Patient and meal assignments added successfully!';
+      ? '病患已新增成功！但部分餐點分配無法建立。'
+      : '病患與餐點分配已新增成功！';
     
     alert(message);
     
-    // Clear form after completion
+    // Navigate to the patient's page
+    this.router.navigate(['/patient-info/view', patientId]);
+    
+    // Clear form after navigation
     this.clearForm();
-
-    // Optional: Navigate to the patient's page
-    // this.router.navigate(['/patient-info', patientId]);
   }
 
   private validateForm(): boolean {
     // Required field validation
     if (!this.roomNumber.trim()) {
-      alert('Room Number is required');
+      alert('房號為必填');
       return false;
     }
 
     if (!this.bedNumber.trim()) {
-      alert('Bed Number is required');
+      alert('床位為必填');
       return false;
     }
 
     // Basic validation for numeric fields
     if (this.age !== null && this.age <= 0) {
-      alert('Age must be a positive number');
+      alert('年齡必須為正數');
       return false;
     }
 
     if (this.height !== null && this.height <= 0) {
-      alert('Height must be a positive number');
+      alert('身高必須為正數');
       return false;
     }
 
     if (this.weight !== null && this.weight <= 0) {
-      alert('Weight must be a positive number');
+      alert('體重必須為正數');
       return false;
     }
 

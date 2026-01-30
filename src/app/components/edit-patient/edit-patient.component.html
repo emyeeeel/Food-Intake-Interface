@@ -1,17 +1,17 @@
 <div class="patient-form-container">
     <div class="header-info">
-      <h2>Edit Patient Information</h2>
+      <h2>編輯病患資訊</h2>
     </div>
 
     <!-- Loading State -->
     <div *ngIf="loading" class="loading-container">
-      <p>Loading patient information...</p>
+      <p>正在載入病患資訊...</p>
     </div>
 
     <!-- Error State -->
     <div *ngIf="error" class="error-container">
       <p class="error-message">{{ error }}</p>
-      <button type="button" class="btn-retry" (click)="loadPatientData()">Retry</button>
+      <button type="button" class="btn-retry" (click)="loadPatientData()">重試</button>
     </div>
 
     <!-- Success Message -->
@@ -19,7 +19,7 @@
       <div class="success-message">
         <span class="success-icon">✓</span>
         <span class="success-text">{{ successMessage }}</span>
-        <button type="button" class="btn-close-success" (click)="clearSuccessMessage()" title="Close">
+        <button type="button" class="btn-close-success" (click)="clearSuccessMessage()" title="關閉">
           ✕
         </button>
       </div>
@@ -31,18 +31,18 @@
         
         <!-- REQUIRED SECTION -->
         <fieldset class="required">
-          <legend>Required Information</legend>
+          <legend>必填資訊</legend>
   
           <!-- Patient Identifier -->
           <div class="patient-identifier">
-            <h2>Patient Identifier</h2>
+            <h2>病患識別</h2>
             <div class="form-group">
-              <label for="roomNumber">Room Number</label>
+              <label for="roomNumber">房號</label>
               <input type="text" id="roomNumber" name="roomNumber" [(ngModel)]="roomNumber" required />
             </div>
   
             <div class="form-group">
-              <label for="bedNumber">Bed Number</label>
+              <label for="bedNumber">床位</label>
               <input type="text" id="bedNumber" name="bedNumber" [(ngModel)]="bedNumber" required />
             </div>
           </div>
@@ -50,14 +50,14 @@
           <!-- Multiple Meal Assignments Container -->
           <div class="meal-assignments">
             <div class="meal-assignments-header">
-              <h2>Patient Meal Assignments</h2>
+              <h2>病患餐點分配</h2>
               <button 
                 type="button" 
                 class="btn-add-assignment" 
                 (click)="addMealAssignment()"
                 [disabled]="mealAssignments.length >= availableDays.length"
               >
-                + Add Assignment
+                + 新增分配
               </button>
             </div>
   
@@ -70,13 +70,13 @@
               >
                 <!-- Assignment Header with Remove Button -->
                 <div class="assignment-header">
-                  <span class="assignment-label">Assignment {{ i + 1 }}</span>
+                  <span class="assignment-label">分配 {{ i + 1 }}</span>
                   <button 
                     type="button" 
                     class="btn-remove-assignment"
                     (click)="removeMealAssignment(i)"
                     [disabled]="mealAssignments.length === 1"
-                    title="Remove Assignment"
+                    title="移除分配"
                   >
                     ✕
                   </button>
@@ -84,7 +84,7 @@
   
                 <!-- Day Cycle Selection -->
                 <div class="form-group">
-                  <label [for]="'dayCycle-' + i">Day Cycle</label>
+                  <label [for]="'dayCycle-' + i">日別</label>
                   <select 
                     [id]="'dayCycle-' + i" 
                     [name]="'dayCycle-' + i" 
@@ -92,7 +92,7 @@
                     (change)="onDayChange($event, i)"
                     required
                   >
-                    <option value="" disabled>Select day</option>
+                    <option value="" disabled>選擇天數</option>
                     <option *ngFor="let day of availableDays" [value]="day.value">
                       {{ day.label }}
                     </option>
@@ -104,7 +104,7 @@
                   
                   <!-- Lunch Meals -->
                   <div class="meal-time-section" *ngIf="assignment.lunchMeals && assignment.lunchMeals.length > 0">
-                    <h4>Lunch Meals</h4>
+                    <h4>午餐</h4>
                     <div class="meals-grid">
                       <div *ngFor="let meal of assignment.lunchMeals" class="meal-option">
                         <input 
@@ -123,7 +123,7 @@
   
                   <!-- Dinner Meals -->
                   <div class="meal-time-section" *ngIf="assignment.dinnerMeals && assignment.dinnerMeals.length > 0">
-                    <h4>Dinner Meals</h4>
+                    <h4>晚餐</h4>
                     <div class="meals-grid">
                       <div *ngFor="let meal of assignment.dinnerMeals" class="meal-option">
                         <input 
@@ -144,7 +144,7 @@
                   <div *ngIf="(!assignment.lunchMeals || assignment.lunchMeals.length === 0) && 
                              (!assignment.dinnerMeals || assignment.dinnerMeals.length === 0)" 
                        class="no-meals">
-                    <p>No meals available for Day {{ assignment.dayId }}</p>
+                    <p>第 {{ assignment.dayId }} 天無可用餐點</p>
                   </div>
                 </div>
               </div>
@@ -154,13 +154,13 @@
   
         <!-- OPTIONAL SECTION -->
         <fieldset class="optional">
-          <legend>Optional Information</legend>
+          <legend>選填資訊</legend>
           
           <!-- Patient Demographics Row 1 -->
           <div class="form-row">
             <div class="col-1">
               <div class="form-group">
-                <label for="age">Age</label>
+                <label for="age">年齡</label>
                 <input 
                   type="number" 
                   id="age" 
@@ -168,23 +168,23 @@
                   [(ngModel)]="age" 
                   min="0" 
                   max="120"
-                  placeholder="Enter age"
+                  placeholder="輸入年齡"
                 />
               </div>
     
               <div class="form-group">
-                <label for="sex">Sex</label>
+                <label for="sex">性別</label>
                 <select id="sex" name="sex" [(ngModel)]="sex">
-                  <option value="" disabled>Select sex</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
+                  <option value="" disabled>選擇性別</option>
+                  <option value="male">男</option>
+                  <option value="female">女</option>
                 </select>
               </div>
             </div>
   
             <div class="col-2">
               <div class="form-group">
-                <label for="height">Height (cm)</label>
+                <label for="height">身高（cm）</label>
                 <input 
                   type="number" 
                   id="height" 
@@ -193,12 +193,12 @@
                   min="50" 
                   max="250"
                   step="0.1"
-                  placeholder="Enter height in cm"
+                  placeholder="輸入身高（cm）"
                 />
               </div>
     
               <div class="form-group">
-                <label for="weight">Weight (kg)</label>
+                <label for="weight">體重（kg）</label>
                 <input 
                   type="number" 
                   id="weight" 
@@ -207,19 +207,19 @@
                   min="10" 
                   max="300"
                   step="0.1"
-                  placeholder="Enter weight in kg"
+                  placeholder="輸入體重（kg）"
                 />
               </div>
             </div>
             <div class="col-3">
               <div class="form-group">
-                <label for="activityLevel">Activity Level</label>
+                <label for="activityLevel">活動量</label>
                 <select id="activityLevel" name="activityLevel" [(ngModel)]="activityLevel">
-                  <option value="" disabled>Select activity level</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="low_active">Low Active</option>
-                  <option value="active">Active</option>
-                  <option value="very_active">Very Active</option>
+                  <option value="" disabled>選擇活動量</option>
+                  <option value="inactive">無活動</option>
+                  <option value="low_active">低活動量</option>
+                  <option value="active">中等活動量</option>
+                  <option value="very_active">高活動量</option>
                 </select>
               </div>
             </div>
@@ -228,13 +228,13 @@
           <!-- Activity Level and Dietary Restrictions -->
           <div class="form-row">
             <div class="form-group">
-              <label for="dietaryRestrictions">Dietary Restrictions</label>
+              <label for="dietaryRestrictions">飲食限制</label>
               <textarea 
                 id="dietaryRestrictions" 
                 name="dietaryRestrictions"
                 [(ngModel)]="dietaryRestrictions"
                 rows="4"
-                placeholder="Enter any dietary restrictions or special requirements..."
+                placeholder="輸入飲食限制或特殊需求..."
               ></textarea>
             </div>
           </div>
@@ -244,9 +244,9 @@
   
       <!-- FORM ACTIONS -->
       <div class="form-buttons">
-        <button type="button" class="btn-cancel" (click)="cancelEdit()">Cancel</button>
-        <button type="button" class="btn-clear" (click)="resetForm()">Reset</button>
-        <button type="button" class="btn-submit" (click)="updatePatient()" [disabled]="!isFormValid()">Update Patient</button>
+        <button type="button" class="btn-cancel" (click)="cancelEdit()">取消</button>
+        <button type="button" class="btn-clear" (click)="resetForm()">全部清除</button>
+        <button type="button" class="btn-submit" (click)="updatePatient()" [disabled]="!isFormValid()">更新病患資訊</button>
       </div>
   
     </form>
