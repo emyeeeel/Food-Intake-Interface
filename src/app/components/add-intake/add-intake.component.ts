@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IntakeRecord } from '../../models/food-intake.model';
 import { IntakeService } from '../../services/intake.service';
+import { DateService } from '../../services/date.service';
 import JSZip from 'jszip';
 
 @Component({
@@ -50,7 +51,8 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private mealAssignmentService: MealAssignmentService,
     private patientService: PatientService,
-    private intakeService: IntakeService
+    private intakeService: IntakeService,
+    private dateService: DateService
   ) {}
 
   ngOnInit(): void {
@@ -212,7 +214,19 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
       if (!grouped[day]) grouped[day] = [];
       grouped[day].push(a);
     });
-    return grouped;
+
+    // Only return the group that matches today's cycle day
+    try {
+      const today = this.dateService.getTodaysCycleDay().toString();
+      if (grouped[today]) {
+        return { [today]: grouped[today] };
+      }
+      // If no assignments for today, return empty object (template will render nothing)
+      return {};
+    } catch (error) {
+      console.error('Error determining today cycle day:', error);
+      return {};
+    }
   }
   
   dayCycleSort = (
@@ -222,6 +236,11 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
   
   getMealsByType(assignments: MealAssignment[], type: string): MealAssignment[] {
     return assignments.filter(a => a.meal_type === type);
+  }
+
+  hasMealsForToday(): boolean {
+    const groups = this.getMealsByDayCycle();
+    return Object.keys(groups).length > 0;
   }
 
   selectMealAssignment(assignment: MealAssignment): void {

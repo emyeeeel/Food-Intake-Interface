@@ -6,6 +6,7 @@ import { IntakeService } from '../../services/intake.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IntakeRecord } from '../../models/food-intake.model';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -13,7 +14,7 @@ import { DateService } from '../../services/date.service';
 
 @Component({
   selector: 'app-patient-intake',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './patient-intake.component.html',
   styleUrl: './patient-intake.component.scss',
 })
@@ -22,6 +23,11 @@ export class PatientIntakeComponent implements OnInit, OnChanges, OnDestroy {
 
   ltcPatient: LTCPatient | null = null;
   intakes: IntakeRecord[] = [];
+  // Pagination state
+  pageSizeOptions: number[] = [5, 10, 20];
+  pageSize: number = 4;
+  currentPage: number = 1;
+  paginatedIntakes: IntakeRecord[] = [];
   loading: boolean = true;
   error: string | null = null;
 
@@ -74,7 +80,9 @@ export class PatientIntakeComponent implements OnInit, OnChanges, OnDestroy {
           .subscribe({
             next: (data) => {
               this.intakes = data;
-              console.log(this.intakes)
+              console.log(this.intakes);
+              this.currentPage = 1;
+              this.updatePagination();
               this.loading = false;
             },
             error: () => {
@@ -141,7 +149,55 @@ export class PatientIntakeComponent implements OnInit, OnChanges, OnDestroy {
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(blob, `${this.intakes[0].patient_identifier}-Intakes.xlsx`);
   }
-  
+
+  // --- Pagination helpers ---
+  private updatePagination(): void {
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedIntakes = this.intakes.slice(start, end);
+  }
+
+  public get totalPages(): number {
+    return Math.max(1, Math.ceil(this.intakes.length / this.pageSize));
+  }
+
+  public goToPage(page: number): void {
+    if (page < 1) page = 1;
+    if (page > this.totalPages) page = this.totalPages;
+    this.currentPage = page;
+    this.updatePagination();
+  }
+
+  public prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  public nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  public firstPage(): void {
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  public lastPage(): void {
+    this.currentPage = this.totalPages;
+    this.updatePagination();
+  }
+
+  public onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
   public getDateForDayCycle(dayCycle: number): string {
     try {
       const date = this.dateService.getDateForCycleDay(dayCycle); // Date object for that day

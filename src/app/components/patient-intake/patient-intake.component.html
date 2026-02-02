@@ -54,7 +54,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let intake of intakes">
+            <tr *ngFor="let intake of paginatedIntakes">
               <td class="meal-name">{{ intake.meal_detail!.meal_name }}</td>
               <td class="meal-time">{{ intake.meal_detail!.meal_time }}</td>
               <td class="day-cycle">第 {{ intake.meal_detail!.day_cycle }} 天</td>
@@ -79,6 +79,23 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="pagination" *ngIf="intakes.length > pageSize">
+        <div class="page-size">
+          <label>每頁顯示：</label>
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)">
+            <option *ngFor="let s of pageSizeOptions" [ngValue]="s">{{s}}</option>
+          </select>
+        </div>
+        <div class="controls">
+          <button (click)="firstPage()" [disabled]="currentPage === 1">« 首頁</button>
+          <button (click)="prevPage()" [disabled]="currentPage === 1">‹ 上一頁</button>
+          <span>第 {{ currentPage }} 頁 / 共 {{ totalPages }} 頁</span>
+          <button (click)="nextPage()" [disabled]="currentPage === totalPages">下一頁 ›</button>
+          <button (click)="lastPage()" [disabled]="currentPage === totalPages">尾頁 »</button>
+        </div>
       </div>
     </div>
   </div>

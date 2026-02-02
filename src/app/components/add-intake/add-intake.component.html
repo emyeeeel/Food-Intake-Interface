@@ -74,7 +74,7 @@
     </div>
   }
 
-  @if (scanResult && mealAssignments.length > 0) {
+  @if (scanResult && hasMealsForToday()) {
     <div class="header-section">
       <h2>新增食物攝取紀錄</h2>
       <button class="nav-button primary" (click)="capture()">
@@ -152,6 +152,10 @@
           </div>
         </div>
       }
+    </div>
+  } @else {
+    <div class="no-assignments">
+      <p>今日無可用餐點分配。</p>
     </div>
   }
   
