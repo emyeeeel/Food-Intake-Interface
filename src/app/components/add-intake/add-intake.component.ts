@@ -12,6 +12,8 @@ import { IntakeRecord } from '../../models/food-intake.model';
 import { IntakeService } from '../../services/intake.service';
 import { DateService } from '../../services/date.service';
 import JSZip from 'jszip';
+import { WeightService } from '../../services/weight.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-add-intake',
@@ -52,7 +54,8 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     private mealAssignmentService: MealAssignmentService,
     private patientService: PatientService,
     private intakeService: IntakeService,
-    private dateService: DateService
+    private dateService: DateService,
+    private weightService: WeightService
   ) {}
 
   ngOnInit(): void {
@@ -362,12 +365,15 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
             // Optional: extract inpainted depth image or CSV if needed
             // const inpaintBlob = await zip.file("inpainted_depth_image.png")?.async("blob");
             // const csvText = await zip.file("depth.csv")?.async("text");
+
+            const netWeightResponse = await firstValueFrom(this.weightService.getNetWeight());
+            const netWeight = netWeightResponse.net_weight || 0;
   
             // Prepare IntakeRecord payload
             const intakePayload = {
               meal: assignment.meal,
               ltc_patient: assignment.ltc_patient || 0,
-              weight_g: 0, // You may update this from your logic if TX2 provides weight
+              weight_g: netWeight, // You may update this from your logic if TX2 provides weight
               volume_ml: 0, // Same for volume
               recorded_at: new Date().toISOString(),
               image: imageFile // send actual file if your backend accepts multipart/form-data
