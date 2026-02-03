@@ -12,8 +12,8 @@ interface Notification {
 @Component({
   selector: 'app-notif',
   imports: [],
-  templateUrl: './notif.component.html',
-  styleUrl: './notif.component.scss'
+  templateUrl: './notification.component.html',
+  styleUrl: './notification.component.scss'
 })
 export class NotifComponent implements OnInit {
   isDropdownOpen: boolean = false;

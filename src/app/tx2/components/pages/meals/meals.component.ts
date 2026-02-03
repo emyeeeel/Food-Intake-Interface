@@ -1,13 +1,12 @@
 import { Component } from '@angular/core';
 import { HeaderComponent } from "../../components/header/header.component";
-import { MainOptionsComponent } from "../../../../components/main-options/main-options.component";
 import { DateContainerComponent } from "../../../../components/date-container/date-container.component";
 import { TodaysMealComponent } from "../../components/todays-meal/todays-meal.component";
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-meals',
-  imports: [HeaderComponent, MainOptionsComponent, DateContainerComponent, TodaysMealComponent],
+  imports: [HeaderComponent, DateContainerComponent, TodaysMealComponent],
   templateUrl: './meals.component.html',
   styleUrl: './meals.component.scss',
 })

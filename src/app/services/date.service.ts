@@ -47,7 +47,7 @@ export class DateService {
   setSelectedDate(date: Date): void {
     this.selectedDateSubject.next(date);
     this.selectedDateStringSubject.next(this.formatDate(date));
-    console.log('DateService: Date updated to', date);
+    // console.log('DateService: Date updated to', date);
   }
 
   /**
@@ -130,7 +130,7 @@ export class DateService {
     // Update if we've moved to a new cycle
     if (newCycle.currentCycle !== currentCycle.currentCycle || 
         newCycle.currentDay !== currentCycle.currentDay) {
-      console.log('DateService: Meal cycle updated:', newCycle);
+      // console.log('DateService: Meal cycle updated:', newCycle);
       this.mealCycleSubject.next(newCycle);
     }
   }
@@ -164,8 +164,8 @@ export class DateService {
     // Then use modulo to cycle through 1-14
     const currentDay = ((daysDiff % environment.mealCycle.cycleLength) + environment.mealCycle.cycleLength) % environment.mealCycle.cycleLength + 1;
     
-    console.log(`DateService: Start date: ${normalizedStartDate.toDateString()}, Input date: ${normalizedInputDate.toDateString()}`);
-    console.log(`DateService: Days difference: ${daysDiff}, Current day in cycle: ${currentDay}`);
+    // console.log(`DateService: Start date: ${normalizedStartDate.toDateString()}, Input date: ${normalizedInputDate.toDateString()}`);
+    // console.log(`DateService: Days difference: ${daysDiff}, Current day in cycle: ${currentDay}`);
     
     return currentDay;
   }

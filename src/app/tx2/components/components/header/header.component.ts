@@ -6,7 +6,7 @@ import { filter } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { SearchBarComponent } from "../../components/search-bar/search-bar.component";
-import { NotifComponent } from "../../components/notif/notif.component";
+import { NotifComponent } from "../notification/notification.component";
 
 interface MenuOption {
   text: string;
@@ -40,7 +40,16 @@ export class HeaderComponent implements OnInit {
       ] 
     },
     { text: '食材', isSelected: false, path: 'ingredients', isDropdownOpen: false },
-    { text: '住民資料', isSelected: false, path: 'patients', isDropdownOpen: false },
+    { 
+      text: '住民資料', 
+      isSelected: false, 
+      path: 'patients', 
+      isDropdownOpen: false,
+      children: [
+        { text: '新增患者', isSelected: false, path: 'patient-info/add' },
+        { text: '所有患者', isSelected: false, path: 'patient-info/all' },
+      ] 
+    },
     { text: '設定', isSelected: false, path: 'settings', isDropdownOpen: false },
   ];
   
