@@ -6,7 +6,7 @@ import { filter } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { SearchBarComponent } from "../search-bar/search-bar.component";
-import { NotifComponent } from "../notification/notification.component";
+import { NotificationComponent } from "../notif/notif.component";
 
 interface MenuOption {
   text: string;
@@ -18,7 +18,7 @@ interface MenuOption {
 
 @Component({
   selector: 'app-header',
-  imports: [MatIconModule, CommonModule, SearchBarComponent, NotifComponent],
+  imports: [MatIconModule, CommonModule, SearchBarComponent, NotificationComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })

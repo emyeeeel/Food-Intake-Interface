@@ -87,7 +87,7 @@
   </ng-container>
 
   <!-- No meals available for today -->
-  <ng-container *ngIf="!hasMealsForToday()">
+  <ng-container *ngIf="!mealSelectionStep && !hasMealsForToday()">
     <div class="no-assignments">
       <p>今日無可用餐點分配。</p>
     </div>

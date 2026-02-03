@@ -11,7 +11,7 @@ import { MealAssignmentService } from '../../../services/meal-assignment.service
 import { IntakeService } from '../../../services/intake.service';
 import { DateService } from '../../../services/date.service';
 import { WeightService } from '../../../services/weight.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-add-intake',
@@ -35,8 +35,6 @@ export class AddIntakeComponent implements OnInit {
   loadingMessage = '';
   uploadCompleted = false;
   redirectStarted = false;
-
-  private snackBar = inject(MatSnackBar);
   
   constructor(
     private router: Router,
@@ -44,7 +42,8 @@ export class AddIntakeComponent implements OnInit {
     private mealAssignmentService: MealAssignmentService,
     private intakeService: IntakeService,
     private dateService: DateService,
-    private weightService: WeightService
+    private weightService: WeightService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -190,16 +189,24 @@ export class AddIntakeComponent implements OnInit {
             const createdRecord = await this.intakeService.createIntake(intakePayload).toPromise();
             console.log('Intake record created successfully:', createdRecord);
 
-            this.snackBar.open('食物攝取記錄已成功創建', '', {
-              duration: 5000,
-              horizontalPosition: 'end', // Right side of the screen
-              verticalPosition: 'top',   // Top of the screen
-              panelClass: ['my-custom-snackbar'] // Custom class to apply margin
+            // this.snackBar.open('食物攝取記錄已成功創建', '', {
+            //   duration: 5000,
+            //   horizontalPosition: 'end', // Right side of the screen
+            //   verticalPosition: 'top',   // Top of the screen
+            //   panelClass: ['my-custom-snackbar'] // Custom class to apply margin
+            // });
+
+            this.notificationService.addNotification({
+              title: 'New Task',
+              message: '食物攝取記錄已成功創建',
+              time: 'Just now',
+              read: false,
             });
   
             // Navigate to patient intakes page
             if (this.scannedPatientId) {
-              this.router.navigate(['/patients/intakes', this.scannedPatientId]);
+              this.router.navigate(['patient-info/intakes', this.scannedPatientId]);
+              // this.router.navigate(['/intakes']);
             }
   
             resolve(createdRecord);

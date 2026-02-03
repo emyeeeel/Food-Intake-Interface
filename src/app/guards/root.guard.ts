@@ -11,7 +11,7 @@ export const rootGuard: CanActivateFn = (route, state) => {
     onAuthStateChanged(auth, (user: User | null) => {
       if (user) {
         console.log('User is authenticated, redirecting to home from root');
-        router.navigate(['/home']);
+        router.navigate(['/intakes']);
         resolve(false); // Prevent navigation to empty route
       } else {
         console.log('User not authenticated, redirecting to login from root');
