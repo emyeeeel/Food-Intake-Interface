@@ -41,7 +41,7 @@
         <button class="back-btn" (click)="backToBeds()">← Back to Beds</button>
       </div>
       <div class="intake-container">
-        <app-add-intake></app-add-intake>
+        <app-add-intake [scannedPatientId]="selectedBed.id"></app-add-intake>
       </div>
     </ng-container>
   </div>

@@ -1,8 +1,7 @@
 
-import { Component, ElementRef, ViewChild, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import jsQR from 'jsqr';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import JSZip from 'jszip';
@@ -19,10 +18,8 @@ import { WeightService } from '../../../../services/weight.service';
   styleUrl: './add-intake.component.scss',
   imports: [CommonModule, FormsModule]
 })
-export class AddIntakeComponent implements OnInit, OnDestroy {
-  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
-
-  scannedPatientId: number | null = null;
+export class AddIntakeComponent implements OnInit {
+  @Input() scannedPatientId: number | null = null;
 
   mealAssignments: MealAssignment[] = [];
   selectedMealAssignmentId: number | null = null;
@@ -30,16 +27,8 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
   loadingAssignments = false;
   assignmentError: string | null = null;
 
-  // Scanner state
-  showScanner = false;
-  scanResult: string | null = null;
-  
-  // Meal selection state
-  mealSelectionStep = true; // Show selection first
+  mealSelectionStep = true; 
   selectedMealType: 'Before' | 'After' | null = null;
-
-  private stream: MediaStream | null = null;
-  private scanInterval: any;
 
   isProcessing = false;
   loadingMessage = '';
@@ -56,11 +45,10 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Initialize component
-  }
-
-  ngOnDestroy(): void {
-    this.stopScanner();
+    if (this.scannedPatientId !== null) {
+      console.log(this.scannedPatientId)
+      this.loadMealAssignments(this.scannedPatientId);
+    }
   }
 
   // Meal type selection
@@ -74,78 +62,6 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
   goBackToSelection(): void {
     this.mealSelectionStep = true;
     this.selectedMealType = null;
-    this.stopScanner(); // Stop scanner if running
-  }
-
-  // Scanner methods
-  toggleScanner(): void {
-    if (this.showScanner) {
-      this.stopScanner();
-    } else {
-      this.startScanner();
-    }
-  }
-
-  startScanner(): void {
-    this.showScanner = true;
-    this.scanResult = null;
-    
-    navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: 'environment', // Use back camera if available
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      }
-    })
-    .then(stream => {
-      if (this.videoElement?.nativeElement) {
-        this.videoElement.nativeElement.srcObject = stream;
-        this.videoElement.nativeElement.play();
-        console.log('Camera started successfully');
-        // Here you would typically initialize your QR scanner library
-        // For example, using jsQR or QuaggaJS
-        this.startQRDetection();
-      }
-    })
-    .catch(err => {
-      console.error('Error accessing camera:', err);
-      this.showScanner = false;
-      // Handle camera permission denied or not available
-    });
-  }
-
-  stopScanner(): void {
-    this.showScanner = false;
-    
-    if (this.videoElement?.nativeElement?.srcObject) {
-      const stream = this.videoElement.nativeElement.srcObject as MediaStream;
-      const tracks = stream.getTracks();
-      
-      tracks.forEach(track => {
-        track.stop();
-      });
-      
-      this.videoElement.nativeElement.srcObject = null;
-      console.log('Camera stopped');
-    }
-
-    console.log("SCAN RESULT BEFORE UPLOAD:", this.scanResult);
-  }
-
-  // Handle QR scan result
-  onQRScanned(result: string): void {
-    this.scanResult = result;
-  
-    const patientId = parseInt(result, 10);
-    if (isNaN(patientId)) {
-      console.warn('QR does not contain a patient ID');
-      return;
-    }
-  
-    this.scannedPatientId = patientId;
-    this.loadMealAssignments(patientId);
-
-    this.stopScanner();
   }
   
   private loadMealAssignments(patientId: number): void {
@@ -166,45 +82,10 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
         }
       });
   }
-  
-
 
   // Helper method to get display text
   getMealTypeDisplayText(): string {
     return this.selectedMealType === 'Before' ? '餐前' : '餐後';
-  }
-
-  private startQRDetection(): void {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    
-    this.scanInterval = setInterval(() => {
-      if (this.videoElement && this.videoElement.nativeElement.readyState === 4) {
-        const video = this.videoElement.nativeElement;
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        
-        if (context) {
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          
-          try {
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            const qrResult = this.detectQRCode(imageData);
-            
-            if (qrResult) {
-              this.onQRScanned(qrResult);
-            }
-          } catch (error) {
-            console.error('QR detection error:', error);
-          }
-        }
-      }
-    }, 100);
-  }
-
-  private detectQRCode(imageData: ImageData): string | null {
-    const code = jsQR(imageData.data, imageData.width, imageData.height);
-    return code ? code.data : null;
   }
 
   getMealsByDayCycle(): { [key: string]: MealAssignment[] } {
@@ -253,8 +134,6 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     this.loadingMessage = '';
     this.uploadCompleted = false;
     this.redirectStarted = false;
-    this.scanResult = null;
-    this.showScanner = false;
     this.scannedPatientId = null;
   }
 
