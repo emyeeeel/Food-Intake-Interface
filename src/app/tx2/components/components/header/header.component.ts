@@ -27,7 +27,7 @@ export class HeaderComponent implements OnInit {
   ltcname: string = environment.careCenterName;
 
   menuOptions: MenuOption[] = [
-    { text: '首頁', isSelected: false, path: 'home', isDropdownOpen: false },
+    { text: '首頁', isSelected: false, path: 'home-page', isDropdownOpen: false },
     { text: '膳食攝取記錄', isSelected: false, path: 'intakes', isDropdownOpen: false },
     { 
       text: '膳食目錄', 
@@ -39,7 +39,6 @@ export class HeaderComponent implements OnInit {
         { text: '所有餐點', isSelected: false, path: 'meal-catalog/all' },
       ] 
     },
-    { text: '食材', isSelected: false, path: 'ingredients', isDropdownOpen: false },
     { 
       text: '住民資料', 
       isSelected: false, 
@@ -50,7 +49,6 @@ export class HeaderComponent implements OnInit {
         { text: '所有患者', isSelected: false, path: 'patient-info/all' },
       ] 
     },
-    { text: '設定', isSelected: false, path: 'settings', isDropdownOpen: false },
   ];
   
 

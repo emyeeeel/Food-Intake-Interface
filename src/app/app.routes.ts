@@ -12,6 +12,7 @@ import { rootGuard } from './guards/root.guard';
 import { PatientsComponent } from './tx2/components/pages/patients/patients.component';
 import { IntakesComponent } from './tx2/components/pages/intakes/intakes.component';
 import { MealsComponent } from './tx2/components/pages/meals/meals.component';
+import { HomeComponent } from './tx2/components/pages/home/home.component';
 
 export const routes: Routes = [
     { path: '', canActivate: [rootGuard], children: [] },
@@ -45,7 +46,11 @@ export const routes: Routes = [
     { path: 'patient-info/intakes/:id', canActivate: [authGuard], component: PatientInfoComponent },
 
     { path: 'settings', canActivate: [authGuard], component: SettingsComponent },
-    { path: 'patients', component: PatientsComponent },
-    { path: 'intakes', component: IntakesComponent },
-    { path: 'meals', component: MealsComponent },
+
+    //Machine interface routes
+    { path: 'patients', canActivate: [authGuard], component: PatientsComponent },
+    { path: 'intakes', canActivate: [authGuard], component: IntakesComponent },
+    { path: 'meals', canActivate: [authGuard], component: MealsComponent },
+    { path: 'patients/intakes/:id', canActivate: [authGuard], component: PatientsComponent },
+    { path: 'home-page', canActivate: [authGuard], component: HomeComponent },
 ];

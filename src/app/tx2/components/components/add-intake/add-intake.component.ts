@@ -1,5 +1,5 @@
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -11,6 +11,7 @@ import { MealAssignmentService } from '../../../../services/meal-assignment.serv
 import { IntakeService } from '../../../../services/intake.service';
 import { DateService } from '../../../../services/date.service';
 import { WeightService } from '../../../../services/weight.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-add-intake',
@@ -35,6 +36,8 @@ export class AddIntakeComponent implements OnInit {
   uploadCompleted = false;
   redirectStarted = false;
 
+  private snackBar = inject(MatSnackBar);
+  
   constructor(
     private router: Router,
     private http: HttpClient,
@@ -186,10 +189,17 @@ export class AddIntakeComponent implements OnInit {
             // Post to backend using IntakeService
             const createdRecord = await this.intakeService.createIntake(intakePayload).toPromise();
             console.log('Intake record created successfully:', createdRecord);
+
+            this.snackBar.open('食物攝取記錄已成功創建', '', {
+              duration: 5000,
+              horizontalPosition: 'end', // Right side of the screen
+              verticalPosition: 'top',   // Top of the screen
+              panelClass: ['my-custom-snackbar'] // Custom class to apply margin
+            });
   
             // Navigate to patient intakes page
             if (this.scannedPatientId) {
-              this.router.navigate(['/patient-info/intakes', this.scannedPatientId]);
+              this.router.navigate(['/patients/intakes', this.scannedPatientId]);
             }
   
             resolve(createdRecord);

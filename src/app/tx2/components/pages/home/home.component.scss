@@ -1,0 +1,21 @@
+:host {
+    display: block;
+    // background-color: #2d9f8c;
+    background-color: #CAECE5;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+    font-family: 'Quicksand', sans-serif;
+  }
+  
+  /* =========================================================
+     HOME CONTAINER
+  ========================================================= */
+  .home-container {
+    display: flex;
+    flex-direction: column;
+  
+    @media (min-width: 481px) {
+      flex-direction: row;
+    }
+  }
