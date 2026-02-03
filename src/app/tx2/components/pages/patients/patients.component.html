@@ -1,0 +1,11 @@
+<div class="patients-container">
+
+    <app-header></app-header>
+
+    <div class="main-container">
+        <app-patient-card *ngFor="let patient of patients" [roomBed]="formatRoomBed(patient)"></app-patient-card>
+    </div>
+
+    
+  </div>
+  

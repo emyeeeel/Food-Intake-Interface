@@ -1,0 +1,46 @@
+<div class="meals-container">
+
+    <app-header></app-header>
+
+    <div class="main-container">
+        <!-- <div class="row-3">
+            <app-main-options
+              iconSrc="assets/icons/add-icon.svg"
+              optionText="新增膳食"
+              altText="Add Meal Icon"
+              backgroundColor="#00313C"
+              textColor="#E6FEF9"
+              (clicked)="navigateToAddMeal()">
+            </app-main-options>
+            <app-main-options
+              iconSrc="assets/icons/all-icon.svg"
+              optionText="查看所有膳食"
+              altText="See All Meals Icon"
+              backgroundColor="#40C1AC"
+              textColor="#E6FEF9"
+              (clicked)="navigateToAllMeals()">
+            </app-main-options>
+            <app-main-options
+              iconSrc="assets/icons/print-icon.svg"
+              optionText="列印膳食"
+              altText="Print Meal Icon"
+              backgroundColor="#E6FEF9"
+              textColor="#00313C"
+              (clicked)="navigateToPrintMeal()">
+            </app-main-options>
+          </div> -->
+          <div class="row-4">
+            <div class="text-title">
+              本日膳食
+            </div>
+            <app-date-container></app-date-container>
+          </div>
+          <div class="row-5">
+            <app-todays-meal time="午餐"></app-todays-meal>
+            <app-todays-meal time="晚餐"></app-todays-meal>
+          </div>
+    </div>
+
+    
+</div>
+  

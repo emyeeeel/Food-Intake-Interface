@@ -1,0 +1,136 @@
+.header{
+    display: flex;
+    flex-direction: column;
+    background-color: #E6FEF9;
+    width: 100vw;
+    height: 120px;
+
+    .title{
+        width: 100%;
+        background-color: #00313C;
+        height: 70px;
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        padding: 10px 20px;
+
+        .logo{
+            width: auto;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            // border: 1px solid red;
+
+            img{
+                height: 30px;
+                width: auto;
+                object-fit: contain;
+            }
+        }
+
+        .current-nav{
+            height: 100%;
+            width: 250px;
+            // border: 1px solid yellow;
+            display: flex;
+            flex: 1;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+
+            span{
+                font-weight: 800;
+                font-size: 20px;
+                color: #F8FFFE;
+            }
+        }
+
+        .user{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+
+            span{
+                font-size: 16px;
+                color: #F8FFFE;
+            }
+        }
+    }
+
+    .menu-options{
+        // border: 1px solid red;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        padding: 10px 20px;
+        gap: 10px;
+
+        .menu{
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+            button{
+                padding: 3px 10px;
+    
+                &.selected {
+                    background-color: #40C1AC;
+                    // width: 235px;
+                    // height: 80px;
+                    // border-radius: 16px;
+                }
+            }
+        }
+
+        .search {
+            display: flex;                  /* Set the container to flex to arrange its children */
+            justify-content: flex-end;      /* Align children to the right */
+            flex: 1;                         /* Allow the search div to take up available space */
+            height: 30px;
+            padding: 0;
+          
+            /* Optionally, you can remove the border if it's not necessary */
+            border: none;
+          }
+          
+
+        .notif{
+            display: flex;
+            // border: 1px solid red;
+            justify-content: flex-end;
+        }
+    }
+  }
+
+  .menu-item {
+    position: relative;
+  
+    .dropdown {
+      display: none; /* hide by default */
+      position: absolute;
+      top: 100%; 
+      right: 0;
+      flex-direction: column;
+      max-width: 100px;
+      z-index: 1000;
+  
+      .dropdown-option {
+        padding: 5px 10px;
+        border: none;
+        text-align: left;
+        width: 100%;
+  
+        &:hover {
+          background-color: #2fa490;
+        }
+      }
+    }
+  
+    /* Show dropdown when hovering the menu-item */
+    &:hover .dropdown {
+      display: flex;
+    }
+  }
+  

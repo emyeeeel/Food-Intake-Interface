@@ -6,10 +6,12 @@ import { MealCatalogComponent } from './pages/meal-catalog/meal-catalog.componen
 import { IngredientsComponent } from './pages/ingredients/ingredients.component';
 import { PatientInfoComponent } from './pages/patient-info/patient-info.component';
 import { SettingsComponent } from './pages/settings/settings.component';
-import { PrintAllMealsComponent } from './components/print-all-meals/print-all-meals.component';
 
 import { authGuard } from './guards/auth.guard';
 import { rootGuard } from './guards/root.guard';
+import { PatientsComponent } from './tx2/components/pages/patients/patients.component';
+import { IntakesComponent } from './tx2/components/pages/intakes/intakes.component';
+import { MealsComponent } from './tx2/components/pages/meals/meals.component';
 
 export const routes: Routes = [
     { path: '', canActivate: [rootGuard], children: [] },
@@ -43,5 +45,7 @@ export const routes: Routes = [
     { path: 'patient-info/intakes/:id', canActivate: [authGuard], component: PatientInfoComponent },
 
     { path: 'settings', canActivate: [authGuard], component: SettingsComponent },
-    { path: 'test', component: PrintAllMealsComponent },
+    { path: 'patients', component: PatientsComponent },
+    { path: 'intakes', component: IntakesComponent },
+    { path: 'meals', component: MealsComponent },
 ];
