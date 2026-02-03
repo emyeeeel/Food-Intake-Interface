@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { environment } from '../../../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { Auth, onAuthStateChanged, User } from '@angular/fire/auth';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { SearchBarComponent } from "../../components/search-bar/search-bar.component";
+import { SearchBarComponent } from "../search-bar/search-bar.component";
 import { NotifComponent } from "../notification/notification.component";
 
 interface MenuOption {

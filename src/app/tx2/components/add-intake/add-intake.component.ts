@@ -6,11 +6,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import JSZip from 'jszip';
 import { firstValueFrom } from 'rxjs';
-import { MealAssignment } from '../../../../models/meal-assignment.mode';
-import { MealAssignmentService } from '../../../../services/meal-assignment.service';
-import { IntakeService } from '../../../../services/intake.service';
-import { DateService } from '../../../../services/date.service';
-import { WeightService } from '../../../../services/weight.service';
+import { MealAssignment } from '../../../models/meal-assignment.mode';
+import { MealAssignmentService } from '../../../services/meal-assignment.service';
+import { IntakeService } from '../../../services/intake.service';
+import { DateService } from '../../../services/date.service';
+import { WeightService } from '../../../services/weight.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({

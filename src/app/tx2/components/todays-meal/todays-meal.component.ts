@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { Meal } from '../../../../models/meal.model';
-import { MealsService } from '../../../../services/meals.service';
-import { DateService } from '../../../../services/date.service';
+import { Meal } from '../../../models/meal.model';
+import { MealsService } from '../../../services/meals.service';
+import { DateService } from '../../../services/date.service';
 
 @Component({
   selector: 'app-todays-meal',

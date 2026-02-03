@@ -9,10 +9,10 @@ import { SettingsComponent } from './pages/settings/settings.component';
 
 import { authGuard } from './guards/auth.guard';
 import { rootGuard } from './guards/root.guard';
-import { PatientsComponent } from './tx2/components/pages/patients/patients.component';
-import { IntakesComponent } from './tx2/components/pages/intakes/intakes.component';
-import { MealsComponent } from './tx2/components/pages/meals/meals.component';
-import { HomeComponent } from './tx2/components/pages/home/home.component';
+import { PatientsComponent } from './tx2/pages/patients/patients.component';
+import { IntakesComponent } from './tx2/pages/intakes/intakes.component';
+import { MealsComponent } from './tx2/pages/meals/meals.component';
+import { HomeComponent } from './tx2/pages/home/home.component';
 
 export const routes: Routes = [
     { path: '', canActivate: [rootGuard], children: [] },

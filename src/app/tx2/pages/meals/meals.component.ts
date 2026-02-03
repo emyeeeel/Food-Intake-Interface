@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { HeaderComponent } from "../../components/header/header.component";
-import { DateContainerComponent } from "../../../../components/date-container/date-container.component";
+import { DateContainerComponent } from "../../../components/date-container/date-container.component";
 import { TodaysMealComponent } from "../../components/todays-meal/todays-meal.component";
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';

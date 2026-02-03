@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { PatientCardComponent } from "../../components/patient-card/patient-card.component";
-import { PatientService } from '../../../../services/patient.service';
-import { LTCPatient } from '../../../../models/ltc-patient.model';
+import { PatientService } from '../../../services/patient.service';
+import { LTCPatient } from '../../../models/ltc-patient.model';
 import { HeaderComponent } from "../../components/header/header.component";
 
 
