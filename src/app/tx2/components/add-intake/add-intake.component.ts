@@ -12,6 +12,7 @@ import { IntakeService } from '../../../services/intake.service';
 import { DateService } from '../../../services/date.service';
 import { WeightService } from '../../../services/weight.service';
 import { NotificationService } from '../../services/notification.service';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-add-intake',
@@ -38,6 +39,7 @@ export class AddIntakeComponent implements OnInit {
   
   constructor(
     private router: Router,
+    private auth: Auth,
     private http: HttpClient,
     private mealAssignmentService: MealAssignmentService,
     private intakeService: IntakeService,
@@ -141,7 +143,7 @@ export class AddIntakeComponent implements OnInit {
 
   public capture(): Promise<any> {
     return new Promise((resolve, reject) => {
-      const apiUrl = 'http://127.0.0.1:8081/api/capture/meal/'; // Use TX2 IP
+      const apiUrl = 'http://127.0.0.1:8000/api/capture/meal/'; // Use TX2 IP
   
       this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
         next: async (zipBlob) => {
@@ -196,10 +198,13 @@ export class AddIntakeComponent implements OnInit {
             //   panelClass: ['my-custom-snackbar'] // Custom class to apply margin
             // });
 
+            const user = this.auth.currentUser; 
+            if (!user) return;
+
             this.notificationService.addNotification({
+              firebase_uid: user.uid,
               title: 'New Task',
               message: '食物攝取記錄已成功創建',
-              time: 'Just now',
               read: false,
             });
   

@@ -3,7 +3,8 @@ import { HeaderComponent } from "../../components/header/header.component";
 import { DateContainerComponent } from "../../../components/date-container/date-container.component";
 import { TodaysMealComponent } from "../../components/todays-meal/todays-meal.component";
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { NotificationService } from '../../services/notification.service';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-meals',
@@ -13,10 +14,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class MealsComponent {
 
-  private snackBar = inject(MatSnackBar);
 
   constructor(
     private router: Router,
+    private notificationService: NotificationService,
+    private auth: Auth
   ) {}
 
   navigateToAddMeal(): void {
@@ -31,19 +33,21 @@ export class MealsComponent {
     this.router.navigate(['/meal-catalog/print']);
   }
 
-  showMessage(){
-    this.snackBar.open('Message here', 'Dismiss', {
-      duration: 5000,
-      horizontalPosition: 'end', // Right side of the screen
-      verticalPosition: 'top',   // Top of the screen
-      panelClass: ['my-custom-snackbar'] // Custom class to apply margin
+  async showMessage() {
+    const user = this.auth.currentUser; 
+    if (!user) return;
+  
+    await this.notificationService.addNotification({
+      firebase_uid: user.uid,
+      title: 'Test',
+      message: 'Test notif added',
+      read: false
     });
-
-    // this.snackBar.openFromComponent(ToastNotifComponent, {
-    //   duration: 5000,
-    //   horizontalPosition: 'end', 
-    //   verticalPosition: 'top'   
-    // });
-    
   }
+
+  // const user = this.auth.currentUser;
+  // if (user) {
+  //   const uid = user.uid;
+  //   this.notificationService.fetchNotifications(uid);
+  // }
 }
