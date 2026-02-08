@@ -1,9 +1,9 @@
 export interface Meal {
   id: number;
   meal_name: string;
-  meal_time: '午餐' | '晚餐' | '晚餐' | string; 
+  meal_time: string; 
   day_cycle: number;
-  plate_type: '金属板' | '金属碗' | '陶瓷碗' | string;
+  plate_type?: string;
   ingredients: number[]; 
   image?: string | null; 
   created_at: string;

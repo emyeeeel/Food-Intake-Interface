@@ -30,11 +30,10 @@ export class IntakeService {
     formData.append('weight_g', intake.weight_g?.toString() || '');
     formData.append('volume_ml', intake.volume_ml?.toString() || '');
     formData.append('recorded_at', intake.recorded_at || '');
+    formData.append('meal_phase', intake.meal_phase?.toString() || '');
     if (intake.image instanceof File) {
       formData.append('image', intake.image);
     }
     return this.http.post<IntakeRecord>(this.apiUrl, formData);
   }
-  
-  
 }

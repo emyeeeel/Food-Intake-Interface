@@ -13,6 +13,8 @@ import { DateService } from '../../../services/date.service';
 import { WeightService } from '../../../services/weight.service';
 import { NotificationService } from '../../services/notification.service';
 import { Auth } from '@angular/fire/auth';
+import { LTCPatient } from '../../../models/ltc-patient.model';
+import { PatientService } from '../../../services/patient.service';
 
 @Component({
   selector: 'app-add-intake',
@@ -22,6 +24,7 @@ import { Auth } from '@angular/fire/auth';
 })
 export class AddIntakeComponent implements OnInit {
   @Input() scannedPatientId: number | null = null;
+  patient: LTCPatient | null = null;
 
   mealAssignments: MealAssignment[] = [];
   selectedMealAssignmentId: number | null = null;
@@ -45,12 +48,23 @@ export class AddIntakeComponent implements OnInit {
     private intakeService: IntakeService,
     private dateService: DateService,
     private weightService: WeightService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private patientService: PatientService
   ) {}
 
   ngOnInit(): void {
     if (this.scannedPatientId !== null) {
       console.log(this.scannedPatientId)
+      // Fetch patient
+      this.patientService.getLTCPatient(this.scannedPatientId).subscribe({
+        next: (patient) => {
+          this.patient = patient;
+          console.log('Loaded patient:', this.patient);
+        },
+        error: (err) => {
+          console.error('Failed to load patient:', err);
+        }
+      });
       this.loadMealAssignments(this.scannedPatientId);
     }
   }
@@ -152,7 +166,7 @@ export class AddIntakeComponent implements OnInit {
               throw new Error('No meal assignment selected');
             }
   
-            // Find selected assignment
+            // Find the selected meal assignment
             const assignment = this.mealAssignments.find(a => a.id === this.selectedMealAssignmentId);
             if (!assignment) {
               throw new Error('Selected meal assignment not found');
@@ -174,9 +188,14 @@ export class AddIntakeComponent implements OnInit {
             // const inpaintBlob = await zip.file("inpainted_depth_image.png")?.async("blob");
             // const csvText = await zip.file("depth.csv")?.async("text");
 
+            // Get net weight from weight service
             const netWeightResponse = await firstValueFrom(this.weightService.getNetWeight());
             const netWeight = netWeightResponse.net_weight || 0;
-  
+            console.log(netWeight)
+
+            // Determine meal phase based on selected meal type
+            const meal_phase = this.selectedMealType === 'Before' ? '前' : '後';
+
             // Prepare IntakeRecord payload
             const intakePayload = {
               meal: assignment.meal,
@@ -184,7 +203,8 @@ export class AddIntakeComponent implements OnInit {
               weight_g: netWeight, // You may update this from your logic if TX2 provides weight
               volume_ml: 0, // Same for volume
               recorded_at: new Date().toISOString(),
-              image: imageFile // send actual file if your backend accepts multipart/form-data
+              image: imageFile, // send actual file if your backend accepts multipart/form-data,
+              meal_phase: meal_phase
             };
   
             // Post to backend using IntakeService
@@ -204,14 +224,14 @@ export class AddIntakeComponent implements OnInit {
             this.notificationService.addNotification({
               firebase_uid: user.uid,
               title: 'New Task',
-              message: '食物攝取記錄已成功創建',
+              message: `${this.patient!.room_number} 房-${this.patient!.bed_number} 床，已為 ${assignment.meal_name} 餐${meal_phase}提供食物攝取記錄。`,
               read: false,
             });
   
             // Navigate to patient intakes page
             if (this.scannedPatientId) {
-              this.router.navigate(['patient-info/intakes', this.scannedPatientId]);
-              // this.router.navigate(['/intakes']);
+              // this.router.navigate(['patient-info/intakes', this.scannedPatientId]);
+              this.router.navigate(['/meals']);
             }
   
             resolve(createdRecord);

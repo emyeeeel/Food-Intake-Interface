@@ -12,7 +12,9 @@ export const environment = {
   },
   mealCycle: {
     startDate: '2026-01-19', 
-    cycleLength: 14 
+    cycleLength: 14,
   },
-  careCenterName: '嘉義國泰綜合長照機構'
+  careCenterName: '嘉義國泰綜合長照機構',
+  lunchTimeEnds: '13:30',
+  dinnerTime: '20:00'
 };
