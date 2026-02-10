@@ -93,4 +93,10 @@
     </div>
   </ng-container>
 
+  <ng-container *ngIf="isProcessing">
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p class="loading-text">上傳食物攝取記錄中…</p>
+    </div>
+  </ng-container>  
 </div>

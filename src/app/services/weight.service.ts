@@ -7,8 +7,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class WeightService {
-  // private baseUrl = environment.apiBaseUrl;
-  private baseUrl = `https://h3vkhzth-8000.asse.devtunnels.ms`;
+  private baseUrl = environment.apiBaseUrl;
+  // private baseUrl = `https://h3vkhzth-8000.asse.devtunnels.ms`;
   private apiUrl = `${this.baseUrl}/api/weights/get-net-weight/`;
 
   constructor(private http: HttpClient) {}

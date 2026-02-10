@@ -156,8 +156,9 @@ export class AddIntakeComponent implements OnInit {
   }
 
   public capture(): Promise<any> {
+    this.isProcessing = true;
     return new Promise((resolve, reject) => {
-      const apiUrl = 'http://127.0.0.1:8000/api/capture/meal/'; // Use TX2 IP
+      const apiUrl = 'http://127.0.0.1:9000/api/capture/meal/'; // Use TX2 IP
   
       this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
         next: async (zipBlob) => {
@@ -206,6 +207,8 @@ export class AddIntakeComponent implements OnInit {
               image: imageFile, // send actual file if your backend accepts multipart/form-data,
               meal_phase: meal_phase
             };
+
+            console.log(intakePayload)
   
             // Post to backend using IntakeService
             const createdRecord = await this.intakeService.createIntake(intakePayload).toPromise();
@@ -227,6 +230,8 @@ export class AddIntakeComponent implements OnInit {
               message: `${this.patient!.room_number} 房-${this.patient!.bed_number} 床，已為 ${assignment.meal_name} 餐${meal_phase}提供食物攝取記錄。`,
               read: false,
             });
+
+            this.isProcessing = false;
   
             // Navigate to patient intakes page
             if (this.scannedPatientId) {
