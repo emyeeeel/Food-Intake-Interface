@@ -213,7 +213,7 @@ Return ONLY the formatted text exactly as specified above. No extra text.
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['patientId'] && changes['patientId'].currentValue) {
-      this.loadAllDataAndAnalyze(changes['patientId'].currentValue);
+      // this.loadAllDataAndAnalyze(changes['patientId'].currentValue);
     }
   }
 

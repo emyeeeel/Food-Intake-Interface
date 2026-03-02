@@ -2,7 +2,7 @@
   <div class="content">
     <div class="text">
       <h2>每日摘要</h2>
-      <span>*每 000 位住民</span>
+      <span>*每 {{ patients.length}} 位住民</span>
     </div>
     <div class="chart">
       @for (percentage of dailyPercentages; track percentage; let i = $index) {

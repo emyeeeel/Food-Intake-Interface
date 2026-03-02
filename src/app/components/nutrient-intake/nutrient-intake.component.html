@@ -3,7 +3,7 @@
     <div class="row-1">
       <div class="text">
         <h2>營養攝取</h2>
-        <span>*每 000 位住民</span>
+        <span>*每 {{patients.length}} 位住民</span>
       </div>
       <div class="view-report">
         <app-see-history-button buttonText="檢視整體報告"></app-see-history-button>
@@ -22,8 +22,9 @@
         </div>
       </div>
       <div class="chart">
-        <app-pie-chart></app-pie-chart>
+        <app-pie-chart [data]="nutritionLegends"></app-pie-chart>
       </div>
     </div>
   </div>
+
 </div>

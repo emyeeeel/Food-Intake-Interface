@@ -158,7 +158,7 @@ export class AddIntakeComponent implements OnInit {
   public capture(): Promise<any> {
     this.isProcessing = true;
     return new Promise((resolve, reject) => {
-      const apiUrl = 'http://127.0.0.1:9000/api/capture/meal/'; // Use TX2 IP
+      const apiUrl = 'http://127.0.0.1:9000/api/capture/meal/'; // Use TX2 IP 
   
       this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
         next: async (zipBlob) => {
@@ -196,6 +196,8 @@ export class AddIntakeComponent implements OnInit {
 
             // Determine meal phase based on selected meal type
             const meal_phase = this.selectedMealType === 'Before' ? '前' : '後';
+
+            // if after, kwaang record before nga weight then i minus then get percentage
 
             // Prepare IntakeRecord payload
             const intakePayload = {

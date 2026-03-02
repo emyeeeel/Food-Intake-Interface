@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { finalize, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +20,18 @@ export class GetAnalysisService {
   
     const body = { query: query };
   
-    return this.http.post<{ recommendation: string }>(this.apiUrl, body, { headers });
+    const start = performance.now();
+
+    return this.http.post<{ recommendation: string }>(
+      this.apiUrl,
+      body,
+      { headers }
+    ).pipe(
+      finalize(() => {
+        const latency = performance.now() - start;
+        console.log(`getAnalysis latency: ${latency.toFixed(2)} ms`);
+      })
+    );
   }
 
   testPing(prompt: string){

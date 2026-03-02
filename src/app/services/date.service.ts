@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { SettingsService } from './settings.service';
 
 export interface MealCycleInfo {
   startDate: string;
@@ -28,7 +29,7 @@ export class DateService {
 
   private cycleCheckInterval: any;
 
-  constructor() {
+  constructor(private settingsService: SettingsService) {
     // Check for cycle updates every hour
     this.cycleCheckInterval = setInterval(() => {
       this.updateCycleIfNeeded();
@@ -79,9 +80,9 @@ export class DateService {
    * @returns Complete meal cycle information
    */
   private calculateCurrentMealCycle(): MealCycleInfo {
-    const configStartDate = new Date(environment.mealCycle.startDate);
+    const configStartDate = new Date(this.settingsService.mealCycle!.startDate);
     const currentDate = new Date();
-    const cycleLength = environment.mealCycle.cycleLength;
+    const cycleLength = this.settingsService.mealCycle!.cycleLength;
 
     // Normalize dates
     const normalizedStartDate = new Date(configStartDate.getFullYear(), configStartDate.getMonth(), configStartDate.getDate());
@@ -150,7 +151,7 @@ export class DateService {
    * @returns Day cycle number (1-14 for a 14-day cycle)
    */
   calculateDayCycleForDate(date: Date): number {
-    const startDate = new Date(environment.mealCycle.startDate);
+    const startDate = new Date(this.settingsService.mealCycle!.startDate);
     
     // Normalize dates to midnight for accurate day calculation
     const normalizedStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
@@ -162,7 +163,7 @@ export class DateService {
     
     // StartDate is Day 1, so we add 1 to daysDiff
     // Then use modulo to cycle through 1-14
-    const currentDay = ((daysDiff % environment.mealCycle.cycleLength) + environment.mealCycle.cycleLength) % environment.mealCycle.cycleLength + 1;
+    const currentDay = ((daysDiff % this.settingsService.mealCycle!.cycleLength) + this.settingsService.mealCycle!.cycleLength) % this.settingsService.mealCycle!.cycleLength + 1;
     
     // console.log(`DateService: Start date: ${normalizedStartDate.toDateString()}, Input date: ${normalizedInputDate.toDateString()}`);
     // console.log(`DateService: Days difference: ${daysDiff}, Current day in cycle: ${currentDay}`);
@@ -220,8 +221,8 @@ export class DateService {
    * @returns Date object for that day
    */
   getDateForCycleDay(dayInCycle: number): Date {
-    if (dayInCycle < 1 || dayInCycle > environment.mealCycle.cycleLength) {
-      throw new Error(`Day in cycle must be between 1 and ${environment.mealCycle.cycleLength}`);
+    if (dayInCycle < 1 || dayInCycle > this.settingsService.mealCycle!.cycleLength) {
+      throw new Error(`Day in cycle must be between 1 and ${this.settingsService.mealCycle!.cycleLength}`);
     }
 
     const cycle = this.getCurrentMealCycle();
