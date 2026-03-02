@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { SearchBarComponent } from "../search-bar/search-bar.component";
 import { NotificationComponent } from "../notif/notif.component";
+import { SettingsService } from '../../../services/settings.service';
 
 interface MenuOption {
   text: string;
@@ -23,8 +24,9 @@ interface MenuOption {
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent implements OnInit {
+  
   username: string = '';
-  ltcname: string = environment.careCenterName;
+  ltcname: string = '';
 
   menuOptions: MenuOption[] = [
     { text: '首頁', isSelected: false, path: 'home-page', isDropdownOpen: false },
@@ -52,7 +54,9 @@ export class HeaderComponent implements OnInit {
   ];
   
 
-  constructor(private auth: Auth, private router: Router) {}
+  constructor(private auth: Auth, private router: Router, private settingsService: SettingsService) {
+    this.ltcname = this.settingsService.careCenterName || 'Unknown';
+  }
 
   ngOnInit(): void {
     this.loadUsername();

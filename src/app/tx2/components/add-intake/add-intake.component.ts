@@ -158,11 +158,12 @@ export class AddIntakeComponent implements OnInit {
   public capture(): Promise<any> {
     this.isProcessing = true;
     return new Promise((resolve, reject) => {
-      const apiUrl = 'http://127.0.0.1:9000/api/capture/meal/'; // Use TX2 IP 
+      const apiUrl = 'http://100.68.223.32:8000/api/capture/meal/'; // Use TX2 IP 
   
       this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
         next: async (zipBlob) => {
           try {
+            console.log('now running tx2 backend')
             if (!this.selectedMealAssignmentId) {
               throw new Error('No meal assignment selected');
             }
@@ -182,6 +183,15 @@ export class AddIntakeComponent implements OnInit {
             if (!rgbFileData) {
               throw new Error("RGB image not found in ZIP");
             }
+
+            const weightBlob = await zip.file("weightdatas.json")?.async("blob");
+            if (!weightBlob) throw new Error("weightdatas.json not found in ZIP");
+
+            // Convert Blob to text
+            const weightText = await weightBlob.text(); // now you have the JSON as string
+
+            console.log("Raw JSON text:", weightText);
+
   
             const imageFile = new File([rgbFileData], `intake_${Date.now()}.png`, { type: 'image/png' });
   

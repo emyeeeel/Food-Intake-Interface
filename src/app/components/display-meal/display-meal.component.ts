@@ -10,6 +10,7 @@ import { environment } from '../../../environments/environment';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-display-meal',
@@ -33,7 +34,8 @@ export class DisplayMealComponent implements OnInit {
 
   constructor(
     private mealsService: MealsService,
-    private dateService: DateService // Add DateService to constructor
+    private dateService: DateService,
+    private settingsService: SettingsService
   ) {}
 
   ngOnInit(): void {
@@ -306,7 +308,7 @@ export class DisplayMealComponent implements OnInit {
       const month = String(today.getMonth() + 1).padStart(2, '0');
       const day = String(today.getDate()).padStart(2, '0');
       const dateString = `${year}${month}${day}`;
-      const filename = `${environment.careCenterName}-循環選單-${dateString}.xlsx`;
+      const filename = `${this.settingsService.careCenterName}-循環選單-${dateString}.xlsx`;
       
       // Save the file
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });

@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { SettingsService } from './settings.service';
 
 export interface MealCycleInfo {
@@ -15,238 +14,174 @@ export interface MealCycleInfo {
 @Injectable({
   providedIn: 'root',
 })
-export class DateService {
+export class DateService implements OnDestroy {
   private selectedDateSubject = new BehaviorSubject<Date>(new Date());
   public selectedDate$: Observable<Date> = this.selectedDateSubject.asObservable();
 
-  // Add formatted date observable if needed
   private selectedDateStringSubject = new BehaviorSubject<string>(this.formatDate(new Date()));
   public selectedDateString$: Observable<string> = this.selectedDateStringSubject.asObservable();
 
-  // Add meal cycle observable
-  private mealCycleSubject = new BehaviorSubject<MealCycleInfo>(this.calculateCurrentMealCycle());
+  private mealCycleSubject = new BehaviorSubject<MealCycleInfo>({
+    startDate: this.formatDate(new Date()),
+    cycleLength: 14,
+    currentCycle: 1,
+    currentDay: 1,
+    nextCycleStartDate: this.formatDate(new Date()),
+    isNewCycle: true,
+  });
   public mealCycle$: Observable<MealCycleInfo> = this.mealCycleSubject.asObservable();
 
   private cycleCheckInterval: any;
 
   constructor(private settingsService: SettingsService) {
-    // Check for cycle updates every hour
-    this.cycleCheckInterval = setInterval(() => {
-      this.updateCycleIfNeeded();
-    }, 60 * 60 * 1000); // 1 hour
+    // Load settings first
+    if (!this.settingsService.settings) {
+      this.settingsService.load().then(() => {
+        this.refreshMealCycle();
+      });
+    } else {
+      this.refreshMealCycle();
+    }
 
-    // Also check when the date changes
+    // Check when the date changes
     this.selectedDate$.subscribe(() => {
       this.updateCycleIfNeeded();
     });
+
+    // Check for cycle updates every hour
+    this.cycleCheckInterval = setInterval(() => {
+      this.updateCycleIfNeeded();
+    }, 60 * 60 * 1000);
   }
 
-  /**
-   * Set the selected date
-   * @param date The selected date
-   */
   setSelectedDate(date: Date): void {
     this.selectedDateSubject.next(date);
     this.selectedDateStringSubject.next(this.formatDate(date));
-    // console.log('DateService: Date updated to', date);
   }
 
-  /**
-   * Get current selected date
-   * @returns Current selected date
-   */
   getSelectedDate(): Date {
     return this.selectedDateSubject.value;
   }
 
-  /**
-   * Get current selected date as string
-   * @returns Current selected date as formatted string
-   */
   getSelectedDateString(): string {
     return this.selectedDateStringSubject.value;
   }
 
-  /**
-   * Get current meal cycle information
-   * @returns Current meal cycle info
-   */
   getCurrentMealCycle(): MealCycleInfo {
     return this.mealCycleSubject.value;
   }
 
-  /**
-   * Calculate comprehensive meal cycle information
-   * @returns Complete meal cycle information
-   */
   private calculateCurrentMealCycle(): MealCycleInfo {
-    const configStartDate = new Date(this.settingsService.mealCycle!.startDate);
-    const currentDate = new Date();
-    const cycleLength = this.settingsService.mealCycle!.cycleLength;
+    // Use default if settings are not loaded
+    const mealCycle = this.settingsService.mealCycle;
+    if (!mealCycle) {
+      return {
+        startDate: this.formatDate(new Date()),
+        cycleLength: 14,
+        currentCycle: 1,
+        currentDay: 1,
+        nextCycleStartDate: this.formatDate(new Date()),
+        isNewCycle: true,
+      };
+    }
 
-    // Normalize dates
+    const configStartDate = new Date(mealCycle.startDate);
+    const cycleLength = mealCycle.cycleLength;
+    const currentDate = new Date();
+
     const normalizedStartDate = new Date(configStartDate.getFullYear(), configStartDate.getMonth(), configStartDate.getDate());
     const normalizedCurrentDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
 
-    // Calculate days since the original start date
-    const daysSinceStart = Math.floor(
-      (normalizedCurrentDate.getTime() - normalizedStartDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
-
-    // Calculate current cycle (0-based internally, 1-based for display)
+    const daysSinceStart = Math.floor((normalizedCurrentDate.getTime() - normalizedStartDate.getTime()) / (1000 * 60 * 60 * 24));
     const currentCycleIndex = Math.floor(daysSinceStart / cycleLength);
-    
-    // Calculate current day within the cycle (1-based)
     const currentDay = (daysSinceStart % cycleLength) + 1;
 
-    // Calculate the actual start date of the current cycle
     const currentCycleStartDate = new Date(normalizedStartDate);
-    currentCycleStartDate.setDate(normalizedStartDate.getDate() + (currentCycleIndex * cycleLength));
+    currentCycleStartDate.setDate(normalizedStartDate.getDate() + currentCycleIndex * cycleLength);
 
-    // Calculate next cycle start date
     const nextCycleStartDate = new Date(currentCycleStartDate);
     nextCycleStartDate.setDate(currentCycleStartDate.getDate() + cycleLength);
 
-    // Check if this is a new cycle compared to previous calculation
-    const previousCycle = this.mealCycleSubject?.value;
-    const isNewCycle = !previousCycle || previousCycle.currentCycle !== (currentCycleIndex + 1);
+    const previousCycle = this.mealCycleSubject.value;
+    const isNewCycle = !previousCycle || previousCycle.currentCycle !== currentCycleIndex + 1;
 
     return {
       startDate: this.formatDate(currentCycleStartDate),
       cycleLength: cycleLength,
-      currentCycle: currentCycleIndex + 1, // 1-based for display
+      currentCycle: currentCycleIndex + 1,
       currentDay: currentDay,
       nextCycleStartDate: this.formatDate(nextCycleStartDate),
-      isNewCycle: isNewCycle
+      isNewCycle: isNewCycle,
     };
   }
 
-  /**
-   * Update cycle if needed (called periodically)
-   */
   private updateCycleIfNeeded(): void {
     const newCycle = this.calculateCurrentMealCycle();
     const currentCycle = this.mealCycleSubject.value;
 
-    // Update if we've moved to a new cycle
-    if (newCycle.currentCycle !== currentCycle.currentCycle || 
-        newCycle.currentDay !== currentCycle.currentDay) {
-      // console.log('DateService: Meal cycle updated:', newCycle);
+    if (newCycle.currentCycle !== currentCycle.currentCycle || newCycle.currentDay !== currentCycle.currentDay) {
       this.mealCycleSubject.next(newCycle);
     }
   }
 
-  /**
-   * Force refresh the meal cycle (useful for testing or manual refresh)
-   */
   refreshMealCycle(): void {
     const newCycle = this.calculateCurrentMealCycle();
     this.mealCycleSubject.next(newCycle);
   }
 
-  /**
-   * Calculate day cycle for a given date (your existing method, enhanced)
-   * StartDate is considered Day 1, next date is Day 2, and so on
-   * @param date The date to calculate day cycle for
-   * @returns Day cycle number (1-14 for a 14-day cycle)
-   */
   calculateDayCycleForDate(date: Date): number {
-    const startDate = new Date(this.settingsService.mealCycle!.startDate);
-    
-    // Normalize dates to midnight for accurate day calculation
+    const mealCycle = this.settingsService.mealCycle;
+    const cycleLength = mealCycle?.cycleLength ?? 14;
+    const startDate = mealCycle ? new Date(mealCycle.startDate) : new Date();
+
     const normalizedStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
     const normalizedInputDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    
-    // Calculate difference in days
-    const timeDiff = normalizedInputDate.getTime() - normalizedStartDate.getTime();
-    const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
-    
-    // StartDate is Day 1, so we add 1 to daysDiff
-    // Then use modulo to cycle through 1-14
-    const currentDay = ((daysDiff % this.settingsService.mealCycle!.cycleLength) + this.settingsService.mealCycle!.cycleLength) % this.settingsService.mealCycle!.cycleLength + 1;
-    
-    // console.log(`DateService: Start date: ${normalizedStartDate.toDateString()}, Input date: ${normalizedInputDate.toDateString()}`);
-    // console.log(`DateService: Days difference: ${daysDiff}, Current day in cycle: ${currentDay}`);
-    
-    return currentDay;
+
+    const daysDiff = Math.floor((normalizedInputDate.getTime() - normalizedStartDate.getTime()) / (1000 * 3600 * 24));
+
+    return ((daysDiff % cycleLength) + cycleLength) % cycleLength + 1;
   }
 
-  /**
-   * Get available days for meal assignment (only future/current days)
-   * @returns Array of available days
-   */
-  getAvailableDays(): { value: string; label: string; }[] {
+  getAvailableDays(): { value: string; label: string }[] {
     const cycle = this.getCurrentMealCycle();
     const availableDays = [];
-
     for (let day = cycle.currentDay; day <= cycle.cycleLength; day++) {
-      availableDays.push({
-        value: day.toString(),
-        label: `Day ${day}`
-      });
+      availableDays.push({ value: day.toString(), label: `Day ${day}` });
     }
-
     return availableDays;
   }
 
-  /**
-   * Check if a specific day is available in current cycle
-   * @param dayNumber Day number to check
-   * @returns True if day is available
-   */
   isDayAvailable(dayNumber: number): boolean {
     const cycle = this.getCurrentMealCycle();
     return dayNumber >= 1 && dayNumber <= cycle.cycleLength && dayNumber >= cycle.currentDay;
   }
 
-  /**
-   * Get the cycle day for today
-   * @returns Today's cycle day number
-   */
   getTodaysCycleDay(): number {
     return this.calculateDayCycleForDate(new Date());
   }
 
-  /**
-   * Get today's date
-   * @returns Today's date
-   */
   getTodayDate(): Date {
     return new Date();
   }
 
-  /**
-   * Get date for a specific day in the current cycle
-   * @param dayInCycle Day number in cycle (1-14)
-   * @returns Date object for that day
-   */
   getDateForCycleDay(dayInCycle: number): Date {
-    if (dayInCycle < 1 || dayInCycle > this.settingsService.mealCycle!.cycleLength) {
-      throw new Error(`Day in cycle must be between 1 and ${this.settingsService.mealCycle!.cycleLength}`);
+    const cycle = this.getCurrentMealCycle();
+    const cycleLength = cycle.cycleLength;
+
+    if (dayInCycle < 1 || dayInCycle > cycleLength) {
+      throw new Error(`Day in cycle must be between 1 and ${cycleLength}`);
     }
 
-    const cycle = this.getCurrentMealCycle();
     const startDate = new Date(cycle.startDate);
     const targetDate = new Date(startDate);
-    
-    // Day 1 is the start date, so we add (dayInCycle - 1) days
     targetDate.setDate(startDate.getDate() + (dayInCycle - 1));
-    
     return targetDate;
   }
 
-  /**
-   * Format date to ISO string (YYYY-MM-DD)
-   * @param date Date to format
-   * @returns Formatted date string
-   */
   private formatDate(date: Date): string {
-    return date.toISOString().split("T")[0];
+    return date.toISOString().split('T')[0];
   }
 
-  /**
-   * Cleanup when service is destroyed
-   */
   ngOnDestroy(): void {
     if (this.cycleCheckInterval) {
       clearInterval(this.cycleCheckInterval);

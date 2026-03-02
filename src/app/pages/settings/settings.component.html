@@ -1,3 +1,7 @@
 <div class="settings-container">
-    <app-menu-bar></app-menu-bar>
+    <app-menu-bar (mobileMenuToggle)="onMobileMenuToggle($event)"></app-menu-bar>
+
+    <div class="main-container">
+        <app-setup></app-setup>
+    </div>
 </div>
