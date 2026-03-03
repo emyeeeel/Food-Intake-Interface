@@ -45,6 +45,7 @@ export const routes: Routes = [
     { path: 'patient-info/view/:id', canActivate: [authGuard], component: PatientInfoComponent },
     { path: 'patient-info/meals/:id', canActivate: [authGuard], component: PatientInfoComponent },
     { path: 'patient-info/intakes/:id', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/analysis/:id', canActivate: [authGuard], component: PatientInfoComponent },
 
     { path: 'settings', canActivate: [authGuard], component: SettingsComponent },
 

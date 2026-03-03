@@ -158,7 +158,7 @@ export class AddIntakeComponent implements OnInit {
   public capture(): Promise<any> {
     this.isProcessing = true;
     return new Promise((resolve, reject) => {
-      const apiUrl = 'http://100.68.223.32:8000/api/capture/meal/'; // Use TX2 IP 
+      const apiUrl = 'https://p0zqhc3k-8000.jpe1.devtunnels.ms/api/capture/meal/'; // Use TX2 IP 
   
       this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
         next: async (zipBlob) => {

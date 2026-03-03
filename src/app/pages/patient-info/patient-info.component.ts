@@ -23,6 +23,7 @@ import { PatientIntakeComponent } from "../../components/patient-intake/patient-
 import { DisplayPatientComponent } from "../../components/display-patient/display-patient.component";
 import { PrintAllPatientsComponent } from "../../components/print-all-patients/print-all-patients.component";
 import { IntakeService } from '../../services/intake.service';
+import { PatientAnalysisComponent } from '../../components/patient-analysis/patient-analysis.component';
 
 @Component({
   selector: 'app-patient-info',
@@ -44,7 +45,8 @@ import { IntakeService } from '../../services/intake.service';
     PatientMealsComponent,
     PatientIntakeComponent,
     DisplayPatientComponent,
-    PrintAllPatientsComponent
+    PrintAllPatientsComponent,
+    PatientAnalysisComponent
 ],
   templateUrl: './patient-info.component.html',
   styleUrls: ['./patient-info.component.scss']
@@ -126,6 +128,13 @@ export class PatientInfoComponent implements OnInit {
       const intakesMatch = path.match(/\/patient-info\/intakes\/(\d+)$/);
       if (intakesMatch) {
         this.patientId = parseInt(intakesMatch[1], 10);
+      }
+      
+    } else if (/\/patient-info\/analysis\/\d+$/.test(path)) {
+      this.currentView = 'analysis';
+      const analysisMatch = path.match(/\/patient-info\/analysis\/(\d+)$/);
+      if (analysisMatch) {
+        this.patientId = parseInt(analysisMatch[1], 10);
       }
       
     }  else {
