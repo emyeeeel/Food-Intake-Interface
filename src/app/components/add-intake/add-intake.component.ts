@@ -8,12 +8,14 @@ import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { PatientService } from '../../services/patient.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IntakeRecord } from '../../models/food-intake.model';
 import { IntakeService } from '../../services/intake.service';
 import { DateService } from '../../services/date.service';
 import JSZip from 'jszip';
 import { WeightService } from '../../services/weight.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable, Subscription } from 'rxjs';
+import { NotificationService } from '../../tx2/services/notification.service';
+import { Auth } from '@angular/fire/auth';
+import { LTCPatient } from '../../models/ltc-patient.model';
 
 @Component({
   selector: 'app-add-intake',
@@ -27,21 +29,29 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
   scannedPatientId: number | null = null;
 
   mealAssignments: MealAssignment[] = [];
-  selectedMealAssignmentId: number | null = null;
+  selectedMealAssignmentId: number | 0 = 0;
 
   loadingAssignments = false;
   assignmentError: string | null = null;
+
+  checking = true;
 
   // Scanner state
   showScanner = false;
   scanResult: string | null = null;
   
   // Meal selection state
-  mealSelectionStep = true; // Show selection first
+  mealSelectionStep = false; // Show selection first
   selectedMealType: 'Before' | 'After' | null = null;
 
   private stream: MediaStream | null = null;
   private scanInterval: any;
+
+  //Meal Period Decider
+  mealTimePeriod: '午餐' | '晚餐' | 0 = 0;
+
+  patient: LTCPatient | null = null;
+  dayCycle: number | null = null;
 
   isProcessing = false;
   loadingMessage = '';
@@ -55,23 +65,51 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     private patientService: PatientService,
     private intakeService: IntakeService,
     private dateService: DateService,
-    private weightService: WeightService
+    private weightService: WeightService,
+    private notificationService: NotificationService,
+    private auth: Auth,
   ) {}
 
+  mealPhaseStatus: '前' | '後' | 'done' | null = null;
+
+  currentSelectedDate: Date = new Date();
+  
   ngOnInit(): void {
     // Initialize component
+    this.mealPeriod();
+    this.dayCycle = this.getCurrentDayInCycle();
+  }
+
+  loadPatientData(): void {
+    if (this.scannedPatientId !== null){
+      this.intakeService
+      .getIntakesByMealPeriod(this.scannedPatientId!, this.mealTimePeriod as '午餐' | '晚餐')
+      .subscribe(intakes => {
+        console.log('Intakes for selected meal period:', intakes);
+        console.log('First Intake Record Meal Details: ', intakes[0]?.meal_detail?.meal_time, this.mealTimePeriod)
+      });
+    }
+  }
+
+mealPeriod(): void {
+  this.mealTimePeriod = this.dateService.getCurrentMealPeriod();
+  console.log('Loaded mealTime:', this.mealTimePeriod); 
+}
+
+  getCurrentDayInCycle(): number {
+    return this.dateService.calculateDayCycleForDate(this.currentSelectedDate);
   }
 
   ngOnDestroy(): void {
     this.stopScanner();
   }
 
-  // Meal type selection
-  selectMealType(type: 'Before' | 'After'): void {
-    this.selectedMealType = type;
-    this.mealSelectionStep = false; // Hide selection buttons
-    console.log(`Selected meal type: ${type}`);
-  }
+  // // Meal type selection
+  // selectMealType(type: 'Before' | 'After'): void {
+  //   this.selectedMealType = type;
+  //   this.mealSelectionStep = false; // Hide selection buttons
+  //   console.log(`Selected meal type: ${type}`);
+  // }
 
   // Go back to meal selection
   goBackToSelection(): void {
@@ -133,6 +171,79 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     }
 
     console.log("SCAN RESULT BEFORE UPLOAD:", this.scanResult);
+
+    if (this.scannedPatientId !== null) {
+      this.loadPatientData();
+      this.loadFilteredMeals();
+      console.log(this.mealAssignments)
+      this.patientService.getLTCPatient(this.scannedPatientId).subscribe({
+        next: (patient) => {
+          this.patient = patient;
+          console.log('Loaded patient:', this.patient);
+        },
+        error: (err) => {
+          console.error('Failed to load patient:', err);
+        }
+      });
+
+      this.intakeService
+      .getMealPhasesForDate(this.scannedPatientId, this.mealTimePeriod as '午餐' | '晚餐')
+      .subscribe(phase => {
+        // phase might be '前', '後', 'done', or null
+        this.mealPhaseStatus = phase;
+        console.log('Meal Phase Status', this.mealPhaseStatus)
+      });
+    }
+
+  }
+
+  setMealType(type: 'Before' | 'After') {
+    this.selectedMealType = type;
+  }
+
+  loadFilteredMeals(): void {
+    if (!this.scannedPatientId || !this.dayCycle) return;
+
+    const filters: any = {};
+
+    if (this.scannedPatientId) {
+      filters.ltc_patient = this.scannedPatientId;
+    }
+
+    if (this.dayCycle) {
+      filters.day_cycle = this.dayCycle;
+    }
+
+    if (this.mealTimePeriod) {
+      filters.meal_type = this.mealTimePeriod;  
+      console.log('Time Period', this.mealTimePeriod)
+    }
+
+    console.log('Filters', filters)
+
+    this.intakeService
+    .getAssignmentsByMealPeriod(
+      this.scannedPatientId,
+      this.mealTimePeriod,
+      this.dayCycle
+    )
+    .subscribe(assignments => {
+      this.mealAssignments = assignments;
+      console.log('Filtered assignments:', assignments);
+      this.selectedMealAssignmentId = assignments[0].id;
+      console.log('Meal Assignment ID: ', this.selectedMealAssignmentId, assignments[0].meal_detail.meal_name)
+    });
+
+    // this.mealAssignmentService
+    //   .getMealAssignmentsWithFilters(filters)
+    //   .subscribe({
+    //     next: (data) => {
+    //       this.mealAssignments = data;
+    //     },
+    //     error: (err) => {
+    //       console.error('Error loading filtered meals', err);
+    //     }
+    //   });
   }
 
   // Handle QR scan result
@@ -169,8 +280,6 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
         }
       });
   }
-  
-
 
   // Helper method to get display text
   getMealTypeDisplayText(): string {
@@ -246,59 +355,12 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     return Object.keys(groups).length > 0;
   }
 
-  selectMealAssignment(assignment: MealAssignment): void {
-    this.selectedMealAssignmentId = assignment.id;
-    console.log('Selected assignment:', assignment);
-  }
-
-  // private async handleQRCodeDetected(qrData: string): Promise<void> {
-  //   this.scanResult = qrData; 
-  //   console.log('QR Code detected:', qrData);
-    
-  //   // Stop the camera
-  //   this.stopScanner();
-  //   this.showScanner = false;
-
-  //   // Start loading state
-  //   this.isProcessing = true;
-  //   this.loadingMessage = 'QR Code detected, processing...';
-  //   this.uploadCompleted = false;
-  //   this.redirectStarted = false;
-
-  //   try {
-  //     // Wait for test upload to complete before proceeding
-  //     this.loadingMessage = 'Uploading data to server...';
-  //     console.log('Uploading data before redirect...');
-      
-  //     await this.capture();
-      
-  //     this.uploadCompleted = true;
-  //     this.loadingMessage = 'Upload successful, preparing to redirect...';
-  //     console.log('Upload completed, now redirecting...');
-      
-  //     // Small delay to show the completed state
-  //     setTimeout(() => {
-  //       this.redirectStarted = true;
-  //       this.loadingMessage = 'Redirecting to patient information...';
-        
-  //       // After successful upload, redirect to the hardcoded URL
-  //       const redirectUrl = `/meal-intake/all`; 
-  //       this.router.navigate([redirectUrl]);
-  //     }, 1000);
-      
-  //   } catch (error) {
-  //     console.error('Upload failed, but still redirecting:', error);
-  //     this.loadingMessage = 'Upload failed, but continuing to redirect...';
-      
-  //     setTimeout(() => {
-  //       this.redirectStarted = true;
-  //       this.loadingMessage = 'Redirecting to patient information...';
-        
-  //       const redirectUrl = `/meal-intake/all`;
-  //       this.router.navigate([redirectUrl]);
-  //     }, 1000);
-  //   }
+  // selectMealAssignment(assignment: MealAssignment): void {
+  //   this.selectedMealAssignmentId = assignment.id;
+  //   console.log('Selected assignment:', assignment);
   // }
+
+  
 
   resetState(): void {
     this.isProcessing = false;
@@ -334,73 +396,114 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
   }
 
   public capture(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const apiUrl = 'http://127.0.0.1:8000/api/capture/meal/'; // Use TX2 IP
+      this.isProcessing = true;
+      return new Promise((resolve, reject) => {
+        const apiUrl = 'https://p0zqhc3k-8000.jpe1.devtunnels.ms/api/capture/meal/'; // Use TX2 IP 
+    
+        this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
+          next: async (zipBlob) => {
+            try {
+              console.log('now running tx2 backend')
+              if (!this.selectedMealAssignmentId) {
+                throw new Error('No meal assignment selected');
+              }
+    
+              // Find the selected meal assignment
+              const assignment = this.mealAssignments.find(a => a.id === this.selectedMealAssignmentId);
+              if (!assignment) {
+                throw new Error('Selected meal assignment not found');
+              }
+    
+              // Load ZIP
+              const jszip = new JSZip();
+              const zip = await jszip.loadAsync(zipBlob);
+    
+              // Extract RGB image as Blob
+              const rgbFileData = await zip.file("rgb_image.png")?.async("blob");
+              if (!rgbFileData) {
+                throw new Error("RGB image not found in ZIP");
+              }
   
-      this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
-        next: async (zipBlob) => {
-          try {
-            if (!this.selectedMealAssignmentId) {
-              throw new Error('No meal assignment selected');
+              const weightBlob = await zip.file("weightdatas.json")?.async("blob");
+              if (!weightBlob) throw new Error("weightdatas.json not found in ZIP");
+  
+              // Convert Blob to text
+              const weightText = await weightBlob.text(); // now you have the JSON as string
+  
+              console.log("Raw JSON text:", weightText);
+  
+    
+              const imageFile = new File([rgbFileData], `intake_${Date.now()}.png`, { type: 'image/png' });
+    
+              // Optional: extract inpainted depth image or CSV if needed
+              // const inpaintBlob = await zip.file("inpainted_depth_image.png")?.async("blob");
+              // const csvText = await zip.file("depth.csv")?.async("text");
+  
+              // Get net weight from weight service
+              const netWeightResponse = await firstValueFrom(this.weightService.getNetWeight());
+              const netWeight = netWeightResponse.net_weight || 0;
+              console.log(netWeight)
+  
+              // Determine meal phase based on selected meal type
+              const meal_phase = this.selectedMealType === 'Before' ? '前' : '後';
+  
+              // if after, kwaang record before nga weight then i minus then get percentage
+  
+              // Prepare IntakeRecord payload
+              const intakePayload = {
+                meal: assignment.meal,
+                ltc_patient: assignment.ltc_patient || 0,
+                weight_g: netWeight, // You may update this from your logic if TX2 provides weight
+                volume_ml: 0, // Same for volume
+                recorded_at: new Date().toISOString(),
+                image: imageFile, // send actual file if your backend accepts multipart/form-data,
+                meal_phase: meal_phase
+              };
+  
+              console.log(intakePayload)
+    
+              // Post to backend using IntakeService
+              const createdRecord = await this.intakeService.createIntake(intakePayload).toPromise();
+              console.log('Intake record created successfully:', createdRecord);
+  
+              // this.snackBar.open('食物攝取記錄已成功創建', '', {
+              //   duration: 5000,
+              //   horizontalPosition: 'end', // Right side of the screen
+              //   verticalPosition: 'top',   // Top of the screen
+              //   panelClass: ['my-custom-snackbar'] // Custom class to apply margin
+              // });
+  
+              const user = this.auth.currentUser; 
+              if (!user) return;
+  
+              this.notificationService.addNotification({
+                firebase_uid: user.uid,
+                title: 'New Task',
+                message: `${this.patient!.room_number} 房-${this.patient!.bed_number} 床，已為 ${assignment.meal_name} 餐${meal_phase}提供食物攝取記錄。`,
+                read: false,
+              });
+  
+              this.isProcessing = false;
+    
+              // Navigate to patient intakes page
+              if (this.scannedPatientId) {
+                // this.router.navigate(['patient-info/intakes', this.scannedPatientId]);
+                this.router.navigate(['/meals']);
+              }
+    
+              resolve(createdRecord);
+    
+            } catch (err) {
+              console.error('Failed to create intake record:', err);
+              reject(err);
             }
-  
-            // Find selected assignment
-            const assignment = this.mealAssignments.find(a => a.id === this.selectedMealAssignmentId);
-            if (!assignment) {
-              throw new Error('Selected meal assignment not found');
-            }
-  
-            // Load ZIP
-            const jszip = new JSZip();
-            const zip = await jszip.loadAsync(zipBlob);
-  
-            // Extract RGB image as Blob
-            const rgbFileData = await zip.file("rgb_image.png")?.async("blob");
-            if (!rgbFileData) {
-              throw new Error("RGB image not found in ZIP");
-            }
-  
-            const imageFile = new File([rgbFileData], `intake_${Date.now()}.png`, { type: 'image/png' });
-  
-            // Optional: extract inpainted depth image or CSV if needed
-            // const inpaintBlob = await zip.file("inpainted_depth_image.png")?.async("blob");
-            // const csvText = await zip.file("depth.csv")?.async("text");
-
-            const netWeightResponse = await firstValueFrom(this.weightService.getNetWeight());
-            const netWeight = netWeightResponse.net_weight || 0;
-  
-            // Prepare IntakeRecord payload
-            const intakePayload = {
-              meal: assignment.meal,
-              ltc_patient: assignment.ltc_patient || 0,
-              weight_g: netWeight, // You may update this from your logic if TX2 provides weight
-              volume_ml: 0, // Same for volume
-              recorded_at: new Date().toISOString(),
-              image: imageFile // send actual file if your backend accepts multipart/form-data
-            };
-  
-            // Post to backend using IntakeService
-            const createdRecord = await this.intakeService.createIntake(intakePayload).toPromise();
-            console.log('Intake record created successfully:', createdRecord);
-  
-            // Navigate to patient intakes page
-            if (this.scannedPatientId) {
-              this.router.navigate(['/patient-info/intakes', this.scannedPatientId]);
-            }
-  
-            resolve(createdRecord);
-  
-          } catch (err) {
-            console.error('Failed to create intake record:', err);
-            reject(err);
+          },
+          error: (error) => {
+            console.error('API Error:', error);
+            reject(error);
           }
-        },
-        error: (error) => {
-          console.error('API Error:', error);
-          reject(error);
-        }
+        });
       });
-    });
-  }
+    }
   
 }

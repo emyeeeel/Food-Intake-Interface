@@ -54,6 +54,37 @@ export class DateService implements OnDestroy {
     }, 60 * 60 * 1000);
   }
 
+  getCurrentMealPeriod(): '午餐' | '晚餐' | 0 {
+    const settings = this.settingsService.settings;
+
+    if (!settings) return 0;
+
+    const now = new Date();
+
+    const isWithinRange = (start: string, end: string): boolean => {
+      const [startHour, startMin, startSec] = start.split(':').map(Number);
+      const [endHour, endMin, endSec] = end.split(':').map(Number);
+
+      const startTime = new Date();
+      startTime.setHours(startHour, startMin, startSec || 0, 0);
+
+      const endTime = new Date();
+      endTime.setHours(endHour, endMin, endSec || 0, 0);
+
+      return now >= startTime && now <= endTime;
+    };
+
+    if (isWithinRange(settings.mealTimeRanges.lunch['start'], settings.mealTimeRanges.lunch['end'])) {
+      return '午餐';
+    }
+
+    if (isWithinRange(settings.mealTimeRanges.dinner['start'], settings.mealTimeRanges.dinner['end'])) {
+      return '晚餐';
+    }
+
+    return 0;
+  }
+
   setSelectedDate(date: Date): void {
     this.selectedDateSubject.next(date);
     this.selectedDateStringSubject.next(this.formatDate(date));
@@ -71,7 +102,7 @@ export class DateService implements OnDestroy {
     return this.mealCycleSubject.value;
   }
 
-  private calculateCurrentMealCycle(): MealCycleInfo {
+  public calculateCurrentMealCycle(): MealCycleInfo {
     // Use default if settings are not loaded
     const mealCycle = this.settingsService.mealCycle;
     if (!mealCycle) {

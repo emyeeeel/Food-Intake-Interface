@@ -1,47 +1,15 @@
 <div class="main-container">
 
-  <!-- Meal Type Selection Step -->
-  @if (mealSelectionStep) {
-    <div class="meal-selection-container">
-      <div class="selection-header">
-        <h4>請選擇用餐時間</h4>
-        <p>選擇您要記錄的用餐階段</p>
-      </div>
-      <div class="meal-type-buttons">
-        <button
-          class="meal-type-btn before-meal"
-          (click)="selectMealType('Before')">
-          <div class="btn-text">
-            <span class="main-text">餐前</span>
-            <span class="sub-text">Before Meal</span>
-          </div>
-        </button>
-        <button
-          class="meal-type-btn after-meal"
-          (click)="selectMealType('After')">
-          <div class="btn-text">
-            <span class="main-text">餐後</span>
-            <span class="sub-text">After Meal</span>
-          </div>
-        </button>
-      </div>
-    </div>
-  }
-
-  <!-- Scanner Header (moved above scanner container) -->
+  <!-- Scanner Header -->
   @if (!mealSelectionStep && !scanResult) {
     <div class="scanner-header">
-      <button class="back-btn" (click)="goBackToSelection()">
-        ← 返回選擇
-      </button>
       <div class="selected-meal-info">
-        <span class="meal-type-indicator">{{ getMealTypeDisplayText() }}</span>
         <span class="meal-type-subtitle">掃描 QR 碼記錄</span>
       </div>
     </div>
   }
 
-  <!-- QR Scanner Section (shown after meal type selection) -->
+  <!-- QR Scanner Section -->
   @if (!mealSelectionStep && !scanResult) {
     <div class="qr-scanner-container">
       <div class="scanner-section">
@@ -59,104 +27,68 @@
                 </div>
               </div>
             </div>
-            <!-- @if (scanResult) {
-              <div class="scanner-result">
-                <div class="result-success">
-                  <h5>掃描成功!</h5>
-                  <p>{{ scanResult }}</p>
-                  <p class="meal-type-info">記錄類型: {{ getMealTypeDisplayText() }}</p>
-                </div>
-              </div>
-            } -->
           </div>
         }
       </div>
     </div>
   }
 
-  @if (scanResult && hasMealsForToday()) {
+  <!-- Show Add Intake Section -->
+  @if (scanResult && selectedMealAssignmentId != 0) {
     <div class="header-section">
       <h2>新增食物攝取紀錄</h2>
       <button class="nav-button primary" (click)="capture()">
         上傳食物攝取記錄
       </button>
     </div>
-
-    <div class="meals-content">
-
-      <h4 class="patient-title">
-        病人 ID: {{ scannedPatientId }}
-      </h4>
-  
-      @for (dayGroup of getMealsByDayCycle() | keyvalue: dayCycleSort; track dayGroup.key) {
-        <div class="day-section">
-  
-          <h3 class="day-header">第 {{ dayGroup.key }} 天</h3>
-  
-          <div class="meals">
-  
-            <!-- Lunch -->
-            <div class="meal-type-section">
-              <div class="meals-grid">
-                @for (assignment of getMealsByType(dayGroup.value, '午餐'); track assignment.id) {
-                  <div
-                    class="meal-card"
-                    [class.selected]="selectedMealAssignmentId === assignment.id"
-                    (click)="selectMealAssignment(assignment)"
-                  >
-                    <div class="meal-image">
-                      <img
-                        [src]="assignment.meal_detail!.image || 'assets/images/meals/meal_placeholder.jpg'"
-                        [alt]="assignment.meal_detail!.meal_name"
-                      />
-                    </div>
-  
-                    <div class="meal-info">
-                      <h4 class="meal-type-header">午餐</h4>
-                      <p class="meal-name">
-                        {{ assignment.meal_detail!.meal_name || assignment.meal_name }}
-                      </p>
-                    </div>
-                  </div>
-                }
-              </div>
+    <div class="meal-selection-container">
+      <div class="meal-type-buttons">
+        @if(mealPhaseStatus !== 'done'){
+          <div class="meal-type-buttons">
+          <!-- 餐前 button -->
+          <button
+            class="meal-type-btn"
+            [class.selected]="selectedMealType === 'Before'"
+            [disabled]="mealPhaseStatus !== null && mealPhaseStatus !== '後'"
+            (click)="setMealType('Before')">
+            <div class="btn-text">
+              <span class="main-text">餐前</span>
             </div>
-  
-            <!-- Dinner -->
-            <div class="meal-type-section">
-              <div class="meals-grid">
-                @for (assignment of getMealsByType(dayGroup.value, '晚餐'); track assignment.id) {
-                  <div
-                    class="meal-card"
-                    [class.selected]="selectedMealAssignmentId === assignment.id"
-                    (click)="selectMealAssignment(assignment)"
-                  >
-                    <div class="meal-image">
-                      <img
-                        [src]="assignment.meal_detail!.image || 'assets/images/meals/meal_placeholder.jpg'"
-                        [alt]="assignment.meal_detail!.meal_name"
-                      />
-                    </div>
-  
-                    <div class="meal-info">
-                      <h4 class="meal-type-header">晚餐</h4>
-                      <p class="meal-name">
-                        {{ assignment.meal_detail!.meal_name || assignment.meal_name }}
-                      </p>
-                    </div>
-                  </div>
-                }
-              </div>
+          </button>
+
+          <!-- 餐後 button -->
+          <button
+            class="meal-type-btn"
+            [class.selected]="selectedMealType === 'After'"
+            [disabled]="mealPhaseStatus !== '前'"
+            (click)="setMealType('After')">
+            <div class="btn-text">
+              <span class="main-text">餐後</span>
             </div>
-  
-          </div>
+          </button>
         </div>
-      }
+        }
+        @if(mealPhaseStatus == 'done'){
+          <div class="message">
+            <h3>{{ mealTimePeriod }} records has been recorded.</h3>
+          </div>
+        }
+      </div>
     </div>
-  } @else {
+  }
+
+  <!-- Show "No assignments" only after scanning and no assignments -->
+  @if (scanResult && !checking && selectedMealAssignmentId == 0) {
     <div class="no-assignments">
       <p>今日無可用餐點分配。</p>
     </div>
   }
-  
+
+  <ng-container *ngIf="isProcessing">
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p class="loading-text">上傳食物攝取記錄中…</p>
+    </div>
+  </ng-container>  
+
 </div>
