@@ -86,6 +86,7 @@
                 <div class="form-group">
                   <label [for]="'dayCycle-' + i">日別</label>
                   <select 
+                    [disabled]="true"
                     [id]="'dayCycle-' + i" 
                     [name]="'dayCycle-' + i" 
                     [(ngModel)]="assignment.dayId"

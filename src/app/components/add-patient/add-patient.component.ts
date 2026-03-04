@@ -38,22 +38,7 @@ export class AddPatientComponent implements OnInit {
   dietaryRestrictions: string = '';
   
   mealAssignments: MealAssignmentForm[] = [];
-  availableDays = [
-    { value: '1', label: '第1天' },
-    { value: '2', label: '第2天' },
-    { value: '3', label: '第3天' },
-    { value: '4', label: '第4天' },
-    { value: '5', label: '第5天' },
-    { value: '6', label: '第6天' },
-    { value: '7', label: '第7天' },
-    { value: '8', label: '第8天' },
-    { value: '9', label: '第9天' },
-    { value: '10', label: '第10天' },
-    { value: '11', label: '第11天' },
-    { value: '12', label: '第12天' },
-    { value: '13', label: '第13天' },
-    { value: '14', label: '第14天' }
-  ];
+  availableDays: { value: string, label: string }[] = [];
   allMeals: Meal[] = [];
 
   // Form state
@@ -68,36 +53,38 @@ export class AddPatientComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const totalDays = 14; 
+    this.availableDays = Array.from({ length: totalDays }, (_, i) => ({
+      value: (i + 1).toString(),
+      label: `第${i + 1}天`
+    }));
     // Load all meals on component initialization
     this.loadMeals();
-    // Initialize with one assignment
-    this.addMealAssignment();
   }
 
   private loadMeals(): void {
     this.mealsService.getMeals().subscribe({
       next: (meals) => {
-        console.log('Meals Response:', meals);
         this.allMeals = meals;
+        this.addMealAssignment(); // now safe to add assignment with meals
       },
-      error: (error) => {
-        console.error('Error fetching meals:', error);
-      }
+      error: (error) => console.error(error)
     });
   }
 
   addMealAssignment(): void {
-    const newAssignment: MealAssignmentForm = {
-      id: this.generateId(),
-      dayId: '',
-      lunchMeals: [],
-      dinnerMeals: [],
-      selectedLunchMeals: [],
-      selectedDinnerMeals: []
-    };
-    
-    this.mealAssignments.push(newAssignment);
-  }
+  const dayId = (this.mealAssignments.length + 1).toString();
+  const newAssignment: MealAssignmentForm = {
+    id: this.generateId(),
+    dayId,
+    lunchMeals: this.allMeals.filter(meal => meal.day_cycle.toString() === dayId && meal.meal_time === '午餐'),
+    dinnerMeals: this.allMeals.filter(meal => meal.day_cycle.toString() === dayId && meal.meal_time === '晚餐'),
+    selectedLunchMeals: [],
+    selectedDinnerMeals: []
+  };
+  
+  this.mealAssignments.push(newAssignment);
+}
 
   removeMealAssignment(index: number): void {
     if (this.mealAssignments.length > 1) {

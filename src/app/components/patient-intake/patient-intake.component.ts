@@ -102,6 +102,33 @@ export class PatientIntakeComponent implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.add(patientSub);
   }
 
+  public getConsumedPercentage(intake: IntakeRecord): string {
+    // Before meal is always 100%
+    if (intake.meal_phase === '前') {
+      return '100%';
+    }
+
+    // Find corresponding '前' intake for same meal and day
+    const beforeIntake = this.intakes.find(i =>
+      i.meal_phase === '前' &&
+      i.meal_detail?.meal_time === intake.meal_detail?.meal_time &&
+      this.getDateForDayCycle(i.meal_detail!.day_cycle) === this.getDateForDayCycle(intake.meal_detail!.day_cycle)
+    );
+
+    // Use assumed weights if missing
+    const beforeWeight = Number(beforeIntake?.weight_g ?? 100);
+    const afterWeight = Number(intake.weight_g ?? 50);
+
+    const consumed = beforeWeight - afterWeight;
+
+    console.log('Before weight:', beforeWeight, 'After weight:', afterWeight);
+
+    // Clamp percentage to 0–100%
+    const percentage = ((beforeWeight - afterWeight) / beforeWeight) * 100;
+
+    return `${percentage.toFixed(2)}%`;
+}
+
   public exportIntakesToExcel(): void {
     if (this.intakes.length === 0) {
       alert('No intake records to save.');
@@ -125,10 +152,10 @@ export class PatientIntakeComponent implements OnInit, OnChanges, OnDestroy {
       }
   
       return {
+        'Date': formattedDate,
         'Meal': intake.meal_detail?.meal_name || '-',
         'Time': intake.meal_detail?.meal_time || '-',
-        'Day': dayCycle !== null ? `Day ${dayCycle}` : '-',
-        'Date': formattedDate,
+        'Period': intake.meal_phase || '-',
         'Weight (g)': intake.weight_g ?? '-',
         'Volume (ml)': intake.volume_ml ?? '-',
         'Recorded At': intake.recorded_at

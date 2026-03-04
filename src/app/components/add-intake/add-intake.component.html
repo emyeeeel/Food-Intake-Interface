@@ -37,7 +37,8 @@
   @if (scanResult && selectedMealAssignmentId != 0) {
     <div class="header-section">
       <h2>新增食物攝取紀錄</h2>
-      <button class="nav-button primary" (click)="capture()">
+      <button class="nav-button primary" (click)="capture()" 
+      [disabled]="mealPhaseStatus == 'done' ">
         上傳食物攝取記錄
       </button>
     </div>
@@ -70,7 +71,7 @@
         }
         @if(mealPhaseStatus == 'done'){
           <div class="message">
-            <h3>{{ mealTimePeriod }} records has been recorded.</h3>
+            <h1>{{ mealTimePeriod }}記錄已被記錄</h1>
           </div>
         }
       </div>

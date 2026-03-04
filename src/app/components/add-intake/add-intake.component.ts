@@ -439,10 +439,15 @@ mealPeriod(): void {
               // const inpaintBlob = await zip.file("inpainted_depth_image.png")?.async("blob");
               // const csvText = await zip.file("depth.csv")?.async("text");
   
-              // Get net weight from weight service
-              const netWeightResponse = await firstValueFrom(this.weightService.getNetWeight());
-              const netWeight = netWeightResponse.net_weight || 0;
-              console.log(netWeight)
+              // Get net weight from json zip
+              let netWeight = 0;
+
+              try {
+                const weightData = JSON.parse(weightText);
+                netWeight = weightData?.net_weight ?? 0;
+              } catch (error) {
+                console.error('Failed to parse weight JSON:', error);
+              }
   
               // Determine meal phase based on selected meal type
               const meal_phase = this.selectedMealType === 'Before' ? '前' : '後';
@@ -487,8 +492,8 @@ mealPeriod(): void {
     
               // Navigate to patient intakes page
               if (this.scannedPatientId) {
-                // this.router.navigate(['patient-info/intakes', this.scannedPatientId]);
-                this.router.navigate(['/meals']);
+                this.router.navigate(['patient-info/intakes', this.scannedPatientId]);
+                // this.router.navigate(['/meals']);
               }
     
               resolve(createdRecord);
