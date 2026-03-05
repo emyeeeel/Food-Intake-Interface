@@ -15,5 +15,6 @@ export interface IntakeRecord {
     meal_detail: Meal;
     patient_identifier: string;
     image: File | null;
+    depth_csv: File | null;
     meal_phase: string;
 }

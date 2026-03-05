@@ -197,35 +197,51 @@ export class AddIntakeComponent implements OnInit {
   
             // Optional: extract inpainted depth image or CSV if needed
             // const inpaintBlob = await zip.file("inpainted_depth_image.png")?.async("blob");
-            // const csvText = await zip.file("depth.csv")?.async("text");
+            
+            const csvBlob = await zip.file("depth.csv")?.async("blob");
+              if (!csvBlob) {
+                throw new Error("depth.csv not found in ZIP");
+              }
 
-            // Get net weight from weight service
-            const netWeightResponse = await firstValueFrom(this.weightService.getNetWeight());
-            const netWeight = netWeightResponse.net_weight || 0;
-            console.log(netWeight)
+              const csvFile = new File(
+                [csvBlob],
+                `depth_${Date.now()}.csv`,
+                { type: "text/csv" }
+              );
 
-            // Determine meal phase based on selected meal type
-            const meal_phase = this.selectedMealType === 'Before' ? '前' : '後';
+              console.log(csvFile);
+              console.log(csvFile.name);
+              console.log(csvFile.type);
 
-            // if after, kwaang record before nga weight then i minus then get percentage
+            // Get net weight from json zip
+              let netWeight = 0;
 
-            // Prepare IntakeRecord payload
-            const intakePayload = {
-              meal: assignment.meal,
-              ltc_patient: assignment.ltc_patient || 0,
-              weight_g: netWeight, // You may update this from your logic if TX2 provides weight
-              volume_ml: 0, // Same for volume
-              recorded_at: new Date().toISOString(),
-              image: imageFile, // send actual file if your backend accepts multipart/form-data,
-              meal_phase: meal_phase
-            };
-
-            console.log(intakePayload)
+              try {
+                const weightData = JSON.parse(weightText);
+                netWeight = weightData?.net_weight ?? 0;
+              } catch (error) {
+                console.error('Failed to parse weight JSON:', error);
+              }
   
-            // Post to backend using IntakeService
-            const createdRecord = await this.intakeService.createIntake(intakePayload).toPromise();
-            console.log('Intake record created successfully:', createdRecord);
+              // Determine meal phase based on selected meal type
+              const meal_phase = this.selectedMealType === 'Before' ? '前' : '後';
 
+              const formData = new FormData();
+
+              formData.append('meal', assignment.meal.toString());
+              formData.append('ltc_patient', (assignment.ltc_patient || 0).toString());
+              formData.append('weight_g', netWeight.toString());
+              formData.append('volume_ml', '0');
+              formData.append('recorded_at', new Date().toISOString());
+              formData.append('meal_phase', meal_phase);
+
+              formData.append('image', imageFile);
+              formData.append('depth_csv', csvFile);
+    
+              // Post to backend using IntakeService
+              const createdRecord = await this.intakeService.createIntake(formData).toPromise();
+              console.log('Intake record created successfully:', createdRecord);
+  
             // this.snackBar.open('食物攝取記錄已成功創建', '', {
             //   duration: 5000,
             //   horizontalPosition: 'end', // Right side of the screen
@@ -251,7 +267,7 @@ export class AddIntakeComponent implements OnInit {
               this.router.navigate(['/meals']);
             }
   
-            resolve(createdRecord);
+            // resolve(createdRecord);
   
           } catch (err) {
             console.error('Failed to create intake record:', err);

@@ -121,7 +121,7 @@ export class PatientIntakeComponent implements OnInit, OnChanges, OnDestroy {
 
     const consumed = beforeWeight - afterWeight;
 
-    console.log('Before weight:', beforeWeight, 'After weight:', afterWeight);
+    // console.log('Before weight:', beforeWeight, 'After weight:', afterWeight);
 
     // Clamp percentage to 0–100%
     const percentage = ((beforeWeight - afterWeight) / beforeWeight) * 100;

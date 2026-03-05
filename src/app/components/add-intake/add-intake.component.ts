@@ -85,7 +85,7 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
       this.intakeService
       .getIntakesByMealPeriod(this.scannedPatientId!, this.mealTimePeriod as '午餐' | '晚餐')
       .subscribe(intakes => {
-        console.log('Intakes for selected meal period:', intakes);
+        console.log('Number of for selected meal period:', intakes,length);
         console.log('First Intake Record Meal Details: ', intakes[0]?.meal_detail?.meal_time, this.mealTimePeriod)
       });
     }
@@ -220,6 +220,9 @@ mealPeriod(): void {
     }
 
     console.log('Filters', filters)
+    console.log("Patient:", this.scannedPatientId);
+    console.log("Day cycle:", this.dayCycle);
+    console.log("Meal period:", this.mealTimePeriod);
 
     this.intakeService
     .getAssignmentsByMealPeriod(
@@ -230,8 +233,18 @@ mealPeriod(): void {
     .subscribe(assignments => {
       this.mealAssignments = assignments;
       console.log('Filtered assignments:', assignments);
-      this.selectedMealAssignmentId = assignments[0].id;
-      console.log('Meal Assignment ID: ', this.selectedMealAssignmentId, assignments[0].meal_detail.meal_name)
+
+      if (assignments.length > 0) {
+        this.selectedMealAssignmentId = assignments[0].id;
+        console.log(
+          'Meal Assignment ID:',
+          this.selectedMealAssignmentId,
+          assignments[0].meal_detail?.meal_name
+        );
+      } else {
+        console.warn('No meal assignments found for this patient and meal period');
+        this.selectedMealAssignmentId = 0;
+      }
     });
 
     // this.mealAssignmentService
@@ -437,7 +450,21 @@ mealPeriod(): void {
     
               // Optional: extract inpainted depth image or CSV if needed
               // const inpaintBlob = await zip.file("inpainted_depth_image.png")?.async("blob");
-              // const csvText = await zip.file("depth.csv")?.async("text");
+              
+              const csvBlob = await zip.file("depth.csv")?.async("blob");
+              if (!csvBlob) {
+                throw new Error("depth.csv not found in ZIP");
+              }
+
+              const csvFile = new File(
+                [csvBlob],
+                `depth_${Date.now()}.csv`,
+                { type: "text/csv" }
+              );
+
+              console.log(csvFile);
+              console.log(csvFile.name);
+              console.log(csvFile.type);
   
               // Get net weight from json zip
               let netWeight = 0;
@@ -455,20 +482,33 @@ mealPeriod(): void {
               // if after, kwaang record before nga weight then i minus then get percentage
   
               // Prepare IntakeRecord payload
-              const intakePayload = {
-                meal: assignment.meal,
-                ltc_patient: assignment.ltc_patient || 0,
-                weight_g: netWeight, // You may update this from your logic if TX2 provides weight
-                volume_ml: 0, // Same for volume
-                recorded_at: new Date().toISOString(),
-                image: imageFile, // send actual file if your backend accepts multipart/form-data,
-                meal_phase: meal_phase
-              };
+              // const intakePayload = {
+              //   meal: assignment.meal,
+              //   ltc_patient: assignment.ltc_patient || 0,
+              //   weight_g: netWeight, // You may update this from your logic if TX2 provides weight
+              //   volume_ml: 0, // Same for volume
+              //   recorded_at: new Date().toISOString(),
+              //   image: imageFile, // send actual file if your backend accepts multipart/form-data,
+              //   depth_csv: csvFile,
+              //   meal_phase: meal_phase,
+              // };
   
-              console.log(intakePayload)
+              // console.log(intakePayload)
+
+              const formData = new FormData();
+
+              formData.append('meal', assignment.meal.toString());
+              formData.append('ltc_patient', (assignment.ltc_patient || 0).toString());
+              formData.append('weight_g', netWeight.toString());
+              formData.append('volume_ml', '0');
+              formData.append('recorded_at', new Date().toISOString());
+              formData.append('meal_phase', meal_phase);
+
+              formData.append('image', imageFile);
+              formData.append('depth_csv', csvFile);
     
               // Post to backend using IntakeService
-              const createdRecord = await this.intakeService.createIntake(intakePayload).toPromise();
+              const createdRecord = await this.intakeService.createIntake(formData).toPromise();
               console.log('Intake record created successfully:', createdRecord);
   
               // this.snackBar.open('食物攝取記錄已成功創建', '', {

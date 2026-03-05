@@ -26,28 +26,35 @@ export class IntakeService {
 
     return this.http.get<IntakeRecord[]>(this.apiUrl, { params });
   }
-  
-  createIntake(intake: Partial<IntakeRecord>): Observable<IntakeRecord> {
-    const formData = new FormData();
-    formData.append('meal', intake.meal?.toString() || '');
-    formData.append('ltc_patient', intake.ltc_patient?.toString() || '');
-    formData.append('weight_g', intake.weight_g?.toString() || '');
-    formData.append('volume_ml', intake.volume_ml?.toString() || '');
-    formData.append('recorded_at', intake.recorded_at || '');
-    formData.append('meal_phase', intake.meal_phase?.toString() || '');
-    if (intake.image instanceof File) {
-      formData.append('image', intake.image);
-    }
-    const start = performance.now();
 
-    return this.http.post<IntakeRecord>(this.apiUrl, formData).pipe(
-      finalize(() => {
-        const end = performance.now();
-        const latency = end - start;
-        console.log(`createIntake latency: ${latency.toFixed(2)} ms`);
-      })
-    );
+  createIntake(data: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}`, data);
   }
+  
+  // createIntake(intake: Partial<IntakeRecord>): Observable<IntakeRecord> {
+  //   const formData = new FormData();
+  //   formData.append('meal', intake.meal?.toString() || '');
+  //   formData.append('ltc_patient', intake.ltc_patient?.toString() || '');
+  //   formData.append('weight_g', intake.weight_g?.toString() || '');
+  //   formData.append('volume_ml', intake.volume_ml?.toString() || '');
+  //   formData.append('recorded_at', intake.recorded_at || '');
+  //   formData.append('meal_phase', intake.meal_phase?.toString() || '');
+  //   if (intake.image instanceof File) {
+  //     formData.append('image', intake.image);
+  //   }
+  //   if(intake.depth_csv instanceof File){
+  //     formData.append('csv', intake.depth_csv);
+  //   }
+  //   const start = performance.now();
+
+  //   return this.http.post<IntakeRecord>(this.apiUrl, formData).pipe(
+  //     finalize(() => {
+  //       const end = performance.now();
+  //       const latency = end - start;
+  //       console.log(`createIntake latency: ${latency.toFixed(2)} ms`);
+  //     })
+  //   );
+  // }
   //method to check if there are entry for food intakes of ltc_patient based on 'lunch' or 'dinner' and recorded date (which should match todays date) filter
   //this will return the filtered list of IntakeRecord[] for the matched records
  getMealPhasesForDate(
@@ -140,6 +147,7 @@ getIntakesByMealPeriod(
   return this.getIntakeByLtcPatientId(ltcPatientId).pipe(
     map(records => {
       return records.filter(record => {
+        
         if (!record.recorded_at) return false;
 
         const recordDate = new Date(record.recorded_at);
@@ -165,19 +173,32 @@ getAssignmentsByMealPeriod(
   dayCycle: number
 ): Observable<MealAssignment[]> {
 
-  return this.mealAssignments.getMealAssignmentsByLTCPatient(ltcPatientId).pipe(
-    map(records => {
-      return records.filter(record => {
-        if (!record.meal_detail.meal_time) return false;
+ return this.mealAssignments.getMealAssignmentsByLTCPatient(ltcPatientId).pipe(
+  map(records => {
 
-        // Only include records for the requested mealPeriod
-        const isMealPeriodMatch = record.meal_detail?.meal_time === mealPeriod;
+    // console.log("RAW assignments from API:", records);
 
-        const isDayCycleMatch = record.meal_detail.day_cycle === dayCycle;
+    return records.filter(record => {
+      // console.log("Checking record:", record);
 
-        return isMealPeriodMatch && isDayCycleMatch;
-      });
-    })
-  );
+      const isMealPeriodMatch = record.meal_detail?.meal_time === mealPeriod;
+      const isDayCycleMatch = record.meal_detail?.day_cycle === dayCycle;
+
+      // console.log(
+      //   "meal match:", record.meal_detail?.meal_time,
+      //   "==", mealPeriod,
+      //   isMealPeriodMatch
+      // );
+
+      // console.log(
+      //   "day match:", record.meal_detail?.day_cycle,
+      //   "==", dayCycle,
+      //   isDayCycleMatch
+      // );
+
+      return isMealPeriodMatch && isDayCycleMatch;
+    });
+  })
+);
 }
 }
