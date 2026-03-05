@@ -131,9 +131,9 @@ Return ONLY the formatted text exactly as specified above. No extra text.
   constructor(
     private patientService: PatientService,
     private recommendedIntakeService: RecommendedIntakeService,
-    private mealAssignmentService: MealAssignmentService,
-    private mealsService: MealsService,
-    private getAnalysisService: GetAnalysisService,
+    // private mealAssignmentService: MealAssignmentService,
+    // private mealsService: MealsService,
+    // private getAnalysisService: GetAnalysisService,
     private router: Router
   ) {}
 
@@ -164,37 +164,38 @@ Return ONLY the formatted text exactly as specified above. No extra text.
           next: (recData) => {
             this.recommendedIntake = recData.nutritional_recommendations;
             console.log('Recommended intake loaded:', recData);
+            this.loading = false;
   
             // Load meal assignments for LTC patient
-            this.mealAssignmentService.getMealAssignmentsByLTCPatient(patientId).subscribe({
-              next: (assignments) => {
-                this.mealAssignments = assignments;
-                console.log('LTC Meal assignments loaded:', assignments);
+            // this.mealAssignmentService.getMealAssignmentsByLTCPatient(patientId).subscribe({
+            //   next: (assignments) => {
+            //     this.mealAssignments = assignments;
+            //     console.log('LTC Meal assignments loaded:', assignments);
   
-                // All data loaded, now build query
-                this.query = this.buildQuery();
-                console.log('Query built:', this.query);
+            //     // All data loaded, now build query
+            //     this.query = this.buildQuery();
+            //     console.log('Query built:', this.query);
   
-                // Call analysis service
-                this.getAnalysisService.getAnalysis(this.query).subscribe({
-                  next: (response: { recommendation: string }) => {
-                    this.recommendedAnalysis = this.formatAnalysisForUI(response.recommendation);
-                    console.log('Analysis completed:', this.recommendedAnalysis);
-                    this.loading = false;
-                  },
-                  error: (err) => {
-                    console.error('Analysis error:', err);
-                    this.recommendedAnalysis = '載入分析失敗.'; //Failed to load analysis
-                    this.loading = false;
-                  }
-                });
-              },
-              error: (err) => {
-                console.error('LTC meal assignments error:', err);
-                this.error = '膳食分配加載失敗.'; //Failed to load meal assignments
-                this.loading = false;
-              }
-            });
+            //     // Call analysis service
+            //     this.getAnalysisService.getAnalysis(this.query).subscribe({
+            //       next: (response: { recommendation: string }) => {
+            //         this.recommendedAnalysis = this.formatAnalysisForUI(response.recommendation);
+            //         console.log('Analysis completed:', this.recommendedAnalysis);
+            //         this.loading = false;
+            //       },
+            //       error: (err) => {
+            //         console.error('Analysis error:', err);
+            //         this.recommendedAnalysis = '載入分析失敗.'; //Failed to load analysis
+            //         this.loading = false;
+            //       }
+            //     });
+            //   },
+            //   error: (err) => {
+            //     console.error('LTC meal assignments error:', err);
+            //     this.error = '膳食分配加載失敗.'; //Failed to load meal assignments
+            //     this.loading = false;
+            //   }
+            // });
           },
           error: (err) => {
             console.error('LTC recommended intake error:', err);
