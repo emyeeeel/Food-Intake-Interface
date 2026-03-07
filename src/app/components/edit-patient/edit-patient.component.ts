@@ -257,15 +257,21 @@ export class EditPatientComponent implements OnInit, OnDestroy {
    * Add new meal assignment
    */
   addMealAssignment(): void {
-    if (this.mealAssignments.length < this.availableDays.length) {
-      this.mealAssignments.push({
-        dayId: '',
-        lunchMeals: [],
-        dinnerMeals: [],
-        selectedLunchMeals: [],
-        selectedDinnerMeals: []
-      });
-    }
+    if (this.mealAssignments.length >= this.availableDays.length) return;
+
+    // Auto-assign the next day cycle based on current count
+    const nextDayId = (this.mealAssignments.length + 1).toString();
+    const newIndex = this.mealAssignments.length;
+
+    this.mealAssignments.push({
+      dayId: nextDayId,
+      lunchMeals: [],
+      dinnerMeals: [],
+      selectedLunchMeals: [],
+      selectedDinnerMeals: []
+    });
+
+    this.loadMealsForDay(nextDayId, newIndex);
   }
 
   /**

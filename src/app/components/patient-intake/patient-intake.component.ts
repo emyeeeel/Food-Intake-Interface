@@ -102,31 +102,11 @@ export class PatientIntakeComponent implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.add(patientSub);
   }
 
-  public getConsumedPercentage(intake: IntakeRecord): string {
-    // Before meal is always 100%
-    if (intake.meal_phase === '前') {
-      return '100%';
-    }
-
-    // Find corresponding '前' intake for same meal and day
-    const beforeIntake = this.intakes.find(i =>
-      i.meal_phase === '前' &&
-      i.meal_detail?.meal_time === intake.meal_detail?.meal_time &&
-      this.getDateForDayCycle(i.meal_detail!.day_cycle) === this.getDateForDayCycle(intake.meal_detail!.day_cycle)
-    );
-
-    // Use assumed weights if missing
-    const beforeWeight = Number(beforeIntake?.weight_g ?? 100);
-    const afterWeight = Number(intake.weight_g ?? 50);
-
-    const consumed = beforeWeight - afterWeight;
-
-    // console.log('Before weight:', beforeWeight, 'After weight:', afterWeight);
-
-    // Clamp percentage to 0–100%
-    const percentage = ((beforeWeight - afterWeight) / beforeWeight) * 100;
-
-    return `${percentage.toFixed(2)}%`;
+public getConsumedPercentage(intake: IntakeRecord): string {
+  if (intake.volume_ml === null || intake.volume_ml === undefined) {
+    return '-';
+  }
+  return `${Number(intake.volume_ml).toFixed(1)}%`;
 }
 
   public exportIntakesToExcel(): void {
@@ -161,6 +141,7 @@ export class PatientIntakeComponent implements OnInit, OnChanges, OnDestroy {
         'Recorded At': intake.recorded_at
           ? new Date(intake.recorded_at).toLocaleString()
           : '-',
+        'Recorded By': intake.recorded_by ?? '-'
       };
     });
   
@@ -239,4 +220,11 @@ export class PatientIntakeComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
   
+  navigateToIntakeReport(intakeId: number): void {
+    if (this.patientId && intakeId) {
+      this.router.navigate(['/patient-info', this.patientId, 'intakes', intakeId, 'view']);
+    } else {
+      console.error('Patient ID or Intake ID missing');
+    }
+  }
 }

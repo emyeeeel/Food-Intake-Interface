@@ -292,7 +292,7 @@ Return ONLY the formatted text exactly as specified above. No extra text.
    */
   navigateToPatientMeals(): void {
     if (this.patientId) {
-      this.router.navigate(['/patient-info/meals', this.patientId]);
+      this.router.navigate(['/patient-info', this.patientId, 'meals']);
     } else {
       console.error('Patient ID is required to navigate to meals');
       this.error = 'Unable to navigate: Patient ID not found';
@@ -304,7 +304,16 @@ Return ONLY the formatted text exactly as specified above. No extra text.
    */
   navigateToPatientIntakes(): void {
     if (this.patientId) {
-      this.router.navigate(['/patient-info/intakes', this.patientId]);
+      this.router.navigate(['/patient-info', this.patientId, 'intakes']);
+    } else {
+      console.error('Patient ID is required to navigate to intakes');
+      this.error = 'Unable to navigate: Patient ID not found';
+    }
+  }
+
+  navigateToIntakesAnaylysis(): void {
+    if (this.patientId) {
+      this.router.navigate(['/patient-info', this.patientId, 'analysis']);
     } else {
       console.error('Patient ID is required to navigate to intakes');
       this.error = 'Unable to navigate: Patient ID not found';

@@ -107,7 +107,7 @@
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 10px;
   min-height: 0;
   max-height: 100%;
 
@@ -475,7 +475,57 @@ button {
       }
     }
 
-    .recommended-analysis-section {
+    .analysis-section {
+      display: flex;
+      flex-direction: column;
+
+      .analysis-content{
+        min-height: 100px;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;
+        white-space: pre-wrap;
+        overflow-x: auto;
+        overflow-y: auto;
+        max-width: 100%;
+        padding: 12px;
+        background-color: #F8FFFE;
+        border-radius: 6px;
+        border: 1px solid #E0F7F4;
+        font-family: 'Quicksand', sans-serif;
+        font-size: 12px;
+        line-height: 1.5;
+        margin-bottom: 10px;
+
+        pre {
+          margin: 0;
+          padding: 0;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          font-family: inherit;
+          font-size: inherit;
+          line-height: inherit;
+        }
+      }
+
+      .intake-analysis{
+
+        button {
+          flex: 1;
+          padding: 12px 16px;
+          border-radius: 8px;
+          font-size: 11px;
+          min-height: 32px;
+          
+            border: none !important;
+            background-color: #00313C;
+            color: #F8FFFE;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+        }
+      }
       h3 {
         font-size: 14px;
         margin: 0;

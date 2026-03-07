@@ -107,6 +107,17 @@
               </div>
             </div>
           </div>
+          <div class="analysis-section">
+            <div class="section-header">
+              <h3>病人餐飲攝取摘要</h3>
+            </div>
+            <div class="analysis-content">
+
+            </div>
+            <div class="intake-analysis">
+              <button (click)="navigateToIntakesAnaylysis()">患者飲食分析</button>
+            </div>
+          </div>
         } @else {
           <div class="no-intake-data">
             <p>無建議攝取量資料</p>
@@ -153,7 +164,7 @@
         } -->
 
         <!-- AI Analysis Section with Loading State -->
-        <div class="recommended-analysis-section">
+        <!-- <div class="recommended-analysis-section">
           <div class="section-header">
             <h3>生成式AI推薦系統分析</h3>
           </div>
@@ -176,27 +187,20 @@
               </div>
             }
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
-  } @else if (loading) {
-    <!-- Only show this loading when patient data is not yet loaded -->
+  } 
+  <!-- @else if (loading) {
+    Only show this loading when patient data is not yet loaded 
     <div class="initial-loading">
       <div class="loading-spinner large"></div>
       <span>載入LTC病人資料...</span>
-    </div>
-  } @else {
+    </div>}  -->
+  <!-- @else {
     <div class="no-patient-data">
       <p>找不到LTC病人資料</p>
       <p>病人ID: {{ patientId }}</p>
     </div>
-  }
-
-  <!-- Debug Info (Development only) -->
-  @if (false) {
-    <div class="debug-info">
-      <h4>Debug Information</h4>
-      <pre>{{ getDebugInfo()}}</pre>
-    </div>
-  }
+  } -->
 </div>

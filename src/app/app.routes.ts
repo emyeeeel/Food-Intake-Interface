@@ -29,8 +29,8 @@ export const routes: Routes = [
     { path: 'meal-catalog/add', canActivate: [authGuard], component: MealCatalogComponent },
     { path: 'meal-catalog/all', canActivate: [authGuard], component: MealCatalogComponent },
     { path: 'meal-catalog/print', canActivate: [authGuard], component: MealCatalogComponent },
-    { path: 'meal-catalog/edit/:id', canActivate: [authGuard], component: MealCatalogComponent },
-    { path: 'meal-catalog/view/:id', canActivate: [authGuard], component: MealCatalogComponent }, 
+    { path: 'meal-catalog/:id/edit', canActivate: [authGuard], component: MealCatalogComponent },
+    { path: 'meal-catalog/:id/view', canActivate: [authGuard], component: MealCatalogComponent }, 
 
     { path: 'ingredients', canActivate: [authGuard], component: IngredientsComponent },
     { path: 'ingredients/add', canActivate: [authGuard], component: IngredientsComponent },
@@ -41,11 +41,13 @@ export const routes: Routes = [
     { path: 'patient-info/add', canActivate: [authGuard], component: PatientInfoComponent },
     { path: 'patient-info/all', canActivate: [authGuard], component: PatientInfoComponent },
     { path: 'patient-info/print', canActivate: [authGuard], component: PatientInfoComponent },
-    { path: 'patient-info/edit/:id', canActivate: [authGuard], component: PatientInfoComponent },
-    { path: 'patient-info/view/:id', canActivate: [authGuard], component: PatientInfoComponent },
-    { path: 'patient-info/meals/:id', canActivate: [authGuard], component: PatientInfoComponent },
-    { path: 'patient-info/intakes/:id', canActivate: [authGuard], component: PatientInfoComponent },
-    { path: 'patient-info/analysis/:id', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/:id/edit', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/:id/view', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/:id/meals', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/:id/intakes', canActivate: [authGuard], component: PatientInfoComponent },
+    { path: 'patient-info/:id/analysis', canActivate: [authGuard], component: PatientInfoComponent },
+
+    { path: 'patient-info/:id/intakes/:id/view', canActivate: [authGuard], component: PatientInfoComponent },
 
     { path: 'settings', canActivate: [authGuard], component: SettingsComponent },
 

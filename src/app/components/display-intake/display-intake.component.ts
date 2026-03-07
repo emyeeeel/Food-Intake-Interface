@@ -37,7 +37,7 @@ export class DisplayIntakeComponent implements OnInit {
   isCalculating: boolean = false;
   intakeData: any = {};
 
-  private apiUrl = 'https://h3vkhzth-8000.asse.devtunnels.ms/api/segment/results/';
+  private apiUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/api/segment/results/';
   // private apiUrl = 'http://127.0.0.1:8000/api/segment/results/';
 
   constructor(private http: HttpClient) { }

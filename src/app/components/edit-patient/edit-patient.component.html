@@ -84,20 +84,7 @@
   
                 <!-- Day Cycle Selection -->
                 <div class="form-group">
-                  <label [for]="'dayCycle-' + i">日別</label>
-                  <select 
-                    [disabled]="true"
-                    [id]="'dayCycle-' + i" 
-                    [name]="'dayCycle-' + i" 
-                    [(ngModel)]="assignment.dayId"
-                    (change)="onDayChange($event, i)"
-                    required
-                  >
-                    <option value="" disabled>選擇天數</option>
-                    <option *ngFor="let day of availableDays" [value]="day.value">
-                      {{ day.label }}
-                    </option>
-                  </select>
+                  <span>{{ assignment.dayId ? '第 ' + assignment.dayId + ' 天' : '-' }}</span>
                 </div>
   
                 <!-- Meals Container for this assignment -->

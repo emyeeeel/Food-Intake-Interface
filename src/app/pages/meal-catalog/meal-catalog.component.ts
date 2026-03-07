@@ -88,7 +88,6 @@ export class MealCatalogComponent implements OnInit {
   }
 
   private updateCurrentView(path: string): void {
-    console.log('Updating current view for path:', path);
     
     if (path.includes('/add') || path.endsWith('add')) {
       this.currentView = 'add-meal';
@@ -102,7 +101,7 @@ export class MealCatalogComponent implements OnInit {
       this.currentView = 'print-meal';
       this.mealId = null;
 
-    } else if (/meal-catalog\/edit\/\d+/.test(path)) {
+    } else if (/meal-catalog\/\d+\/edit/.test(path)) {
       // Remove leading slash from regex - matches both /meal-catalog/edit/123 and meal-catalog/edit/123
       this.currentView = 'edit-meal';
       const editMatch = path.match(/meal-catalog\/edit\/(\d+)/);
@@ -111,7 +110,7 @@ export class MealCatalogComponent implements OnInit {
         console.log('Edit meal ID extracted:', this.mealId);
       }
 
-    } else if (/meal-catalog\/view\/\d+/.test(path)) {
+    } else if (/meal-catalog\/\d+\/view/.test(path)) {
       // Remove leading slash from regex - matches both /meal-catalog/view/123 and meal-catalog/view/123
       this.currentView = 'view-meal';
       const viewMatch = path.match(/meal-catalog\/view\/(\d+)/);
@@ -137,8 +136,6 @@ export class MealCatalogComponent implements OnInit {
       this.currentView = 'default';
       this.mealId = null;
     }
-
-    console.log('Current view updated to:', this.currentView, 'Meal ID:', this.mealId);
   }
 
   navigateToAddMeal(): void {
@@ -154,11 +151,11 @@ export class MealCatalogComponent implements OnInit {
   }
 
   navigateToEditMeal(mealId: number): void {
-    this.router.navigate(['/meal-catalog/edit' + mealId]);
+    this.router.navigate(['/meal-catalog', mealId, 'edit']);
   }
 
   navigateToViewMeal(mealId: number): void {
-    this.router.navigate(['/meal-catalog/view' + mealId]);
+    this.router.navigate(['/meal-catalog', mealId, 'view']);
   }
 
   clearDescription(): void {
@@ -194,13 +191,13 @@ export class MealCatalogComponent implements OnInit {
     const url = this.router.url;
     
     // Try edit format first
-    let match = url.match(/\/meal-catalog\/edit\/(\d+)/);
+    let match = url.match(/\/meal-catalog\/(\d+)\/edit/);
     if (match) {
       return parseInt(match[1], 10);
     }
     
     // Try view format
-    match = url.match(/\/meal-catalog\/view\/(\d+)/);
+    match = url.match(/\/meal-catalog\/(\d+)\/view/);
     if (match) {
       return parseInt(match[1], 10);
     }

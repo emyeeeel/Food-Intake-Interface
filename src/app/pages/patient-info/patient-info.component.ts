@@ -24,6 +24,7 @@ import { DisplayPatientComponent } from "../../components/display-patient/displa
 import { PrintAllPatientsComponent } from "../../components/print-all-patients/print-all-patients.component";
 import { IntakeService } from '../../services/intake.service';
 import { PatientAnalysisComponent } from '../../components/patient-analysis/patient-analysis.component';
+import { ViewIntakeComponent } from "../../components/view-intake/view-intake.component";
 
 @Component({
   selector: 'app-patient-info',
@@ -46,7 +47,8 @@ import { PatientAnalysisComponent } from '../../components/patient-analysis/pati
     PatientIntakeComponent,
     DisplayPatientComponent,
     PrintAllPatientsComponent,
-    PatientAnalysisComponent
+    PatientAnalysisComponent,
+    ViewIntakeComponent
 ],
   templateUrl: './patient-info.component.html',
   styleUrls: ['./patient-info.component.scss']
@@ -94,6 +96,7 @@ export class PatientInfoComponent implements OnInit {
   }
 
   private updateCurrentView(path: string): void {
+
     if (path.endsWith('/add') || path === 'add') {
       this.currentView = 'addRecord';
 
@@ -103,41 +106,48 @@ export class PatientInfoComponent implements OnInit {
     } else if (path.endsWith('/print') || path === 'print') {
       this.currentView = 'printRecord';
 
-    } else if (/\/patient-info\/view\/\d+$/.test(path)) {
+    } else if (/\/patient-info\/\d+\/view$/.test(path)) {
       this.currentView = 'patientRecord';
-      const viewMatch = path.match(/\/patient-info\/view\/(\d+)$/);
-      if (viewMatch) {
-        this.patientId = parseInt(viewMatch[1], 10);
-      }
 
-    } else if (/\/patient-info\/edit\/\d+$/.test(path)) {
+      const match = path.match(/\/patient-info\/(\d+)\/view$/);
+      if (match) this.patientId = parseInt(match[1], 10);
+
+    } else if (/\/patient-info\/\d+\/edit$/.test(path)) {
       this.currentView = 'editRecord';
-      const editMatch = path.match(/\/patient-info\/edit\/(\d+)$/);
-      if (editMatch) {
-        this.patientId = parseInt(editMatch[1], 10);
-      }
-    } else if (/\/patient-info\/meals\/\d+$/.test(path)) {
+
+      const match = path.match(/\/patient-info\/(\d+)\/edit$/);
+      if (match) this.patientId = parseInt(match[1], 10);
+
+    } else if (/\/patient-info\/\d+\/meals$/.test(path)) {
       this.currentView = 'mealsRecord';
-      const mealsMatch = path.match(/\/patient-info\/meals\/(\d+)$/);
-      if (mealsMatch) {
-        this.patientId = parseInt(mealsMatch[1], 10);
-      }
-      
-    } else if (/\/patient-info\/intakes\/\d+$/.test(path)) {
+
+      const match = path.match(/\/patient-info\/(\d+)\/meals$/);
+      if (match) this.patientId = parseInt(match[1], 10);
+
+    } else if (/\/patient-info\/\d+\/intakes$/.test(path)) {
       this.currentView = 'intakesRecord';
-      const intakesMatch = path.match(/\/patient-info\/intakes\/(\d+)$/);
-      if (intakesMatch) {
-        this.patientId = parseInt(intakesMatch[1], 10);
-      }
-      
-    } else if (/\/patient-info\/analysis\/\d+$/.test(path)) {
+
+      const match = path.match(/\/patient-info\/(\d+)\/intakes$/);
+      if (match) this.patientId = parseInt(match[1], 10);
+
+    } else if (/\/patient-info\/\d+\/analysis$/.test(path)) {
       this.currentView = 'analysis';
-      const analysisMatch = path.match(/\/patient-info\/analysis\/(\d+)$/);
-      if (analysisMatch) {
-        this.patientId = parseInt(analysisMatch[1], 10);
+
+      const match = path.match(/\/patient-info\/(\d+)\/analysis$/);
+      if (match) this.patientId = parseInt(match[1], 10);
+
+    } else if (/\/patient-info\/\d+\/intakes\/\d+\/view$/.test(path)) {
+      this.currentView = 'intake-report';
+
+      const match = path.match(/\/patient-info\/(\d+)\/intakes\/(\d+)\/view$/);
+      if (match) {
+        this.patientId = parseInt(match[1], 10);
+        const intakeId = parseInt(match[2], 10);
+        console.log('Patient ID:', this.patientId);
+        console.log('Intake ID:', intakeId);
       }
-      
-    }  else {
+    }
+    else {
       this.currentView = 'default';
     }
 
@@ -146,22 +156,13 @@ export class PatientInfoComponent implements OnInit {
 
   getPatientIdFromRoute(): number | null {
     const url = this.router.url;
-    
-    let match = url.match(/\/patient-info\/view\/(\d+)/);
+
+    const match = url.match(/\/patient-info\/(\d+)/);
+
     if (match) {
       return parseInt(match[1], 10);
     }
-    
-    match = url.match(/\/patient-info\/edit\/(\d+)/);
-    if (match) {
-      return parseInt(match[1], 10);
-    }
-  
-    match = url.match(/\/patient-info\/(\d+)/);
-    if (match) {
-      return parseInt(match[1], 10);
-    }
-    
+
     return null;
   }
 
@@ -185,13 +186,11 @@ export class PatientInfoComponent implements OnInit {
   }
 
   navigateToPatientRecord(): void {
-    console.log('Navigate to Patient Record');
-    this.router.navigate(['/patient-info/view' + this.patientId]);
+    this.router.navigate(['/patient-info', this.patientId, 'view']);
   }
 
   navigateToEditPatient(): void {
-    console.log('Navigate to Edit Patient');
-    this.router.navigate(['/patient-info/edit' + this.patientId]);
+    this.router.navigate(['/patient-info', this.patientId, 'edit']);
   }
 
   onMobileMenuToggle(isOpen: boolean) {

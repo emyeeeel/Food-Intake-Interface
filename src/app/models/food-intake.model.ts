@@ -10,6 +10,7 @@ export interface IntakeRecord {
     weight_g: number;
     volume_ml: number;
     recorded_at: string; 
+    recorded_by: string;
     patient_detail: Patient | null;
     ltc_patient_detail: LTCPatient | null;
     meal_detail: Meal;

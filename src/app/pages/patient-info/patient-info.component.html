@@ -176,15 +176,30 @@
 
   @if (currentView === 'analysis') {
     <div class="main-container">
-      <!-- <div class="row-1">
+      <div class="row-1">
         <app-back (click)="currentView = 'default'"></app-back>
         <div class="search-bar">
           <app-search-bar></app-search-bar>
         </div>
         <app-notif></app-notif>
-      </div> -->
+      </div>
       <div class="patient-analysis">
         <app-patient-analysis></app-patient-analysis>
+      </div>
+    </div>
+  }
+
+  @if (currentView === 'intake-report') {
+    <div class="main-container">
+      <div class="row-1">
+        <app-back (click)="currentView = 'default'"></app-back>
+        <div class="search-bar">
+          <app-search-bar></app-search-bar>
+        </div>
+        <app-notif></app-notif>
+      </div>
+      <div class="intake-analysis">
+        <app-view-intake></app-view-intake>
       </div>
     </div>
   }

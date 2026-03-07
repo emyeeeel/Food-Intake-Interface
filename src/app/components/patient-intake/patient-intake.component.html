@@ -51,6 +51,7 @@
               <th>體積 (ml)</th>
               <th>影像</th>
               <th>紀錄時間</th>
+              <th>記錄者</th>
               <th></th>
             </tr>
           </thead>
@@ -76,8 +77,9 @@
                   <span>--</span>
                 </ng-template>
               </td>              
-              <td>{{ intake.recorded_at | date:'MMM d, y • h:mm a' }}</td>
-              <td>actions</td>
+              <td>{{ intake.recorded_at | date:'h:mm a'  }}</td>
+              <td>{{ intake.recorded_by }}</td>
+              <td><div class="view-more" (click)="navigateToIntakeReport(intake.id)">看更多</div></td>
             </tr>
           </tbody>
         </table>

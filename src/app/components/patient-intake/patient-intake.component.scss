@@ -294,3 +294,25 @@
   cursor: pointer;
   border: 1px solid #ddd;
 }
+
+  .view-more {
+    font-family: "Quicksand", sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    color: rgb(230, 254, 249);;
+    background-color: rgb(64, 193, 172);
+    padding: 0 8px;
+    border-radius: 7px;
+    text-align: center;
+    max-width: 75px;
+    margin: 0 auto; // Center the view-more div within its cell
+  }
+
+  .view-more {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}

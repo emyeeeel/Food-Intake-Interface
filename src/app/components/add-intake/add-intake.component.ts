@@ -16,6 +16,7 @@ import { firstValueFrom, Observable, Subscription } from 'rxjs';
 import { NotificationService } from '../../tx2/services/notification.service';
 import { Auth } from '@angular/fire/auth';
 import { LTCPatient } from '../../models/ltc-patient.model';
+import { IntakeRecord } from '../../models/food-intake.model';
 
 @Component({
   selector: 'app-add-intake',
@@ -35,6 +36,8 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
   assignmentError: string | null = null;
 
   checking = true;
+
+  intakes: IntakeRecord[] = [];
 
   // Scanner state
   showScanner = false;
@@ -85,7 +88,8 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
       this.intakeService
       .getIntakesByMealPeriod(this.scannedPatientId!, this.mealTimePeriod as '午餐' | '晚餐')
       .subscribe(intakes => {
-        console.log('Number of for selected meal period:', intakes,length);
+        this.intakes = intakes;
+        console.log('Number of food intakes:', intakes.length);
         console.log('First Intake Record Meal Details: ', intakes[0]?.meal_detail?.meal_time, this.mealTimePeriod)
       });
     }
@@ -175,7 +179,7 @@ mealPeriod(): void {
     if (this.scannedPatientId !== null) {
       this.loadPatientData();
       this.loadFilteredMeals();
-      console.log(this.mealAssignments)
+      console.log('Meal Assignments', this.mealAssignments)
       this.patientService.getLTCPatient(this.scannedPatientId).subscribe({
         next: (patient) => {
           this.patient = patient;
@@ -235,12 +239,15 @@ mealPeriod(): void {
       console.log('Filtered assignments:', assignments);
 
       if (assignments.length > 0) {
+        
         this.selectedMealAssignmentId = assignments[0].id;
         console.log(
           'Meal Assignment ID:',
           this.selectedMealAssignmentId,
           assignments[0].meal_detail?.meal_name
         );
+
+        console.log(this.intakes)
       } else {
         console.warn('No meal assignments found for this patient and meal period');
         this.selectedMealAssignmentId = 0;
@@ -478,6 +485,8 @@ mealPeriod(): void {
   
               // Determine meal phase based on selected meal type
               const meal_phase = this.selectedMealType === 'Before' ? '前' : '後';
+
+              console.log(meal_phase)
   
               // if after, kwaang record before nga weight then i minus then get percentage
   
@@ -500,13 +509,33 @@ mealPeriod(): void {
               formData.append('meal', assignment.meal.toString());
               formData.append('ltc_patient', (assignment.ltc_patient || 0).toString());
               formData.append('weight_g', netWeight.toString());
-              formData.append('volume_ml', '0');
+              if(meal_phase == '前'){
+                formData.append('volume_ml', '100');
+              }else{
+                const beforeRecord = this.intakes.find(r => r.meal_phase === '前');
+
+                if (beforeRecord && beforeRecord.weight_g > 0) {
+                  const beforeWeight = beforeRecord.weight_g;
+                  const afterWeight = netWeight; 
+
+                  const consumed = ((beforeWeight - afterWeight) / beforeWeight) * 100;
+                  const consumedClamped = Math.max(0, Math.min(100, consumed)); 
+                  
+                  formData.append('volume_ml', consumedClamped.toFixed(2).toString());
+                }
+              }
               formData.append('recorded_at', new Date().toISOString());
               formData.append('meal_phase', meal_phase);
 
               formData.append('image', imageFile);
               formData.append('depth_csv', csvFile);
-    
+              const user = this.auth.currentUser;
+              if (!user) return;
+              const email = user?.email;
+              const username = email ? email.split('@')[0] : 'Unknown';
+              console.log(username)
+              formData.append('recorded_by', username);
+
               // Post to backend using IntakeService
               const createdRecord = await this.intakeService.createIntake(formData).toPromise();
               console.log('Intake record created successfully:', createdRecord);
@@ -517,9 +546,6 @@ mealPeriod(): void {
               //   verticalPosition: 'top',   // Top of the screen
               //   panelClass: ['my-custom-snackbar'] // Custom class to apply margin
               // });
-  
-              const user = this.auth.currentUser; 
-              if (!user) return;
   
               this.notificationService.addNotification({
                 firebase_uid: user.uid,

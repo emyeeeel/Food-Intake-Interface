@@ -235,7 +235,7 @@ export class PatientCardComponent implements OnInit {
     this.closeOptions();
 
     // Update navigation to use LTC patient routes
-    this.router.navigate(['/patient-info/edit', this.patientId]).catch(error => {
+    this.router.navigate(['/patient-info', this.patientId, 'edit']).catch(error => {
       console.error('Navigation failed:', error);
       alert('Failed to navigate to edit LTC patient details. Please try again.');
     });
@@ -246,7 +246,7 @@ export class PatientCardComponent implements OnInit {
     this.closeOptions();
 
     // Update navigation to use LTC patient routes
-    this.router.navigate(['/patient-info/view', this.patientId]).catch(error => {
+    this.router.navigate(['/patient-info', this.patientId, 'view']).catch(error => {
       console.error('Navigation failed:', error);
       alert('Failed to navigate to LTC patient details. Please try again.');
     });

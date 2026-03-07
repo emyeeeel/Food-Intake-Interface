@@ -43,7 +43,7 @@ export class MealItemComponent {
 
     // Check if mealId is valid before navigation
     if (this.mealId) {
-      this.router.navigate(['/meal-catalog/view', this.mealId]).catch(error => { 
+      this.router.navigate(['/meal-catalog', this.mealId, 'view']).catch(error => { 
         console.error('Navigation failed:', error);
       });
     } else {
@@ -57,7 +57,7 @@ export class MealItemComponent {
 
     // Check if mealId is valid before navigation
     if (this.mealId) {
-      this.router.navigate(['/meal-catalog/edit', this.mealId]).catch(error => { 
+      this.router.navigate(['/meal-catalog', this.mealId, 'edit']).catch(error => { 
         console.error('Navigation failed:', error);
       });
     } else {

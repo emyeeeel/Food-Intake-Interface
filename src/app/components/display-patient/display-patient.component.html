@@ -78,8 +78,8 @@
               </div>
             </div>
             <div class="patient-actions">
-              <a [routerLink]="['/patient-info/view', patient.id]" class="btn-action view">查看</a>
-              <a [routerLink]="['/patient-info/edit', patient.id]" class="btn-action edit">編輯</a>
+              <a [routerLink]="['/patient-info', patient.id, 'view']" class="btn-action view">查看</a>
+              <a [routerLink]="['/patient-info', patient.id, 'edit']" class="btn-action edit">編輯</a>
             </div>
           </div>
         }
