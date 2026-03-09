@@ -14,6 +14,7 @@ import { PatientService } from '../../services/patient.service';
 import { LTCPatient } from '../../models/ltc-patient.model';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { RecommenderService } from '../../services/recommender.service';
 
 Chart.register(...registerables, annotationPlugin);
 
@@ -44,9 +45,14 @@ export class PatientAnalysisComponent implements AfterViewInit, OnDestroy, OnIni
   ltcPatient?: LTCPatient;
   ltcPatientId!: number;
 
+  recommendationText: string = '';
+  recommendationLoading: boolean = false;
+  recommendationError: string | null = null;
+
   constructor(
     private route: ActivatedRoute,
-    private patientService: PatientService
+    private patientService: PatientService,
+    private recommenderService: RecommenderService
   ) {}
 
   // 🔥 Listen to route changes
@@ -64,11 +70,43 @@ export class PatientAnalysisComponent implements AfterViewInit, OnDestroy, OnIni
   }
 
   loadPatientData(): void {
-    this.patientService.getLTCPatient(this.ltcPatientId)
-      .subscribe(patient => {
-        this.ltcPatient = patient;
-        this.onPeriodChange('weekly'); 
-      });
+    this.patientService.getLTCPatient(this.ltcPatientId).subscribe(patient => {
+      this.ltcPatient = patient;
+      this.onPeriodChange('weekly');
+    });
+  }
+
+  loadRecommendation(period: 'daily' | 'weekly' | 'monthly'): void {
+    this.recommendationLoading = true;
+    this.recommendationError = null;
+    this.recommendationText = '';
+
+    let request$;
+
+    switch (period) {
+      case 'daily':
+        request$ = this.recommenderService.getDailyRecommendations(this.ltcPatientId);
+        break;
+      case 'weekly':
+        request$ = this.recommenderService.getWeeklyRecommendations(this.ltcPatientId);
+        break;
+      case 'monthly':
+        // no monthly endpoint — fall back to general nutrients
+        request$ = this.recommenderService.getGeneralNutrientRecommendations(this.ltcPatientId);
+        break;
+    }
+
+    request$.subscribe({
+      next: (response) => {
+        this.recommendationText = response['response'] ?? JSON.stringify(response, null, 2);
+        this.recommendationLoading = false;
+      },
+      error: (err) => {
+        console.error('Recommendation error:', err);
+        this.recommendationError = '無法載入飲食建議';
+        this.recommendationLoading = false;
+      }
+    });
   }
 
   // ================================
@@ -151,6 +189,7 @@ export class PatientAnalysisComponent implements AfterViewInit, OnDestroy, OnIni
   onPeriodChange(period: 'daily' | 'weekly' | 'monthly'): void {
   if (!this.ltcPatient) return;
   this.selectedPeriod = period;
+  this.loadRecommendation(period);
 
   let labels: string[] = [];
   let data: number[] = [];

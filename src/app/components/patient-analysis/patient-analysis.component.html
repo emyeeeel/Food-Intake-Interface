@@ -23,7 +23,20 @@
     </div>
     <div class="analysis-section">
       <div class="analysis-content">
-        <pre class="analysis-text">Place text holder here</pre>
+        @if (recommendationLoading) {
+          <div class="section-loading">
+            <div class="loading-spinner"></div>
+            <span>生成AI飲食建議中...</span>
+          </div>
+        } @else if (recommendationError) {
+          <div class="analysis-error">
+            <p>{{ recommendationError }}</p>
+          </div>
+        } @else if (recommendationText) {
+          <pre class="analysis-text">{{ recommendationText }}</pre>
+        } @else {
+          <pre class="analysis-text">等待數據載入完成後生成分析...</pre>
+        }
       </div>
     </div>
   </div>
