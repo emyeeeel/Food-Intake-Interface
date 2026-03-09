@@ -6,5 +6,13 @@
     "pathRewrite": {
       "^/api": ""
     }
+  },
+  "/recommender-api": {
+    "target": "https://jqh2g82b-8001.asse.devtunnels.ms",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/recommender-api": ""
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { finalize, Observable } from 'rxjs';
+import { finalize, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SettingsService } from './settings.service';
 import { IntakeRecord } from '../models/food-intake.model';
@@ -19,6 +19,18 @@ export class IntakeService {
 
   getIntakes(): Observable<IntakeRecord[]> {
     return this.http.get<IntakeRecord[]>(this.apiUrl);
+  }
+
+  // Add this inside your IntakeService class
+  getIntakeById(intakeId: number): Observable<IntakeRecord | null> {
+    if (!intakeId) {
+      return of(null);
+    }
+
+    // Assuming your API supports /api/food-intakes/{id}/
+    return this.http.get<IntakeRecord>(`${this.apiUrl}${intakeId}/`).pipe(
+      map(record => record || null)
+    );
   }
 
   getIntakeByLtcPatientId(ltcPatientId: number): Observable<IntakeRecord[]> {
@@ -201,4 +213,38 @@ getAssignmentsByMealPeriod(
   })
 );
 }
+
+getIntakesByPatientDateAndMealPeriod(
+  ltcPatientId: number,
+  mealPeriod: '午餐' | '晚餐',
+  date: Date = new Date()
+): Observable<IntakeRecord[]> {
+
+  const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  return this.getIntakeByLtcPatientId(ltcPatientId).pipe(
+    map(records => {
+
+      return records.filter(record => {
+
+        if (!record.recorded_at) return false;
+
+        const recordDate = new Date(record.recorded_at);
+
+        const isSameDate =
+          recordDate.getFullYear() === targetDate.getFullYear() &&
+          recordDate.getMonth() === targetDate.getMonth() &&
+          recordDate.getDate() === targetDate.getDate();
+
+        const isMealPeriodMatch =
+          record.meal_detail?.meal_time === mealPeriod;
+
+        return isSameDate && isMealPeriodMatch;
+
+      });
+
+    })
+  );
+}
+
 }

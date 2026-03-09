@@ -11,6 +11,31 @@ import jsQR from 'jsqr';
 import { GetAnalysisService } from '../../services/get-analysis.service';
 import { MealAssignment } from '../../models/meal-assignment.mode';
 import { MealsService } from '../../services/meals.service';
+import { RecommenderService } from '../../services/recommender.service';
+
+interface MealIntakeChunk {
+  result: number;
+  chunk: string;
+  score?: number;
+  metadata: {
+    room_number: string;
+    bed_number: string;
+    date: string;
+    meal_time: string;
+    meal_phase: string;
+    intake_id: number;
+    meal_id: number;
+    ltc_patient_id: number;
+  };
+}
+
+interface MealIntakeSummaryResponse {
+  response: string;
+  food_intake_chunks: MealIntakeChunk[];
+  retrieved_chunks: MealIntakeChunk[];
+  date: string;
+}
+
 
 @Component({
   selector: 'app-patient-details',
@@ -36,6 +61,11 @@ export class PatientDetailsComponent implements OnInit, OnChanges{
   private scanInterval: any;
 
   query: string = '';
+
+  // Replace the string property with:
+  mealIntakeSummary: MealIntakeSummaryResponse | null = null;
+  mealIntakeLoading: boolean = false;
+  mealIntakeError: string | null = null;
 
   private buildQuery(): string {
     if (!this.ltcPatient || !this.recommendedIntake || !this.mealAssignments.length) {
@@ -134,6 +164,7 @@ Return ONLY the formatted text exactly as specified above. No extra text.
     // private mealAssignmentService: MealAssignmentService,
     // private mealsService: MealsService,
     // private getAnalysisService: GetAnalysisService,
+    private recommenderService: RecommenderService,
     private router: Router
   ) {}
 
@@ -158,7 +189,20 @@ Return ONLY the formatted text exactly as specified above. No extra text.
       next: (ltcPatientData) => {
         this.ltcPatient = ltcPatientData;
         console.log('LTC Patient loaded:', ltcPatientData);
-  
+
+        this.mealIntakeLoading = true;
+        this.recommenderService.getDailyMealIntakeSummary(patientId).subscribe({
+          next: (response: MealIntakeSummaryResponse) => {
+            this.mealIntakeSummary = response;
+            this.mealIntakeLoading = false;
+          },
+          error: (error) => {
+            console.error('Error:', error);
+            this.mealIntakeError = '無法載入今日攝食摘要';
+            this.mealIntakeLoading = false;
+          }
+        });
+          
         // Load recommended intake for LTC patient
         this.recommendedIntakeService.getRecommendedIntake(patientId).subscribe({
           next: (recData) => {

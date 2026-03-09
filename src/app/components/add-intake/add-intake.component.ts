@@ -205,66 +205,102 @@ mealPeriod(): void {
     this.selectedMealType = type;
   }
 
-  loadFilteredMeals(): void {
-    if (!this.scannedPatientId || !this.dayCycle) return;
+  // loadFilteredMeals(): void {
+  //   if (!this.scannedPatientId || !this.dayCycle) return;
 
-    const filters: any = {};
+  //   const filters: any = {};
 
-    if (this.scannedPatientId) {
-      filters.ltc_patient = this.scannedPatientId;
-    }
+  //   if (this.scannedPatientId) {
+  //     filters.ltc_patient = this.scannedPatientId;
+  //   }
 
-    if (this.dayCycle) {
-      filters.day_cycle = this.dayCycle;
-    }
+  //   if (this.dayCycle) {
+  //     filters.day_cycle = this.dayCycle;
+  //   }
 
-    if (this.mealTimePeriod) {
-      filters.meal_type = this.mealTimePeriod;  
-      console.log('Time Period', this.mealTimePeriod)
-    }
+  //   if (this.mealTimePeriod) {
+  //     filters.meal_type = this.mealTimePeriod;  
+  //     console.log('Time Period', this.mealTimePeriod)
+  //   }
 
-    console.log('Filters', filters)
-    console.log("Patient:", this.scannedPatientId);
-    console.log("Day cycle:", this.dayCycle);
-    console.log("Meal period:", this.mealTimePeriod);
+  //   console.log('Filters', filters)
+  //   console.log("Patient:", this.scannedPatientId);
+  //   console.log("Day cycle:", this.dayCycle);
+  //   console.log("Meal period:", this.mealTimePeriod);
 
-    this.intakeService
-    .getAssignmentsByMealPeriod(
-      this.scannedPatientId,
-      this.mealTimePeriod,
-      this.dayCycle
-    )
-    .subscribe(assignments => {
-      this.mealAssignments = assignments;
-      console.log('Filtered assignments:', assignments);
+  //   this.intakeService
+  //   .getAssignmentsByMealPeriod(
+  //     this.scannedPatientId,
+  //     this.mealTimePeriod,
+  //     this.dayCycle
+  //   )
+  //   .subscribe(assignments => {
+  //     this.mealAssignments = assignments;
+  //     console.log('Filtered assignments:', assignments);
 
-      if (assignments.length > 0) {
+  //     if (assignments.length > 0) {
         
-        this.selectedMealAssignmentId = assignments[0].id;
-        console.log(
-          'Meal Assignment ID:',
-          this.selectedMealAssignmentId,
-          assignments[0].meal_detail?.meal_name
+  //       this.selectedMealAssignmentId = assignments[0].id;
+  //       console.log(
+  //         'Meal Assignment ID:',
+  //         this.selectedMealAssignmentId,
+  //         assignments[0].meal_detail?.meal_name
+  //       );
+
+  //       console.log(this.intakes)
+  //     } else {
+  //       console.warn('No meal assignments found for this patient and meal period');
+  //       this.selectedMealAssignmentId = 0;
+  //     }
+  //   });
+
+  //   // this.mealAssignmentService
+  //   //   .getMealAssignmentsWithFilters(filters)
+  //   //   .subscribe({
+  //   //     next: (data) => {
+  //   //       this.mealAssignments = data;
+  //   //     },
+  //   //     error: (err) => {
+  //   //       console.error('Error loading filtered meals', err);
+  //   //     }
+  //   //   });
+  // }
+
+  loadFilteredMeals(): void {
+  if (!this.scannedPatientId || !this.dayCycle) return;
+
+  // Determine the meal assignments source
+  const fetchAssignments$ =
+    this.mealTimePeriod === 0
+      ? this.mealAssignmentService.getMealAssignmentsByLTCPatient(this.scannedPatientId)
+      : this.intakeService.getAssignmentsByMealPeriod(
+          this.scannedPatientId,
+          this.mealTimePeriod,
+          this.dayCycle
         );
 
-        console.log(this.intakes)
-      } else {
-        console.warn('No meal assignments found for this patient and meal period');
-        this.selectedMealAssignmentId = 0;
-      }
-    });
+  fetchAssignments$.subscribe(assignments => {
+    // Filter by day cycle
+    let filteredAssignments = assignments.filter(a => a.meal_detail?.day_cycle === this.dayCycle);
 
-    // this.mealAssignmentService
-    //   .getMealAssignmentsWithFilters(filters)
-    //   .subscribe({
-    //     next: (data) => {
-    //       this.mealAssignments = data;
-    //     },
-    //     error: (err) => {
-    //       console.error('Error loading filtered meals', err);
-    //     }
-    //   });
-  }
+    // If mealTimePeriod is lunch/dinner, filter by that too
+    if (this.mealTimePeriod !== 0) {
+      filteredAssignments = filteredAssignments.filter(a => a.meal_type === this.mealTimePeriod);
+    }
+
+    this.mealAssignments = filteredAssignments;
+
+    console.log('Filtered assignments for today & meal period:', filteredAssignments);
+
+    if (filteredAssignments.length > 0) {
+      this.selectedMealAssignmentId = filteredAssignments[0].id;
+      console.log('Auto-selected assignment ID:', this.selectedMealAssignmentId);
+    } else {
+      console.warn('No meal assignments found for this patient and meal period');
+      this.selectedMealAssignmentId = 0;
+    }
+  });
+}
 
   // Handle QR scan result
   onQRScanned(result: string): void {
@@ -558,7 +594,7 @@ mealPeriod(): void {
     
               // Navigate to patient intakes page
               if (this.scannedPatientId) {
-                this.router.navigate(['patient-info/intakes', this.scannedPatientId]);
+                this.router.navigate(['patient-info', this.scannedPatientId, 'intakes']);
                 // this.router.navigate(['/meals']);
               }
     

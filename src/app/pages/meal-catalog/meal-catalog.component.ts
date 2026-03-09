@@ -9,7 +9,6 @@ import { FilterIconComponent } from '../../components/filter-icon/filter-icon.co
 import { FilterOptionsComponent } from '../../components/filter-options/filter-options.component';
 import { MainOptionsComponent } from '../../components/main-options/main-options.component';
 import { DateContainerComponent } from '../../components/date-container/date-container.component';
-import { MealItemComponent } from '../../components/meal-item/meal-item.component';
 import { MealsService } from '../../services/meals.service';
 import { Meal } from '../../models/meal.model';
 import { AddMealComponent } from '../../components/add-meal/add-meal.component';

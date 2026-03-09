@@ -112,7 +112,28 @@
               <h3>病人餐飲攝取摘要</h3>
             </div>
             <div class="analysis-content">
+              @if (mealIntakeLoading) {
+                <div class="section-loading">
+                  <div class="loading-spinner"></div>
+                  <span>生成AI分析中...</span>
+                </div>
+              } @else if (mealIntakeError) {
+                <div class="analysis-error">
+                  <p>無法生成分析報告</p>
+                  <p class="error-detail">{{ mealIntakeError }}</p>
+                </div>
+              } @else if (mealIntakeSummary) {
 
+                <!-- AI Summary -->
+                <div class="summary-section">
+                  <p class="analysis-text">{{ mealIntakeSummary.response }}</p>
+                </div>
+
+              } @else {
+                <div class="analysis-placeholder">
+                  <p>等待數據載入完成後生成分析...</p>
+                </div>
+              }
             </div>
             <div class="intake-analysis">
               <button (click)="navigateToIntakesAnaylysis()">患者飲食分析</button>
