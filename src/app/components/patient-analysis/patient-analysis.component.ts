@@ -72,7 +72,7 @@ export class PatientAnalysisComponent implements AfterViewInit, OnDestroy, OnIni
   loadPatientData(): void {
     this.patientService.getLTCPatient(this.ltcPatientId).subscribe(patient => {
       this.ltcPatient = patient;
-      this.onPeriodChange('weekly');
+      this.onPeriodChange('daily');
     });
   }
 

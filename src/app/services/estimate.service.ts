@@ -9,11 +9,19 @@ import { EstimationResult } from '../models/estimation.model';
   providedIn: 'root'
 })
 export class EstimationService {
-  private apiUrl = `${environment.apiBaseUrl}/api/estimate/results/by-intake/`;
 
   constructor(private http: HttpClient) {}
 
   getResultsByIntakeId(intakeId: number): Observable<EstimationResult[]> {
-    return this.http.get<EstimationResult[]>(`${this.apiUrl}${intakeId}/`);
+    return this.http.get<EstimationResult[]>(
+      `${environment.apiBaseUrl}/api/estimate/results/by-intake/${intakeId}/`
+    );
+  }
+
+  runEstimation(intakeId: number): Observable<EstimationResult> {
+    return this.http.post<EstimationResult>(
+      `${environment.apiBaseUrl}/api/estimate/run/${intakeId}/`,
+      {}
+    );
   }
 }
