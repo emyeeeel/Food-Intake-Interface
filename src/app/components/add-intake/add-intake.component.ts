@@ -454,7 +454,7 @@ mealPeriod(): void {
   public capture(): Promise<any> {
       this.isProcessing = true;
       return new Promise((resolve, reject) => {
-        const apiUrl = 'https://p0zqhc3k-8000.jpe1.devtunnels.ms/api/capture/meal/'; // Use TX2 IP 
+        const apiUrl = 'http://192.168.0.174:8000/api/capture/meal/'; // Use TX2 IP 
     
         this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
           next: async (zipBlob) => {

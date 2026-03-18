@@ -31,12 +31,13 @@ export class SettingsService {
    * Load the LTC settings from backend for the specific careCenterID
    */
   async load(): Promise<void> {
-    const id = environment.careCenterID;
+  const id = environment.careCenterID;
+
+  try {
     const raw = await firstValueFrom(
       this.http.get<any>(`${environment.apiBaseUrl}/api/settings/${id}/`)
     );
 
-    // Map backend snake_case to frontend camelCase
     this._settings = {
       id: raw.id,
       careCenterName: raw.care_center_name,
@@ -49,7 +50,14 @@ export class SettingsService {
         dinner: { start: raw.dinner_start, end: raw.dinner_end }
       }
     };
+
+  } catch (error) {
+    console.error('Settings load failed:', error);
+
+    // fallback so app doesn't crash
+    this._settings = null;
   }
+}
 
   /**
    * Raw settings object

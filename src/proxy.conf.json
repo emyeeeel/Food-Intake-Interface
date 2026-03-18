@@ -8,7 +8,7 @@
     }
   },
   "/recommender-api": {
-    "target": "https://jqh2g82b-8001.asse.devtunnels.ms",
+    "target": "https://fgktksbk-8001.jpe1.devtunnels.ms",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {

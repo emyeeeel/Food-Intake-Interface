@@ -42,6 +42,7 @@
     "@angular/cli": "^21.1.0",
     "@angular/compiler-cli": "^20.3.16",
     "@angular/material": "^20.2.14",
+    "@tauri-apps/cli": "^2.10.1",
     "@types/file-saver": "^2.0.7",
     "@types/jasmine": "~5.1.0",
     "@types/qrcode": "^1.5.6",
