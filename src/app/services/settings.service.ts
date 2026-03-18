@@ -16,6 +16,7 @@ export interface MealTimeRanges {
 export interface LTCSettings {
   id: number;
   careCenterName: string;
+  machineIp: string | null;       // ← added
   mealCycle: MealCycle;
   mealTimeRanges: MealTimeRanges;
 }
@@ -25,65 +26,42 @@ export class SettingsService {
 
   private _settings: LTCSettings | null = null;
 
-  constructor(private http: HttpClient) {}
+  // Exposed publicly so components can call PUT without accessing private members
+  readonly http: HttpClient;
 
-  /**
-   * Load the LTC settings from backend for the specific careCenterID
-   */
+  constructor(http: HttpClient) {
+    this.http = http;
+  }
+
   async load(): Promise<void> {
-  const id = environment.careCenterID;
+    const id = environment.machineID;
+    try {
+      const raw = await firstValueFrom(
+        this.http.get<any>(`${environment.apiBaseUrl}/api/settings/${id}/`)
+      );
 
-  try {
-    const raw = await firstValueFrom(
-      this.http.get<any>(`${environment.apiBaseUrl}/api/settings/${id}/`)
-    );
-
-    this._settings = {
-      id: raw.id,
-      careCenterName: raw.care_center_name,
-      mealCycle: {
-        startDate: raw.meal_cycle_start_date,
-        cycleLength: raw.meal_cycle_length
-      },
-      mealTimeRanges: {
-        lunch: { start: raw.lunch_start, end: raw.lunch_end },
-        dinner: { start: raw.dinner_start, end: raw.dinner_end }
-      }
-    };
-
-  } catch (error) {
-    console.error('Settings load failed:', error);
-
-    // fallback so app doesn't crash
-    this._settings = null;
-  }
-}
-
-  /**
-   * Raw settings object
-   */
-  get settings(): LTCSettings | null {
-    return this._settings;
+      this._settings = {
+        id: raw.id,
+        careCenterName: raw.care_center_name,
+        machineIp: raw.machine_ip ?? null,    // ← added
+        mealCycle: {
+          startDate: raw.meal_cycle_start_date,
+          cycleLength: raw.meal_cycle_length,
+        },
+        mealTimeRanges: {
+          lunch:  { start: raw.lunch_start,  end: raw.lunch_end  },
+          dinner: { start: raw.dinner_start, end: raw.dinner_end },
+        },
+      };
+    } catch (error) {
+      console.error('Settings load failed:', error);
+      this._settings = null;
+    }
   }
 
-  /**
-   * Convenience getter for care center name
-   */
-  get careCenterName(): string | undefined {
-    return this._settings?.careCenterName;
-  }
-
-  /**
-   * Convenience getter for meal cycle
-   */
-  get mealCycle(): MealCycle | undefined {
-    return this._settings?.mealCycle;
-  }
-
-  /**
-   * Convenience getter for meal time ranges
-   */
-  get mealTimeRanges(): MealTimeRanges | undefined {
-    return this._settings?.mealTimeRanges;
-  }
+  get settings(): LTCSettings | null { return this._settings; }
+  get careCenterName(): string | undefined { return this._settings?.careCenterName; }
+  get machineIp(): string | null | undefined { return this._settings?.machineIp; }
+  get mealCycle(): MealCycle | undefined { return this._settings?.mealCycle; }
+  get mealTimeRanges(): MealTimeRanges | undefined { return this._settings?.mealTimeRanges; }
 }

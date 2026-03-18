@@ -37,8 +37,9 @@
   @if (scanResult && selectedMealAssignmentId != 0) {
     <div class="header-section">
       <h2>新增食物攝取紀錄</h2>
-      <button class="nav-button primary" (click)="capture()" 
-      [disabled]="mealPhaseStatus == 'done' ">
+      <button class="nav-button primary" 
+      (click)="openCapturePopup()"
+      [disabled]="mealPhaseStatus == 'done'|| !settingsService.machineIp || !selectedMealType">
         上傳食物攝取記錄
       </button>
     </div>
@@ -84,6 +85,12 @@
       <p>今日無可用餐點分配。</p>
     </div>
   }
+
+  <app-pop-up
+    [visible]="showCapturePopup"
+    (confirmed)="onCaptureConfirmed()"
+    (cancelled)="onCaptureCancelled()">
+  </app-pop-up>
 
   <ng-container *ngIf="isProcessing">
     <div class="loading-overlay">

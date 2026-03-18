@@ -1,1 +1,14 @@
-<p>pop-up works!</p>
+@if (visible) {
+  <div class="popup-backdrop">
+    <div class="popup-card">
+      <h2 class="popup-title">準備拍攝</h2>
+      <p class="popup-message">
+        請將餐盤放置於機器感測區內，確認擺放完成後，點擊「確認」開始拍攝。
+      </p>
+      <div class="popup-actions">
+        <button class="popup-btn secondary" (click)="onCancel()">取消</button>
+        <button class="popup-btn primary" (click)="onConfirm()">確認</button>
+      </div>
+    </div>
+  </div>
+}

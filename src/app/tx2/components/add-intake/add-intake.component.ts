@@ -15,6 +15,7 @@ import { NotificationService } from '../../services/notification.service';
 import { Auth } from '@angular/fire/auth';
 import { LTCPatient } from '../../../models/ltc-patient.model';
 import { PatientService } from '../../../services/patient.service';
+import { SettingsService } from '../../../services/settings.service';
 
 @Component({
   selector: 'app-add-intake',
@@ -49,7 +50,8 @@ export class AddIntakeComponent implements OnInit {
     private dateService: DateService,
     private weightService: WeightService,
     private notificationService: NotificationService,
-    private patientService: PatientService
+    private patientService: PatientService,
+    public settingsService: SettingsService,
   ) {}
 
   ngOnInit(): void {
@@ -158,7 +160,15 @@ export class AddIntakeComponent implements OnInit {
   public capture(): Promise<any> {
     this.isProcessing = true;
     return new Promise((resolve, reject) => {
-      const apiUrl = 'http://192.168.0.174:8000/api/capture/meal/'; // Use TX2 IP 
+      const machineIp = this.settingsService.machineIp;
+      if (!machineIp) {
+          this.isProcessing = false;
+          reject(new Error('Machine IP is not configured. Please set it in Settings.'));
+          return;
+        }
+
+        const apiUrl = `${machineIp}/api/capture/meal/`; 
+    
   
       this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
         next: async (zipBlob) => {

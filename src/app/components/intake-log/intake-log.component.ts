@@ -10,9 +10,9 @@ import { TagsComponent } from "../tags/tags.component";
 export class IntakeLogComponent implements OnInit {
   @Input() time!: string;
   @Input() assignedMeal!: string;
-  @Input() originalVolume!: number;
-  @Input() remainingPercent!: number;
-  @Input() remainingVolume!: number;
+  @Input() weight!: number;
+  @Input() percent!: number;
+  @Input() volume!: number;
   
   iconSrc: string = '';
 

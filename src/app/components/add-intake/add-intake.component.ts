@@ -17,12 +17,14 @@ import { NotificationService } from '../../tx2/services/notification.service';
 import { Auth } from '@angular/fire/auth';
 import { LTCPatient } from '../../models/ltc-patient.model';
 import { IntakeRecord } from '../../models/food-intake.model';
+import { SettingsService } from '../../services/settings.service';
+import { PopUpComponent } from '../pop-up/pop-up.component';
 
 @Component({
   selector: 'app-add-intake',
   templateUrl: './add-intake.component.html',
   styleUrl: './add-intake.component.scss',
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, PopUpComponent]
 })
 export class AddIntakeComponent implements OnInit, OnDestroy {
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
@@ -36,6 +38,8 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
   assignmentError: string | null = null;
 
   checking = true;
+
+  showCapturePopup = false;
 
   intakes: IntakeRecord[] = [];
 
@@ -68,9 +72,9 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     private patientService: PatientService,
     private intakeService: IntakeService,
     private dateService: DateService,
-    private weightService: WeightService,
     private notificationService: NotificationService,
     private auth: Auth,
+    public settingsService: SettingsService,
   ) {}
 
   mealPhaseStatus: '前' | '後' | 'done' | null = null;
@@ -454,7 +458,15 @@ mealPeriod(): void {
   public capture(): Promise<any> {
       this.isProcessing = true;
       return new Promise((resolve, reject) => {
-        const apiUrl = 'http://192.168.0.174:8000/api/capture/meal/'; // Use TX2 IP 
+        const machineIp = this.settingsService.machineIp;
+
+        if (!machineIp) {
+          this.isProcessing = false;
+          reject(new Error('Machine IP is not configured. Please set it in Settings.'));
+          return;
+        }
+
+        const apiUrl = `${machineIp}/api/capture/meal/`; 
     
         this.http.post(apiUrl, {}, { responseType: 'blob', withCredentials: false}).subscribe({
           next: async (zipBlob) => {
@@ -613,4 +625,19 @@ mealPeriod(): void {
       });
     }
   
+  // Called by the button — shows the popup instead of capturing immediately
+  openCapturePopup(): void {
+    this.showCapturePopup = true;
+  }
+
+  // Called when the user clicks OK in the popup
+  onCaptureConfirmed(): void {
+    this.showCapturePopup = false;
+    this.capture();
+  }
+
+  // Called when the user clicks Cancel in the popup
+  onCaptureCancelled(): void {
+    this.showCapturePopup = false;
+  }
 }

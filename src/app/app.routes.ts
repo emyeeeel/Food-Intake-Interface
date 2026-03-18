@@ -14,6 +14,7 @@ import { IntakesComponent } from './tx2/pages/intakes/intakes.component';
 import { MealsComponent } from './tx2/pages/meals/meals.component';
 import { HomeComponent } from './tx2/pages/home/home.component';
 import { NotificationComponent } from './tx2/components/notif/notif.component';
+import { PopUpComponent } from './components/pop-up/pop-up.component';
 
 export const routes: Routes = [
     { path: '', canActivate: [rootGuard], children: [] },
@@ -58,5 +59,5 @@ export const routes: Routes = [
     { path: 'patients/intakes/:id', canActivate: [authGuard], component: PatientsComponent },
     { path: 'home-page', canActivate: [authGuard], component: HomeComponent },
 
-    { path: 'test', canActivate: [authGuard], component: NotificationComponent },
+    { path: 'test', canActivate: [authGuard], component: PopUpComponent },
 ];
