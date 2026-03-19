@@ -66,4 +66,9 @@ export class IntakesComponent implements OnInit  {
   backToBeds() {
     this.selectedBed = null;
   }
+  
+  handleIntakeCompleted() {
+    this.selectedBed = null;
+    this.selectedRoom = null;
+  }
 }

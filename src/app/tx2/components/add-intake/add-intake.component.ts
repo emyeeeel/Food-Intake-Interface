@@ -1,5 +1,5 @@
 
-import { Component, OnInit, Input, inject } from '@angular/core';
+import { Component, OnInit, Input, inject, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -25,6 +25,7 @@ import { SettingsService } from '../../../services/settings.service';
 })
 export class AddIntakeComponent implements OnInit {
   @Input() scannedPatientId: number | null = null;
+  @Output() intakeCompleted = new EventEmitter<void>();
   patient: LTCPatient | null = null;
 
   mealAssignments: MealAssignment[] = [];
@@ -274,7 +275,7 @@ export class AddIntakeComponent implements OnInit {
             // Navigate to patient intakes page
             if (this.scannedPatientId) {
               // this.router.navigate(['patient-info/intakes', this.scannedPatientId]);
-              this.router.navigate(['/meals']);
+              this.intakeCompleted.emit();
             }
   
             // resolve(createdRecord);

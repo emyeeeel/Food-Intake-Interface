@@ -29,28 +29,28 @@ export class HeaderComponent implements OnInit {
   ltcname: string = '';
 
   menuOptions: MenuOption[] = [
-    { text: '首頁', isSelected: false, path: 'home-page', isDropdownOpen: false },
+    // { text: '首頁', isSelected: false, path: 'home-page', isDropdownOpen: false },
     { text: '膳食攝取記錄', isSelected: false, path: 'intakes', isDropdownOpen: false },
-    { 
-      text: '膳食目錄', 
-      isSelected: false, 
-      path: 'meals',
-      isDropdownOpen: false,
-      children: [
-        { text: '添加餐點', isSelected: false, path: 'meal-catalog/add' },
-        { text: '所有餐點', isSelected: false, path: 'meal-catalog/all' },
-      ] 
-    },
-    { 
-      text: '住民資料', 
-      isSelected: false, 
-      path: 'patients', 
-      isDropdownOpen: false,
-      children: [
-        { text: '新增患者', isSelected: false, path: 'patient-info/add' },
-        { text: '所有患者', isSelected: false, path: 'patient-info/all' },
-      ] 
-    },
+    // { 
+    //   text: '膳食目錄', 
+    //   isSelected: false, 
+    //   path: 'meals',
+    //   isDropdownOpen: false,
+    //   // children: [
+    //   //   { text: '添加餐點', isSelected: false, path: 'meal-catalog/add' },
+    //   //   { text: '所有餐點', isSelected: false, path: 'meal-catalog/all' },
+    //   // ] 
+    // },
+    // { 
+    //   text: '住民資料', 
+    //   isSelected: false, 
+    //   path: 'patients', 
+    //   isDropdownOpen: false,
+    //   // children: [
+    //   //   { text: '新增患者', isSelected: false, path: 'patient-info/add' },
+    //   //   { text: '所有患者', isSelected: false, path: 'patient-info/all' },
+    //   // ] 
+    // },
   ];
   
 
