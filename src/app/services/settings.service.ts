@@ -43,7 +43,7 @@ export class SettingsService {
       this._settings = {
         id: raw.id,
         careCenterName: raw.care_center_name,
-        machineIp: raw.machine_ip ?? null,    // ← added
+        machineIp: raw.machine_ip ?? null,
         mealCycle: {
           startDate: raw.meal_cycle_start_date,
           cycleLength: raw.meal_cycle_length,
@@ -53,9 +53,14 @@ export class SettingsService {
           dinner: { start: raw.dinner_start, end: raw.dinner_end },
         },
       };
+
+      console.log(`Settings loaded for machine ID ${id}:`, this._settings);
+
     } catch (error) {
-      console.error('Settings load failed:', error);
+      console.error(`Settings load failed for machine ID ${id}:`, error);
       this._settings = null;
+      // Re-throw so callers (e.g. ngOnInit) can react to the failure
+      throw error;
     }
   }
 

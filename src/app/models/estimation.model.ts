@@ -10,4 +10,5 @@ export interface EstimationResult {
   total_volume_ml: number;
   food_items: FoodItem[];
   segmented_image: string;
+  status: string;
 }

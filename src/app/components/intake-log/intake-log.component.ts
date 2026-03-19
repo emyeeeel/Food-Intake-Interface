@@ -12,7 +12,7 @@ export class IntakeLogComponent implements OnInit {
   @Input() assignedMeal!: string;
   @Input() weight!: number;
   @Input() percent!: number;
-  @Input() volume!: number;
+  @Input() volume: string | number = 0;
   
   iconSrc: string = '';
 
@@ -31,4 +31,24 @@ export class IntakeLogComponent implements OnInit {
     this.iconSrc = timeToIconMap[timeKey] || 'assets/icons/lunch-time.svg';
   }
   
+  get formattedAssignedMeal(): string {
+    if (!this.assignedMeal) return '';
+
+    const [meal, id, phase] = this.assignedMeal.split('-');
+
+    const mealMap: { [key: string]: string } = {
+      '午餐': 'L',
+      '晚餐': 'D'
+    };
+
+    const phaseMap: { [key: string]: string } = {
+      '前': 'B',
+      '後': 'A'
+    };
+
+    const mappedMeal = mealMap[meal] || meal;
+    const mappedPhase = phaseMap[phase] || phase;
+
+    return `${mappedMeal}-${id}-${mappedPhase}`;
+  }
 }

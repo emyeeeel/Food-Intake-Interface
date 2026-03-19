@@ -56,29 +56,41 @@ export class DateService implements OnDestroy {
 
   getCurrentMealPeriod(): '午餐' | '晚餐' | 0 {
     const settings = this.settingsService.settings;
-
     if (!settings) return 0;
 
     const now = new Date();
 
     const isWithinRange = (start: string, end: string): boolean => {
-      const [startHour, startMin, startSec] = start.split(':').map(Number);
-      const [endHour, endMin, endSec] = end.split(':').map(Number);
+      const [startHour, startMin, startSec = 0] = start.split(':').map(Number);
+      const [endHour, endMin, endSec = 0] = end.split(':').map(Number);
 
       const startTime = new Date();
-      startTime.setHours(startHour, startMin, startSec || 0, 0);
+      startTime.setHours(startHour, startMin, startSec, 0);
 
       const endTime = new Date();
-      endTime.setHours(endHour, endMin, endSec || 0, 0);
+      endTime.setHours(endHour, endMin, endSec, 0);
+
+      // Handle cross-midnight ranges (e.g. 16:30 → 00:49 next day)
+      // If end is before start, the range wraps past midnight
+      if (endTime <= startTime) {
+        // now is either after start OR before end (next day)
+        return now >= startTime || now <= endTime;
+      }
 
       return now >= startTime && now <= endTime;
     };
 
-    if (isWithinRange(settings.mealTimeRanges.lunch['start'], settings.mealTimeRanges.lunch['end'])) {
+    if (isWithinRange(
+      settings.mealTimeRanges.lunch.start,
+      settings.mealTimeRanges.lunch.end
+    )) {
       return '午餐';
     }
 
-    if (isWithinRange(settings.mealTimeRanges.dinner['start'], settings.mealTimeRanges.dinner['end'])) {
+    if (isWithinRange(
+      settings.mealTimeRanges.dinner.start,
+      settings.mealTimeRanges.dinner.end
+    )) {
       return '晚餐';
     }
 
