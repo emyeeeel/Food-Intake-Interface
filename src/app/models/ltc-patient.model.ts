@@ -2,6 +2,8 @@ export interface LTCPatient {
     id: number;
     room_number: string;
     bed_number: string;
+    name?: string;
+    national_id?: string;
     age: number;
     sex: string;
     height_cm: number;

@@ -40,6 +40,8 @@ export class EditPatientComponent implements OnInit, OnDestroy {
   // Form fields
   roomNumber: string = '';
   bedNumber: string = '';
+  name: string = '';
+  national_id: string = '';
   age: number | null = null;
   sex: string = '';
   height: number | null = null;

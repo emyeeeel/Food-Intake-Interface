@@ -30,6 +30,8 @@ export class AddPatientComponent implements OnInit {
   // Form data properties
   roomNumber: string = '';
   bedNumber: string = '';
+  name: string = '';
+  national_id: string = '';
   age: number | null = null;
   sex: string = '';
   height: number | null = null;

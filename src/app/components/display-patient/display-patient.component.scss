@@ -187,7 +187,14 @@
         .room-bed {
           font-weight: 700;
           color: #00313C;
-          font-size: 11px;
+          font-size: 16px;
+          white-space: nowrap;
+        }
+
+        .name{
+          font-weight: 400;
+          color: #00313C;
+          font-size: 16px;
           white-space: nowrap;
         }
 

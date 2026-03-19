@@ -57,25 +57,7 @@
           <div class="patient-item">
             <div class="patient-header">
               <span class="room-bed">{{ patient.room_number }}-{{ patient.bed_number }}</span>
-              <span class="sex-badge" [attr.data-sex]="patient.sex">{{ patient.sex === 'M' ? '男' : patient.sex === 'F' ? '女' : patient.sex }}</span>
-            </div>
-            <div class="patient-info">
-              <div class="info-item">
-                <span class="label">年齡:</span>
-                <span class="value">{{ patient.age }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">身高:</span>
-                <span class="value">{{ patient.height_cm }}cm</span>
-              </div>
-              <div class="info-item">
-                <span class="label">體重:</span>
-                <span class="value">{{ patient.weight_kg }}kg</span>
-              </div>
-              <div class="info-item">
-                <span class="label">活動:</span>
-                <span class="value">{{ patient.activity_level }}</span>
-              </div>
+              <span class="name">{{ patient.name }}</span>
             </div>
             <div class="patient-actions">
               <a [routerLink]="['/patient-info', patient.id, 'view']" class="btn-action view">查看</a>
