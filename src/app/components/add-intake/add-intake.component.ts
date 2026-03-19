@@ -41,6 +41,8 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
   showCapturePopup = false;
   intakes: IntakeRecord[] = [];
 
+  isLoadingPhase = false;
+
   // Scanner state
   showScanner = false;
   scanResult: string | null = null;
@@ -144,6 +146,7 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     const period = this.getActiveMealPeriod();
     if (!period) {
       console.warn('refreshMealPhaseStatus: meal period not yet resolved, skipping.');
+      this.isLoadingPhase = false;
       return;
     }
 
@@ -151,6 +154,7 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
       .getMealPhasesForDate(this.scannedPatientId, period)
       .subscribe(phase => {
         this.mealPhaseStatus = phase;
+        this.isLoadingPhase = false;
         console.log(`Meal Phase Status (period: ${period}):`, phase);
       });
   }
@@ -207,6 +211,7 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     console.log('SCAN RESULT BEFORE UPLOAD:', this.scanResult);
 
     if (this.scannedPatientId !== null) {
+      this.isLoadingPhase = true;
       // loadFilteredMeals resolves effectiveMealPeriod and calls
       // refreshMealPhaseStatus internally — so we call it first.
       this.loadFilteredMeals();
@@ -282,6 +287,7 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
       } else {
         console.warn('No meal assignments found for this patient and meal period');
         this.selectedMealAssignmentId = 0;
+        this.checking = false; 
       }
     });
   }
@@ -300,6 +306,7 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     this.effectiveMealPeriod = null;
     this.mealPhaseStatus = null;
     this.selectedMealType = null;
+    this.checking = true;
 
     this.loadMealAssignments(patientId);
     this.stopScanner();
@@ -553,5 +560,9 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
 
   onCaptureCancelled(): void {
     this.showCapturePopup = false;
+  }
+
+  get activeMealPeriodLabel(): string {
+    return this.getActiveMealPeriod() ?? '';
   }
 }

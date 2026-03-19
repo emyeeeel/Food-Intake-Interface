@@ -34,55 +34,77 @@
   }
 
   <!-- Show Add Intake Section -->
-  @if (scanResult && selectedMealAssignmentId != 0) {
-    <div class="header-section">
-      <h2>新增食物攝取紀錄</h2>
-      <button class="nav-button primary" 
+@if (scanResult && selectedMealAssignmentId != 0) {
+  <div class="header-section">
+    <h2>新增食物攝取紀錄</h2>
+    <button class="nav-button primary"
       (click)="openCapturePopup()"
-      [disabled]="mealPhaseStatus == 'done'|| !settingsService.machineIp || !selectedMealType">
-        上傳食物攝取記錄
-      </button>
-    </div>
-    <div class="meal-selection-container">
+      [disabled]="mealPhaseStatus == 'done' || !settingsService.machineIp || !selectedMealType || isLoadingPhase">
+      上傳食物攝取記錄
+    </button>
+  </div>
+
+  <div class="meal-selection-container">
+    @if (isLoadingPhase) {
+      <div class="phase-loading">
+        <div class="spinner-small"></div>
+        <p>確認餐期狀態中...</p>
+      </div>
+    }
+
+    @if (!isLoadingPhase) {
       <div class="meal-type-buttons">
         @if(mealPhaseStatus !== 'done'){
           <div class="meal-type-buttons">
-          <!-- 餐前 button -->
-          <button
-            class="meal-type-btn"
-            [class.selected]="selectedMealType === 'Before'"
-            [disabled]="mealPhaseStatus !== null && mealPhaseStatus !== '後'"
-            (click)="setMealType('Before')">
-            <div class="btn-text">
-              <span class="main-text">餐前</span>
-            </div>
-          </button>
-
-          <!-- 餐後 button -->
-          <button
-            class="meal-type-btn"
-            [class.selected]="selectedMealType === 'After'"
-            [disabled]="mealPhaseStatus !== '前'"
-            (click)="setMealType('After')">
-            <div class="btn-text">
-              <span class="main-text">餐後</span>
-            </div>
-          </button>
-        </div>
+            <button
+              class="meal-type-btn"
+              [class.selected]="selectedMealType === 'Before'"
+              [disabled]="mealPhaseStatus !== null && mealPhaseStatus !== '後'"
+              (click)="setMealType('Before')">
+              <div class="btn-text">
+                <span class="main-text">餐前</span>
+              </div>
+            </button>
+            <button
+              class="meal-type-btn"
+              [class.selected]="selectedMealType === 'After'"
+              [disabled]="mealPhaseStatus !== '前'"
+              (click)="setMealType('After')">
+              <div class="btn-text">
+                <span class="main-text">餐後</span>
+              </div>
+            </button>
+          </div>
         }
         @if(mealPhaseStatus == 'done'){
           <div class="message">
-            <h1>{{ mealTimePeriod }}記錄已被記錄</h1>
+            <h1>{{ activeMealPeriodLabel }}記錄已被記錄</h1>
           </div>
         }
       </div>
-    </div>
-  }
+    }
+  </div>
+}
 
   <!-- Show "No assignments" only after scanning and no assignments -->
-  @if (scanResult && !checking && selectedMealAssignmentId == 0) {
-    <div class="no-assignments">
-      <p>今日無可用餐點分配。</p>
+  @if (scanResult && selectedMealAssignmentId == 0) {
+    <div class="meal-selection-container">
+      <div class="meal-type-buttons">
+
+        @if (checking) {
+          <div class="phase-loading">
+            <div class="spinner-small"></div>
+            <p>確認餐期狀態中...</p>
+          </div>
+        }
+
+        @if (!checking) {
+          <div class="message">
+            <h1>今日無可用餐點分配。</h1>
+          </div>
+        }
+
+      </div>
     </div>
   }
 
