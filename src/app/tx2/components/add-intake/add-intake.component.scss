@@ -5,42 +5,112 @@
   width: 100%;
   min-height: 100%;
   background-color: #CAECE5;
-  // max-width: 600px;
   margin: 0 auto;
   font-family: 'Quicksand', sans-serif;
   display: flex;
   flex-direction: column;
-
-  /* allow children to fit full width */
   align-items: stretch;
   box-sizing: border-box;
 
   // Meal Selection Styles
   .meal-selection-container {
     .selection-header {
-      text-align: center;
-      margin-bottom: 10px;
-      height: 80px;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
+      flex-direction: row;
+      justify-content: space-between;
       align-items: center;
-      gap: 5px;
-      background: linear-gradient(135deg, #40C1AC, #2FA695);
-      box-shadow: 0 4px 12px rgba(64, 193, 172, 0.3);
-      padding: 15px 20px;
-        border-radius: 15px;
+      gap: 12px;
+      margin-bottom: 10px;
+      padding: 16px 20px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #00313C, #014d5e);
+      box-shadow: 0 4px 16px rgba(0, 49, 60, 0.35);
 
-      h4 {
-        color: white;
-        font-weight: 700;
-        font-size: 25px;
+      .label {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+
+        h4 {
+          color: #ffffff;
+          font-weight: 800;
+          font-size: 18px;
+          margin: 0;
+          letter-spacing: 0.3px;
+          line-height: 1.2;
+        }
+
+        p {
+          color: #40C1AC;
+          font-size: 13px;
+          font-weight: 700;
+          margin: 0;
+          letter-spacing: 0.2px;
+        }
       }
 
-      p {
-        color: white;
-        font-size: 12px;
-        margin: 0;
+      .upload-section {
+        flex-shrink: 0;
+
+        .nav-button.primary {
+          background: linear-gradient(135deg, #40C1AC, #2FA695);
+          color: #ffffff;
+          font-size: 13px;
+          font-weight: 700;
+          padding: 10px 16px;
+          border-radius: 10px;
+          border: none;
+          cursor: pointer;
+          white-space: nowrap;
+          box-shadow:
+            0 3px 10px rgba(64, 193, 172, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          transition:
+            background 0.25s ease,
+            box-shadow 0.25s ease,
+            transform 0.15s ease,
+            opacity 0.25s ease;
+
+          &:hover {
+            background: linear-gradient(135deg, #2FA695, #258B7A);
+            transform: translateY(-1px);
+            box-shadow:
+              0 6px 16px rgba(47, 166, 149, 0.45),
+              inset 0 1px 0 rgba(255, 255, 255, 0.25);
+          }
+
+          &:active {
+            transform: translateY(0);
+            background: linear-gradient(135deg, #258B7A, #1F7A68);
+            box-shadow:
+              0 2px 6px rgba(31, 122, 104, 0.35),
+              inset 0 2px 4px rgba(0, 0, 0, 0.15);
+          }
+
+          // ── Disabled state: no meal type selected yet ──
+          &.disabled,
+          &:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+            background: #B8D8D3;
+            color: rgba(0, 49, 60, 0.5);
+            box-shadow: none;
+            transform: none;
+
+            &:hover {
+              background: #B8D8D3;
+              transform: none;
+              box-shadow: none;
+            }
+
+            &:active {
+              background: #B8D8D3;
+              transform: none;
+              box-shadow: none;
+            }
+          }
+        }
       }
     }
 
@@ -60,7 +130,7 @@
       .meal-type-btn {
         display: flex;
         align-items: center;
-        justify-content: center; // Center content without icon
+        justify-content: center;
         padding: 20px;
         border: none;
         border-radius: 12px;
@@ -69,6 +139,21 @@
         cursor: pointer;
         transition: all 0.3s ease;
         text-align: center;
+        min-height: 125px;
+
+        &.before-meal::before {
+          content: '餐前';
+          font-size: 40px;
+          font-weight: 700;
+          color: white;
+        }
+
+        &.after-meal::before {
+          content: '餐後';
+          font-size: 40px;
+          font-weight: 700;
+          color: white;
+        }
 
         &:hover {
           transform: translateY(-2px);
@@ -79,20 +164,43 @@
           transform: translateY(0);
         }
 
+        &.selected {
+          border: 2px solid #40C1AC;
+          background: linear-gradient(135deg, #40C1AC, #2FA695);
+
+          &::before {
+            color: white;
+          }
+        }
+
+        &.disabled,
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.5;
+          background: #B8D8D3;
+          box-shadow: none;
+
+          &:hover {
+            transform: none;
+            box-shadow: none;
+          }
+
+          &::before {
+            color: #7A9B96;
+          }
+        }
+
         .btn-text {
           display: flex;
           flex-direction: column;
+          align-items: center;
 
-          .main-text {
-            font-size: 40px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 4px;
-          }
-
-          .sub-text {
-            font-size: 14px;
-            color: #7A9B96;
+          .recorded-badge {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.75);
+            margin-top: 6px;
+            letter-spacing: 0.3px;
           }
         }
       }
@@ -160,10 +268,8 @@
     padding: 20px;
     border: 1px solid #B8D8D3;
     box-shadow: 0 4px 12px rgba(0, 49, 60, 0.12);
-
-    width: 100%; /* FULL WIDTH */
+    width: 100%;
     box-sizing: border-box;
-
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -318,7 +424,6 @@
   margin-top: 20px;
   border: 1px solid #B8D8D3;
   box-shadow: 0 4px 12px rgba(0, 49, 60, 0.12);
-
   flex-grow: 1;
   overflow-y: auto;
 }
@@ -342,7 +447,6 @@
 // Responsive Design
 @media screen and (min-width: 600px) {
   .main-container {
-
     .meal-selection-container {
       .meal-type-buttons {
         flex-direction: column;
@@ -385,60 +489,42 @@
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 49, 60, 0.1);
   border: 1px solid #B8D8D3;
-
-  /* ✅ Key changes */
   max-height: 420px;
   overflow-y: auto;
   overflow-x: hidden;
-
-  /* Layout preservation */
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-
-  /* Smooth scrolling feel */
   scroll-behavior: smooth;
   padding: 15px;
 
-  h4{
+  h4 {
     margin-bottom: 10px;
   }
 }
 
-.patient-name{
+.patient-name {
   margin-bottom: 15px;
 }
 
-/* ---------------- SCROLLBAR POLISH (NON-BREAKING) ---------------- */
-
-/* WebKit browsers */
-.meals-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.meals-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+/* WebKit scrollbar */
+.meals-content::-webkit-scrollbar { width: 8px; }
+.meals-content::-webkit-scrollbar-track { background: transparent; }
 .meals-content::-webkit-scrollbar-thumb {
   background-color: rgba(0, 49, 60, 0.25);
   border-radius: 4px;
 }
-
 .meals-content::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 49, 60, 0.45);
 }
-
-/* Firefox */
 .meals-content {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 49, 60, 0.35) transparent;
 }
 
-
 .day-section {
-  border: 1px solid #b8d8d3; /* subtle teal-gray */
+  border: 1px solid #b8d8d3;
   background: linear-gradient(135deg, #ffffff, #f9fdfd);
   padding: 12px;
   margin-bottom: 15px;
@@ -446,17 +532,17 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 2px 8px rgba(0, 49, 60, 0.08); /* subtle depth */
+  box-shadow: 0 2px 8px rgba(0, 49, 60, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-  .day-header{
-    h3{
+  .day-header {
+    h3 {
       font-size: 18px;
-    font-weight: 800;
-    color: #00313C;
-    margin-bottom: 10px;
-    text-align: center;
-    width: 100%;
+      font-weight: 800;
+      color: #00313C;
+      margin-bottom: 10px;
+      text-align: center;
+      width: 100%;
     }
   }
 }
@@ -484,15 +570,15 @@
   box-shadow: 0 4px 12px rgba(0, 49, 60, 0.1);
 }
 
-.meal-card{
+.meal-card {
   display: flex;
   flex-direction: row;
   border-radius: 8px;
   gap: 10px;
   padding: 10px;
-  background: linear-gradient(135deg, #f9fefc, #ffffff); /* light gradient for depth */
+  background: linear-gradient(135deg, #f9fefc, #ffffff);
   box-shadow: 0 1px 4px rgba(0, 49, 60, 0.06);
-  border: 1px solid #cce7e3; /* soft teal-gray */
+  border: 1px solid #cce7e3;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &.selected {
@@ -500,16 +586,13 @@
   }
 }
 
-.meal-info{
+.meal-info {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  h4{
-    font-size: 18px;
-  }
-  p{
-    font-size: 12px;
-  }
+
+  h4 { font-size: 18px; }
+  p  { font-size: 12px; }
 }
 
 .meal-image {
@@ -557,24 +640,18 @@ button {
   padding: 6px 9px;
   border: none;
   cursor: pointer;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   white-space: nowrap;
-
   transition:
     background 0.25s ease,
     box-shadow 0.25s ease,
     transform 0.15s ease,
     opacity 0.2s ease;
-
-  /* Subtle baseline depth */
   box-shadow: 0 1px 3px rgba(0, 49, 60, 0.08);
 }
-
-
 
 .nav-button.primary,
 .assign-meals-button,
@@ -609,42 +686,73 @@ button {
 /* ===============================
    LOADING OVERLAY & SPINNER
    =============================== */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(202, 236, 229, 0.85);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
 
-   .loading-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(202, 236, 229, 0.85); // matches your theme
-    z-index: 9999;
-  
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  
-    backdrop-filter: blur(4px);
-  }
-  
-  .spinner {
-    width: 56px;
-    height: 56px;
-    border: 6px solid rgba(64, 193, 172, 0.25);
-    border-top-color: #40C1AC;
-    border-radius: 50%;
-    animation: spin 0.9s linear infinite;
-    margin-bottom: 16px;
-  }
-  
-  .loading-text {
-    font-size: 16px;
-    font-weight: 700;
+.spinner {
+  width: 56px;
+  height: 56px;
+  border: 6px solid rgba(64, 193, 172, 0.25);
+  border-top-color: #40C1AC;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 16px;
+}
+
+.loading-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #00313C;
+  letter-spacing: 0.5px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.phase-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 12px;
+
+  p {
     color: #00313C;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    font-size: 24px;
   }
-  
-  /* Spinner animation */
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
+}
+
+.outside-meal-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 8px;
+  text-align: center;
+
+  h4 {
+    color: #00313C;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
   }
-  
+
+  p {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 0;
+  }
+}

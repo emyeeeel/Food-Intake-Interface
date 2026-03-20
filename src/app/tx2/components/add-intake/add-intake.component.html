@@ -1,102 +1,96 @@
 <div class="main-container">
 
-  <!-- Meal Type Selection Step -->
-  <ng-container *ngIf="mealSelectionStep && scannedPatientId">
+  <!-- ── Auto-selection loading spinner ── -->
+  @if (!autoSelectionReady && scannedPatientId) {
+    <div class="phase-loading">
+      <div class="spinner-small"></div>
+      <p>確認餐期狀態中...</p>
+    </div>
+  }
+
+  <!-- ── Outside meal time ── -->
+  <ng-container *ngIf="autoSelectionReady && mealSelectionStep && scannedPatientId && !currentMealPeriod">
     <div class="meal-selection-container">
-      <div class="selection-header">
-        <h4>請選擇用餐時間</h4>
-        <p>選擇您要記錄的用餐階段</p>
-      </div>
-      <div class="meal-type-buttons">
-        <button
-          class="meal-type-btn before-meal"
-          (click)="selectMealType('Before')">
-          <div class="btn-text">
-            <span class="main-text">餐前</span>
-          </div>
-        </button>
-        <button
-          class="meal-type-btn after-meal"
-          (click)="selectMealType('After')">
-          <div class="btn-text">
-            <span class="main-text">餐後</span>
-          </div>
-        </button>
+      <div class="outside-meal-time">
+        <h4>目前非用餐時段</h4>
+        <p>請於用餐時間內進行記錄</p>
       </div>
     </div>
   </ng-container>
 
-  <!-- Meal Selection After Type Selection -->
-  <ng-container *ngIf="!mealSelectionStep && hasMealsForToday()">
+  <!-- ── Meal Type (Before / After) Selection ── -->
+  <ng-container *ngIf="autoSelectionReady && mealSelectionStep && scannedPatientId && currentMealPeriod">
+    <div class="meal-selection-container">
+      <div class="selection-header">
+        <div class="label">
+          <h4>請選擇用餐時間</h4>
+          <p>{{ mealPeriodAssignmentLabel }}</p>
+        </div>
+
+        <div class="upload-section">
+          <button
+            class="nav-button primary"
+            [disabled]="!selectedMealType"
+            [class.disabled]="!selectedMealType"
+            (click)="selectedMealType && openCapturePopup()">
+            上傳食物攝取記錄
+          </button>
+        </div>
+      </div>
+
+      <div class="meal-type-buttons">
+
+        <!-- 餐前: disabled once any record exists -->
+        <button
+          class="meal-type-btn before-meal"
+          [disabled]="isBeforeDisabled()"
+          [class.disabled]="isBeforeDisabled()"
+          [class.selected]="selectedMealType === 'Before'"
+          (click)="!isBeforeDisabled() && selectMealType('Before')">
+        </button>
+
+        <!-- 餐後: disabled until at least one record exists -->
+        <button
+          class="meal-type-btn after-meal"
+          [disabled]="isAfterDisabled()"
+          [class.disabled]="isAfterDisabled()"
+          [class.selected]="selectedMealType === 'After'"
+          (click)="!isAfterDisabled() && selectMealType('After')">
+        </button>
+
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ── Meal card list (after type selection) ── -->
+  <ng-container *ngIf="autoSelectionReady && !mealSelectionStep && hasMealsForToday()">
     <div class="header-section">
       <h2>新增食物攝取紀錄</h2>
       <button class="nav-button primary" (click)="capture()">
         上傳食物攝取記錄
       </button>
     </div>
-
-    <div class="meals-content">
-      <h4 class="patient-title">
-        病人 ID: {{ scannedPatientId }}
-      </h4>
-      <div *ngFor="let dayGroup of getMealsByDayCycle() | keyvalue: dayCycleSort">
-        <div class="day-section">
-          <h3 class="day-header">第 {{ dayGroup.key }} 天</h3>
-          <div class="meals">
-            <!-- Lunch -->
-            <div class="meal-type-section">
-              <div class="meals-grid">
-                <div *ngFor="let assignment of getMealsByType(dayGroup.value, '午餐')" 
-                     class="meal-card"
-                     [class.selected]="selectedMealAssignmentId === assignment.id"
-                     (click)="selectMealAssignment(assignment)">
-                  <div class="meal-image">
-                    <img [src]="assignment.meal_detail!.image || 'assets/images/meals/meal_placeholder.jpg'"
-                         [alt]="assignment.meal_detail!.meal_name" />
-                  </div>
-                  <div class="meal-info">
-                    <h4 class="meal-type-header">午餐</h4>
-                    <p class="meal-name">{{ assignment.meal_detail!.meal_name || assignment.meal_name }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Dinner -->
-            <div class="meal-type-section">
-              <div class="meals-grid">
-                <div *ngFor="let assignment of getMealsByType(dayGroup.value, '晚餐')" 
-                     class="meal-card"
-                     [class.selected]="selectedMealAssignmentId === assignment.id"
-                     (click)="selectMealAssignment(assignment)">
-                  <div class="meal-image">
-                    <img [src]="assignment.meal_detail!.image || 'assets/images/meals/meal_placeholder.jpg'"
-                         [alt]="assignment.meal_detail!.meal_name" />
-                  </div>
-                  <div class="meal-info">
-                    <h4 class="meal-type-header">晚餐</h4>
-                    <p class="meal-name">{{ assignment.meal_detail!.meal_name || assignment.meal_name }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </ng-container>
 
-  <!-- No meals available for today -->
-  <ng-container *ngIf="!mealSelectionStep && !hasMealsForToday()">
+  <!-- ── No meals for today ── -->
+  <ng-container *ngIf="autoSelectionReady && !mealSelectionStep && !hasMealsForToday()">
     <div class="no-assignments">
       <p>今日無可用餐點分配。</p>
     </div>
   </ng-container>
 
+  <app-pop-up
+    [visible]="showCapturePopup"
+    (confirmed)="onCaptureConfirmed()"
+    (cancelled)="onCaptureCancelled()">
+  </app-pop-up>
+
+  <!-- ── Upload progress overlay ── -->
   <ng-container *ngIf="isProcessing">
     <div class="loading-overlay">
       <div class="spinner"></div>
       <p class="loading-text">上傳食物攝取記錄中…</p>
     </div>
-  </ng-container>  
+  </ng-container>
+
 </div>
