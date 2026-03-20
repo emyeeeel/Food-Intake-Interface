@@ -57,7 +57,7 @@
           <div class="patient-item">
             <div class="patient-header">
               <span class="room-bed">{{ patient.room_number }}-{{ patient.bed_number }}</span>
-              <span class="name">{{ patient.name }}</span>
+              <span class="name">( {{ patient.name }} )</span>
             </div>
             <div class="patient-actions">
               <a [routerLink]="['/patient-info', patient.id, 'view']" class="btn-action view">查看</a>

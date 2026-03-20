@@ -20,7 +20,7 @@ export class DisplayPatientComponent implements OnInit {
 
   // Pagination properties
   currentPage = 1;
-  pageSize = 6;
+  pageSize = 7;
   totalPatients = 0;
   totalPages = 0;
   targetPage: number | null = null;
