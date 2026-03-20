@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "tauri": "tauri",
+    "tauri:build:clean": "cargo clean --manifest-path src-tauri/Cargo.toml && npm run build && cargo tauri build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

@@ -173,16 +173,58 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
     }
   }
 
-  startScanner(): void {
-    this.showScanner = true;
-    this.scanResult = null;
+startScanner(): void {
+  this.showScanner = true;
+  this.scanResult = null;
 
-    navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: 'environment',
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
+  // Step 1: Request permission first with a bare getUserMedia call
+  // This causes WebKitGTK to populate real deviceIds on enumerateDevices
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(tempStream => {
+      // Stop the temp stream immediately — we just needed it for permission
+      tempStream.getTracks().forEach(t => t.stop());
+
+      // Step 2: Now enumerate with real labels and deviceIds
+      return navigator.mediaDevices.enumerateDevices();
+    })
+    .then(devices => {
+      console.log('=== ALL DEVICES AFTER PERMISSION ===');
+      devices.forEach((d, i) => {
+        console.log(`Device ${i}: kind=${d.kind} label="${d.label}" deviceId="${d.deviceId}"`);
+      });
+
+      const videoCameras = devices.filter(d => d.kind === 'videoinput');
+
+      const preferred = videoCameras.find(
+        d => d.label.toLowerCase().includes('web cam 1080p')
+      );
+
+      const labeledFallback = videoCameras.find(
+        d => d.label &&
+             !d.label.toLowerCase().includes('intel') &&
+             !d.label.toLowerCase().includes('realsense')
+      );
+
+      const deviceIdFallback = videoCameras.find(
+        d => d.deviceId && d.deviceId !== ''
+      );
+
+      const selected = preferred ?? labeledFallback ?? deviceIdFallback;
+      console.log('Selected camera:', selected?.label || selected?.deviceId || 'NONE');
+
+      if (selected?.deviceId) {
+        return navigator.mediaDevices.getUserMedia({
+          video: {
+            deviceId: { exact: selected.deviceId },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
       }
+
+      // Fallback if still no deviceId
+      console.warn('Still no deviceId found, using bare video:true');
+      return navigator.mediaDevices.getUserMedia({ video: true });
     })
     .then(stream => {
       if (this.videoElement?.nativeElement) {
@@ -193,10 +235,13 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
       }
     })
     .catch(err => {
-      console.error('Error accessing camera:', err);
+      console.error('=== CAMERA ERROR ===');
+      console.error('name:', err.name);
+      console.error('message:', err.message);
+      alert(`Camera Error\nname: ${err.name}\nmessage: ${err.message}`);
       this.showScanner = false;
     });
-  }
+}
 
   stopScanner(): void {
     this.showScanner = false;
