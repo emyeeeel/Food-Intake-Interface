@@ -215,7 +215,7 @@ startScanner(): void {
       if (selected?.deviceId) {
         return navigator.mediaDevices.getUserMedia({
           video: {
-            deviceId: { exact: selected.deviceId },
+            deviceId: selected.deviceId,
             width: { ideal: 1280 },
             height: { ideal: 720 }
           }
