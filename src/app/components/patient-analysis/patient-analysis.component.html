@@ -1,0 +1,43 @@
+<div class="main-container">
+  <div class="row-1">
+    <div class="linechart-container">
+      <canvas #lineChart></canvas>
+    </div>
+
+    <div class="barchart-container">
+      <canvas #barChart></canvas>
+    </div>
+  </div>
+  <div class="row-2">
+    <div class="header">
+      <div class="title">
+        <h2 *ngIf="ltcPatient">病人（{{ ltcPatient.room_number }}房-{{ ltcPatient.bed_number }}床）飲食分析</h2>
+      </div>
+      <div class="selection">
+          <select [(ngModel)]="selectedPeriod" (change)="onPeriodChange(selectedPeriod)">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+      </div>
+    </div>
+    <div class="analysis-section">
+      <div class="analysis-content">
+        @if (recommendationLoading) {
+          <div class="section-loading">
+            <div class="loading-spinner"></div>
+            <span>生成AI飲食建議中...</span>
+          </div>
+        } @else if (recommendationError) {
+          <div class="analysis-error">
+            <p>{{ recommendationError }}</p>
+          </div>
+        } @else if (recommendationText) {
+          <pre class="analysis-text">{{ recommendationText }}</pre>
+        } @else {
+          <pre class="analysis-text">等待數據載入完成後生成分析...</pre>
+        }
+      </div>
+    </div>
+  </div>
+</div>

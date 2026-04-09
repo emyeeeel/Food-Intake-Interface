@@ -1,0 +1,142 @@
+<div class="display-ingredients-container">
+  <div class="header">
+    <h2>所有成分</h2>
+    <div class="header-actions">
+      @if (!isLoading && !error) {
+        <span class="total-count">
+          總計: {{ totalIngredients }} 成分
+        </span>
+      }
+      <button
+        type="button"
+        class="btn-refresh"
+        (click)="refreshIngredients()"
+        [disabled]="isLoading"
+        >
+        @if (!isLoading) {
+          <span>重新整理</span>
+        }
+        @if (isLoading) {
+          <span>載入中...</span>
+        }
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>正在載入食材...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error && !isLoading) {
+    <div class="error-state">
+      <div class="error-icon">❌</div>
+      <p class="error-message">{{ error }}</p>
+      <button type="button" class="btn-retry" (click)="refreshIngredients()">
+        再試一次
+      </button>
+    </div>
+  }
+
+  <!-- Ingredients Grid with Pagination -->
+  @if (!isLoading && !error && ingredients.length > 0) {
+    <div class="ingredients-grid-container">
+      <!-- Current Page Info -->
+      <div class="page-info">
+        <span class="page-indicator">
+          第 {{ currentPage }} 頁，共 {{ totalPages }} 頁
+        </span>
+      </div>
+      <!-- Ingredients Grid using app-ingredients-card -->
+      <div class="ingredients-grid">
+        @for (ingredient of paginatedIngredients; track trackByIngredientId($index, ingredient)) {
+          <app-ingredients-card
+            [ingredient]="ingredient"
+            class="ingredient-item-wrapper"
+            >
+          </app-ingredients-card>
+        }
+      </div>
+      <!-- Pagination Controls -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          <span>
+            顯示 {{ paginatedIngredients.length }} / {{ totalIngredients }} 成分
+          </span>
+        </div>
+        <div class="pagination-controls">
+          <div class="nav-buttons">
+            <button
+              type="button"
+              class="btn-page btn-first"
+              [disabled]="currentPage === 1"
+              (click)="goToFirstPage()"
+              title="First Page"
+              >
+              <<
+            </button>
+            <button
+              type="button"
+              class="btn-page btn-prev"
+              [disabled]="currentPage === 1"
+              (click)="goToPreviousPage()"
+              title="Previous Page"
+              >
+              <
+            </button>
+          </div>
+          <div class="page-numbers">
+            @for (page of getVisiblePages(); track page) {
+              <button
+                type="button"
+                class="btn-page-number"
+                [class.active]="page === currentPage"
+                [class.ellipsis]="page === '...'"
+                [disabled]="page === '...'"
+                (click)="goToPage(page)"
+                [title]="page === '...' ? '' : 'Go to page ' + page"
+                >
+                {{ page }}
+              </button>
+            }
+          </div>
+          <div class="nav-buttons">
+            <button
+              type="button"
+              class="btn-page btn-next"
+              [disabled]="currentPage === totalPages"
+              (click)="goToNextPage()"
+              >
+              >
+            </button>
+            <button
+              type="button"
+              class="btn-page btn-last"
+              [disabled]="currentPage === totalPages"
+              (click)="goToLastPage()"
+              title="Last Page"
+              >
+              >>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading && !error && ingredients.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">🥕</div>
+      <h3>未找到成分</h3>
+      <p>資料庫中尚無任何成分.</p>
+      <button type="button" class="btn-primary" routerLink="/add-ingredient">
+        加入第一個食材
+      </button>
+    </div>
+  }
+</div>

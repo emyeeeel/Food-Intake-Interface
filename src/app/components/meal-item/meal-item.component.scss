@@ -1,17 +1,21 @@
 .meal-item{
-    width: 430px;
-    height: 316px;
+    width: 100%;
+    max-width: 400px;
+    height: 100%;
+    max-height: 280px;
     border-radius: 24px;
     background-color: #E6FEF9;
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 22px 24px;
-    gap: 25px;
+    padding: 25px;
+    gap: 20px;
 
     .col-1{
-        width: 192px;
-        height: 270px;
+        width: 100%;
+        max-width: 180px;
+        height: 100%;
+        min-height: 225px;
         border-radius: 14px;
         display: flex;
         align-items: center;
@@ -20,36 +24,50 @@
         .meal-image {
             width: 100%;
             height: 100%;
+            min-height: 225px;
             object-fit: cover;
-            border-radius: 8px;
-          }
+            border-radius: 12px;
+        }
     }
 
     .col-2{
-        width: 167px;
-        height: 270px;
+        width: 100%;
+        max-width: 180px;
+        height: 100%;
 
         .row-1{
             height: 8px;
+            position: relative;
 
             .circles {
                 display: flex;
-                gap: 4px; // 4px spacing between circles
+                gap: 4px; 
                 align-items: center;
                 justify-content: right;
+                cursor: pointer;
+                transition: all 0.3s ease;
                 
-                .circle {
-                  width: 7.24px;
-                  height: 7.24px;
-                  border-radius: 50%; 
-                  background-color: #00313C; 
+                &:hover {
+                    transform: scale(1.1);
                 }
-              }
+
+                .circle {
+                    width: 7.24px;
+                    height: 7.24px;
+                    border-radius: 50%; 
+                    background-color: #00313C; 
+                    transition: background-color 0.3s ease;
+                }
+
+                &:hover .circle {
+                    background-color: #40C1AC;
+                }
+            }
         }
 
         .row-2{
             height: 54px;
-            margin-top: 45px;
+            margin-top: 25px;
             display: flex;
             align-items: center;
             justify-content: left;
@@ -66,9 +84,8 @@
         }
 
         .row-3{
-            height: 58px;
+            height: 50px;
             margin-top: 30px;
-
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -80,7 +97,7 @@
                 span{
                     font-family: 'Quicksand', sans-serif;
                     font-weight: 600;
-                    font-size: 20px;
+                    font-size: 18px;
                     color: #00313C;
                     margin: 0;
                     padding: 0;
@@ -92,7 +109,6 @@
         .row-4{
             height: 35px;
             margin-top: 25px;
-
             display: flex;
             flex-direction: row;
             justify-content: space-between;
@@ -101,7 +117,7 @@
             span{
                 font-family: 'Quicksand', sans-serif;
                 font-weight: 600;
-                font-size: 20px;
+                font-size: 14px;
                 color: #00313C;
                 margin: 0;
                 padding: 0;
@@ -113,7 +129,6 @@
                 height: 100%;
                 border-radius: 24px;
                 background-color: #00313C;
-
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -122,12 +137,241 @@
                     color: #E6FEF9;
                     font-family: 'Quicksand', sans-serif;
                     font-weight: 600;
-                    font-size: 14px;
+                    font-size: 12px;
                     margin: 0;
                     padding: 0;
                     line-height: 1;
                 }
             }
         }
+    }
+
+    // Media queries for responsive design
+    @media (min-width: 1024px){
+        min-width: 350px;
+        max-height: 260px;
+        padding: 22px 24px;
+        justify-content: space-between;
+        gap: 15px;
+        border-radius: 16px;
+
+        .col-1{
+            width: 192px;
+        }
+
+        .col-2{
+            width: 167px;
+
+            .row-1{
+                .circles {
+                    gap: 2px;
+                    
+                    .circle {
+                        width: 6px;
+                        height: 6px;
+                    }
+                }
+            }
+
+            .row-2{
+                margin-top: 25px;
+                h1{
+                    font-size: 30px;
+                }
+            }
+
+            .row-3{
+                height: 50px;
+                margin-top: 15px;
+
+                .first, .second{
+                    span{
+                        font-size: 16px;
+                    }
+                }
+            }
+
+            .row-4{
+                span{
+                    font-size: 16px;
+                }
+
+                .type{
+                    span{
+                        font-size: 12px;
+                    }
+                }
+            }
+        }
+    }
+
+    @media (min-width: 1280px){ 
+        min-width: 430px;
+        min-height: 350px;
+        padding: 22px 24px;
+
+        .col-1{
+            min-width: 190px;
+        }
+
+        .col-2{
+            max-width: 170px;
+
+            .row-1{
+                .circles {
+                    .circle {
+                        width: 7.24px;
+                        height: 7.24px;
+                    }
+                }
+            }
+
+            .row-2{
+                margin-top: 45px;
+                h1{
+                    font-size: 40px;
+                }
+            }
+
+            .row-3{
+                height: 58px;
+                margin-top: 50px;
+
+                .first, .second{
+                    span{
+                        font-size: 20px;
+                    }
+                }
+            }
+
+            .row-4{
+                span{
+                    font-size: 20px;
+                }
+
+                .type{
+                    span{
+                        font-size: 14px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* Wrapper controls positioning */
+.option-wrapper {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+}
+
+/* Dropdown - Following Patient Card Styling */
+.options-dropdown {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 120px;
+    max-width: 160px;
+    
+    background: linear-gradient(135deg, #40C1AC, #2FA695);
+    border-radius: 12px 0 12px 12px;
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(64, 193, 172, 0.2);
+    z-index: 100;
+    
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    animation: fadeInDown 0.3s ease;
+
+    button {
+        width: 100%;
+        padding: 12px 14px;
+        background: none;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 400;
+        font-size: 15px;
+        color: #F5F4F2;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background: rgba(245, 245, 245, 0.1);
+            color: #FFFFFF;
+        }
+
+        &:first-child {
+            &:hover {
+                background: rgba(255, 255, 255, 0.15);
+            }
+        }
+
+        &:last-child {
+            &:hover {
+                background: rgba(255, 193, 7, 0.2);
+            }
+        }
+    }
+
+    // Responsive adjustments
+    @media (min-width: 1024px) {
+        min-width: 110px;
+        max-width: 140px;
+
+        button {
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        min-width: 120px;
+        max-width: 160px;
+
+        button {
+            padding: 12px 14px;
+            font-size: 15px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        min-width: 140px;
+        right: -10px;
+
+        button {
+            padding: 14px 16px;
+            font-size: 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        right: auto;
+        transform: translate(-50%, -50%);
+        min-width: 200px;
+        border-radius: 12px;
+
+        button {
+            padding: 16px 20px;
+            font-size: 16px;
+        }
+    }
+}
+
+// Animation keyframes
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

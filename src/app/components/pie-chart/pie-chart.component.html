@@ -1,21 +1,27 @@
 <div class="pie-chart-container">
     <svg class="pie-chart" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-      <!-- Outer circle (full donut) -->
-      <circle 
-        cx="50" 
-        cy="50" 
-        r="40" 
-        fill="#40C1AC" 
-        stroke="none">
-      </circle>
-      
-      <!-- Inner circle (creates the hole) -->
-      <circle 
-        cx="50" 
-        cy="50" 
-        r="20" 
-        fill="white" 
-        stroke="none">
-      </circle>
+      <!-- background ring -->
+    <circle
+      cx="50"
+      cy="50"
+      r="40"
+      fill="transparent"
+      stroke="#eee"
+      stroke-width="20">
+    </circle>
+
+    <!-- dynamic segments -->
+    <circle
+      *ngFor="let seg of segments"
+      cx="50"
+      cy="50"
+      r="40"
+      fill="transparent"
+      [attr.stroke]="seg.color"
+      stroke-width="20"
+      [attr.stroke-dasharray]="seg.dashArray"
+      [attr.stroke-dashoffset]="seg.dashOffset"
+      transform="rotate(-90 50 50)">
+    </circle>
     </svg>
   </div>

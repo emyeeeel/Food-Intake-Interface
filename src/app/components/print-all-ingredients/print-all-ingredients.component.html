@@ -1,0 +1,173 @@
+<div class="print-all-ingredients">
+  <div class="ingredients-header">
+    <h2>Ingredient Records</h2>
+    <div class="header-controls">
+      <div class="ingredients-count">
+        Total: {{ totalIngredients }} ingredients
+      </div>
+      <div class="print-controls">
+        <button class="btn-print-all" (click)="printAllIngredients()" [disabled]="ingredients.length === 0">
+          Print All Ingredients
+        </button>
+        <button class="btn-print-selected" (click)="printSelectedIngredients()" [disabled]="selectedIngredients.size === 0">
+          Print Selected ({{ selectedIngredients.size }})
+        </button>
+        <button class="btn-clear-selection" (click)="clearSelection()" [disabled]="selectedIngredients.size === 0">
+          Clear Selection
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <span>Loading ingredients...</span>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error) {
+    <div class="error">
+      {{ error }}
+    </div>
+  }
+
+  <!-- Main Content -->
+  @if (!loading && !error && ingredients.length > 0) {
+    <div class="main-content">
+      <!-- Ingredients Table -->
+      <div class="ingredients-table-container">
+        <!-- Table Controls -->
+        <div class="table-controls">
+          <div class="selection-controls">
+            <button class="btn-select-all"
+              (click)="selectAllCurrentPage()"
+              [disabled]="isAllCurrentPageSelected()">
+              Select All on Page
+            </button>
+            <button class="btn-deselect-all"
+              (click)="deselectAllCurrentPage()"
+              [disabled]="!isAnyCurrentPageSelected()">
+              Deselect All on Page
+            </button>
+          </div>
+        </div>
+        <!-- Table -->
+        <div class="table-wrapper">
+          <table class="ingredients-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>ID</th>
+                <th>Ingredient Name</th>
+                <th>Food Group</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ingredient of paginatedIngredients; track ingredient.id) {
+                <tr
+                  [class.selected]="selectedIngredients.has(ingredient.id)"
+                  (click)="toggleIngredientSelection(ingredient.id)"
+                  class="ingredient-row">
+                  <!-- Checkbox -->
+                  <td class="ingredient-checkbox">
+                    <input type="checkbox"
+                      [checked]="selectedIngredients.has(ingredient.id)"
+                      (click)="$event.stopPropagation()"
+                      (change)="toggleIngredientSelection(ingredient.id, $event)">
+                  </td>
+                  <!-- ID -->
+                  <td class="ingredient-id">
+                    {{ ingredient.id }}
+                  </td>
+                  <!-- Name -->
+                  <td class="ingredient-name">
+                    {{ ingredient.name }}
+                  </td>
+                  <!-- Food Group -->
+                  <td class="ingredient-food-group">
+                    {{ ingredient.food_group || '-' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <!-- Pagination Controls -->
+        @if (totalPages > 1) {
+          <div class="pagination-container">
+            <div class="pagination-info">
+              <span>Showing {{ getStartIndex() }} to {{ getEndIndex() }} of {{ totalIngredients }} entries</span>
+            </div>
+            <div class="pagination-controls">
+              <!-- First Page -->
+              <button class="btn-page"
+                (click)="goToFirstPage()"
+                [disabled]="currentPage === 1"
+                title="First Page">
+                ⟪
+              </button>
+              <!-- Previous Page -->
+              <button class="btn-page"
+                (click)="goToPreviousPage()"
+                [disabled]="currentPage === 1"
+                title="Previous Page">
+                ⟨
+              </button>
+              <!-- Page Numbers -->
+              @for (page of getVisiblePages(); track page) {
+                <button
+                  class="btn-page"
+                  [class.active]="page === currentPage"
+                  [disabled]="page === '...'"
+                  (click)="goToPage(page)"
+                  [title]="page === '...' ? '' : 'Go to page ' + page">
+                  {{ page }}
+                </button>
+              }
+              <!-- Next Page -->
+              <button class="btn-page"
+                (click)="goToNextPage()"
+                [disabled]="currentPage === totalPages"
+                title="Next Page">
+                ⟩
+              </button>
+              <!-- Last Page -->
+              <button class="btn-page"
+                (click)="goToLastPage()"
+                [disabled]="currentPage === totalPages"
+                title="Last Page">
+                ⟫
+              </button>
+            </div>
+            <!-- Jump to Page -->
+            <div class="jump-to-page">
+              <label for="targetPage">Go to page:</label>
+              <input type="number"
+                id="targetPage"
+                [(ngModel)]="targetPage"
+                [min]="1"
+                [max]="totalPages"
+                placeholder="Page #"
+                (keyup.enter)="goToTargetPage()">
+              <button class="btn-go"
+                (click)="goToTargetPage()"
+                [disabled]="!targetPage || targetPage < 1 || targetPage > totalPages">
+                Go
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- No Data State -->
+  @if (!loading && !error && ingredients.length === 0) {
+    <div class="no-ingredients">
+      No ingredients found
+    </div>
+  }
+</div>

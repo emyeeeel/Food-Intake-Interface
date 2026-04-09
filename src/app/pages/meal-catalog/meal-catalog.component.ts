@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Add this import
+import { FormsModule } from '@angular/forms'; 
 import { Router, ActivatedRoute } from '@angular/router';
 import { MenuBarComponent } from '../../components/menu-bar/menu-bar.component';
 import { BackComponent } from '../../components/back/back.component';
@@ -9,20 +8,20 @@ import { SearchBarComponent } from '../../components/search-bar/search-bar.compo
 import { FilterIconComponent } from '../../components/filter-icon/filter-icon.component';
 import { FilterOptionsComponent } from '../../components/filter-options/filter-options.component';
 import { MainOptionsComponent } from '../../components/main-options/main-options.component';
-import { ClearAllButtonComponent } from '../../components/clear-all-button/clear-all-button.component';
-import { DarkButtonComponent } from '../../components/dark-button/dark-button.component';
 import { DateContainerComponent } from '../../components/date-container/date-container.component';
-import { MealItemComponent } from '../../components/meal-item/meal-item.component';
-import { ServingTimeComponent } from '../../components/serving-time/serving-time.component';
-import { DayCycleComponent } from '../../components/day-cycle/day-cycle.component';
 import { MealsService } from '../../services/meals.service';
 import { Meal } from '../../models/meal.model';
+import { AddMealComponent } from '../../components/add-meal/add-meal.component';
+import { DisplayMealComponent } from "../../components/display-meal/display-meal.component";
+import { PrintAllMealsComponent } from "../../components/print-all-meals/print-all-meals.component";
+import { EditMealComponent } from "../../components/edit-meal/edit-meal.component";
+import { ShowMealComponent } from "../../components/show-meal/show-meal.component";
+import { TodaysMealComponent } from '../../components/todays-meal/todays-meal.component';
 
 @Component({
   selector: 'app-meal-catalog',
   imports: [
-    CommonModule,
-    FormsModule, 
+    FormsModule,
     MenuBarComponent,
     BackComponent,
     NotifComponent,
@@ -30,13 +29,14 @@ import { Meal } from '../../models/meal.model';
     FilterIconComponent,
     FilterOptionsComponent,
     MainOptionsComponent,
-    ClearAllButtonComponent,
-    DarkButtonComponent,
     DateContainerComponent,
-    MealItemComponent,
-    ServingTimeComponent,
-    DayCycleComponent
-  ],
+    AddMealComponent,
+    DisplayMealComponent,
+    PrintAllMealsComponent,
+    EditMealComponent,
+    ShowMealComponent,
+    TodaysMealComponent
+],
   templateUrl: './meal-catalog.component.html',
   styleUrl: './meal-catalog.component.scss'
 })
@@ -44,6 +44,9 @@ export class MealCatalogComponent implements OnInit {
   currentView: string = 'default';
   mealDescription: string = ''; 
   meals: Meal[] = [];
+  mealId: number | null = null; // Add this property to store the meal ID
+
+  isMobileMenuOpen = false; 
 
   constructor(
     private router: Router,
@@ -84,16 +87,53 @@ export class MealCatalogComponent implements OnInit {
   }
 
   private updateCurrentView(path: string): void {
-    if (path.endsWith('/add') || path === 'add') {
+    
+    if (path.includes('/add') || path.endsWith('add')) {
       this.currentView = 'add-meal';
-    } else if (path.endsWith('/all') || path === 'all') {
+      this.mealId = null;
+
+    } else if (path.includes('/all') || path.endsWith('all')) {
       this.currentView = 'all-meals';
-    } else if (path.endsWith('/print') || path === 'print') {
+      this.mealId = null;
+
+    } else if (path.includes('/print') || path.endsWith('print')) {
       this.currentView = 'print-meal';
-    } else if (path === 'meal-catalog' || path === '') {
+      this.mealId = null;
+
+    } else if (/meal-catalog\/\d+\/edit/.test(path)) {
+      // Remove leading slash from regex - matches both /meal-catalog/edit/123 and meal-catalog/edit/123
+      this.currentView = 'edit-meal';
+      const editMatch = path.match(/meal-catalog\/edit\/(\d+)/);
+      if (editMatch) {
+        this.mealId = parseInt(editMatch[1], 10);
+        console.log('Edit meal ID extracted:', this.mealId);
+      }
+
+    } else if (/meal-catalog\/\d+\/view/.test(path)) {
+      // Remove leading slash from regex - matches both /meal-catalog/view/123 and meal-catalog/view/123
+      this.currentView = 'view-meal';
+      const viewMatch = path.match(/meal-catalog\/view\/(\d+)/);
+      if (viewMatch) {
+        this.mealId = parseInt(viewMatch[1], 10);
+        console.log('View meal ID extracted:', this.mealId);
+      }
+
+    } else if (path.endsWith('/edit') || path === 'edit') {
+      this.currentView = 'edit-meal';
+      this.mealId = null;
+
+    } else if (path.endsWith('/view') || path === 'view') {
+      this.currentView = 'view-meal';
+      this.mealId = null;
+
+    } else if (path === '/meal-catalog' || path === 'meal-catalog' || path === '') {
       this.currentView = 'default';
+      this.mealId = null;
+
     } else {
+      console.log('No matching route pattern found, setting to default');
       this.currentView = 'default';
+      this.mealId = null;
     }
   }
 
@@ -107,6 +147,14 @@ export class MealCatalogComponent implements OnInit {
 
   navigateToPrintMeal(): void {
     this.router.navigate(['/meal-catalog/print']);
+  }
+
+  navigateToEditMeal(mealId: number): void {
+    this.router.navigate(['/meal-catalog', mealId, 'edit']);
+  }
+
+  navigateToViewMeal(mealId: number): void {
+    this.router.navigate(['/meal-catalog', mealId, 'view']);
   }
 
   clearDescription(): void {
@@ -131,5 +179,28 @@ export class MealCatalogComponent implements OnInit {
   
     return `${mealLetter}-${dayCycle}-0${mealId}`;
   }
-   
+  
+  // Called by MenuBar to toggle main content dimming
+  onMobileMenuToggle(isOpen: boolean) {
+    this.isMobileMenuOpen = isOpen;
+  }
+
+  // Helper method to get meal ID from route
+  getMealIdFromRoute(): number | null {
+    const url = this.router.url;
+    
+    // Try edit format first
+    let match = url.match(/\/meal-catalog\/(\d+)\/edit/);
+    if (match) {
+      return parseInt(match[1], 10);
+    }
+    
+    // Try view format
+    match = url.match(/\/meal-catalog\/(\d+)\/view/);
+    if (match) {
+      return parseInt(match[1], 10);
+    }
+    
+    return null;
+  }
 }

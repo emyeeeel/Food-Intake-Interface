@@ -2,12 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { Patient } from '../models/patient.model';
+import { environment } from '../../environments/environment';
+import { LTCPatient } from '../models/ltc-patient.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PatientService {
-  private apiUrl = 'http://127.0.0.1:8000/api/patients/';
+  private baseUrl = environment.apiBaseUrl;
+  private apiUrl = `${this.baseUrl}/api/patients/`;
   
 
   constructor(private http: HttpClient) {}
@@ -19,6 +22,28 @@ export class PatientService {
   getPatientCount(): Observable<number> {
     return this.http.get<Patient[]>(this.apiUrl).pipe(
       map(patients => patients.length)
+    );
+  }
+
+  getLTCPatients(): Observable<LTCPatient[]> {
+    return this.http.get<LTCPatient[]>(`${this.baseUrl}/api/ltc-patients`);
+  }
+
+  postLTCPatient(ltcPatient: LTCPatient): Observable<LTCPatient> {
+    return this.http.post<LTCPatient>(`${this.baseUrl}/api/ltc-patients`, ltcPatient);
+  }
+
+  getLTCPatient(id: number): Observable<LTCPatient> {
+    return this.http.get<LTCPatient>(`${this.baseUrl}/api/ltc-patients/${id}`);
+  }
+
+  updateLTCPatient(id: number, ltcPatient: LTCPatient): Observable<LTCPatient> {
+    return this.http.put<LTCPatient>(`${this.baseUrl}/api/ltc-patients/${id}`, ltcPatient);
+  }
+
+  getLTCPatientCount(): Observable<number> {
+    return this.http.get<LTCPatient[]>(`${this.baseUrl}/api/ltc-patients`).pipe(
+      map(ltcPatients => ltcPatients.length)
     );
   }
 }

@@ -1,9 +1,9 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-serving-time',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './serving-time.component.html',
   styleUrl: './serving-time.component.scss'
 })

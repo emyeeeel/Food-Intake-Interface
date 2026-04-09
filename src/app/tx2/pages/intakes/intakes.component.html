@@ -1,0 +1,48 @@
+<div class="intakes-container">
+  <app-header></app-header>
+
+  <div class="main-container">
+    <!-- Loading state -->
+    <div *ngIf="loading" class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Rooms and outpatient -->
+    <ng-container *ngIf="!loading && !selectedRoom">
+      <div class="room-container">
+          <div class="room-card" *ngFor="let room of getUniqueRooms()" (click)="selectRoom(room)">
+            {{ room }}
+          </div>
+          <div class="outpatient">
+            門診
+          </div>
+      </div>
+    </ng-container>
+
+    <!-- Beds -->
+    <ng-container *ngIf="!loading && selectedRoom && !selectedBed">
+      <div class="bed-header">
+        <button class="back-btn" (click)="backToRooms()">← 返回房間</button>
+      </div>
+      <div class="bed-container">
+        <div
+          class="room-card bed-card"
+          *ngFor="let patient of getBedsForRoom(selectedRoom)"
+          (click)="selectBed(patient)"
+        >
+          {{ patient.bed_number }}
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Add Intake -->
+    <ng-container *ngIf="selectedBed">
+      <div class="bed-header">
+        <button class="back-btn" (click)="backToBeds()">← 返回房間</button>
+      </div>
+      <div class="intake-container">
+        <app-add-intake [scannedPatientId]="selectedBed.id" (intakeCompleted)="handleIntakeCompleted()"></app-add-intake>
+      </div>
+    </ng-container>
+  </div>
+</div>

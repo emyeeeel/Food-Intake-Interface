@@ -1,6 +1,7 @@
 .main-container{
-    width: 360px;
-    height: 260px;
+    width: 100%;
+    max-width: 390px;
+    height: 100%;
     border-radius: 24px;
     background: linear-gradient(to right, #00313C 0%, #00252D 100%);
     padding: 25px;
@@ -16,6 +17,9 @@
         justify-content: space-between;
 
         .name{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             span{
                 font-family: 'Quicksand', sans-serif;
                 font-weight: 500;
@@ -47,12 +51,15 @@
 
     .row-2{
         height: 62px;
-
         display: flex;
         flex-direction: row;
         gap: 32px;
 
         div{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            
             span{
                 font-family: 'Quicksand', sans-serif;
                 font-weight: 500;
@@ -60,19 +67,30 @@
                 color: #F5F4F2;
             }
 
+            // Target the h2.value element specifically
+            h2.value,
             .value{
                 font-family: 'Quicksand', sans-serif;
                 font-weight: bold;
                 font-size: 40px;
                 color: #F5F4F2;
+                margin: 0; // Remove default h2 margins
+                padding: 0; // Remove default h2 padding
+                line-height: 1; // Consistent line height
+                display: flex;
+                align-items: baseline; // Align number and unit baselines
+                gap: 2px; // Small gap between number and unit
 
-                .unit {
+                // Target the unit span inside value
+                .unit,
+                span.unit {
                     font-family: 'Onest', sans-serif;
                     font-size: 20px; 
                     font-weight: 500; 
                     color: #40C1AC;
-                    margin-left: 2px; 
-                  }
+                    margin-left: 0; // Remove margin, use gap instead
+                    line-height: 1; // Match parent line height
+                }
             }
         }
     }
@@ -125,9 +143,176 @@
             }
         }
     }
+
+    @media (min-width: 1024px) { // 1024x600
+        height: 205px; // reduced height
+            gap: 20px; // reduce gap between rows
+    
+            .row-1 {
+                height: 50px; // adjust row height
+                .name {
+                    span {
+                        font-size: 14px; // smaller label
+                    }
+                    .value {
+                        font-size: 32px; // scale down main value
+                    }
+                }
+    
+                .option {
+                    gap: 2px;
+                    .circle {
+                        width: 6px;
+                        height: 6px;
+                    }
+                }
+            }
+    
+            .row-2 {
+                height: 50px; // scale down row height
+                gap: 24px; // reduce gap between columns
+                div {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+
+                    span {
+                        font-size: 14px; // smaller label
+                    }
+                    
+                    h2.value,
+                    .value {
+                        font-size: 32px;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        line-height: 1;
+                        display: flex;
+                        align-items: baseline;
+                        gap: 2px;
+                        
+                        .unit,
+                        span.unit {
+                            font-size: 16px;
+                            line-height: 1;
+                            margin-left: 0;
+                        }
+                    }
+                }
+            }
+    
+            .row-3 {
+                height: 18px; // slightly smaller
+                .prev, .next {
+                    gap: 6px;
+                    span {
+                        font-size: 14px; // smaller text
+                    }
+                    .left-arrow, .right-arrow {
+                        width: 0.9em;
+                        height: 0.9em;
+                    }
+                }
+            }
+    }
+
+    // 1280px screens: restore “normal” desktop values
+    @media (min-width: 1280px) {
+        max-width: 360px;
+        height: 100%;
+        padding: 25px;
+        gap: 32px;
+
+        .row-1 { height: 62px;
+            .name {
+                span { font-size: 16px; }
+                .value { font-size: 40px; }
+            }
+            .option .circle { width: 7.24px; height: 7.24px; }
+        }
+
+        .row-2 { height: 62px; gap: 32px;
+            div {
+                display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+                span { font-size: 16px; }
+                
+                h2.value,
+                .value { 
+                    font-size: 40px;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    line-height: 1;
+                    display: flex;
+                    align-items: baseline;
+                    gap: 2px;
+                    
+                    .unit,
+                    span.unit { 
+                        font-size: 20px;
+                        line-height: 1;
+                        margin-left: 0;
+                    }
+                }
+            }
+        }
+
+        .row-3 { height: 20px;
+            .prev, .next {
+                gap: 8px;
+                span { font-size: 16px; }
+                .left-arrow, .right-arrow { width: 1em; height: 1em; }
+            }
+        }
+    }
 }
 
 .prev.disabled, .next.disabled {
     opacity: 0.5;
     pointer-events: none;
+  }
+
+/* Wrapper controls positioning */
+.option-wrapper {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+  }
+  
+ /* Dropdown */
+.options-dropdown {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 120px;
+    max-width: 160px;
+    
+    background: linear-gradient(135deg, #40C1AC, #2FA695);
+    border-radius: 12px 0 12px 12px;
+    box-shadow: 
+      0 8px 25px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(64, 193, 172, 0.2);
+    z-index: 100;
+    
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+  
+  /* Items */
+  .options-dropdown button {
+    width: 100%;
+    padding: 12px 14px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    color: #F5F4F2;
+  
+    &:hover {
+      background: #f5f5f5;
+    }
   }

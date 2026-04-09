@@ -1,9 +1,9 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-consumption-bar',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './consumption-bar.component.html',
   styleUrl: './consumption-bar.component.scss'
 })

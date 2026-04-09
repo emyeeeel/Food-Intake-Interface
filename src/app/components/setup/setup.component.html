@@ -1,0 +1,61 @@
+<div class="setup-container" *ngIf="!loading">
+  <div class="setup-card">
+    <h2 class="setup-title">設定頁面</h2>
+
+    <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()" class="setup-form">
+      <div class="form-group">
+        <label>長照中心名稱</label>
+        <input type="text" formControlName="careCenterName" />
+      </div>
+
+      <div class="form-group">
+        <label>餐期循環開始日期</label>
+        <input type="date" formControlName="mealCycleStartDate" />
+      </div>
+
+      <div class="form-group">
+        <label>午餐開始時間</label>
+        <input type="time" formControlName="lunchStart" />
+      </div>
+
+      <div class="form-group">
+        <label>晚餐開始時間</label>
+        <input type="time" formControlName="dinnerStart" />
+      </div>
+
+      <div class="form-group">
+        <label>午餐結束時間</label>
+        <input type="time" formControlName="lunchEnd" />
+      </div>
+
+      <div class="form-group">
+        <label>晚餐結束時間</label>
+        <input type="time" formControlName="dinnerEnd" />
+      </div>
+
+      <div class="form-group">
+        <label>餐期循環天數</label>
+        <input type="number" formControlName="mealCycleLength" min="1" />
+      </div>
+
+      <div class="form-group">
+        <label>機器 IP 位址</label>
+        <input
+          type="text"
+          formControlName="machineIp"
+          placeholder="e.g. http://192.168.0.174:8000"
+        />
+        <small class="field-error" *ngIf="machineIpInvalid">
+          請輸入有效的網址格式，例如 http://192.168.0.174:8000
+        </small>
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="primary" [disabled]="saving">儲存設定</button>
+      </div>
+    </form>
+
+    <div *ngIf="error" class="error">{{ error }}</div>
+    <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+  </div>
+</div>

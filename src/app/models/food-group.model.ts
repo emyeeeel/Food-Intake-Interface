@@ -1,5 +1,5 @@
-export interface FoodGroup{
+export interface FoodGroup {
     id: number;
     name: string;
-    description?: string;
-}
+    description: string;
+  }

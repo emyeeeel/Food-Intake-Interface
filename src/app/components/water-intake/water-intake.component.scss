@@ -1,0 +1,148 @@
+.main-container {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    border-radius: 24px;
+    background-color: #E6FEF9;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .row-1 {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        min-width: 0;
+        flex-shrink: 0; // Prevents shrinking
+
+        .title {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+            min-width: 0;
+
+            span {
+                font-family: 'Quicksand', sans-serif;
+                font-weight: 500;
+                font-size: 16px;
+                color: #00313C;
+            }
+
+            .value {
+                font-family: 'Quicksand', sans-serif;
+                font-weight: bold;
+                font-size: 28px;
+                color: #00313C;
+                min-width: 0;
+                overflow-wrap: break-word;
+
+                .unit {
+                    font-family: 'Onest', sans-serif;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #40C1AC;
+                    margin-left: 2px;
+                }
+            }
+        }
+        // Remove margin-bottom: 10px; since we're using gap
+    }
+
+    .row-2 {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        min-width: 0;
+        flex: 1; // This makes row-2 fill remaining space
+        min-height: 0; // Important for flex children
+
+        div {
+            flex: 1 1 0;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            overflow-wrap: break-word;
+            padding-top: 10px;
+
+            span {
+                font-family: 'Quicksand', sans-serif;
+                font-weight: 500;
+                font-size: 14px;
+                color: #00313C;
+            }
+
+            .value {
+                font-family: 'Quicksand', sans-serif;
+                font-weight: bold;
+                font-size: 28px;
+                color: #00313C;
+                min-width: 0;
+
+                .unit {
+                    font-family: 'Onest', sans-serif;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #40C1AC;
+                    margin-left: 2px;
+                }
+            }
+        }
+    }
+
+    .row-3 {
+        width: 100%;
+        color: #40C1AC;
+        flex-shrink: 0; // Prevents shrinking
+    }
+
+    @media (min-width: 1024px) {
+        max-width: 190px;
+        // justify-content: space-between;
+
+        .row-2 {
+            .reco-intake{
+                .value { 
+                    font-size: 60px; 
+                    .unit { font-size: 20px; } 
+                }
+            }
+        }
+
+        .row-3{
+            span{
+                font-size: 10px;
+            }
+        }
+    }
+
+    @media (min-width: 1280px) {
+        min-width: 228px;
+        height: 260px;
+        padding: 25px;
+        gap: 24px;
+
+        .row-1 {
+            .title {
+                span { font-size: 16px; }
+                .value { 
+                    font-size: 40px;
+                    .unit { font-size: 20px; }
+                }
+            }
+            .option .circle { width: 7.24px; height: 7.24px; }
+        }
+
+        .row-2 {
+            .reco-intake{
+                span { font-size: 16px; }
+                .value { 
+                    font-size: 40px; 
+                    .unit { font-size: 20px; } 
+                }
+            }
+        }
+
+        .row-3 { height: 24px; width: 88px; }
+    }
+}

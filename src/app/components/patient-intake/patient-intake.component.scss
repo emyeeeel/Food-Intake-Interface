@@ -1,0 +1,318 @@
+.patient-intake{
+  width: 100%;
+  background-color: #CAECE5;
+  box-sizing: border-box;
+  font-family: 'Quicksand', sans-serif;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+  .header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #FFFFFF, #F8FFFE);
+    padding: 8px 12px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 49, 60, 0.08);
+    border: 1px solid #B8D8D3;
+    flex-shrink: 0;
+
+    h2{
+        color: #00313C;
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        margin: 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+  }
+
+  // Loading
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 10px;
+  color: #00313C;
+  flex: 1;
+
+  .loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #E0F7F4;
+    border-top: 2px solid #40C1AC;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+  }
+}
+
+// Error
+.error {
+  background: linear-gradient(135deg, #FFE6E6, #FFF0F0);
+  border: 1px solid #FFB3B3;
+  color: #CC0000;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+// Patient Info Card
+.patient-info {
+  background: linear-gradient(135deg, #FFFFFF, #F8FFFE);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0, 49, 60, 0.08);
+  border: 1px solid #B8D8D3;
+
+  h3 {
+    margin: 0;
+    color: #00313C;
+    font-size: 13px;
+    font-weight: 700;
+  }
+}
+
+// No data
+.no-meals {
+  text-align: center;
+  padding: 30px 15px;
+  color: #7A9B96;
+  background: white;
+  border-radius: 8px;
+  font-style: italic;
+  font-size: 12px;
+}
+
+// Table container (same as print-all-meals)
+.meals-table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 49, 60, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-wrapper {
+  overflow-y: auto;
+}
+
+.meals-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background: linear-gradient(135deg, #40C1AC, #2FA695);
+    color: white;
+
+    th {
+      padding: 8px 6px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #E0F7F4;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background-color: #F8FFFE;
+      }
+    }
+
+    td {
+      padding: 8px 6px;
+      font-size: 11px;
+      color: #01262E;
+      vertical-align: middle;
+
+      &.meal-name {
+        font-weight: 600;
+        color: #00313C;
+      }
+
+      &.meal-time {
+        font-weight: 500;
+      }
+
+      &.day-cycle {
+        color: #40C1AC;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Animation
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  gap: 8px;
+  border-top: 1px solid #E6FEF9;
+  background: #ffffff;
+}
+
+.page-size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #00313C;
+}
+
+.page-size select {
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #B8D8D3;
+  background: white;
+  font-size: 12px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.controls button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+  background: #40C1AC;
+  color: white;
+  font-weight: 600;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.controls button:disabled {
+  background: #B8D8D3;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.controls span {
+  font-size: 12px;
+  color: #00313C;
+  font-weight: 600;
+}
+
+.btn-download-excel {
+  background: linear-gradient(135deg, #40C1AC, #2FA695);
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 10px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(64, 193, 172, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Quicksand', sans-serif;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2FA695, #268B7A);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(64, 193, 172, 0.3);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(64, 193, 172, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #9CA3AF !important;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .download-icon {
+    font-size: 10px;
+    transition: transform 0.3s ease;
+  }
+
+  .download-spinner {
+    width: 10px;
+    height: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: 1px solid white;
+    border-radius: 50%;
+    animation: downloadSpin 1s linear infinite;
+  }
+
+  &:hover:not(:disabled) .download-icon {
+    transform: scale(1.1);
+  }
+}
+
+.image-cell {
+  vertical-align: middle;
+}
+
+.intake-image {
+  max-width: 80px;
+  max-height: 80px;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+}
+
+  .view-more {
+    font-family: "Quicksand", sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    color: rgb(230, 254, 249);;
+    background-color: rgb(64, 193, 172);
+    padding: 0 8px;
+    border-radius: 7px;
+    text-align: center;
+    max-width: 75px;
+    margin: 0 auto; // Center the view-more div within its cell
+  }
+
+  .view-more {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}

@@ -1,18 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ConsumptionBarComponent } from "../consumption-bar/consumption-bar.component";
-import { CommonModule } from '@angular/common';
+import { LTCPatient } from '../../models/ltc-patient.model';
+import { PatientService } from '../../services/patient.service';
+
 
 @Component({
   selector: 'app-daily-consumption',
-  imports: [ConsumptionBarComponent, CommonModule],
+  imports: [ConsumptionBarComponent],
   templateUrl: './daily-consumption.component.html',
   styleUrl: './daily-consumption.component.scss'
 })
-export class DailyConsumptionComponent {
+export class DailyConsumptionComponent implements OnInit {
+  patients: LTCPatient[] = [];  
   dailyPercentages: number[] = [];
 
+  constructor(private patientService: PatientService) {}
+
   ngOnInit(): void {
+    this.loadLTCPatients()
     this.generateRandomPercentages();
+  }
+
+  private loadLTCPatients(): void {
+    this.patientService.getLTCPatients().subscribe(
+      (patients) => {
+        this.patients = patients;  
+      },
+      (error) => {
+        console.error('Error fetching LTC patients:', error);
+      }
+    );
   }
 
   generateRandomPercentages(): void {

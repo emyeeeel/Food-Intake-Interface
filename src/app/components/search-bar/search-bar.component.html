@@ -1,15 +1,17 @@
 <div class="search" (click)="toggleSearch()">
-    <img src="assets/icons/search-icon.svg" alt="Search Icon" class="search-icon">
-    <input 
-        *ngIf="isSearchActive" 
-        type="text" 
-        class="search-input"
-        placeholder="Search here"
-        [(ngModel)]="searchQuery"
-        (blur)="onSearchBlur()"
-        (keyup.enter)="performSearch()"
-        #searchInput>
-    <span 
-        *ngIf="!isSearchActive" 
-        class="search-text">搜尋</span>
+  <img src="assets/icons/search-icon.svg" alt="Search Icon" class="search-icon">
+  @if (isSearchActive) {
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Search here"
+      [(ngModel)]="searchQuery"
+      (blur)="onSearchBlur()"
+      (keyup.enter)="performSearch()"
+      #searchInput>
+  }
+  @if (!isSearchActive) {
+    <span
+    class="search-text">搜尋</span>
+  }
 </div>

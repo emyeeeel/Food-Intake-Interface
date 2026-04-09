@@ -1,124 +1,206 @@
 <div class="patient-info-container">
-    <app-menu-bar></app-menu-bar>
+  <app-menu-bar (mobileMenuToggle)="onMobileMenuToggle($event)"></app-menu-bar>
 
-    <!-- DEFAULT VIEW -->
-    <ng-container *ngIf="currentView === 'default'">
-        <div class="main-container">
-            <div class="row-1">
-                <app-back></app-back>
-                <div class="search-bar">
-                    <app-search-bar></app-search-bar>
-                </div>
-                <app-notif></app-notif>
-            </div>
-
-            <div class="row-2">
-                <app-patient-card 
-                    [patientId]="patientId"
-                    (patientIdChange)="onPatientIdChange($event)">
-                </app-patient-card>
-                <app-bmi-card [patientId]="patientId"></app-bmi-card>
-                <app-bp-card [patientId]="patientId"></app-bp-card>
-            </div>
-
-            <div class="row-3">
-                <app-main-options 
-                    iconSrc="assets/icons/add-icon.svg"
-                    optionText="新增紀錄"
-                    (click)="navigateToAddRecord()">
-                </app-main-options>
-
-                <app-main-options 
-                    iconSrc="assets/icons/all-icon.svg"
-                    optionText="檢視所有紀錄"
-                    (click)="navigateToAllRecord()">
-                </app-main-options>
-
-                <app-main-options 
-                    iconSrc="assets/icons/print-icon.svg"
-                    optionText="列印紀錄"
-                    (click)="navigateToPrintRecord()">
-                </app-main-options>
-            </div>
-
-            <div class="row-4">
-                <div class="text-title">膳食安排</div>
-                <app-date-container></app-date-container>
-            </div>
-
-            <div class="row-5">
-                <app-meal-assignment
-                    mealType="lunch"
-                    [patientId]="patientId"
-                    [dayCycle]="1"
-                    (mealsStatus)="onLunchStatus($event)">
-                </app-meal-assignment>
-
-                <app-meal-assignment
-                    mealType="dinner"
-                    [patientId]="patientId"
-                    [dayCycle]="1"
-                    (mealsStatus)="onDinnerStatus($event)">
-                </app-meal-assignment>
-
-                <ng-container *ngIf="!lunchHasMeal && !dinnerHasMeal">
-                    <div class="no-meals-container">
-                        <div class="no-meals-text">
-                            <p>No meals assigned for this patient.</p>
-                        </div>
-                    </div>
-                </ng-container>
-            </div>
+  <!-- DEFAULT VIEW -->
+  @if (currentView === 'default') {
+    <div class="main-container">
+      <div class="row-1">
+        <app-back></app-back>
+        <div class="search-bar">
+          <app-search-bar></app-search-bar>
         </div>
-    </ng-container>
-
-    <!-- ADD RECORD VIEW -->
-    <ng-container *ngIf="currentView === 'addRecord'">
-        <div class="main-container">
-            <div class="row-1">
-                <app-back (click)="currentView = 'default'"></app-back>
-                <div class="search-bar">
-                    <app-search-bar></app-search-bar>
-                </div>
-                <app-notif></app-notif>
+        <app-notif></app-notif>
+      </div>
+      <div class="row-2">
+        <app-patient-card
+          [patientId]="patientId"
+          (patientIdChange)="onPatientIdChange($event)">
+        </app-patient-card>
+        <div class="medical-data">
+          <app-water-intake></app-water-intake>
+          <app-protein-intake></app-protein-intake>
+        </div>
+      </div>
+      <div class="row-3">
+        <app-main-options
+          iconSrc="assets/icons/add-icon.svg"
+          optionText="新增住民"
+          backgroundColor="#00313C"
+          textColor="#E6FEF9"
+          (click)="navigateToAddRecord()">
+        </app-main-options>
+        <app-main-options
+          iconSrc="assets/icons/all-icon.svg"
+          optionText="檢視所有住民"
+          backgroundColor="#40C1AC"
+          textColor="#E6FEF9"
+          (click)="navigateToAllRecord()">
+        </app-main-options>
+        <app-main-options
+          iconSrc="assets/icons/print-icon.svg"
+          optionText="列印紀錄"
+          backgroundColor="#E6FEF9"
+          textColor="#00313C"
+          (click)="navigateToPrintRecord()">
+        </app-main-options>
+      </div>
+      <div class="row-4">
+        <div class="text-title">膳食安排</div>
+        <app-date-container></app-date-container>
+      </div>
+      <div class="row-5">
+        <app-meal-assignment
+          mealType="lunch"
+          [patientId]="patientId"
+          (mealsStatus)="onLunchStatus($event)">
+        </app-meal-assignment>
+        <app-meal-assignment
+          mealType="dinner"
+          [patientId]="patientId"
+          (mealsStatus)="onDinnerStatus($event)">
+        </app-meal-assignment>
+        @if (!lunchHasMeal && !dinnerHasMeal) {
+          <div class="no-meals-container">
+            <div class="no-meals-text">
+              <p>No meals assigned for this patient.</p>
             </div>
-            <!-- Add your add-record form content here -->
-        </div>
-    </ng-container>
+          </div>
+        }
+      </div>
+    </div>
+  }
 
-    <!-- SEE ALL RECORD VIEW -->
-    <ng-container *ngIf="currentView === 'allRecord'">
-        <div class="main-container">
-            <div class="row-1">
-                <app-back (click)="currentView = 'default'"></app-back>
-                <div class="search-bar">
-                    <app-search-bar></app-search-bar>
-                </div>
-                <app-notif></app-notif>
-            </div>
-            <!-- Add your add-record form content here -->
+  <!-- ADD RECORD VIEW -->
+  @if (currentView === 'addRecord') {
+    <div class="main-container">
+      <div class="row-1">
+        <app-back (click)="currentView = 'default'"></app-back>
+        <div class="search-bar">
+          <app-search-bar></app-search-bar>
         </div>
-    </ng-container>
+        <app-notif></app-notif>
+      </div>
+      <app-add-patient/>
+    </div>
+  }
 
-    <!-- PRINT RECORD VIEW -->
-    <ng-container *ngIf="currentView === 'printRecord'">
-        <div class="main-container">
-            <div class="row-1">
-                <app-back (click)="currentView = 'default'"></app-back>
-                <div class="search-bar">
-                    <app-search-bar></app-search-bar>
-                </div>
-                <app-notif></app-notif>
-            </div>
-            <!-- Add your print-record form content here -->
+  <!-- SEE ALL RECORD VIEW -->
+  @if (currentView === 'allRecord') {
+    <div class="main-container">
+      <div class="row-1">
+        <app-back (click)="currentView = 'default'"></app-back>
+        <div class="search-bar">
+          <app-search-bar></app-search-bar>
         </div>
-    </ng-container>
+        <app-notif></app-notif>
+      </div>
+      <app-display-patient></app-display-patient>
+    </div>
+  }
 
-    <!-- PATIENT DETAILS VIEW -->
-    <ng-container *ngIf="currentView === 'patientRecord'">
-        <div class="patient-container">
-            <app-patient-details [patientId]="patientId"></app-patient-details>
+  <!-- PRINT RECORD VIEW -->
+  @if (currentView === 'printRecord') {
+    <div class="main-container">
+      <div class="row-1">
+        <app-back (click)="currentView = 'default'"></app-back>
+        <div class="search-bar">
+          <app-search-bar></app-search-bar>
         </div>
-    </ng-container>
+        <app-notif></app-notif>
+      </div>
+      <app-print-all-patients></app-print-all-patients>
+    </div>
+  }
 
+  <!-- PATIENT DETAILS VIEW -->
+  @if (currentView === 'patientRecord') {
+    <div class="main-container">
+      <div class="row-1">
+        <app-back (click)="currentView = 'default'"></app-back>
+        <div class="search-bar">
+          <app-search-bar></app-search-bar>
+        </div>
+        <app-notif></app-notif>
+      </div>
+      <div class="patient-container">
+        <app-patient-details [patientId]="patientId"></app-patient-details>
+      </div>
+    </div>
+  }
+
+  @if (currentView === 'editRecord') {
+    <div class="main-container">
+      <div class="row-1">
+        <app-back (click)="currentView = 'default'"></app-back>
+        <div class="search-bar">
+          <app-search-bar></app-search-bar>
+        </div>
+        <app-notif></app-notif>
+      </div>
+      <div class="edit-record-view">
+        <!-- Edit patient form component -->
+        <app-edit-patient></app-edit-patient>
+      </div>
+    </div>
+  }
+
+  @if (currentView === 'mealsRecord') {
+    <div class="main-container">
+      <div class="row-1">
+        <app-back (click)="currentView = 'default'"></app-back>
+        <div class="search-bar">
+          <app-search-bar></app-search-bar>
+        </div>
+        <app-notif></app-notif>
+      </div>
+      <div class="edit-record-view">
+        <app-patient-meals></app-patient-meals>
+      </div>
+    </div>
+  }
+
+  @if (currentView === 'intakesRecord') {
+    <div class="main-container">
+      <div class="row-1">
+        <app-back (click)="currentView = 'default'"></app-back>
+        <div class="search-bar">
+          <app-search-bar></app-search-bar>
+        </div>
+        <app-notif></app-notif>
+      </div>
+      <div class="edit-record-view">
+        <app-patient-intake></app-patient-intake>
+      </div>
+    </div>
+  }
+
+  @if (currentView === 'analysis') {
+    <div class="main-container">
+      <div class="row-1">
+        <app-back (click)="currentView = 'default'"></app-back>
+        <div class="search-bar">
+          <app-search-bar></app-search-bar>
+        </div>
+        <app-notif></app-notif>
+      </div>
+      <div class="patient-analysis">
+        <app-patient-analysis></app-patient-analysis>
+      </div>
+    </div>
+  }
+
+  @if (currentView === 'intake-report') {
+    <div class="main-container">
+      <div class="row-1">
+        <app-back (click)="currentView = 'default'"></app-back>
+        <div class="search-bar">
+          <app-search-bar></app-search-bar>
+        </div>
+        <app-notif></app-notif>
+      </div>
+      <div class="intake-analysis">
+        <app-view-intake></app-view-intake>
+      </div>
+    </div>
+  }
 </div>

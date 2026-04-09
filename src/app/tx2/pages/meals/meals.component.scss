@@ -1,0 +1,194 @@
+:host {
+    display: block;
+    // background-color: #2d9f8c;
+    background-color: #CAECE5;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+    font-family: 'Quicksand', sans-serif;
+  }
+  
+  /* =========================================================
+     HOME CONTAINER
+  ========================================================= */
+  .home-container {
+    display: flex;
+    flex-direction: column;
+  
+    @media (min-width: 481px) {
+      flex-direction: row;
+    }
+  }
+
+  .main-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 20px 25px;
+    gap: 25px;
+    overflow-x: hidden;
+    transition: filter 0.3s ease, pointer-events 0.3s ease;
+
+  
+    /* Global container width constraint */
+    div {
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+  
+    app-add-meal {
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+  }
+  
+  app-display-meal{
+    width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+  }
+  
+  app-print-all-meals{
+    width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+  }
+  
+  app-edit-meal{
+    width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+  }
+  
+  app-show-meal{
+    width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+  }
+}
+
+.row-3 {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  justify-content: flex-start;
+  flex-wrap: wrap;           /* allow wrap on small screens */
+  align-items: stretch;      /* make children fill row width */
+  
+
+  > * {
+    flex: 1 1 100%;          /* full width on mobile */
+    min-width: 0;            /* prevent overflow */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 481px) {
+    flex-direction: row;     /* horizontal layout on tablet+ */
+    gap: 15px;
+
+    > * {
+      flex: 1 1 0;           /* shrink/grow proportionally */
+      min-width: 0;          /* ensures content stays inside container */
+    }
+  }
+
+  @media (min-width: 1025px) {
+    gap: 20px;
+
+    > * {
+      flex: 1 1 0;
+      max-width: 300px;      /* optional: limit card width to avoid overflow */
+    }
+  }
+
+  @media (min-width: 1280px) {
+    
+
+    > * {
+      max-width: 340px;      /* slightly wider on larger desktops */
+    }
+  }
+}
+
+ /* =========================================================
+     ROW 4 — Recent Intake Title + Date
+  ========================================================== */
+  .row-4 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+
+    .text-title {
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      color: #00313C;
+      white-space: nowrap;
+
+      @media (min-width: 481px) {
+        font-size: 22px;
+      }
+
+      @media (min-width: 1025px) {
+        font-size: 24px;
+      }
+    }
+
+  }
+
+  .row-5 {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    // border: 1px solid red;
+
+    > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    @media (min-width: 481px) {
+      flex-direction: row;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 1025px) {
+      gap: 20px;
+      flex-wrap: nowrap;
+
+      > * {
+        /* Optional: clamp log card height similar to homepage row-4 */
+        height: clamp(150px, 20vh, 220px);
+      }
+    }
+  
+    /* DESKTOP – evenly distributed with spacing */
+    @media (min-width: 1025px) {
+      flex-direction: row;
+      flex-wrap: nowrap;
+      gap: 25px;
+  
+      > app-meal-item {
+        flex: 1 1 0;       // evenly take available space
+        min-width: 300px;  // prevents shrinking too much
+        max-width: none;   // removes restriction from .meal-item max-width
+      }
+    }
+  }
+
+  .large-snackbar {
+    max-width: 700px;
+    padding: 24px 32px;
+  }
+  

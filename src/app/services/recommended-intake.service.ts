@@ -2,16 +2,25 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RecommendedIntakeApiResponse } from '../models/recommended-intake-api.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecommendedIntakeService {
-  private apiUrl = 'http://127.0.0.1:8000/api/patients/';
+  private baseUrl = environment.apiBaseUrl;
+  private apiUrl = `${this.baseUrl}/api/ltc-patients/`;
 
   constructor(private http: HttpClient) {}
 
+  // getRecommendedIntake(patientId: number): Observable<RecommendedIntakeApiResponse> {
+  //   return this.http.get<RecommendedIntakeApiResponse>(`${this.apiUrl}${patientId}/recommended-intake/`);
+  // }
+
   getRecommendedIntake(patientId: number): Observable<RecommendedIntakeApiResponse> {
-    return this.http.get<RecommendedIntakeApiResponse>(`${this.apiUrl}${patientId}/recommended-intake/`);
+    return this.http.post<RecommendedIntakeApiResponse>(
+      `${this.apiUrl}${patientId}/recommended-intake/`,
+      {} // required body
+    );
   }
 }

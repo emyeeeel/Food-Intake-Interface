@@ -1,0 +1,20 @@
+<div class="meals-container">
+
+    <app-header></app-header>
+
+    <div class="main-container">
+          <div class="row-4">
+            <div class="text-title" (click)="showMessage()">
+              本日膳食
+            </div>
+            <app-date-container></app-date-container>
+          </div>
+          <div class="row-5">
+            <app-todays-meal time="午餐"></app-todays-meal>
+            <app-todays-meal time="晚餐"></app-todays-meal>
+          </div>
+    </div>
+
+    
+</div>
+  

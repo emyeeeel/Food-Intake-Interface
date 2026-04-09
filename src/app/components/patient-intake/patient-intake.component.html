@@ -1,0 +1,107 @@
+<div class="patient-intake">
+  <div class="header">
+    <h2>患者食物攝取量</h2>
+    <button
+      class="btn-download-excel"
+      (click)="exportIntakesToExcel()"
+      [disabled]="loading || intakes.length === 0"
+    >
+    <span class="download-icon">📊</span>
+          <span>下載 Excel</span>
+    </button>
+  </div>
+
+   <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <span>正在載入食物攝取紀錄...</span>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error" class="main-content">
+
+    <!-- Patient Info Card -->
+    <div class="patient-info" *ngIf="ltcPatient">
+      <h3>
+        房號 {{ ltcPatient.room_number }} – 床號 {{ ltcPatient.bed_number }}
+      </h3>
+    </div>
+
+    <!-- No Records -->
+    <div class="no-meals" *ngIf="intakes.length === 0">
+      <p>未找到攝取紀錄.</p>
+    </div>
+
+    <!-- Intake Table -->
+    <div class="meals-table-container" *ngIf="intakes.length > 0">
+      <div class="table-wrapper">
+        <table class="meals-table">
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>餐別</th>
+              <th>時間</th>
+              <th>餐期</th>
+              <th>重量 (g)</th>
+              <th>體積 (ml)</th>
+              <th>影像</th>
+              <th>紀錄時間</th>
+              <th>記錄者</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let intake of paginatedIntakes">
+              <td class="day-cycle">{{ getDateForDayCycle(intake.meal_detail!.day_cycle) }}</td>
+              <td class="meal-name">{{ intake.meal_detail!.meal_name }}</td>
+              <td class="meal-time">{{ intake.meal_detail!.meal_time }}</td>
+              <td class="meal-phase">{{ intake.meal_phase }}</td>
+              <td>{{ intake.weight_g || '-' }}</td>
+              <td>{{ getConsumedPercentage(intake) }}</td>
+              <td class="image-cell">
+                <ng-container *ngIf="intake.image; else noImage">
+                  <img
+                    [src]="intake.image"
+                    alt="餐點影像"
+                    class="intake-image"
+                    loading="lazy"
+                  />
+                </ng-container>
+              
+                <ng-template #noImage>
+                  <span>--</span>
+                </ng-template>
+              </td>              
+              <td>{{ intake.recorded_at | date:'h:mm a'  }}</td>
+              <td>{{ intake.recorded_by }}</td>
+              <td><div class="view-more" (click)="navigateToIntakeReport(intake.id)">看更多</div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="pagination" *ngIf="intakes.length > pageSize">
+        <div class="page-size">
+          <label>每頁顯示：</label>
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)">
+            <option *ngFor="let s of pageSizeOptions" [ngValue]="s">{{s}}</option>
+          </select>
+        </div>
+        <div class="controls">
+          <button (click)="firstPage()" [disabled]="currentPage === 1">« 首頁</button>
+          <button (click)="prevPage()" [disabled]="currentPage === 1">‹ 上一頁</button>
+          <span>第 {{ currentPage }} 頁 / 共 {{ totalPages }} 頁</span>
+          <button (click)="nextPage()" [disabled]="currentPage === totalPages">下一頁 ›</button>
+          <button (click)="lastPage()" [disabled]="currentPage === totalPages">尾頁 »</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  

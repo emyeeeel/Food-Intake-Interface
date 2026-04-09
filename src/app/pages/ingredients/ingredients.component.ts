@@ -1,22 +1,27 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router'; // Add Router import if you want navigation
+import { NavigationEnd, Router } from '@angular/router'; // Add Router import if you want navigation
 import { MenuBarComponent } from "../../components/menu-bar/menu-bar.component";
 import { BackComponent } from "../../components/back/back.component";
 import { SearchBarComponent } from "../../components/search-bar/search-bar.component";
 import { NotifComponent } from "../../components/notif/notif.component";
 import { FilterIconComponent } from "../../components/filter-icon/filter-icon.component";
 import { FilterOptionsComponent } from "../../components/filter-options/filter-options.component";
-import { CommonModule } from '@angular/common';
+
 import { MainOptionsComponent } from "../../components/main-options/main-options.component";
 import { IngredientsCategoriesComponent } from "../../components/ingredients-categories/ingredients-categories.component";
+import { filter } from 'rxjs';
+import { DisplayIngredientsComponent } from "../../components/display-ingredients/display-ingredients.component";
+import { PrintAllIngredientsComponent } from '../../components/print-all-ingredients/print-all-ingredients.component';
 
 @Component({
   selector: 'app-ingredients',
-  imports: [CommonModule, MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent, FilterIconComponent, FilterOptionsComponent, MainOptionsComponent, IngredientsCategoriesComponent],
+  imports: [MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent, FilterIconComponent, FilterOptionsComponent, MainOptionsComponent, IngredientsCategoriesComponent, DisplayIngredientsComponent, PrintAllIngredientsComponent],
   templateUrl: './ingredients.component.html',
   styleUrl: './ingredients.component.scss'
 })
 export class IngredientsComponent {
+  isMobileMenuOpen = false; 
+  currentView: string = 'default'; 
   filterOptions: string[] = [
     '低過敏源飲食',
     '高纖維飲食',
@@ -80,6 +85,30 @@ export class IngredientsComponent {
 
   constructor(private router: Router) {} 
 
+  ngOnInit(): void {
+    // Update view on navigation
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.updateCurrentView(event.urlAfterRedirects);
+      });
+
+    // Initial view based on URL
+    this.updateCurrentView(this.router.url);
+  }
+
+  private updateCurrentView(path: string): void {
+    if (path.endsWith('/add') || path === 'add') {
+      this.currentView = 'add';
+    } else if (path.endsWith('/all') || path === 'all') {
+      this.currentView = 'all';
+    } else if (path.endsWith('/print') || path === 'print') {
+      this.currentView = 'print';
+    } else {
+      this.currentView = 'default';
+    }
+  }  
+
   // Method to handle category selection
   onCategorySelected(category: any): void {
     console.log('Selected category:', category);
@@ -101,5 +130,10 @@ export class IngredientsComponent {
   printIngredients(): void {
     console.log('Print Ingredients');
     this.router.navigate(['/ingredients/print']);
+  }
+
+  // Called by MenuBar to toggle main content dimming
+  onMobileMenuToggle(isOpen: boolean) {
+    this.isMobileMenuOpen = isOpen;
   }
 }

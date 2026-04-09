@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-ingredients-categories',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './ingredients-categories.component.html',
   styleUrl: './ingredients-categories.component.scss'
 })

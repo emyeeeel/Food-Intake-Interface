@@ -1,0 +1,99 @@
+<div class="display-intake-container">
+
+  <!-- Header -->
+  <div class="header">
+    <h2>食物攝取紀錄</h2>
+    <div class="header-actions">
+      @if (!isLoading && !error) {
+        <span class="total-count">總計: {{ combinedRecords.length }} 筆紀錄</span>
+      }
+      <button class="btn-refresh" (click)="refreshRecords()" [disabled]="isLoading">
+        @if (!isLoading) { <span>重新整理</span> }
+        @if (isLoading) { <span>載入中...</span> }
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>正在載入紀錄...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error && !isLoading) {
+    <div class="error-state">
+      <div class="error-icon">❌</div>
+      <p>{{ error }}</p>
+      <button class="btn-retry" (click)="refreshRecords()">再試一次</button>
+    </div>
+  }
+
+  <!-- Records -->
+  @if (!isLoading && !error && combinedRecords.length > 0) {
+    <div class="records-container">
+
+      <div class="page-info">
+        <span class="page-indicator">第 {{ currentPage }} 頁，共 {{ totalPages }} 頁</span>
+      </div>
+
+      <div class="records-list">
+        @for (record of paginatedRecords; track record.intake.id) {
+          <app-intake-log
+            [assignedMeal]="
+              record.intake.meal_detail.meal_time + '-' +
+              record.intake.meal_detail.id + '-' +
+              record.intake.meal_phase
+            "
+            [time]="record.intake.meal_detail.meal_time"
+            [weight]="record.intake.weight_g"
+            [percent]="record.intake.volume_ml"
+            [volume]="getFormattedVolume(record)"
+          ></app-intake-log>
+        }
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-container">
+        <div class="pagination-info">
+          <span>顯示 {{ paginatedRecords.length }} / {{ combinedRecords.length }} 筆紀錄</span>
+        </div>
+        <div class="pagination-controls">
+          <div class="nav-buttons">
+            <button class="btn-page btn-first" [disabled]="currentPage === 1" (click)="goToFirstPage()"><<</button>
+            <button class="btn-page btn-prev" [disabled]="currentPage === 1" (click)="goToPreviousPage()"><</button>
+          </div>
+          <div class="page-numbers">
+            @for (page of getVisiblePages(); track page) {
+              <button
+                class="btn-page-number"
+                [class.active]="page === currentPage"
+                [class.ellipsis]="page === '...'"
+                [disabled]="page === '...'"
+                (click)="goToPage(page)">
+                {{ page }}
+              </button>
+            }
+          </div>
+          <div class="nav-buttons">
+            <button class="btn-page btn-next" [disabled]="currentPage === totalPages" (click)="goToNextPage()">></button>
+            <button class="btn-page btn-last" [disabled]="currentPage === totalPages" (click)="goToLastPage()">>></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <!-- Empty -->
+  @if (!isLoading && !error && combinedRecords.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">🍽️</div>
+      <h3>尚無紀錄</h3>
+      <p>目前沒有任何食物攝取紀錄</p>
+    </div>
+  }
+
+</div>

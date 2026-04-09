@@ -1,76 +1,291 @@
 :host {
-    display: block;
-    background-color: #CAECE5;
-    min-height: 100vh;
-    width: 100%;
-  }
-  
-  .patient-info-container {
-    display: flex;
+  display: block;
+  background-color: #CAECE5;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* =========================================================
+   MEAL CATALOG CONTAINER
+========================================================= */
+.patient-info-container {
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 481px) {
     flex-direction: row;
   }
+} 
+
+.patient-container{
+  width: 100%;
+}
+
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  gap: 15px;
+  overflow-x: hidden;
+  transition: filter 0.3s ease, pointer-events 0.3s ease;
+
+  @media (min-width: 481px) {
+    padding: 30px;
+    gap: 10px;
+  }
+
+  @media (min-width: 1025px) {
+    padding: 35px 20px;
+    gap: 25px;
+  }
+
+  /* Global container width constraint */
+  div {
+    width: 100%;
+    max-width: 883px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  app-add-patient{
+    width: 100%;
+    max-width: 883px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  app-display-patient{
+    width: 100%;
+    max-width: 883px;
+    margin: 0 auto;
+    box-sizing: border-box;    
+  }
+
+  app-print-all-patients{
+    width: 100%;
+    max-width: 883px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
   
-  .main-container {
-    flex: 1;
-    height: 100vh;
+  &.mobile-menu-open {
+    filter: brightness(0.7);
+    pointer-events: none;
+  }
+
+  /* =========================================================
+     ROW 1 — Search + Notification
+  ========================================================= */
+  .row-1 {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    padding: 40px 0;
-  
-    div {
-      width: 883px;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
+    gap: 10px;
+    height: 44px; 
+
+    @media (min-width: 481px) {
+      gap: 15px;
     }
-  }
 
-  .row-1{
-    gap: 15px;
-  }
-
-  .search-bar{
-    flex: 1; 
-      
+    .search-bar {
+      flex: 1;
+      min-width: 0;
+      height: 100%; 
       app-search-bar {
         width: 100%;
         height: 100%;
         display: block;
       }
-   }
-
-   .row-2{
-    height: 260px;
-    margin-top: 42px;
-    margin-bottom: 30px;
-   }
-
-  //  .row-3{
-
-  //  }
-
-   .row-4{
-    height: 57px;
-    justify-content: space-between;
-    margin-top: 32px;
-    margin-bottom: 32px;
-  
-    .text-title{
-      font-family: 'Quicksand', sans-serif;
-      font-weight: bold;
-      font-size: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: left;
-      color: #00313C;
     }
-   }
 
-   .row-5{
-    height: 132px;
-    
-   }
+    app-notif {
+      flex-shrink: 0;
+      height: 100%; 
+    }
+  
+    @media (min-width: 768px) {
+      gap: 12px;
+      height: 48px; 
+    }
+  
+    @media (min-width: 1024px) {
+      gap: 15px;
+      height: 45px; 
+    }
+  
+    @media (min-width: 1280px) {
+      gap: 15px;
+      height: 56px; 
+    }
+  }
+
+/* =========================================================
+ ROW 2 — Filter Options 
+========================================================= */
+
+.row-2 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0; 
+
+  app-patient-card {
+    min-width: 0; 
+    flex: 1 1 auto;
+  }
+
+  .medical-data {
+    width: 100%;
+    max-width: 390px;
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+     
+    > * {
+      flex: 1 1 0;
+      min-width: 0;   
+      max-width: 100%;
+      overflow: hidden; 
+    }
+
+    @media (min-width: 1025px) {
+      max-width: none;     
+      width: auto;         
+
+      > * {
+        flex: unset;       
+        min-width: unset;  
+        max-width: unset;  
+        overflow: unset;   
+      }
+    }
+  }
+
+  @media (min-width: 481px) {
+    flex-direction: row;
+    gap: 15px;
+    max-height: 205px;
+  }
+
+  @media (min-width: 1025px) {
+    flex-direction: row;
+    gap: 20px;
+    min-height: 260px;
+  }
+}
+
+ /* =========================================================
+   ROW 3 — Main Options (Content contained)
+========================================================= */
+.row-3 {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  justify-content: flex-start;
+  flex-wrap: wrap;       
+  align-items: stretch;      
+
+  > * {
+    flex: 1 1 100%;          
+    min-width: 0;           
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 481px) {
+    flex-direction: row;    
+    gap: 15px;
+
+    > * {
+      flex: 1 1 0;           
+      min-width: 0;        
+      max-height: 100px;     
+      height: 100%;        
+    }
+  }
+
+  @media (min-width: 1025px) {
+    gap: 20px;
+
+    > * {
+      flex: 1 1 0;
+      max-width: 300px;   
+      max-height: 110px;     
+    }
+  }
+
+  @media (min-width: 1280px) {
+    gap: 25px;
+
+    > * {
+      max-width: 340px;  
+    }
+  }
+}
+
+/* =========================================================
+     ROW 4 — Recent Intake Title + Date
+  ========================================================== */
+  .row-4 {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+
+    .text-title {
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      color: #00313C;
+      white-space: nowrap;
+
+      @media (min-width: 481px) {
+        font-size: 22px;
+      }
+
+      @media (min-width: 1025px) {
+        font-size: 24px;
+      }
+    }
+
+    @media (min-width: 481px) {
+      height: 40px;
+    }
+
+    @media (min-width: 1025px) {
+      height: 52px;
+    }
+  }
+
+  .row-5{
+    width: 100%;
+    // border: 1px solid red;
+    display: flex;
+    gap: 15px;
+    flex-direction: column;
+
+    @media (min-width: 481px) {
+      flex-direction: row;
+      flex: 1 1 100%;
+      min-width: 0;
+      max-height: 120px;
+    }
+
+    @media (min-width: 1025px) {
+      flex-direction: row;
+      justify-content: space-evenly;
+      max-height: 150px;
+    }
+  }
+}
 
 .no-meals-container{
   display: flex;
@@ -85,11 +300,57 @@
     p{
       font-family: 'Quicksand', sans-serif;
       font-weight: bold;
-      font-size: 32px;
+      font-size: 24px;
       display: flex;
       align-items: center;
       justify-content: left;
       color: #00313C;
     }
   }
+}
+
+@media (min-width: 1024px) and (max-width: 1024px) and (min-height: 600px) and (max-height: 600px) {
+  // Add this with higher specificity
+.patient-info-container .main-container .row-4 {
+  ::ng-deep app-date-container {
+    .main-container .popup-container {
+      position: absolute !important;
+      top: auto !important;
+      bottom: calc(100% + 10px) !important; // Position above with 10px gap
+      left: 0 !important;
+      right: auto !important;
+      width: 200px !important;
+      z-index: 99999 !important;
+      
+      // Ensure it shows above everything
+      transform: none !important;
+      
+      // Animation
+      animation: popupSlideUp 0.3s ease-out !important;
+    }
+  }
+}
+
+@keyframes popupSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Adjust row-4 spacing
+.row-4 {
+  // Add to existing styles
+  position: relative;
+  margin-top: 50px; // Space for popup above
+  
+  @media (max-width: 480px) {
+    margin-top: 45px;
+  }
+}
+
 }

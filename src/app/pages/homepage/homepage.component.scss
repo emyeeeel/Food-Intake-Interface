@@ -3,37 +3,75 @@
   background-color: #CAECE5;
   min-height: 100vh;
   width: 100%;
+  overflow-x: hidden;
 }
 
+/* =========================================================
+   HOME CONTAINER
+========================================================= */
 .home-container {
   display: flex;
-  flex-direction: row;
-}
-
-.main-container {
-  flex: 1;
-  height: 100vh;
-  display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 40px 0;
 
-  div {
-    width: 883px;
+  @media (min-width: 481px) {
+    flex-direction: row;
   }
 }
 
+/* =========================================================
+   MAIN CONTAINER
+========================================================= */
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  gap: 15px;
+  overflow-x: hidden;
+  transition: filter 0.3s ease, pointer-events 0.3s ease;
+
+  @media (min-width: 481px) {
+    padding: 30px;
+    gap: 20px;
+  }
+
+  @media (min-width: 1025px) {
+    padding: 35px 20px;
+    gap: 25px;
+  }
+
+  /* Global container width constraint */
+  div {
+    width: 100%;
+    max-width: 883px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  &.mobile-menu-open {
+    filter: brightness(0.7);
+    pointer-events: none;
+  }
+
+  /* =========================================================
+     ROW 1 — Search + Notification
+  ========================================================= */
+/* =========================================================
+   ROW 1 — Search + Notification (match notif height)
+========================================================= */
 .row-1 {
-  height: 52px;
   display: flex;
   flex-direction: row;
-  gap: 15px;
-  margin-bottom: 40px;
-
+  align-items: center;
+  gap: 10px;
+  height: 44px; // base mobile height, matches notif
 
   .search-bar {
-    flex: 1; 
-    
+    flex: 1;
+    min-width: 0;
+    height: 100%; // input fills row
     app-search-bar {
       width: 100%;
       height: 100%;
@@ -41,153 +79,136 @@
     }
   }
 
-  .filter {
-    max-width: 132px;
-    background-color: #E6FEF9;
-    gap: 10px;
-  }
-
-
-  // Icon styling
-  .search-icon,
-  .filter-icon {
-    width: 20px;
-    height: 20px;
+  app-notif {
     flex-shrink: 0;
+    height: 100%; // notif fills row
   }
 
-
-  // Text styling
-  .search-text,
-  .filter-text {
-    font-family: 'Quicksand', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    color: #9EC2BD;
-    user-select: none;
+  @media (min-width: 768px) {
+    gap: 12px;
+    height: 48px; // tablet
   }
 
-  .filter-text {
-    color: #9EC2BD;
+  @media (min-width: 1024px) {
+    gap: 15px;
+    height: 45px; // desktop
   }
 
-  // Search input styling
-  .search-input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    outline: none;
-    font-family: 'Quicksand', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    color: #9EC2BD;
-    
-    &::placeholder {
-      color: #9EC2BD;
-    }
+  @media (min-width: 1280px) {
+    gap: 15px;
+    height: 56px; // large desktop
   }
 }
 
-.row-2 {
-  height: 200px;
-  margin-bottom: 35px;
-  border-radius: 26px;
-  background: linear-gradient(to right, #00313C 0%, #00252D 100%);
-  
-  app-welcome-user {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-}
-
-.row-3 {
-  height: 52px;
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 20px;
-  
-
-  .summary-text {
-    display: flex;
-    align-items: center;
-    font-size: 24px;
-    font-weight: 800;
-    font-family: 'Quicksand', sans-serif;
-    color: #00313C;
-  }
-}
-
-.row-4 {
-  height: 336px;
-  display: flex;
-  flex-direction: row;
-  gap: 30px;
-}
-
-.bg-primary {
-  background-color: #00313C;
-}
-
-.bg-secondary {
-  background-color: #E6FEF9;
-}
-
-.bg-dark {
-  background-color: #01262E;
-}
-
-.text-primary {
-  color: #00313C;
-}
-
-.text-white {
-  color: #FFFFFF;
-}
-
-
-@media (max-width: 768px) {
-  .home-container {
-    flex-direction: column;
-  }
-
-  .main-container {
-    height: auto;
-    min-height: 100vh;
-    padding: 20px;
-
-    div {
-      width: 100%;
-    }
-  }
-
-  .row-1,
-  .row-3 {
-    flex-direction: column;
-    height: auto;
-    gap: 10px;
-  }
-
-  .row-4 {
-    flex-direction: column;
-    height: auto;
-    
-    .col-1 {
-      max-width: none;
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .main-container {
-    padding: 15px 10px;
-  }
-
+  /* =========================================================
+     ROW 2 — Welcome User Panel
+  ========================================================= */
   .row-2 {
-    height: 150px;
+    display: flex;
+    flex-direction: column;
+
+    @media (min-width: 481px) {
+      flex-direction: row;
+    }
+
+    app-welcome-user {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      height: auto;
+    }
   }
 
-  .row-3 .summary-text {
-    font-size: 20px;
+  /* =========================================================
+     ROW 3 — Summary Text + Date
+  ========================================================= */
+  .row-3 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    .summary-text {
+      font-size: 20px;
+      font-weight: 800;
+      font-family: 'Quicksand', sans-serif;
+      color: #00313C;
+      white-space: nowrap;
+    }
+
+    @media (min-width: 481px) {
+      .summary-text { font-size: 22px; }
+    }
+
+    @media (min-width: 1025px) {
+      .summary-text { font-size: 24px; }
+    }
+  }
+
+  /* =========================================================
+     ROW 4 — Daily Consumption, Nutrient Intake, Calendar
+     (THE MAIN ISSUE → FIXED HERE)
+  ========================================================= */
+  .row-4 {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    /* --- Allow shrink + avoid overflow --- */
+    > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    @media (min-width: 481px) {
+      gap: 20px;
+    }
+
+    /* =========================================================
+       DESKTOP FIX — ENSURE ROW 4 FITS WITHOUT SCROLLING
+    ========================================================= */
+    @media (min-width: 1024px) {
+      flex-direction: row;
+      gap: 22px;
+      flex-wrap: nowrap;
+
+      /* Each child card (daily consumption, nutrient intake, calendar)
+         gets a height clamp that ALWAYS fits inside view */
+      > * {
+        height: clamp(220px, 26vh, 320px);   /* compressed responsive height */
+        max-height: 220px;               /* prevents row overflow */
+      }
+    }
+
+    /* 1280×800 medium desktop */
+    @media (min-width: 1280px) {
+      gap: 25px;
+
+      > * {
+        height: clamp(350px, 28vh, 340px);
+        max-height: 350px;
+      }
+    }
+
+    /* 1440px and above */
+    @media (min-width: 1440px) {
+      gap: 30px;
+
+      > * {
+        height: clamp(300px, 30vh, 360px);
+        max-height: 360px;
+      }
+    }
   }
 }
+
+/* =========================================================
+   HELPER CLASSES
+========================================================= */
+.bg-primary { background-color: #00313C; }
+.bg-secondary { background-color: #E6FEF9; }
+.bg-dark { background-color: #01262E; }
+
+.text-primary { color: #00313C; }
+.text-white { color: #FFFFFF; }

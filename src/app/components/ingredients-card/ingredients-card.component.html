@@ -1,0 +1,48 @@
+@if (ingredient) {
+  <div class="ingredient-card">
+    <!-- Ingredient Image -->
+    <div class="ingredient-image-container">
+      <img
+        [src]="ingredient.image || defaultImage"
+        [alt]="ingredient.name"
+        class="ingredient-image"
+        (error)="onImageError($event)">
+        @if (!ingredient.image) {
+          <div class="image-placeholder">
+            <span class="placeholder-text">{{ ingredient.name.charAt(0).toUpperCase() }}</span>
+          </div>
+        }
+      </div>
+      <!-- Ingredient Information -->
+      <div class="ingredient-info">
+        <div class="name-and-food-group">
+          <h3 class="ingredient-name">{{ ingredient.name }}</h3>
+          <!-- Food Group -->
+          @if (foodGroup) {
+            <div class="food-group-section">
+              <span class="food-group-badge">{{ foodGroup!.name }}</span>
+            </div>
+          }
+        </div>
+        <!-- Nutrients List -->
+        @if (nutrients && nutrients.length > 0) {
+          <div class="nutrients-section">
+            <h4 class="section-title">營養成分</h4>
+            <div class="nutrients-list">
+              @for (nutrient of nutrients; track nutrient) {
+                <span class="nutrient-tag">
+                  {{ nutrient.name }}
+                </span>
+              }
+            </div>
+          </div>
+        }
+        <!-- No nutrients message -->
+        @if (!ingredient.nutrients || ingredient.nutrients.length === 0) {
+          <div class="no-data">
+            <p>沒有可用的營養數據.</p>
+          </div>
+        }
+      </div>
+    </div>
+  }

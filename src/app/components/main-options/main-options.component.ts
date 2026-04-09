@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-main-options',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './main-options.component.html',
   styleUrl: './main-options.component.scss'
 })

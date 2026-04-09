@@ -1,0 +1,176 @@
+<div class="print-all-patients" (keydown)="onKeyDown($event)">
+  <div class="patients-header">
+    <h2>Patient Records</h2>
+    <div class="header-controls">
+      <div class="print-controls">
+        <button class="btn-print-all" (click)="printAllPatients()" [disabled]="patients.length === 0">
+          Print All Patients
+        </button>
+        <button class="btn-print-selected" (click)="printSelectedPatients()" [disabled]="selectedPatients.size === 0">
+          Print Selected ({{ selectedPatients.size }})
+        </button>
+        <button class="btn-clear-selection" (click)="clearSelection()" [disabled]="selectedPatients.size === 0">
+          Clear Selection
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <span>Loading patients...</span>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error) {
+    <div class="error">
+      {{ error }}
+    </div>
+  }
+
+  <!-- Main Content -->
+  @if (!loading && !error && patients.length > 0) {
+    <div class="main-content">
+      <!-- Patients Table -->
+      <div class="patients-table-container">
+        <!-- Table Controls -->
+        <div class="table-controls">
+          <div class="selection-controls">
+            <button class="btn-select-all"
+              (click)="selectAllCurrentPage()"
+              [disabled]="isAllCurrentPageSelected()">
+              Select All on Page
+            </button>
+            <button class="btn-deselect-all"
+              (click)="deselectAllCurrentPage()"
+              [disabled]="!isAnyCurrentPageSelected()">
+              Deselect All on Page
+            </button>
+          </div>
+        </div>
+        <!-- Table -->
+        <div class="table-wrapper">
+          <table class="patients-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Room</th>
+                <th>Bed</th>
+                <th>Age</th>
+                <th>Sex</th>
+                <th>Height (cm)</th>
+                <th>Weight (kg)</th>
+                <th>Activity Level</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (patient of paginatedPatients; track patient.id) {
+                <tr
+                  [class.selected]="selectedPatients.has(patient.id)"
+                  (click)="togglePatientSelection(patient.id)"
+                  class="patient-row">
+                  <!-- Checkbox -->
+                  <td class="patient-checkbox">
+                    <input type="checkbox"
+                      [checked]="selectedPatients.has(patient.id)"
+                      (click)="$event.stopPropagation()"
+                      (change)="togglePatientSelection(patient.id, $event)">
+                  </td>
+                  <!-- Room -->
+                  <td class="room">{{ patient.room_number }}</td>
+                  <!-- Bed -->
+                  <td class="bed">{{ patient.bed_number }}</td>
+                  <!-- Age -->
+                  <td class="age">{{ patient.age }}</td>
+                  <!-- Sex -->
+                  <td class="sex">{{ patient.sex === 'M' ? 'Male' : patient.sex === 'F' ? 'Female' : patient.sex }}</td>
+                  <!-- Height -->
+                  <td class="height">{{ patient.height_cm }}</td>
+                  <!-- Weight -->
+                  <td class="weight">{{ patient.weight_kg }}</td>
+                  <!-- Activity Level -->
+                  <td class="activity">{{ patient.activity_level }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <!-- Pagination Controls -->
+        @if (totalPages > 1) {
+          <div class="pagination-container">
+            <div class="pagination-info">
+              <span>Showing {{ getStartIndex() }} to {{ getEndIndex() }} of {{ totalPatients }} entries</span>
+            </div>
+            <div class="pagination-controls">
+              <!-- First Page -->
+              <button class="btn-page"
+                (click)="goToFirstPage()"
+                [disabled]="currentPage === 1"
+                title="First Page">
+                ⟪
+              </button>
+              <!-- Previous Page -->
+              <button class="btn-page"
+                (click)="goToPreviousPage()"
+                [disabled]="currentPage === 1"
+                title="Previous Page">
+                ⟨
+              </button>
+              <!-- Page Numbers -->
+              @for (page of getVisiblePages(); track page) {
+                <button
+                  class="btn-page"
+                  [class.active]="page === currentPage"
+                  [disabled]="page === '...'"
+                  (click)="goToPage(page)"
+                  [title]="page === '...' ? '' : 'Go to page ' + page">
+                  {{ page }}
+                </button>
+              }
+              <!-- Next Page -->
+              <button class="btn-page"
+                (click)="goToNextPage()"
+                [disabled]="currentPage === totalPages"
+                title="Next Page">
+                ⟩
+              </button>
+              <!-- Last Page -->
+              <button class="btn-page"
+                (click)="goToLastPage()"
+                [disabled]="currentPage === totalPages"
+                title="Last Page">
+                ⟫
+              </button>
+            </div>
+            <!-- Jump to Page -->
+            <div class="jump-to-page">
+              <label for="targetPage">Go to page:</label>
+              <input type="number"
+                id="targetPage"
+                [(ngModel)]="targetPage"
+                [min]="1"
+                [max]="totalPages"
+                placeholder="Page #"
+                (keyup.enter)="goToTargetPage()">
+              <button class="btn-go"
+                (click)="goToTargetPage()"
+                [disabled]="!targetPage || targetPage < 1 || targetPage > totalPages">
+                Go
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- No Patients State -->
+  @if (!loading && !error && patients.length === 0) {
+    <div class="no-patients">
+      <p>No patients found.</p>
+    </div>
+  }
+</div>
