@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Meal } from '../../models/meal.model';
 import { MealsService } from '../../services/meals.service';
 import { IngredientsService } from '../../services/ingredients.service';
+import { SettingsService } from '../../services/settings.service';
+import { DateService } from '../../services/date.service';
 import { Ingredient } from '../../models/ingredient.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -41,7 +43,9 @@ export class PrintAllMealsComponent implements OnInit {
 
   constructor(
     private mealService: MealsService,
-    private ingredientsService: IngredientsService
+    private ingredientsService: IngredientsService,
+    private settingsService: SettingsService,
+    private dateService: DateService
   ) {}
 
   ngOnInit(): void {
@@ -60,10 +64,14 @@ export class PrintAllMealsComponent implements OnInit {
       next: (response) => {
         console.log('Meals Service Response:', response.meals);
         console.log('Ingredients Service Response:', response.ingredients);
-        
-        this.meals = response.meals;
+
+        // Hard filter by system menu mode. Legacy rows without menu_mode
+        // fall back to 'cyclic'. Matches display-meal behaviour so users
+        // never accidentally print the other mode's meals.
+        const mode = this.settingsService.menuMode;
+        this.meals = response.meals.filter(m => (m.menu_mode ?? 'cyclic') === mode);
         this.ingredients = response.ingredients;
-        this.totalMeals = response.meals.length;
+        this.totalMeals = this.meals.length;
         this.calculatePagination();
         this.updatePaginatedMeals();
         this.loading = false;
@@ -481,19 +489,38 @@ export class PrintAllMealsComponent implements OnInit {
     if (!meal) return '';
 
     const mealTypeMap: Record<string, string> = {
-      '午餐': 'L',    
-      '晚餐': 'D',    
-      '點心': 'S',    
+      '午餐': 'L',
+      '晚餐': 'D',
+      '點心': 'S',
     };
 
     const mealLetter = meal.meal_time && mealTypeMap[meal.meal_time]
       ? mealTypeMap[meal.meal_time]
       : '';
 
+    const mode = meal.menu_mode ?? 'cyclic';
+    if (mode === 'open' && meal.serve_date) {
+      const compactDate = meal.serve_date.replace(/-/g, '');
+      return `${mealLetter}-${compactDate}-${meal.id ?? ''}`;
+    }
+
     const dayCycle = meal.day_cycle ?? '';
     const mealId = meal.id ?? '';
-
     return `${mealLetter}-${dayCycle}-${mealId}`;
+  }
+
+  /** Cell content for the Day/Date column. cyclic → "Day N"; open → "YYYY-MM-DD (週X)". */
+  formatDayLabel(meal: Meal): string {
+    const mode = meal.menu_mode ?? 'cyclic';
+    if (mode === 'open' && meal.serve_date) {
+      return `${meal.serve_date} (${this.dateService.getWeekdayLabel(meal.serve_date)})`;
+    }
+    return `Day ${meal.day_cycle ?? ''}`;
+  }
+
+  /** Column header label adapts to current system mode. */
+  get dayColumnLabel(): string {
+    return this.settingsService.menuMode === 'open' ? 'Date' : 'Day Cycle';
   }
 
   getPrintModeTitle(): string {

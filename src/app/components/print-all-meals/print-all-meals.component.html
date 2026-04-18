@@ -59,7 +59,7 @@
                 <th></th> <!-- Placeholder -->
                 <th>Meal Name</th>
                 <th>Meal Time</th>
-                <th>Day Cycle</th>
+                <th>{{ dayColumnLabel }}</th>
               </tr>
             </thead>
             <tbody>
@@ -81,8 +81,8 @@
                     </td>
                     <!-- Meal Time -->
                     <td class="meal-time">{{ meal.meal_time }}</td>
-                    <!-- Day Cycle -->
-                    <td class="day-cycle">Day {{ meal.day_cycle }}</td>
+                    <!-- Day / Date -->
+                    <td class="day-cycle">{{ formatDayLabel(meal) }}</td>
                   </tr>
                 }
               </tbody>
@@ -190,7 +190,7 @@
                         <th>ID</th>
                         <th>Meal Name</th>
                         <th>Meal Time</th>
-                        <th>Day Cycle</th>
+                        <th>{{ dayColumnLabel }}</th>
                         <th>Plate Type</th>
                         <th>Ingredients</th>
                         <th>Created</th>
@@ -202,7 +202,7 @@
                           <td>{{ meal.id }}</td>
                           <td>{{ meal.meal_name }}</td>
                           <td>{{ meal.meal_time }}</td>
-                          <td>Day {{ meal.day_cycle }}</td>
+                          <td>{{ formatDayLabel(meal) }}</td>
                           <td>{{ meal.plate_type | plateTypeLabel }}</td>
                           <td>{{ getMealIngredients(meal) }}</td>
                           <td>{{ meal.created_at | date:'short' }}</td>
