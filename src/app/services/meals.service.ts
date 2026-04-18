@@ -61,6 +61,20 @@ export class MealsService {
     return this.http.patch<Meal>(`${this.apiUrl}${id}/`, data);
   }
 
+  /** Phase 2 soft-delete. Returns {id, is_archived: true}. Idempotent. */
+  archiveMeal(id: number): Observable<{ id: number; is_archived: boolean }> {
+    return this.http.post<{ id: number; is_archived: boolean }>(
+      `${this.apiUrl}${id}/archive/`, {}
+    );
+  }
+
+  /** Phase 2 soft-delete restore. Returns {id, is_archived: false}. Idempotent. */
+  unarchiveMeal(id: number): Observable<{ id: number; is_archived: boolean }> {
+    return this.http.post<{ id: number; is_archived: boolean }>(
+      `${this.apiUrl}${id}/unarchive/`, {}
+    );
+  }
+
   updateMealCycle(excelFile: File): Observable<any> {
     const url = `${this.baseUrl}/api/add_ltc_meal_cycle/`;
 

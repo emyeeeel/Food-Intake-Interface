@@ -13,6 +13,8 @@
 
     <div class="stats-row">
       <div class="stat"><span class="stat-label">總數</span><span class="stat-value">{{ totalCount }}</span></div>
+      <div class="stat"><span class="stat-label">啟用中</span><span class="stat-value">{{ activeCount }}</span></div>
+      <div class="stat archived"><span class="stat-label">已封存</span><span class="stat-value">{{ archivedCount }}</span></div>
       <div class="stat"><span class="stat-label">循環</span><span class="stat-value">{{ cyclicCount }}</span></div>
       <div class="stat"><span class="stat-label">開放</span><span class="stat-value">{{ openCount }}</span></div>
       <div class="stat unused"><span class="stat-label">無使用</span><span class="stat-value">{{ unusedCount }}</span></div>
@@ -56,6 +58,13 @@
         <button class="chip cyclic-chip" [class.active]="modeFilter === 'cyclic'" (click)="setModeFilter('cyclic')">循環</button>
         <button class="chip open-chip" [class.active]="modeFilter === 'open'" (click)="setModeFilter('open')">開放</button>
       </div>
+
+      <span class="filter-label">狀態：</span>
+      <div class="filter-chips">
+        <button class="chip" [class.active]="archiveFilter === 'active'" (click)="setArchiveFilter('active')">啟用中</button>
+        <button class="chip archived-chip" [class.active]="archiveFilter === 'archived'" (click)="setArchiveFilter('archived')">已封存</button>
+        <button class="chip" [class.active]="archiveFilter === 'all'" (click)="setArchiveFilter('all')">全部</button>
+      </div>
     </div>
 
     <!-- Table -->
@@ -80,6 +89,7 @@
               [class.editing]="isEditing(meal)"
               [class.high-risk]="isHighRiskMeal(meal)"
               [class.unused]="totalUsage(meal) === 0"
+              [class.archived]="meal.is_archived"
             >
               <td class="col-code">{{ getMealCode(meal) }}</td>
               <td class="col-mode">
@@ -91,7 +101,10 @@
                 @if (isEditing(meal)) {
                   <input type="text" class="edit-input" [(ngModel)]="editBuffer.meal_name" placeholder="菜名" />
                 } @else {
-                  <span class="meal-name">{{ meal.meal_name }}</span>
+                  <span class="meal-name">
+                    @if (meal.is_archived) { <span class="archived-tag">[封存]</span> }
+                    {{ meal.meal_name }}
+                  </span>
                 }
               </td>
               <td class="col-time">{{ meal.meal_time }}</td>
@@ -120,7 +133,16 @@
                   </button>
                   <button class="btn-cancel" (click)="cancelEdit()" [disabled]="isSaving(meal)">取消</button>
                 } @else {
-                  <button class="btn-edit" (click)="startEdit(meal)">編輯</button>
+                  <button class="btn-edit" (click)="startEdit(meal)" [disabled]="!!meal.is_archived">編輯</button>
+                  @if (meal.is_archived) {
+                    <button class="btn-unarchive" (click)="unarchiveMeal(meal)" [disabled]="isArchiving(meal)">
+                      {{ isArchiving(meal) ? '...' : '解封存' }}
+                    </button>
+                  } @else {
+                    <button class="btn-archive" (click)="archiveMeal(meal)" [disabled]="isArchiving(meal)">
+                      {{ isArchiving(meal) ? '...' : '封存' }}
+                    </button>
+                  }
                 }
               </td>
             </tr>
@@ -159,9 +181,9 @@
 
     <!-- Deferred features notice -->
     <aside class="deferred-notice">
-      <h3>📦 以下功能於 Phase 2+ 開通（MVP 未含）</h3>
+      <h3>📦 以下功能於 Phase 3+ 開通</h3>
       <ul>
-        <li><strong>封存／解封存</strong>：需要 Meal 新增 is_archived 欄位 migration</li>
+        <li><s><strong>封存／解封存</strong>：Phase 2 已完成 ✅</s></li>
         <li><strong>真刪除</strong>：需要 cascade 警告 + 使用量門檻（有攝取紀錄禁刪）</li>
         <li><strong>合併重複菜</strong>：需要新後端 endpoint（重新指向 foreign keys 後刪除源頭）</li>
       </ul>

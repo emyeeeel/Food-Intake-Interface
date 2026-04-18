@@ -10,6 +10,7 @@ export interface Meal {
   image?: string | null;
   menu_mode?: MenuMode;
   serve_date?: string | null;
+  is_archived?: boolean;   // Phase 2 soft-delete flag (backend-optional until deployed)
   created_at: string;
   updated_at: string;
 }

@@ -49,6 +49,7 @@ export class MealAdminComponent implements OnInit {
   // Filters / sort / paging
   searchQuery = '';
   modeFilter: '' | 'cyclic' | 'open' = '';
+  archiveFilter: 'active' | 'archived' | 'all' = 'active';  // Phase 2: default hides archived
   sortField: SortField = 'id';
   sortAsc = true;
 
@@ -134,6 +135,14 @@ export class MealAdminComponent implements OnInit {
 
   applyFilter(): void {
     let result = [...this.allMeals];
+
+    // Archive filter
+    if (this.archiveFilter === 'active') {
+      result = result.filter(m => !m.is_archived);
+    } else if (this.archiveFilter === 'archived') {
+      result = result.filter(m => !!m.is_archived);
+    }
+    // 'all' = no archive filtering
 
     // Mode filter
     if (this.modeFilter) {
@@ -234,6 +243,11 @@ export class MealAdminComponent implements OnInit {
 
   setModeFilter(mode: '' | 'cyclic' | 'open'): void {
     this.modeFilter = mode;
+    this.applyFilter();
+  }
+
+  setArchiveFilter(f: 'active' | 'archived' | 'all'): void {
+    this.archiveFilter = f;
     this.applyFilter();
   }
 
@@ -350,11 +364,64 @@ export class MealAdminComponent implements OnInit {
     this.router.navigate(['/engineering']);
   }
 
+  // === Archive / Unarchive (Phase 2) ===
+
+  archivingIds: Set<number> = new Set();
+
+  isArchiving(meal: Meal): boolean {
+    return this.archivingIds.has(meal.id);
+  }
+
+  archiveMeal(meal: Meal): void {
+    if (this.archivingIds.has(meal.id)) return;
+    if (!confirm(`封存「${meal.meal_name}」？既有指派與攝取紀錄不受影響，可以隨時解封存。`)) return;
+
+    this.archivingIds.add(meal.id);
+    this.mealsService.archiveMeal(meal.id).subscribe({
+      next: (res) => {
+        const idx = this.allMeals.findIndex(m => m.id === meal.id);
+        if (idx !== -1) {
+          this.allMeals[idx] = { ...this.allMeals[idx], is_archived: res.is_archived };
+        }
+        this.archivingIds.delete(meal.id);
+        this.applyFilter();
+      },
+      error: (err) => {
+        console.error('[MealAdmin] archive failed:', err);
+        alert('封存失敗：' + (err?.error?.detail || err?.message || '未知錯誤'));
+        this.archivingIds.delete(meal.id);
+      },
+    });
+  }
+
+  unarchiveMeal(meal: Meal): void {
+    if (this.archivingIds.has(meal.id)) return;
+
+    this.archivingIds.add(meal.id);
+    this.mealsService.unarchiveMeal(meal.id).subscribe({
+      next: (res) => {
+        const idx = this.allMeals.findIndex(m => m.id === meal.id);
+        if (idx !== -1) {
+          this.allMeals[idx] = { ...this.allMeals[idx], is_archived: res.is_archived };
+        }
+        this.archivingIds.delete(meal.id);
+        this.applyFilter();
+      },
+      error: (err) => {
+        console.error('[MealAdmin] unarchive failed:', err);
+        alert('解封存失敗：' + (err?.error?.detail || err?.message || '未知錯誤'));
+        this.archivingIds.delete(meal.id);
+      },
+    });
+  }
+
   // === Stats helpers for header ===
 
   get totalCount(): number { return this.allMeals.length; }
+  get activeCount(): number { return this.allMeals.filter(m => !m.is_archived).length; }
+  get archivedCount(): number { return this.allMeals.filter(m => !!m.is_archived).length; }
   get cyclicCount(): number { return this.allMeals.filter(m => (m.menu_mode ?? 'cyclic') === 'cyclic').length; }
   get openCount(): number { return this.allMeals.filter(m => m.menu_mode === 'open').length; }
-  get unusedCount(): number { return this.allMeals.filter(m => this.totalUsage(m) === 0).length; }
+  get unusedCount(): number { return this.allMeals.filter(m => this.totalUsage(m) === 0 && !m.is_archived).length; }
   get highRiskCount(): number { return this.allMeals.filter(m => this.isHighRiskMeal(m)).length; }
 }
