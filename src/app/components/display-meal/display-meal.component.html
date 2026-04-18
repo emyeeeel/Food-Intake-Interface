@@ -67,8 +67,8 @@
               </span>
             </td>
             <td class="col-code">{{ getMealCode(meal) }}</td>
-            <td class="col-day">第 {{ meal.day_cycle }} 天</td>
-            <td class="col-date">{{ getDateForDay(meal.day_cycle) }}</td>
+            <td class="col-day">{{ formatDayLabel(meal) }}</td>
+            <td class="col-date">{{ formatDateLabel(meal) }}</td>
             <td class="col-time">{{ meal.meal_time }}</td>
             <td class="col-name">{{ meal.meal_name }}</td>
             <td class="col-plate">{{ meal.plate_type || '-' }}</td>

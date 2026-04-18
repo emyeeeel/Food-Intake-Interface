@@ -195,7 +195,11 @@ export class DisplayMealComponent implements OnInit, OnChanges {
   }
 
   applyFilter(): void {
-    let result = [...this.meals];
+    // Hard mode filter first: system mode decides which meals are visible.
+    // Legacy rows without menu_mode default to 'cyclic' via ?? fallback.
+    const mode = this.settingsService.menuMode;
+    let result = this.meals.filter(m => (m.menu_mode ?? 'cyclic') === mode);
+
     if (this.filterDay) {
       result = result.filter(m => String(m.day_cycle) === this.filterDay);
     }
@@ -245,21 +249,40 @@ export class DisplayMealComponent implements OnInit, OnChanges {
 
   getMealCode(meal: Meal): string {
     if (!meal) return '';
-  
+
     const mealTypeMap: Record<string, string> = {
-      '午餐': 'L',    
-      '晚餐': 'D',    
-      '點心': 'S',    
+      '午餐': 'L',
+      '晚餐': 'D',
+      '點心': 'S',
     };
-  
+
     const mealLetter = meal.meal_time && mealTypeMap[meal.meal_time]
       ? mealTypeMap[meal.meal_time]
-      : '';  // fallback if undefined
-  
+      : '';
+
+    const mode = meal.menu_mode ?? 'cyclic';
+    if (mode === 'open' && meal.serve_date) {
+      const compactDate = meal.serve_date.replace(/-/g, '');
+      return `${mealLetter}-${compactDate}-${meal.id ?? ''}`;
+    }
+
     const dayCycle = meal.day_cycle ?? '';
     const mealId = meal.id ?? '';
-  
     return `${mealLetter}-${dayCycle}-${mealId}`;
+  }
+
+  /** Cell content for 天數 column. cyclic shows "第 N 天"; open shows "-". */
+  formatDayLabel(meal: Meal): string {
+    if ((meal.menu_mode ?? 'cyclic') === 'open') return '-';
+    return `第 ${meal.day_cycle} 天`;
+  }
+
+  /** Cell content for 日期 column. cyclic shows computed M/D; open shows "YYYY-MM-DD (週X)". */
+  formatDateLabel(meal: Meal): string {
+    if ((meal.menu_mode ?? 'cyclic') === 'open' && meal.serve_date) {
+      return `${meal.serve_date} (${this.dateService.getWeekdayLabel(meal.serve_date)})`;
+    }
+    return this.getDateForDay(meal.day_cycle);
   }
 
   truncateDescription(description: string | null | undefined, maxLength: number): string {
