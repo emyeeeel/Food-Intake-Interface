@@ -116,16 +116,22 @@ export class TodaysMealComponent implements OnInit, OnDestroy {
   }
 
   getMealCode(meal: Meal): string {
-    const currentDay = this.getCurrentDayInCycle();
     const normalizedTime = this.normalizeMealTime(this.time);
-
     const timeToLetterMap: Record<string, string> = {
       '\u5348\u9910': 'L',
       '\u665a\u9910': 'D',
       '\u9ede\u5fc3': 'S'
     };
-
     const timeCode = timeToLetterMap[normalizedTime] || 'U';
+
+    // Mode-aware middle segment: open uses compact serve_date,
+    // cyclic uses current day_cycle. Matches show-meal formatting.
+    const mode = meal.menu_mode ?? 'cyclic';
+    if (mode === 'open' && meal.serve_date) {
+      const compactDate = meal.serve_date.replace(/-/g, '');
+      return `${timeCode}-${compactDate}-${meal.id}`;
+    }
+    const currentDay = this.getCurrentDayInCycle();
     return `${timeCode}-${currentDay}-${meal.id}`;
   }
 
