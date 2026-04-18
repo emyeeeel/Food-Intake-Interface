@@ -112,8 +112,8 @@
     font-family: "Quicksand", sans-serif;
     font-size: 12px;
     color: #677578;
-    width: 60px;
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .meal-name {
@@ -121,6 +121,7 @@
     font-size: 14px;
     color: #00313C;
     flex: 1;
+    min-width: 0;
   }
 }
 
