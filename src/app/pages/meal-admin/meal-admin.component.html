@@ -1,0 +1,164 @@
+<div class="meal-admin-container">
+
+  <!-- Header -->
+  <header class="page-header">
+    <div class="title-row">
+      <button class="back-btn" (click)="goBackToEngineering()" title="返回工程模式">←</button>
+      <div class="title-text">
+        <h1>菜色管理</h1>
+        <p class="subtitle">跨模式檢視、編輯；封存 / 刪除 / 合併見 Phase 2+（見 HANDOVER §2）</p>
+      </div>
+      <button class="refresh-btn" (click)="refresh()" [disabled]="loading" title="重新載入">⟳</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><span class="stat-label">總數</span><span class="stat-value">{{ totalCount }}</span></div>
+      <div class="stat"><span class="stat-label">循環</span><span class="stat-value">{{ cyclicCount }}</span></div>
+      <div class="stat"><span class="stat-label">開放</span><span class="stat-value">{{ openCount }}</span></div>
+      <div class="stat unused"><span class="stat-label">無使用</span><span class="stat-value">{{ unusedCount }}</span></div>
+      <div class="stat high-risk"><span class="stat-label">含攝取紀錄</span><span class="stat-value">{{ highRiskCount }}</span></div>
+    </div>
+  </header>
+
+  <!-- Loading / error -->
+  @if (loading) {
+    <div class="state-msg">載入中...</div>
+  } @else if (loadError) {
+    <div class="state-msg error">{{ loadError }} <button class="link-btn" (click)="loadAll()">重試</button></div>
+  } @else {
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="搜尋：菜名 / 代碼 / 日期..."
+          [(ngModel)]="searchQuery"
+          (input)="applyFilter()"
+        />
+        <select class="mode-select" [(ngModel)]="modeFilter" (change)="applyFilter()">
+          <option value="">全部模式</option>
+          <option value="cyclic">循環</option>
+          <option value="open">開放</option>
+        </select>
+        @if (searchQuery || modeFilter) {
+          <button class="link-btn" (click)="clearSearch()">清除篩選</button>
+        }
+      </div>
+      <div class="toolbar-right">
+        <span class="result-count">共 {{ filteredMeals.length }} 筆</span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table class="meal-table">
+        <thead>
+          <tr>
+            <th class="col-code sortable" (click)="setSort('id')">代碼{{ sortIndicator('id') }}</th>
+            <th class="col-mode sortable" (click)="setSort('menu_mode')">模式{{ sortIndicator('menu_mode') }}</th>
+            <th class="col-name sortable" (click)="setSort('meal_name')">菜色名稱{{ sortIndicator('meal_name') }}</th>
+            <th class="col-time sortable" (click)="setSort('meal_time')">餐期{{ sortIndicator('meal_time') }}</th>
+            <th class="col-day sortable" (click)="setSort('day_or_date')">日期／天數{{ sortIndicator('day_or_date') }}</th>
+            <th class="col-plate sortable" (click)="setSort('plate_type')">餐盤{{ sortIndicator('plate_type') }}</th>
+            <th class="col-usage sortable" (click)="setSort('usage')">使用量{{ sortIndicator('usage') }}</th>
+            <th class="col-updated sortable" (click)="setSort('updated_at')">更新時間{{ sortIndicator('updated_at') }}</th>
+            <th class="col-action">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (meal of paginatedMeals; track meal.id) {
+            <tr
+              [class.editing]="isEditing(meal)"
+              [class.high-risk]="isHighRiskMeal(meal)"
+              [class.unused]="totalUsage(meal) === 0"
+            >
+              <td class="col-code">{{ getMealCode(meal) }}</td>
+              <td class="col-mode">
+                <span class="mode-badge" [class.cyclic]="(meal.menu_mode ?? 'cyclic') === 'cyclic'" [class.open]="meal.menu_mode === 'open'">
+                  {{ (meal.menu_mode ?? 'cyclic') === 'open' ? '開放' : '循環' }}
+                </span>
+              </td>
+              <td class="col-name">
+                @if (isEditing(meal)) {
+                  <input type="text" class="edit-input" [(ngModel)]="editBuffer.meal_name" placeholder="菜名" />
+                } @else {
+                  <span class="meal-name">{{ meal.meal_name }}</span>
+                }
+              </td>
+              <td class="col-time">{{ meal.meal_time }}</td>
+              <td class="col-day">{{ getDayOrDate(meal) }}</td>
+              <td class="col-plate">
+                @if (isEditing(meal)) {
+                  <select class="edit-select" [(ngModel)]="editBuffer.plate_type">
+                    @for (pt of plateTypeOptions; track pt.value) {
+                      <option [value]="pt.value">{{ pt.label }}</option>
+                    }
+                  </select>
+                } @else {
+                  {{ meal.plate_type | plateTypeLabel }}
+                }
+              </td>
+              <td class="col-usage">
+                <span class="usage-cell" [class.zero]="totalUsage(meal) === 0" [class.warn]="isHighRiskMeal(meal)">
+                  {{ getUsage(meal).assignments }} 指派 · {{ getUsage(meal).intakes }} 攝取
+                </span>
+              </td>
+              <td class="col-updated">{{ formatUpdatedAt(meal) }}</td>
+              <td class="col-action">
+                @if (isEditing(meal)) {
+                  <button class="btn-save" (click)="saveEdit(meal)" [disabled]="isSaving(meal)">
+                    {{ isSaving(meal) ? '...' : '儲存' }}
+                  </button>
+                  <button class="btn-cancel" (click)="cancelEdit()" [disabled]="isSaving(meal)">取消</button>
+                } @else {
+                  <button class="btn-edit" (click)="startEdit(meal)">編輯</button>
+                }
+              </td>
+            </tr>
+          }
+          @if (paginatedMeals.length === 0) {
+            <tr><td colspan="9" class="empty-state">{{ searchQuery || modeFilter ? '沒有符合條件的菜色' : '尚無菜色資料' }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Inline edit error -->
+    @if (editError) {
+      <div class="state-msg error inline">{{ editError }}</div>
+    }
+
+    <!-- Pagination -->
+    @if (filteredMeals.length > pageSize) {
+      <div class="pagination">
+        <button (click)="goToPage(1)" [disabled]="currentPage === 1">« 首頁</button>
+        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">‹ 上一頁</button>
+        <span class="page-indicator">第 {{ currentPage }} / {{ totalPages }} 頁</span>
+        <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">下一頁 ›</button>
+        <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">末頁 »</button>
+        <span class="page-size-selector">
+          每頁
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size">{{ size }}</option>
+            }
+          </select>
+          筆
+        </span>
+      </div>
+    }
+
+    <!-- Deferred features notice -->
+    <aside class="deferred-notice">
+      <h3>📦 以下功能於 Phase 2+ 開通（MVP 未含）</h3>
+      <ul>
+        <li><strong>封存／解封存</strong>：需要 Meal 新增 is_archived 欄位 migration</li>
+        <li><strong>真刪除</strong>：需要 cascade 警告 + 使用量門檻（有攝取紀錄禁刪）</li>
+        <li><strong>合併重複菜</strong>：需要新後端 endpoint（重新指向 foreign keys 後刪除源頭）</li>
+      </ul>
+      <p class="hint">每一步都會先寫 plan 跟你對齊再動後端 schema。</p>
+    </aside>
+  }
+</div>

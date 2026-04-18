@@ -54,6 +54,31 @@
 
     <!-- Tab: Modules -->
     <div *ngIf="activeTab === 'modules'" class="tab-content">
+
+      <!-- Admin tools (engineering-only sub-pages, not in ModuleConfig) -->
+      <div class="admin-tools">
+        <h3 class="admin-tools-title">🛠️ 資料庫管理工具</h3>
+        <div class="admin-tools-grid">
+          <a class="admin-tool-card" routerLink="/engineering/meal-admin">
+            <span class="tool-icon">🍱</span>
+            <span class="tool-name">菜色管理</span>
+            <span class="tool-desc">跨模式檢視／編輯菜色，追蹤使用量</span>
+            <span class="tool-badge">MVP</span>
+          </a>
+          <div class="admin-tool-card disabled">
+            <span class="tool-icon">👤</span>
+            <span class="tool-name">住民管理</span>
+            <span class="tool-desc">（預留，待開發）</span>
+          </div>
+          <div class="admin-tool-card disabled">
+            <span class="tool-icon">🍽️</span>
+            <span class="tool-name">攝取紀錄管理</span>
+            <span class="tool-desc">（預留，待開發）</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-title">Module Control</h3>
       <div class="module-list">
         <div *ngFor="let mod of modules" class="module-card" [class.inactive]="!mod.is_active">
           <div class="module-info">

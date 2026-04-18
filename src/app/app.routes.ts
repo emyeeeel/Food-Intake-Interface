@@ -17,7 +17,9 @@ import { NotificationComponent } from './tx2/components/notif/notif.component';
 import { PopUpComponent } from './components/pop-up/pop-up.component';
 import { EngineeringComponent } from './pages/engineering/engineering.component';
 import { ForbiddenComponent } from './pages/forbidden/forbidden.component';
+import { MealAdminComponent } from './pages/meal-admin/meal-admin.component';
 import { moduleGuard } from './guards/module.guard';
+import { engineeringAuthGuard } from './guards/engineering-auth.guard';
 
 export const routes: Routes = [
     { path: '', canActivate: [rootGuard], children: [] },
@@ -67,4 +69,5 @@ export const routes: Routes = [
 
     // Hidden engineering route - no menu entry, access by URL only
     { path: 'engineering', component: EngineeringComponent },
+    { path: 'engineering/meal-admin', canActivate: [engineeringAuthGuard], component: MealAdminComponent },
 ];
