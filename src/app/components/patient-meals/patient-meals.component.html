@@ -32,10 +32,10 @@
       </p>
     </div>
     <div
-      *ngFor="let dayGroup of getMealsByDayCycle() | keyvalue: dayCycleSort"
+      *ngFor="let dayGroup of getMealsGroupedByMode() | keyvalue: groupSort"
       class="day-section"
     >
-      <h3 class="day-header">第{{ dayGroup.key }}天</h3>
+      <h3 class="day-header">{{ formatGroupHeader(dayGroup.key) }}</h3>
 
       <div class="meals">
 

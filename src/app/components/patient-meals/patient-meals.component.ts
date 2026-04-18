@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { PatientService } from '../../services/patient.service';
+import { DateService } from '../../services/date.service';
 import { MealAssignment } from '../../models/meal-assignment.mode';
 import { LTCPatient } from '../../models/ltc-patient.model';
 import { Subscription } from 'rxjs';
@@ -23,17 +24,21 @@ export class PatientMealsComponent implements OnInit, OnChanges, OnDestroy {
   mealAssignments: MealAssignment[] = [];
   loading: boolean = true;
   error: string | null = null;
+  currentMenuMode: 'cyclic' | 'open' = 'cyclic';
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private mealAssignmentService: MealAssignmentService,
     private patientService: PatientService,
+    private dateService: DateService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    this.currentMenuMode = this.dateService.getCurrentMenuMode();
+
     if (!this.patientId) {
       const routePatientId = this.route.snapshot.paramMap.get('id');
       if (routePatientId) {
@@ -97,31 +102,56 @@ export class PatientMealsComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Group meal assignments by day cycle
+   * Group meal assignments by the current menu mode's time-unit key.
+   * cyclic: assignment.day_cycle
+   * open:   assignment.meal_detail?.serve_date
    */
-  getMealsByDayCycle(): { [key: string]: MealAssignment[] } {
+  getMealsGroupedByMode(): { [key: string]: MealAssignment[] } {
     const grouped: { [key: string]: MealAssignment[] } = {};
 
     this.mealAssignments.forEach(assignment => {
-      const day = assignment.day_cycle?.toString() || 'Unknown';
-      if (!grouped[day]) {
-        grouped[day] = [];
+      const key = this.getGroupKey(assignment);
+      if (!grouped[key]) {
+        grouped[key] = [];
       }
-      grouped[day].push(assignment);
+      grouped[key].push(assignment);
     });
 
     return grouped;
   }
 
+  private getGroupKey(assignment: MealAssignment): string {
+    if (this.currentMenuMode === 'open') {
+      return assignment.meal_detail?.serve_date ?? 'Unknown';
+    }
+    return assignment.day_cycle?.toString() ?? 'Unknown';
+  }
+
   /**
-   * 🔑 Numeric sort for keyvalue pipe (prevents 1,10,11,2...)
+   * Mode-aware sort for keyvalue pipe.
+   * cyclic: numeric (prevents 1,10,11,2...).
+   * open:   ISO date strings sort correctly via localeCompare.
    */
-  dayCycleSort = (
+  groupSort = (
     a: { key: string; value: MealAssignment[] },
     b: { key: string; value: MealAssignment[] }
   ): number => {
-    return Number(a.key) - Number(b.key);
+    if (this.currentMenuMode === 'open') {
+      return a.key.localeCompare(b.key);
+    }
+    return (Number(a.key) || 0) - (Number(b.key) || 0);
   };
+
+  /**
+   * Header text for each group. cyclic: "第 N 天"; open: "YYYY-MM-DD (週X)".
+   */
+  formatGroupHeader(key: string): string {
+    if (key === 'Unknown') return '未分類';
+    if (this.currentMenuMode === 'open') {
+      return `${key} (${this.dateService.getWeekdayLabel(key)})`;
+    }
+    return `第 ${key} 天`;
+  }
 
   getMealsByType(dayAssignments: MealAssignment[], mealType: string): MealAssignment[] {
     return dayAssignments.filter(a => a.meal_type === mealType);
@@ -145,31 +175,40 @@ export class PatientMealsComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    // Sort mealAssignments by day_cycle, then by meal_type (optional)
+    const isOpen = this.currentMenuMode === 'open';
+    const columnLabel = isOpen ? '日期' : '天數';
+
+    // Sort mode-aware: cyclic by day_cycle numerically, open by serve_date ISO string.
     const sortedAssignments = [...this.mealAssignments].sort((a, b) => {
+      if (isOpen) {
+        const aDate = a.meal_detail?.serve_date ?? '';
+        const bDate = b.meal_detail?.serve_date ?? '';
+        return aDate.localeCompare(bDate);
+      }
       return (Number(a.day_cycle) || 0) - (Number(b.day_cycle) || 0);
     });
-  
-    // Map data for Excel
+
+    // Map data for Excel with mode-aware column.
     const excelData = sortedAssignments.map(assignment => ({
-      '天數': assignment.day_cycle ?? '-',
+      [columnLabel]: isOpen
+        ? (assignment.meal_detail?.serve_date ?? '-')
+        : (assignment.day_cycle ?? '-'),
       '餐別': assignment.meal_type ?? '-',
       '餐名': assignment.meal_detail?.meal_name || assignment.meal_name || '-',
     }));
-  
-    // Create worksheet and workbook
+
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(excelData);
     const workbook: XLSX.WorkBook = {
       Sheets: { '膳食分配': worksheet },
       SheetNames: ['膳食分配']
     };
-  
-    // Write and save
+
     const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-  
-    const fileName = `${this.mealAssignments[0].patient_identifier}-用餐安排.xlsx`;
-  
+
+    const modeSuffix = isOpen ? '開放' : '循環';
+    const fileName = `${this.mealAssignments[0].patient_identifier}-用餐安排-${modeSuffix}.xlsx`;
+
     saveAs(blob, fileName);
   }
   
