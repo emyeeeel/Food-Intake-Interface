@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 import { SettingsService } from './settings.service';
+import { MealsService } from './meals.service';
 
 export interface MealCycleInfo {
   startDate: string;
@@ -33,7 +34,10 @@ export class DateService implements OnDestroy {
 
   private cycleCheckInterval: any;
 
-  constructor(private settingsService: SettingsService) {
+  constructor(
+    private settingsService: SettingsService,
+    private mealsService: MealsService,
+  ) {
     // Load settings first
     if (!this.settingsService.settings) {
       this.settingsService.load().then(() => {
@@ -249,6 +253,35 @@ export class DateService implements OnDestroy {
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
+  }
+
+  /**
+   * Open-mode counterpart to getAvailableDays(). Queries backend for all
+   * open-mode meals and returns their distinct serve_dates, sorted, each
+   * with a weekday-decorated label. Used by add-meal single-form and
+   * add-patient multi-select when menu mode is 'open'.
+   */
+  getAvailableServeDates(): Observable<{ value: string; label: string }[]> {
+    return this.mealsService.getMealsFiltered({ menu_mode: 'open' }).pipe(
+      map(meals => {
+        const dates = [...new Set(
+          meals.map(m => m.serve_date).filter((d): d is string => !!d)
+        )].sort();
+        return dates.map(d => ({
+          value: d,
+          label: `${d} (${this.getWeekdayLabel(d)})`,
+        }));
+      }),
+    );
+  }
+
+  /**
+   * Returns Chinese weekday label for a YYYY-MM-DD date string.
+   * Public so components can format serve_date displays consistently.
+   */
+  getWeekdayLabel(dateStr: string): string {
+    const d = new Date(dateStr);
+    return ['週日', '週一', '週二', '週三', '週四', '週五', '週六'][d.getDay()];
   }
 
   ngOnDestroy(): void {
