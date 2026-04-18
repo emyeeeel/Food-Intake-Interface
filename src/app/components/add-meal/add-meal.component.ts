@@ -856,26 +856,35 @@ private buildMealFormData(): FormData {
     upload$.subscribe({
       next: (response) => {
         console.log('Upload successful:', response);
-        
+
         this.isUploading = false;
 
-        // Show success alert
+        // Build a success alert that surfaces EVERY backend bucket, including
+        // no_changes_count — without it, re-uploading a file whose rows all
+        // already exist in DB looks like "nothing happened" to the user.
+        const created = response.created_count ?? 0;
+        const updated = response.updated_count ?? 0;
+        const noChanges = response.no_changes_count ?? 0;
+        const skipped = response.skipped_count ?? 0;
+        const excelDup = response.duplicate_in_excel_count ?? 0;
+        const errors = response.error_count ?? 0;
+        const totalIndiv = response.total_individual_meals ?? (created + updated + noChanges);
+
         let successMessage = '檔案上傳成功！\n\n';
-        successMessage += '餐點週期已更新\n';
-        
-        if (response.created_count) {
-          successMessage += `新增了 ${response.created_count} 個餐點\n`;
+        if (created) successMessage += `✓ 新增 ${created} 道菜色\n`;
+        if (updated) successMessage += `✎ 更新 ${updated} 道菜色\n`;
+        if (noChanges) successMessage += `= 既有 ${noChanges} 道菜色（內容相同，不變動）\n`;
+        if (skipped) successMessage += `↷ 跳過 ${skipped} 筆（空行或 filter 不符）\n`;
+        if (excelDup) successMessage += `⚠ Excel 內重複 ${excelDup} 筆\n`;
+        if (errors) successMessage += `✗ 錯誤 ${errors} 筆\n`;
+
+        if (!created && !updated && !errors && noChanges) {
+          successMessage += '\n所有菜色都已存在於資料庫中，匯入動作對資料沒有實際改變。';
+          successMessage += '\n（若你預期應該新增，請檢查 day_cycle / 餐期 / 菜名是否與既有資料相同。）';
+        } else {
+          successMessage += `\n共處理 ${totalIndiv} 筆菜色`;
         }
-        if (response.updated_count) {
-          successMessage += `更新了 ${response.updated_count} 個餐點\n`;
-        }
-        if (response.skipped_count) {
-          successMessage += `跳過了 ${response.skipped_count} 個餐點\n`;
-        }
-        
-        const totalProcessed = (response.updated_count || 0) + (response.created_count || 0);
-        successMessage += `\n總共處理了 ${totalProcessed} 筆記錄`;
-        
+
         alert(successMessage);
 
         // Redirect after user closes alert
