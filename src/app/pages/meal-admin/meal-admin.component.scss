@@ -40,6 +40,21 @@
       &:disabled { opacity: 0.4; cursor: not-allowed; }
     }
 
+    .add-btn {
+      padding: 8px 18px;
+      border: 1px solid #4FAFA3;
+      background: #4FAFA3;
+      color: #ffffff;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+
+      &:hover:not(:disabled) { background: #3b8f88; border-color: #3b8f88; }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+
     .title-text {
       flex: 1;
 
@@ -666,6 +681,65 @@ tr.selected {
     padding: 14px 20px;
     border-top: 1px solid #e6ecea;
     background: #f8fbfa;
+  }
+}
+
+// === Quick add modal form rows ===
+.add-modal {
+  max-width: 520px;
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+
+    label {
+      font-size: 0.88rem;
+      color: #00313C;
+      font-weight: 600;
+
+      .required { color: #a63a23; }
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+      padding: 7px 10px;
+      border: 1px solid #d0e6e3;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      color: #00313C;
+      background: #ffffff;
+      width: 100%;
+
+      &:focus {
+        outline: none;
+        border-color: #4FAFA3;
+        box-shadow: 0 0 0 3px rgba(79, 175, 163, 0.15);
+      }
+
+      &:disabled {
+        background: #f0f4f3;
+        color: #8a9599;
+        cursor: not-allowed;
+      }
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 18px;
+
+      label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 400;
+        cursor: pointer;
+      }
+    }
   }
 }
 

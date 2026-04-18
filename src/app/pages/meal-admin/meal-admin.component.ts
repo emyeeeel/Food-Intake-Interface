@@ -9,7 +9,8 @@ import { MealsService, MergePreviewResponse } from '../../services/meals.service
 import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { IntakeService } from '../../services/intake.service';
 import { DateService } from '../../services/date.service';
-import { Meal } from '../../models/meal.model';
+import { SettingsService } from '../../services/settings.service';
+import { Meal, MenuMode } from '../../models/meal.model';
 import { PlateTypeLabelPipe } from '../../pipes/plate-type-label.pipe';
 
 /**
@@ -75,6 +76,7 @@ export class MealAdminComponent implements OnInit {
     private mealAssignmentService: MealAssignmentService,
     private intakeService: IntakeService,
     private dateService: DateService,
+    private settingsService: SettingsService,
     private router: Router,
   ) {}
 
@@ -409,6 +411,98 @@ export class MealAdminComponent implements OnInit {
 
   goBackToEngineering(): void {
     this.router.navigate(['/engineering']);
+  }
+
+  // === Quick add (inline modal) ===
+
+  showAddModal = false;
+  addSaving = false;
+  addError: string | null = null;
+  addForm: {
+    meal_name: string;
+    meal_time: string;
+    menu_mode: MenuMode;
+    day_cycle: number | null;
+    serve_date: string | null;
+    plate_type: string;
+  } = {
+    meal_name: '',
+    meal_time: '午餐',
+    menu_mode: 'cyclic',
+    day_cycle: 1,
+    serve_date: null,
+    plate_type: '',
+  };
+
+  readonly mealTimeOptions = ['午餐', '晚餐', '點心'];
+
+  openAddModal(): void {
+    const today = new Date();
+    const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    this.addForm = {
+      meal_name: '',
+      meal_time: '午餐',
+      menu_mode: this.settingsService.menuMode,
+      day_cycle: 1,
+      serve_date: iso,
+      plate_type: '',
+    };
+    this.addError = null;
+    this.showAddModal = true;
+  }
+
+  closeAddModal(): void {
+    if (this.addSaving) return;
+    this.showAddModal = false;
+    this.addError = null;
+  }
+
+  submitAdd(): void {
+    const name = (this.addForm.meal_name || '').trim();
+    if (!name) {
+      this.addError = '請輸入菜名。';
+      return;
+    }
+    if (this.addForm.menu_mode === 'cyclic' && (this.addForm.day_cycle == null || this.addForm.day_cycle < 1)) {
+      this.addError = '循環模式需要輸入有效的天數（≥1）。';
+      return;
+    }
+    if (this.addForm.menu_mode === 'open' && !this.addForm.serve_date) {
+      this.addError = '開放模式需要選擇日期。';
+      return;
+    }
+
+    const payload: any = {
+      meal_name: name,
+      meal_time: this.addForm.meal_time,
+      menu_mode: this.addForm.menu_mode,
+      plate_type: this.addForm.plate_type || null,
+      ingredients: [],
+    };
+    if (this.addForm.menu_mode === 'cyclic') {
+      payload.day_cycle = this.addForm.day_cycle;
+      payload.serve_date = null;
+    } else {
+      payload.serve_date = this.addForm.serve_date;
+      payload.day_cycle = null;
+    }
+
+    this.addSaving = true;
+    this.addError = null;
+    this.mealsService.addMeal(payload).subscribe({
+      next: (created) => {
+        this.addSaving = false;
+        this.showAddModal = false;
+        this.loadAll();
+        const plateHint = created.plate_type ? `，餐盤 ${created.plate_type}` : '';
+        alert(`新增成功：${created.meal_name}（#${created.id}）${plateHint}`);
+      },
+      error: (err) => {
+        console.error('[MealAdmin] add failed:', err);
+        this.addError = '新增失敗：' + (err?.error?.detail || err?.message || JSON.stringify(err?.error) || '未知錯誤');
+        this.addSaving = false;
+      },
+    });
   }
 
   // === Multi-select (Phase 4 merge) ===

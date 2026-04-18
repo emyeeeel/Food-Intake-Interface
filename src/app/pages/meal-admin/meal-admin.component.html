@@ -8,6 +8,7 @@
         <h1>菜色管理</h1>
         <p class="subtitle">跨模式檢視、編輯、停用；刪除 / 合併見 Phase 3+（見 HANDOVER §2）</p>
       </div>
+      <button class="add-btn" (click)="openAddModal()" [disabled]="loading" title="新增菜色">＋ 新增菜色</button>
       <button class="refresh-btn" (click)="refresh()" [disabled]="loading" title="重新載入">⟳</button>
     </div>
 
@@ -230,6 +231,97 @@
       <p class="hint">💡 新增菜色時，後端會自動比對同名菜並繼承 plate_type + ingredients（<code>_inherit_from_existing_dish</code>）。</p>
       <p class="hint">合併會把所有 source 的指派／攝取紀錄重新指向 canonical，再刪除 source。交易性操作，中途失敗會 rollback。</p>
     </aside>
+  }
+
+  <!-- Quick add modal -->
+  @if (showAddModal) {
+    <div class="modal-overlay" (click)="closeAddModal()">
+      <div class="modal-content add-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>新增菜色</h3>
+          <button class="btn-close" (click)="closeAddModal()" [disabled]="addSaving">×</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-hint">填基本欄位即可。若菜名已存在，後端會自動繼承既有的餐盤與食材（<code>_inherit_from_existing_dish</code>）。</p>
+
+          <div class="form-row">
+            <label>菜名 <span class="required">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="addForm.meal_name"
+              placeholder="例：紅燒豆腐"
+              [disabled]="addSaving"
+              (keydown.enter)="submitAdd()"
+            />
+          </div>
+
+          <div class="form-row">
+            <label>餐期 <span class="required">*</span></label>
+            <select [(ngModel)]="addForm.meal_time" [disabled]="addSaving">
+              @for (t of mealTimeOptions; track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label>模式 <span class="required">*</span></label>
+            <div class="radio-group">
+              <label>
+                <input type="radio" name="addMode" value="cyclic" [(ngModel)]="addForm.menu_mode" [disabled]="addSaving" />
+                循環
+              </label>
+              <label>
+                <input type="radio" name="addMode" value="open" [(ngModel)]="addForm.menu_mode" [disabled]="addSaving" />
+                開放
+              </label>
+            </div>
+          </div>
+
+          @if (addForm.menu_mode === 'cyclic') {
+            <div class="form-row">
+              <label>天數 <span class="required">*</span></label>
+              <input
+                type="number"
+                [(ngModel)]="addForm.day_cycle"
+                min="1"
+                max="30"
+                [disabled]="addSaving"
+              />
+            </div>
+          } @else {
+            <div class="form-row">
+              <label>日期 <span class="required">*</span></label>
+              <input
+                type="date"
+                [(ngModel)]="addForm.serve_date"
+                [disabled]="addSaving"
+              />
+            </div>
+          }
+
+          <div class="form-row">
+            <label>餐盤</label>
+            <select [(ngModel)]="addForm.plate_type" [disabled]="addSaving">
+              <option value="">— 留空讓後端繼承同名菜 —</option>
+              @for (pt of plateTypeOptions; track pt.value) {
+                <option [value]="pt.value">{{ pt.label }}</option>
+              }
+            </select>
+          </div>
+
+          @if (addError) {
+            <div class="state-msg error inline">{{ addError }}</div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeAddModal()" [disabled]="addSaving">取消</button>
+          <button class="btn-save" (click)="submitAdd()" [disabled]="addSaving">
+            {{ addSaving ? '新增中...' : '新增' }}
+          </button>
+        </div>
+      </div>
+    </div>
   }
 
   <!-- Phase 4 merge modal -->
