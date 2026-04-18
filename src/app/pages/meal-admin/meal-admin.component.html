@@ -27,27 +27,34 @@
     <div class="state-msg error">{{ loadError }} <button class="link-btn" (click)="loadAll()">重試</button></div>
   } @else {
 
-    <!-- Toolbar -->
-    <div class="toolbar">
-      <div class="toolbar-left">
+    <!-- Toolbar row 1: search -->
+    <div class="toolbar search-row">
+      <div class="search-group">
         <input
           type="text"
           class="search-input"
           placeholder="搜尋：菜名 / 代碼 / 日期..."
           [(ngModel)]="searchQuery"
           (input)="applyFilter()"
+          (keydown.enter)="applyFilter()"
         />
-        <select class="mode-select" [(ngModel)]="modeFilter" (change)="applyFilter()">
-          <option value="">全部模式</option>
-          <option value="cyclic">循環</option>
-          <option value="open">開放</option>
-        </select>
-        @if (searchQuery || modeFilter) {
-          <button class="link-btn" (click)="clearSearch()">清除篩選</button>
+        <button class="btn-search" (click)="applyFilter()" title="搜尋">🔍 搜尋</button>
+        @if (searchQuery) {
+          <button class="link-btn" (click)="clearSearchOnly()">清除搜尋</button>
         }
       </div>
-      <div class="toolbar-right">
-        <span class="result-count">共 {{ filteredMeals.length }} 筆</span>
+      <div class="result-count-wrap">
+        <span class="result-count">共 <strong>{{ filteredMeals.length }}</strong> 筆</span>
+      </div>
+    </div>
+
+    <!-- Toolbar row 2: mode filter (separated so it doesn't get lost among search UI) -->
+    <div class="toolbar filter-row">
+      <span class="filter-label">模式：</span>
+      <div class="filter-chips">
+        <button class="chip" [class.active]="modeFilter === ''" (click)="setModeFilter('')">全部</button>
+        <button class="chip cyclic-chip" [class.active]="modeFilter === 'cyclic'" (click)="setModeFilter('cyclic')">循環</button>
+        <button class="chip open-chip" [class.active]="modeFilter === 'open'" (click)="setModeFilter('open')">開放</button>
       </div>
     </div>
 

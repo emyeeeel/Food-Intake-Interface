@@ -227,6 +227,16 @@ export class MealAdminComponent implements OnInit {
     this.applyFilter();
   }
 
+  clearSearchOnly(): void {
+    this.searchQuery = '';
+    this.applyFilter();
+  }
+
+  setModeFilter(mode: '' | 'cyclic' | 'open'): void {
+    this.modeFilter = mode;
+    this.applyFilter();
+  }
+
   // === Display helpers ===
 
   /** "L-1-231" for cyclic, "L-20260420-286" for open. Matches show-meal/edit-meal. */
