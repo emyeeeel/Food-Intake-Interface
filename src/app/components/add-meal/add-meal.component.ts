@@ -9,6 +9,7 @@ import { IngredientsService } from '../../services/ingredients.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DateService } from '../../services/date.service';
+import { SettingsService } from '../../services/settings.service';
 
 
 @Component({
@@ -45,8 +46,8 @@ export class AddMealComponent implements OnInit {
 ];
 
 
-  dayCycleOptions = Array.from({ length: 14 }, (_, i) => ({
-  value: i + 1,            // ✅ INTEGER
+  dayCycleOptions = Array.from({ length: 7 }, (_, i) => ({
+  value: i + 1,
   label: `第${i + 1}天`
 }));
 
@@ -63,8 +64,28 @@ export class AddMealComponent implements OnInit {
     private ingredientsService: IngredientsService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private dateService: DateService // Add this
+    private dateService: DateService, // Add this
+    private settingsService: SettingsService,
   ) {}
+
+  get menuMode(): 'cyclic' | 'open' {
+    return this.dateService.getCurrentMenuMode();
+  }
+
+  get menuModeLabel(): string {
+    return this.menuMode === 'open' ? '開放模式' : '循環模式';
+  }
+
+  private buildTemplateFilename(): string {
+    const today = this.dateService.getTodayDate();
+    const dateStr =
+      today.getFullYear() +
+      String(today.getMonth() + 1).padStart(2, '0') +
+      String(today.getDate()).padStart(2, '0');
+    const center = this.settingsService.careCenterName || '長照中心';
+    const modeLabel = this.menuMode === 'open' ? '開放' : '循環';
+    return `${center}-菜單-${modeLabel}-${dateStr}.xlsx`;
+  }
 
   mealImage: File | null = null;
   mealImagePreview: string | null = null;
@@ -429,148 +450,116 @@ private buildMealFormData(): FormData {
   }
 
   downloadTemplate(): void {
-  // Get today's date and cycle day
-  const today = this.dateService.getTodayDate();
-  const todaysCycleDay = this.dateService.getTodaysCycleDay();
-  
-  // Format today's date as YYYYMMDD
-  const todayFormatted = today.getFullYear() +
-    String(today.getMonth() + 1).padStart(2, '0') +
-    String(today.getDate()).padStart(2, '0');
-
-  console.log(`Today is cycle day ${todaysCycleDay}, formatted date: ${todayFormatted}`);
-
-  // Fetch meals for today's cycle day using MealsService
-  this.mealsService.getMeals().subscribe({
-    next: (allMeals: Meal[]) => {
-      // Filter meals for today's cycle day
-      const todayMeals = allMeals.filter(meal => meal.day_cycle === todaysCycleDay);
-      
-      console.log('Meals for today:', todayMeals);
-
-      let templateData: any[] = [];
-
-      if (todayMeals.length > 0) {
-        // Group meals by meal_time and combine meal names
-        const mealGroups = todayMeals.reduce((groups: any, meal) => {
-          const mealTime = meal.meal_time || '午餐';
-          if (!groups[mealTime]) {
-            groups[mealTime] = [];
-          }
-          groups[mealTime].push(meal.meal_name || '');
-          return groups;
-        }, {});
-
-        // Create template data with 4 columns including day cycle
-        templateData = Object.keys(mealGroups).map(mealTime => ({
-          '日期': todayFormatted,
-          '日週期': todaysCycleDay, // Add day cycle column
-          '用餐時間': mealTime,
-          '菜色名稱': mealGroups[mealTime].filter((name: string) => name.trim()).join(', ')
-        }));
-      } else {
-        // Fallback template if no meals found for today - Updated with 4 columns
-        templateData = [
-          {
-            '日期': todayFormatted,
-            '日週期': todaysCycleDay, // Add day cycle column
-            '用餐時間': '午餐',
-            '菜色名稱': '請填入午餐菜色名稱'
-          },
-          {
-            '日期': todayFormatted,
-            '日週期': todaysCycleDay, // Add day cycle column
-            '用餐時間': '晚餐',
-            '菜色名稱': '請填入晚餐菜色名稱'
-          }
-        ];
-        
-        console.log('No meals found for today, using fallback template');
-      }
-
-      // Create workbook and download - Updated column widths for 4 columns
-      import('xlsx').then(XLSX => {
-        const workbook = XLSX.utils.book_new();
-        const worksheet = XLSX.utils.json_to_sheet(templateData);
-        
-        // Set column widths for better formatting - Updated for 4 columns
-        const columnWidths = [
-          { wch: 12 },  // 日期 (Date)
-          { wch: 10 },  // 日週期 (Day Cycle)
-          { wch: 15 },  // 用餐時間 (Meal Time)
-          { wch: 60 }   // 菜色名稱 (Meal Names - wider for multiple dishes)
-        ];
-        worksheet['!cols'] = columnWidths;
-        
-        XLSX.utils.book_append_sheet(workbook, worksheet, `第${todaysCycleDay}天餐點模板`);
-        
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], { 
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-        });
-        
-        import('file-saver').then(fileSaver => {
-          fileSaver.saveAs(blob, `膳食週期模板-${todayFormatted}.xlsx`); // Meal Cycle Template
-        });
-      });
-    },
-    error: (error) => {
-      console.error('Error fetching meals:', error);
-      
-      // Create fallback template on error - Updated with 4 columns
-      const fallbackData = [
-        {
-          '日期': todayFormatted,
-          '日週期': todaysCycleDay, // Add day cycle column
-          '用餐時間': '午餐',
-          '菜色名稱': '請填入午餐菜色名稱'
-        },
-        {
-          '日期': todayFormatted,
-          '日週期': todaysCycleDay, // Add day cycle column
-          '用餐時間': '晚餐',
-          '菜色名稱': '請填入晚餐菜色名稱'
-        }
-      ];
-
-      // Create workbook and download with fallback data - Updated column widths
-      import('xlsx').then(XLSX => {
-        const workbook = XLSX.utils.book_new();
-        const worksheet = XLSX.utils.json_to_sheet(fallbackData);
-        
-        // Updated column widths for 4 columns
-        const columnWidths = [
-          { wch: 12 },  // 日期
-          { wch: 10 },  // 日週期  
-          { wch: 15 },  // 用餐時間
-          { wch: 60 }   // 菜色名稱
-        ];
-        worksheet['!cols'] = columnWidths;
-        
-        XLSX.utils.book_append_sheet(workbook, worksheet, `第${todaysCycleDay}天餐點模板`);
-        
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], { 
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-        });
-        
-        import('file-saver').then(fileSaver => {
-          fileSaver.saveAs(blob, `膳食週期模板-${todayFormatted}.xlsx`);
-        });
-      });
+    if (this.menuMode === 'open') {
+      this.downloadOpenTemplate();
+    } else {
+      this.downloadCyclicTemplate();
     }
-  });
-}
+  }
+
+  private downloadCyclicTemplate(): void {
+    const filename = this.buildTemplateFilename();
+
+    // Fetch ALL cyclic meals to build full 7-day cycle template
+    this.mealsService.getMealsFiltered({ menu_mode: 'cyclic' }).subscribe({
+      next: (allMeals: Meal[]) => {
+        const templateData: any[] = [];
+        const mealTimeOrder = ['午餐', '晚餐'];
+
+        for (let day = 1; day <= 7; day++) {
+          const dateForDay = this.dateService.getDateForCycleDay(day);
+          const dateStr = dateForDay.getFullYear() +
+            String(dateForDay.getMonth() + 1).padStart(2, '0') +
+            String(dateForDay.getDate()).padStart(2, '0');
+
+          for (const mealTime of mealTimeOrder) {
+            const dayMeals = allMeals.filter(
+              m => String(m.day_cycle) === String(day) && m.meal_time === mealTime
+            );
+            const names = dayMeals.map(m => m.meal_name).filter(n => n?.trim()).join(', ');
+
+            templateData.push({
+              '日期': dateStr,
+              '日週期': day,
+              '用餐時間': mealTime,
+              '菜色名稱': names || '請填入菜色名稱'
+            });
+          }
+        }
+
+        this.exportTemplateExcel(templateData, filename, 'cyclic');
+      },
+      error: () => {
+        const templateData: any[] = [];
+        for (let day = 1; day <= 7; day++) {
+          for (const mealTime of ['午餐', '晚餐']) {
+            templateData.push({
+              '日期': '',
+              '日週期': day,
+              '用餐時間': mealTime,
+              '菜色名稱': '請填入菜色名稱'
+            });
+          }
+        }
+        this.exportTemplateExcel(templateData, filename, 'cyclic');
+      }
+    });
+  }
+
+  private downloadOpenTemplate(): void {
+    const filename = this.buildTemplateFilename();
+    // Build next 7 days starting from today as a starter template.
+    const today = this.dateService.getTodayDate();
+    const templateData: any[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const iso = d.getFullYear() +
+        '-' + String(d.getMonth() + 1).padStart(2, '0') +
+        '-' + String(d.getDate()).padStart(2, '0');
+      for (const mealTime of ['午餐', '晚餐']) {
+        templateData.push({
+          '日期': iso,
+          '用餐時間': mealTime,
+          '菜色名稱': '請填入菜色名稱',
+        });
+      }
+    }
+    this.exportTemplateExcel(templateData, filename, 'open');
+  }
+
+  private exportTemplateExcel(data: any[], filename: string, mode: 'cyclic' | 'open'): void {
+    import('xlsx').then(XLSX => {
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      worksheet['!cols'] = mode === 'open'
+        ? [{ wch: 12 }, { wch: 15 }, { wch: 60 }]
+        : [{ wch: 12 }, { wch: 10 }, { wch: 15 }, { wch: 60 }];
+      const sheetName = mode === 'open' ? '開放菜單' : '7天循環菜單';
+      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+      const buf = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([buf], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+      import('file-saver').then(fs => {
+        fs.saveAs(blob, filename);
+      });
+    });
+  }
 
   uploadExcelFile(): void {
     if (!this.selectedFile) return;
 
     // Initialize upload state
     this.isUploading = true;
-    console.log('Starting upload...');
+    console.log('Starting upload in', this.menuMode, 'mode...');
 
-    // Use MealsService updateMealCycle() to post the Excel file
-    this.mealsService.updateMealCycle(this.selectedFile).subscribe({
+    const upload$ = this.menuMode === 'open'
+      ? this.mealsService.addOpenMealCycle(this.selectedFile)
+      : this.mealsService.updateMealCycle(this.selectedFile);
+
+    upload$.subscribe({
       next: (response) => {
         console.log('Upload successful:', response);
         

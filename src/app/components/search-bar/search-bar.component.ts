@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 
@@ -9,11 +9,13 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './search-bar.component.scss'
 })
 export class SearchBarComponent {
+  @Input() placeholder = '搜尋...';
   isSearchActive: boolean = false;
   searchQuery: string = '';
   
   @ViewChild('searchInput') searchInput!: ElementRef;
   @Output() searchPerformed = new EventEmitter<string>();
+  @Output() searchChanged = new EventEmitter<string>();
 
   toggleSearch(): void {
     this.isSearchActive = true;

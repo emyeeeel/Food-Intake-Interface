@@ -1,10 +1,18 @@
 <div class="intakes-container">
   <app-header></app-header>
 
+  <div *ngIf="deviceId" class="device-id-bar">
+    裝置：{{ deviceId }}
+  </div>
+
   <div class="main-container">
     <!-- Loading state -->
     <div *ngIf="loading" class="loading-spinner">
       <div class="spinner"></div>
+    </div>
+    <div *ngIf="checkingAssignment" class="loading-spinner assignment-checking">
+      <div class="spinner"></div>
+      <div class="checking-text">檢查住民配餐中...</div>
     </div>
 
     <!-- Rooms and outpatient -->
@@ -29,6 +37,7 @@
           class="room-card bed-card"
           *ngFor="let patient of getBedsForRoom(selectedRoom)"
           (click)="selectBed(patient)"
+          [class.disabled]="checkingAssignment"
         >
           {{ patient.bed_number }}
         </div>
@@ -44,5 +53,13 @@
         <app-add-intake [scannedPatientId]="selectedBed.id" (intakeCompleted)="handleIntakeCompleted()"></app-add-intake>
       </div>
     </ng-container>
+
+    <div *ngIf="assignmentDialogVisible" class="assignment-dialog-overlay" (click)="closeAssignmentDialog()">
+      <div class="assignment-dialog" (click)="$event.stopPropagation()">
+        <div class="assignment-dialog-title">{{ assignmentDialogTitle }}</div>
+        <div class="assignment-dialog-message">{{ assignmentDialogMessage }}</div>
+        <button class="assignment-dialog-button" (click)="closeAssignmentDialog()">確認</button>
+      </div>
+    </div>
   </div>
 </div>

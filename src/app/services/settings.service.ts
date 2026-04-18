@@ -13,10 +13,13 @@ export interface MealTimeRanges {
   dinner: { start: string; end: string };
 }
 
+export type MenuMode = 'cyclic' | 'open';
+
 export interface LTCSettings {
   id: number;
   careCenterName: string;
   machineIp: string | null;       // ← added
+  menuMode: MenuMode;
   mealCycle: MealCycle;
   mealTimeRanges: MealTimeRanges;
 }
@@ -44,6 +47,7 @@ export class SettingsService {
         id: raw.id,
         careCenterName: raw.care_center_name,
         machineIp: raw.machine_ip ?? null,
+        menuMode: (raw.menu_mode === 'open' ? 'open' : 'cyclic'),
         mealCycle: {
           startDate: raw.meal_cycle_start_date,
           cycleLength: raw.meal_cycle_length,
@@ -67,6 +71,17 @@ export class SettingsService {
   get settings(): LTCSettings | null { return this._settings; }
   get careCenterName(): string | undefined { return this._settings?.careCenterName; }
   get machineIp(): string | null | undefined { return this._settings?.machineIp; }
+  get menuMode(): MenuMode { return this._settings?.menuMode ?? 'cyclic'; }
   get mealCycle(): MealCycle | undefined { return this._settings?.mealCycle; }
   get mealTimeRanges(): MealTimeRanges | undefined { return this._settings?.mealTimeRanges; }
+
+  async updateMenuMode(mode: MenuMode): Promise<void> {
+    const id = environment.machineID;
+    await firstValueFrom(
+      this.http.patch(`${environment.apiBaseUrl}/api/settings/${id}/`, { menu_mode: mode })
+    );
+    if (this._settings) {
+      this._settings.menuMode = mode;
+    }
+  }
 }

@@ -67,7 +67,10 @@
         },
         "serve": {
           "options": {
-            "proxyConfig": "src/proxy.conf.json"
+            "proxyConfig": "src/proxy.conf.json",
+            "allowedHosts": [
+              "wiselab-foodintake-app.cc.cd"
+            ]
           },
           "builder": "@angular/build:dev-server",
           "configurations": {

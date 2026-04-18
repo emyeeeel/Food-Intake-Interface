@@ -1,6 +1,7 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://h3vkhzth-8000.asse.devtunnels.ms', // https://h3vkhzth-8000.asse.devtunnels.ms
+  apiBaseUrl: 'https://wiselab-foodintake-api.cc.cd',
+  frontendBaseUrl: 'https://wiselab-foodintake-app.cc.cd',
   firebase: {
     apiKey: "AIzaSyBy7BBj2uglhn79_ezYXfiswBjl-C6dwcQ",
     authDomain: "mobile-food-intake.firebaseapp.com",

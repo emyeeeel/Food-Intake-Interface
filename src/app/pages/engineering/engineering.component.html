@@ -1,0 +1,160 @@
+<div class="eng-container">
+
+  <!-- Login Gate -->
+  <div *ngIf="!isAuthenticated" class="login-gate">
+    <div class="login-card">
+      <div class="login-icon">E</div>
+      <h2>Engineering Mode</h2>
+      <form (ngSubmit)="onLogin()">
+        <input
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Password"
+          autofocus
+          [disabled]="loginLoading" />
+        <button type="submit" [disabled]="loginLoading || !password">
+          {{ loginLoading ? '...' : 'Enter' }}
+        </button>
+      </form>
+      <div *ngIf="loginError" class="login-error">{{ loginError }}</div>
+    </div>
+  </div>
+
+  <!-- Authenticated Content -->
+  <div *ngIf="isAuthenticated" class="eng-main">
+
+    <!-- Header -->
+    <div class="eng-header">
+      <h1>Engineering Mode</h1>
+      <div class="session-info">
+        <span class="timer">{{ formatTime(remainingSeconds) }}</span>
+        <button class="btn-logout" (click)="onLogout()">Logout</button>
+      </div>
+    </div>
+
+    <!-- Session Reminder Popup -->
+    <div *ngIf="showReminder" class="reminder-overlay">
+      <div class="reminder-card">
+        <h3>Session Expiring</h3>
+        <p>工程模式將在 {{ formatTime(remainingSeconds) }} 後自動登出</p>
+        <div class="reminder-actions">
+          <button class="btn-extend" (click)="onExtend()">延長 Session</button>
+          <button class="btn-logout-sm" (click)="onLogout()">立即登出</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button [class.active]="activeTab === 'modules'" (click)="activeTab = 'modules'">Module Control</button>
+      <button [class.active]="activeTab === 'dashboard'" (click)="activeTab = 'dashboard'; loadDashboard()">Dashboard</button>
+      <button [class.active]="activeTab === 'settings'" (click)="activeTab = 'settings'">Settings</button>
+    </div>
+
+    <!-- Tab: Modules -->
+    <div *ngIf="activeTab === 'modules'" class="tab-content">
+      <div class="module-list">
+        <div *ngFor="let mod of modules" class="module-card" [class.inactive]="!mod.is_active">
+          <div class="module-info">
+            <span class="module-name">{{ mod.display_name }}</span>
+            <span class="module-key">{{ mod.module_key }}</span>
+            <span class="module-route">{{ mod.route_path }}</span>
+            <span class="module-status" [ngClass]="getModuleStatusClass(mod)">
+              {{ getModuleStatus(mod) }}
+            </span>
+          </div>
+          <div class="module-controls">
+            <div class="toggle-group">
+              <span class="toggle-label">Page</span>
+              <button class="toggle-switch page" [class.on]="mod.is_active" (click)="onToggleActive(mod)">
+                <span class="toggle-slider"></span>
+              </button>
+            </div>
+            <div class="toggle-group">
+              <span class="toggle-label">Visible</span>
+              <button class="toggle-switch" [class.on]="mod.is_enabled" [class.disabled]="!mod.is_active || mod.is_engineering" (click)="onToggleVisible(mod)">
+                <span class="toggle-slider"></span>
+              </button>
+            </div>
+            <div class="toggle-group">
+              <span class="toggle-label">ENG</span>
+              <button class="toggle-switch eng" [class.on]="mod.is_engineering" [class.disabled]="!mod.is_active" (click)="onToggleEng(mod)">
+                <span class="toggle-slider"></span>
+              </button>
+            </div>
+            <button class="btn-go" [class.disabled]="!mod.is_active" [disabled]="!mod.is_active" (click)="navigateToModule(mod)">Go &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Dashboard -->
+    <div *ngIf="activeTab === 'dashboard'" class="tab-content">
+      <div *ngIf="dashboardLoading" class="loading">Loading...</div>
+      <div *ngIf="dashboard && !dashboardLoading" class="dashboard-grid">
+        <div class="stat-card">
+          <span class="stat-value">{{ dashboard.patients }}</span>
+          <span class="stat-label">Residents</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ dashboard.meals }}</span>
+          <span class="stat-label">Meals (14-day)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ dashboard.meal_assignments }}</span>
+          <span class="stat-label">Assignments</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ dashboard.food_intakes_total }}</span>
+          <span class="stat-label">Total Intakes</span>
+        </div>
+        <div class="stat-card highlight">
+          <span class="stat-value">{{ dashboard.food_intakes_today }}</span>
+          <span class="stat-label">Today</span>
+        </div>
+        <div class="stat-card" *ngIf="dashboard.latest_intake">
+          <span class="stat-value">{{ dashboard.latest_intake.device_id || '—' }}</span>
+          <span class="stat-label">Last Device</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Settings -->
+    <div *ngIf="activeTab === 'settings'" class="tab-content">
+      <div class="settings-section">
+        <h3>Session</h3>
+        <div class="setting-row">
+          <label>Timeout (minutes)</label>
+          <input type="number" [(ngModel)]="timeoutMinutes" min="5" />
+        </div>
+        <div class="setting-row">
+          <label>Reminder before (minutes)</label>
+          <input type="number" [(ngModel)]="reminderMinutes" min="1" />
+        </div>
+        <button class="btn-save" (click)="saveConfig()">Save</button>
+      </div>
+
+      <div class="settings-section">
+        <h3>Change Password</h3>
+        <div class="setting-row">
+          <label>Current password</label>
+          <input type="password" [(ngModel)]="oldPassword" />
+        </div>
+        <div class="setting-row">
+          <label>New password</label>
+          <input type="password" [(ngModel)]="newPassword" />
+        </div>
+        <div class="setting-row">
+          <label>Confirm new password</label>
+          <input type="password" [(ngModel)]="confirmPassword" />
+        </div>
+        <button class="btn-save" (click)="changePassword()">Update Password</button>
+      </div>
+
+      <div *ngIf="settingsMessage" class="msg-success">{{ settingsMessage }}</div>
+      <div *ngIf="settingsError" class="msg-error">{{ settingsError }}</div>
+    </div>
+
+  </div>
+</div>

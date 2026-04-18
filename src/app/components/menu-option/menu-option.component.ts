@@ -1,7 +1,8 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { EngineeringService } from '../../services/engineering.service';
 
 interface MenuOption {
   text: string;
@@ -18,6 +19,7 @@ interface MenuOption {
   styleUrl: './menu-option.component.scss'
 })
 export class MenuOptionComponent implements OnInit {
+  @Input() collapsed = false;
   menuOptions: MenuOption[] = [
     {
       text: '首頁',
@@ -63,13 +65,27 @@ export class MenuOptionComponent implements OnInit {
     },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private engService: EngineeringService) {}
+
+  get visibleOptions(): MenuOption[] {
+    return this.menuOptions.filter(opt => {
+      const keyMap: Record<string, string> = {
+        'home': 'homepage',
+        'meal-intake': 'meal-intake',
+        'meal-catalog': 'meal-catalog',
+        'ingredients': 'ingredients',
+        'patient-info': 'residents',
+        'settings': 'settings',
+      };
+      const moduleKey = keyMap[opt.path];
+      if (!moduleKey) return true;
+      return this.engService.isModuleActive(moduleKey) && this.engService.isModuleVisible(moduleKey);
+    });
+  }
 
   ngOnInit() {
-    // Check initial route
     this.updateSelectedOption(this.router.url);
 
-    // Listen for route changes
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {

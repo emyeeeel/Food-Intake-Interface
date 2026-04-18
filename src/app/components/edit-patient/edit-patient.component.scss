@@ -372,15 +372,14 @@
   
   .optional {
     display: flex;
-    flex-direction: row;
-    gap: 14px;
+    flex-direction: column;
+    gap: 10px;
     width: 100%;
-    max-height: 180px;       // optional: ensures it doesn't grow too large
+    max-height: none;
     padding: 12px;
     background: rgba(255, 255, 255, 0.6);
     border-radius: 8px;
   
-    /* Each main row flexed in row */
     .form-row {
       display: flex;
       flex-direction: row;
@@ -388,46 +387,33 @@
       width: 100%;
       align-items: flex-start;
     }
-  
-    /* First form-row takes 3/5 of space */
-    .form-row:first-child {
-      display: flex;
-      flex-direction: row;
-      gap: 14px;
-      width: 100%;
-      align-items: flex-start;
-      flex: 3;  // 3/5 of available space
-      min-height: 0;
-      border: 1px solid red; // Your debug border
+
+    .compact-grid {
+      align-items: stretch;
     }
-  
-    /* Second form-row takes 2/5 of space */
-    .form-row:last-child {
-      display: flex;
-      flex-direction: row;
-      gap: 14px;
-      width: 100%;
-      align-items: flex-start;
-      flex: 2;  // 2/5 of available space
-      min-height: 0;
-    }
-  
-    /* Column groups (Row 1) stacked vertically inside col */
+
     .col-1,
     .col-2,
     .col-3 {
       display: flex;
-      flex-direction: column;   // stack contents vertically
-      gap: 5px;
-      flex: 1;                  // equal width columns
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
       min-width: 0;
     }
+
+    .compact-column {
+      justify-content: flex-start;
+    }
+
+    .stretch-group {
+      flex: 1;
+    }
   
-    /* Individual form fields */
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 6px;
       min-width: 0;
   
       label {
@@ -435,13 +421,52 @@
         font-weight: 600;
         color: #00313C;
       }
-  
+
+      .date-example {
+        font-size: 10px;
+        line-height: 1.4;
+        color: #5e7b84;
+      }
+
+      .date-example.alternate {
+        color: #7f9aa1;
+      }
+
+      .date-input-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .calendar-trigger {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid #b8d8d3;
+        background: #f7fbfa;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      .native-date-proxy {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        padding: 0;
+        border: 0;
+      }
+
       input,
       select,
       textarea {
         font-family: 'Quicksand', sans-serif;
         font-size: 12px;
         padding: 3px 4px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         border-radius: 6px;
         border: 1px solid #B8D8D3;
         background: #ffffff;
@@ -457,8 +482,22 @@
   
       textarea {
         resize: none;
-        min-height: 30px;
-        min-width: 200px;
+        min-height: 160px;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      input[readonly] {
+        background: #f4fbf9;
+        color: #5a7076;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    .optional {
+      .compact-grid {
+        flex-direction: column;
       }
     }
   }
@@ -492,6 +531,17 @@
     &:hover {
       background: #f0f8f7;
       border-color: #4FAFA3;
+    }
+  }
+
+  .form-buttons .btn-cancel {
+    background: #f7fbfa;
+    color: #44616a;
+    border: 1px solid #d5e8e3;
+
+    &:hover {
+      background: #eef7f5;
+      border-color: #b8d8d3;
     }
   }
   

@@ -1,36 +1,32 @@
 <div class="intake-container">
-    <div class="row-1">
-        <div class="icon">
-            <img [src]="iconSrc" [alt]="time + ' Icon'">
-        </div>
-        <span class="time">{{ time }}</span>
+  <div class="row-1">
+    <div class="icon">
+      <img [src]="iconSrc" [alt]="getMealTime() + ' Icon'">
     </div>
-    <div class="row-2">
-        <table class="meal-details-table">
-            <thead>
-                <tr>
-                    <th>膳食代碼</th>
-                    <th>餐點名稱</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Dynamic rows based on meals filtered by day cycle and time serving -->
-                <tr *ngFor="let meal of getMealsForDisplay(); let i = index">
-                    <td class="value">{{ getMealCode(meal) }}</td>
-                    <td class="value">{{ meal.meal_name }}</td>
-                    <td class="tags-cell">
-                        <div class="view-more">看更多</div>
-                    </td>
-                </tr>
-                
-                <!-- Show message if no meals found -->
-                <tr *ngIf="getMealsForDisplay().length === 0">
-                    <td colspan="3" class="no-meals">
-                        不提供餐食 {{ time }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <span class="time">{{ getMealTime() }}</span>
+  </div>
+
+  <div class="row-2">
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="status-msg">載入中...</div>
+    <div *ngIf="!isLoading && loadingError" class="status-msg error">{{ loadingError }}</div>
+    <div *ngIf="!isLoading && !loadingError && !getMainMeal()" class="status-msg">目前沒有 {{ getMealTime() }} 餐點</div>
+
+    <!-- Main meal (always visible) -->
+    <div *ngIf="getMainMeal() && !isLoading" class="main-meal-row">
+      <span class="meal-code">{{ getMealCode(getMainMeal()!) }}</span>
+      <span class="meal-name">{{ getMainMeal()!.meal_name }}</span>
+      <div class="view-more" (click)="toggleExpand()">
+        {{ expanded ? '收合' : '看更多' }}
+      </div>
     </div>
+
+    <!-- Expanded: all meals -->
+    <div *ngIf="expanded && !isLoading" class="expanded-meals">
+      <div *ngFor="let meal of getAllMeals(); let i = index" class="meal-item" [class.first]="i === 0">
+        <span class="meal-code">{{ getMealCode(meal) }}</span>
+        <span class="meal-name">{{ meal.meal_name }}</span>
+      </div>
+    </div>
+  </div>
 </div>

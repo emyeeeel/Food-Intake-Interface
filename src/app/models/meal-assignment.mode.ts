@@ -14,6 +14,8 @@ export interface MealAssignment {
   meal_type: string;
   day_cycle: string;
   meal_name: string;
+  menu_mode?: 'cyclic' | 'open';
+  serve_date?: string | null;
 }
 
 // Optional: Create a type for creating new meal assignments (without computed fields)

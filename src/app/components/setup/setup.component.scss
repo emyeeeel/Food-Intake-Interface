@@ -1,7 +1,7 @@
 /* setup.component.scss */
 .setup-container {
   width: 100%;
-  max-height: 500px;
+  max-height: none;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -135,5 +135,225 @@
 @media (max-width: 768px) {
   .setup-form {
     grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   WLED CONTROL
+========================================================= */
+.wled-card {
+  margin-top: 16px;
+}
+
+.wled-toggle {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  &:hover { color: #2FA695; }
+
+  .toggle-arrow {
+    font-size: 0.8rem;
+  }
+}
+
+.wled-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wled-scan-row {
+  display: flex;
+  gap: 8px;
+}
+
+.wled-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+
+  &.scan {
+    background: linear-gradient(135deg, #40C1AC, #2FA695);
+    color: white;
+    &:hover { background: linear-gradient(135deg, #2FA695, #258B7A); }
+    &:disabled { background: #B8D8D3; cursor: not-allowed; }
+  }
+
+  &.link {
+    background: #E0F7F4;
+    color: #00313C;
+    border: 1px solid #B8D8D3;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    &:hover { background: #C7F0E8; }
+  }
+
+  &.on {
+    background: #40C1AC;
+    color: white;
+  }
+
+  &.off {
+    background: #FF6B6B;
+    color: white;
+  }
+}
+
+.wled-error {
+  color: #CC0000;
+  font-size: 0.85rem;
+}
+
+.wled-devices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wled-device-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border: 2px solid #B8D8D3;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { border-color: #40C1AC; background: #F0F9F7; }
+  &.selected { border-color: #2FA695; background: #E0F7F4; }
+
+  .device-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #00313C;
+  }
+
+  .device-info {
+    font-size: 0.8rem;
+    color: #7A9B96;
+  }
+}
+
+.wled-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wled-top-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.wled-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #00313C;
+  }
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.color-picker {
+  width: 60px;
+  height: 40px;
+  border: 2px solid #B8D8D3;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 2px;
+
+  &::-webkit-color-swatch-wrapper { padding: 2px; }
+  &::-webkit-color-swatch { border: none; border-radius: 4px; }
+}
+
+.color-value {
+  font-size: 0.85rem;
+  color: #7A9B96;
+  font-family: monospace;
+}
+
+.preset-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preset-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid #ddd;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { transform: scale(1.15); border-color: #333; }
+
+  &.white   { background: #ffffff; }
+  &.warm    { background: #ffb464; }
+  &.red     { background: #ff0000; }
+  &.green   { background: #00ff00; }
+  &.blue    { background: #0000ff; }
+  &.purple  { background: #b400ff; }
+  &.orange  { background: #ff7800; }
+  &.cyan    { background: #00ffff; }
+}
+
+.menu-mode-group {
+  grid-column: 1 / -1;
+
+  .menu-mode-options {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .menu-mode-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid #cfdcd9;
+    border-radius: 8px;
+    background: #fbfdfc;
+    cursor: pointer;
+    font-weight: 500;
+    color: #00313C;
+
+    input[type="radio"] {
+      accent-color: #1f8a70;
+      margin: 0;
+    }
+
+    &:has(input:checked) {
+      border-color: #1f8a70;
+      background: #e8f5f2;
+    }
+  }
+
+  .hint {
+    display: block;
+    margin-top: 6px;
+    color: #6a7a78;
+    font-size: 0.8rem;
+    line-height: 1.4;
   }
 }

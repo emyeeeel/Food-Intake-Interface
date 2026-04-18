@@ -1,0 +1,71 @@
+<div class="dashboard" *ngIf="!isLoading">
+
+  <div class="dashboard-row">
+    <!-- Left: Progress card -->
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-title">今日攝取進度</span>
+        <span class="progress-meta">{{ todayLabel }} / 第{{ cycleDay }}天 / {{ currentMealPeriod }}</span>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-bar" [style.width.%]="progressPercent"></div>
+      </div>
+
+      <div class="progress-stats">
+        <div class="stat">
+          <span class="stat-value completed">{{ completedPatients }}</span>
+          <span class="stat-label">已完成</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value missing">{{ totalPatients - completedPatients }}</span>
+          <span class="stat-label">未拍照</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value total">{{ totalPatients }}</span>
+          <span class="stat-label">總住民</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value percent">{{ progressPercent }}%</span>
+          <span class="stat-label">完成率</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Recent uploads -->
+    <div class="recent-card">
+      <div class="section-title">最近上傳</div>
+      <div class="recent-list" *ngIf="recentUploads.length > 0">
+        <div class="recent-row" *ngFor="let u of recentUploads" (click)="goToPatient(u.patientId)">
+          <span class="recent-time">{{ u.time }}</span>
+          <span class="recent-room">{{ u.room }}-{{ u.bed }}</span>
+          <span class="recent-name">{{ u.name }}</span>
+          <span class="recent-phase" [class.before]="u.phase === '餐前'" [class.after]="u.phase === '餐後'">
+            {{ u.mealTime }}-{{ u.phase }}
+          </span>
+          <span class="recent-device">{{ u.deviceId }}</span>
+        </div>
+      </div>
+      <div class="empty-text" *ngIf="recentUploads.length === 0">今天尚無上傳紀錄</div>
+    </div>
+  </div>
+
+  <!-- Bottom full-width: Missing patients -->
+  <div class="missing-section" *ngIf="missingPatients.length > 0">
+    <button class="btn-toggle-missing" (click)="toggleMissing()">
+      {{ showMissing || searchQuery ? '收起' : '查看' }}未拍照住民 ({{ missingPatients.length }})
+    </button>
+
+    <div class="missing-list" *ngIf="showMissing || searchQuery">
+      <div class="missing-row" *ngFor="let p of missingPatients" (click)="goToPatient(p.id)">
+        <span class="missing-room">{{ p.room }}-{{ p.bed }}</span>
+        <span class="missing-name">{{ p.name }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="dashboard-loading" *ngIf="isLoading">
+  <div class="spinner"></div>
+</div>

@@ -144,14 +144,23 @@
     <div class="excel-upload-container">
       <div class="header-with-back">
         <button class="btn-back" (click)="goBackToOptions()">← 返回</button>
-        <h3>更新循環菜單使用Excel</h3>
+        <h3>透過 Excel 匯入菜單</h3>
       </div>
-      
+
       <div class="upload-section">
+        <div class="mode-banner" [class.open]="menuMode === 'open'" [class.cyclic]="menuMode === 'cyclic'">
+          目前模式：<strong>{{ menuModeLabel }}</strong>
+          @if (menuMode === 'open') {
+            <span class="mode-hint">匯入將建立「日期型」菜單（欄位：日期 / 用餐時間 / 菜色名稱）</span>
+          } @else {
+            <span class="mode-hint">匯入將建立「日週期型」菜單（欄位：日期 / 日週期 / 用餐時間 / 菜色名稱）</span>
+          }
+        </div>
+
         <div class="upload-instructions">
           <h4>上傳說明</h4>
           <ul>
-            <li>請使用提供的Excel模板</li>
+            <li>請使用提供的 Excel 模板（下方按鈕下載當前模式模板）</li>
             <li>確保所有必填欄位都已填寫</li>
             <li>檔案格式必須為 .xlsx 或 .xls</li>
             <li>最大檔案大小: 10MB</li>

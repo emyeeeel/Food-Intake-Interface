@@ -203,6 +203,27 @@ export class DateService implements OnDestroy {
     return this.calculateDayCycleForDate(new Date());
   }
 
+  getCurrentMenuMode(): 'cyclic' | 'open' {
+    return this.settingsService.menuMode;
+  }
+
+  /**
+   * Return the filter params to query meals/assignments for a given date,
+   * based on the active menu mode. In cyclic mode returns {day_cycle}; in
+   * open mode returns {serve_date: 'YYYY-MM-DD'}.
+   */
+  getMealFilterParamsForDate(date: Date): { [key: string]: string } {
+    const mode = this.getCurrentMenuMode();
+    if (mode === 'open') {
+      return { menu_mode: 'open', serve_date: this.formatDate(date) };
+    }
+    return { menu_mode: 'cyclic', day_cycle: this.calculateDayCycleForDate(date).toString() };
+  }
+
+  getTodayMealFilterParams(): { [key: string]: string } {
+    return this.getMealFilterParamsForDate(new Date());
+  }
+
   getTodayDate(): Date {
     return new Date();
   }
@@ -222,7 +243,12 @@ export class DateService implements OnDestroy {
   }
 
   private formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
+    // Use local components — toISOString() converts to UTC and can off-by-one
+    // in non-UTC timezones (e.g. UTC+8 → 2026-04-20 local becomes 2026-04-19Z).
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   ngOnDestroy(): void {

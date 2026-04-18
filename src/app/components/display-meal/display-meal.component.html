@@ -3,165 +3,103 @@
     <h2>所有餐點</h2>
     <div class="header-actions">
       @if (!isLoading && !error) {
-        <span class="total-count">
-          總計: {{ totalMeals }} 道餐點
-        </span>
+        <span class="total-count">總計: {{ totalMeals }} 道餐點</span>
       }
-      <button
-        type="button"
-        class="btn-refresh"
-        (click)="refreshMeals()"
-        [disabled]="isLoading"
-        >
-        @if (!isLoading) {
-          <span>重新整理</span>
-        }
-        @if (isLoading) {
-          <span>載入中...</span>
-        }
+      <button type="button" class="btn-action" (click)="refreshMeals()" [disabled]="isLoading">
+        {{ isLoading ? '載入中...' : '重新整理' }}
       </button>
-      <button
-        type="button"
-        class="btn-download-excel"
-        (click)="downloadMealCycleAsExcel()"
-        [disabled]="isLoading || meals.length === 0"
-        title="下載餐點週期 Excel 檔案"
-      >
-        @if (!isDownloading) {
-          <span class="download-icon">📊</span>
-          <span>下載 Excel</span>
-        }
-        @if (isDownloading) {
-          <span class="download-spinner"></span>
-          <span>準備中...</span>
-        }
+      <button type="button" class="btn-action" (click)="downloadMealCycleAsExcel()" [disabled]="isLoading || meals.length === 0">
+        {{ isDownloading ? '準備中...' : '下載 Excel' }}
       </button>
     </div>
   </div>
 
-  <!-- Loading State -->
-  @if (isLoading) {
-    <div class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>正在載入餐點...</p>
-    </div>
-  }
-
-  <!-- Error State -->
-  @if (error && !isLoading) {
-    <div class="error-state">
-      <div class="error-icon">❌</div>
-      <p class="error-message">{{ error }}</p>
-      <button type="button" class="btn-retry" (click)="refreshMeals()">
-        再試一次
-      </button>
-    </div>
-  }
-
-  <!-- Meals Grid with Pagination -->
+  <!-- Filter -->
   @if (!isLoading && !error && meals.length > 0) {
-    <div class="meals-grid-container">
-      <!-- Current Page Info -->
-      <div class="page-info">
-        <span class="page-indicator">
-          第 {{ currentPage }} 頁，共 {{ totalPages }} 頁
-        </span>
-        <!-- <span class="showing-info">
-        Showing {{ getStartIndex() }} - {{ getEndIndex() }} of {{ totalMeals }} meals
-      </span> -->
+    <div class="filter-bar">
+      <select [(ngModel)]="filterDay" (change)="applyFilter()">
+        <option value="">全部天數</option>
+        @for (d of [1,2,3,4,5,6,7]; track d) {
+          <option [value]="d">第 {{ d }} 天 ({{ getDateForDay(d) }})</option>
+        }
+      </select>
+      <select [(ngModel)]="filterTime" (change)="applyFilter()">
+        <option value="">全部餐期</option>
+        <option value="午餐">午餐</option>
+        <option value="晚餐">晚餐</option>
+      </select>
     </div>
-    <!-- Meals Grid using app-meal-item -->
-    <div class="meals-grid">
-      @for (meal of paginatedMeals; track trackByMealId(i, meal); let i = $index) {
-        <app-meal-item
-          [mealId]="meal.id"
-          [mealImageSrc]="meal.image || 'assets/images/meals/meal_placeholder.jpg'"
-          [mealCode]="getMealCode(meal)"
-          [dayCycleValue]="'第' + (meal.day_cycle || '') + '天'"
-          [mealTimeValue]="meal.meal_time || ''"
-          [plateTypeValue]="meal.plate_type || 'Standard'"
-          [plateTypeValue]="meal.plate_type || ''"
-          class="meal-item-wrapper"
-          >
-        </app-meal-item>
-      }
-    </div>
-    <!-- Pagination Controls -->
-    <div class="pagination-container">
-      <div class="pagination-info">
-        <span>
-          顯示 {{ paginatedMeals.length }} / {{ totalMeals }} 道餐點
-        </span>
-      </div>
-      <div class="pagination-controls">
-        <div class="nav-buttons">
-          <button
-            type="button"
-            class="btn-page btn-first"
-            [disabled]="currentPage === 1"
-            (click)="goToFirstPage()"
-            title="First Page"
-            >
-            <<
-          </button>
-          <button
-            type="button"
-            class="btn-page btn-prev"
-            [disabled]="currentPage === 1"
-            (click)="goToPreviousPage()"
-            title="Previous Page"
-            >
-            <
-          </button>
-        </div>
-        <div class="page-numbers">
-          @for (page of getVisiblePages(); track page) {
-            <button
-              type="button"
-              class="btn-page-number"
-              [class.active]="page === currentPage"
-              [class.ellipsis]="page === '...'"
-              [disabled]="page === '...'"
-              (click)="goToPage(page)"
-              [title]="page === '...' ? '' : 'Go to page ' + page"
-              >
-              {{ page }}
-            </button>
-          }
-        </div>
-        <div class="nav-buttons">
-          <button
-            type="button"
-            class="btn-page btn-next"
-            [disabled]="currentPage === totalPages"
-            (click)="goToNextPage()"
-            >
-            >
-          </button>
-          <button
-            type="button"
-            class="btn-page btn-last"
-            [disabled]="currentPage === totalPages"
-            (click)="goToLastPage()"
-            title="Last Page"
-            >
-            >>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-}
+  }
 
-<!-- Empty State -->
-@if (!isLoading && !error && meals.length === 0) {
-  <div class="empty-state">
-    <div class="empty-icon">🍽️</div>
-    <h3>尚無餐點</h3>
-    <p>資料庫中目前沒有任何餐點</p>
-    <button type="button" class="btn-primary" routerLink="/add-meal">
-      新增第一道餐點
-    </button>
-  </div>
-}
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="status-box">載入中...</div>
+  }
+
+  <!-- Error -->
+  @if (error && !isLoading) {
+    <div class="status-box error">{{ error }}
+      <button class="btn-action" (click)="refreshMeals()">再試一次</button>
+    </div>
+  }
+
+  <!-- Meal Table -->
+  @if (!isLoading && !error && filteredMeals.length > 0) {
+    <table class="meal-table">
+      <thead>
+        <tr>
+          <th class="col-icon"></th>
+          <th class="col-code">代碼</th>
+          <th class="col-day">天數</th>
+          <th class="col-date">日期</th>
+          <th class="col-time">餐期</th>
+          <th class="col-name">菜色名稱</th>
+          <th class="col-plate">餐盤</th>
+          <th class="col-actions">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (meal of paginatedMeals; track meal.id) {
+          <tr>
+            <td class="col-icon">
+              <span class="meal-icon" [class.lunch]="meal.meal_time === '午餐'" [class.dinner]="meal.meal_time === '晚餐'">
+                {{ meal.meal_time === '午餐' ? '☀' : '🌙' }}
+              </span>
+            </td>
+            <td class="col-code">{{ getMealCode(meal) }}</td>
+            <td class="col-day">第 {{ meal.day_cycle }} 天</td>
+            <td class="col-date">{{ getDateForDay(meal.day_cycle) }}</td>
+            <td class="col-time">{{ meal.meal_time }}</td>
+            <td class="col-name">{{ meal.meal_name }}</td>
+            <td class="col-plate">{{ meal.plate_type || '-' }}</td>
+            <td class="col-actions">
+              <button class="btn-edit" (click)="editMeal(meal)" title="編輯">✎</button>
+              <button class="btn-delete" (click)="deleteMeal(meal)" title="刪除">✕</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <span class="page-info">{{ getStartIndex() }}-{{ getEndIndex() }} / {{ filteredMeals.length }}</span>
+      <div class="page-buttons">
+        <button class="btn-page" [disabled]="currentPage === 1" (click)="goToFirstPage()">&laquo;</button>
+        <button class="btn-page" [disabled]="currentPage === 1" (click)="goToPreviousPage()">&lsaquo;</button>
+        @for (page of getVisiblePages(); track page) {
+          <button class="btn-page" [class.active]="page === currentPage" [disabled]="page === '...'" (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        }
+        <button class="btn-page" [disabled]="currentPage === totalPages" (click)="goToNextPage()">&rsaquo;</button>
+        <button class="btn-page" [disabled]="currentPage === totalPages" (click)="goToLastPage()">&raquo;</button>
+      </div>
+    </div>
+  }
+
+  <!-- Empty -->
+  @if (!isLoading && !error && filteredMeals.length === 0) {
+    <div class="status-box">尚無餐點資料</div>
+  }
 </div>

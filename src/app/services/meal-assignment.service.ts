@@ -268,18 +268,35 @@ export class MealAssignmentService {
    * @returns Observable of today's meal assignments
    */
   getTodaysMealAssignments(
-    patientId: number, 
-    isLTCPatient: boolean, 
+    patientId: number,
+    isLTCPatient: boolean,
     dayCycle: number
   ): Observable<MealAssignment[]> {
     let params = new HttpParams().set('day_cycle', dayCycle.toString());
-    
+
     if (isLTCPatient) {
       params = params.set('ltc_patient', patientId.toString());
     } else {
       params = params.set('patient', patientId.toString());
     }
 
+    return this.http.get<MealAssignment[]>(this.apiUrl, { params });
+  }
+
+  /**
+   * Mode-aware lookup. Caller supplies menu_mode filter fields (day_cycle or
+   * serve_date) plus the patient filter; this service adds the patient param.
+   */
+  getMealAssignmentsWithRawFilters(
+    filters: { [key: string]: string | number | undefined }
+  ): Observable<MealAssignment[]> {
+    let params = new HttpParams();
+    Object.keys(filters).forEach(key => {
+      const value = filters[key];
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, String(value));
+      }
+    });
     return this.http.get<MealAssignment[]>(this.apiUrl, { params });
   }
 }

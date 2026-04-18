@@ -1,0 +1,207 @@
+:host { display: block; min-height: 100vh; background: #1a1a2e; color: #e0e0e0; font-family: 'Consolas', 'Courier New', monospace; }
+
+.eng-container { padding: 20px; max-width: 1000px; margin: 0 auto; }
+
+/* === Login Gate === */
+.login-gate {
+  display: flex; justify-content: center; align-items: center; min-height: 100vh;
+
+  .login-card {
+    background: #16213e; border: 1px solid #0f3460; border-radius: 12px;
+    padding: 40px; text-align: center; width: 320px;
+
+    .login-icon {
+      width: 60px; height: 60px; background: #e94560; color: white;
+      border-radius: 50%; font-size: 28px; font-weight: bold;
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+    }
+
+    h2 { color: #e94560; margin-bottom: 24px; font-size: 1.2rem; }
+
+    input {
+      width: 100%; padding: 12px; background: #0f3460; border: 1px solid #533483;
+      color: #e0e0e0; border-radius: 6px; font-size: 1rem; margin-bottom: 12px;
+      text-align: center; letter-spacing: 4px;
+      &:focus { outline: none; border-color: #e94560; }
+    }
+
+    button {
+      width: 100%; padding: 10px; background: #e94560; color: white;
+      border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;
+      &:hover { background: #c73a52; }
+      &:disabled { background: #555; cursor: not-allowed; }
+    }
+  }
+
+  .login-error { color: #e94560; margin-top: 12px; font-size: 0.85rem; }
+}
+
+/* === Header === */
+.eng-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 0; border-bottom: 1px solid #0f3460; margin-bottom: 16px;
+
+  h1 { color: #e94560; font-size: 1.4rem; margin: 0; }
+
+  .session-info { display: flex; align-items: center; gap: 12px; }
+  .timer { color: #533483; font-size: 1.1rem; }
+  .btn-logout {
+    padding: 6px 16px; background: transparent; border: 1px solid #e94560;
+    color: #e94560; border-radius: 4px; cursor: pointer;
+    &:hover { background: #e94560; color: white; }
+  }
+}
+
+/* === Tabs === */
+.tab-bar {
+  display: flex; gap: 4px; margin-bottom: 16px;
+
+  button {
+    padding: 10px 20px; background: #16213e; border: 1px solid #0f3460;
+    color: #888; border-radius: 6px 6px 0 0; cursor: pointer; font-family: inherit;
+    &.active { background: #0f3460; color: #e94560; border-bottom-color: #0f3460; }
+    &:hover { color: #e0e0e0; }
+  }
+}
+
+.tab-content { background: #16213e; border: 1px solid #0f3460; border-radius: 0 8px 8px 8px; padding: 20px; }
+
+/* === Module List === */
+.module-list { display: flex; flex-direction: column; gap: 10px; }
+
+.module-card {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #0f3460; border-radius: 8px; padding: 14px 18px;
+
+  &.inactive {
+    background: #1a1a2e; border: 1px dashed #333;
+    .module-name { color: #555; }
+  }
+
+  .module-info {
+    display: flex; flex-direction: column; gap: 2px;
+    .module-name { font-size: 1.1rem; font-weight: bold; color: #e0e0e0; }
+    .module-key { font-size: 0.75rem; color: #666; }
+    .module-route { font-size: 0.75rem; color: #533483; }
+    .module-status {
+      font-size: 0.8rem; margin-top: 4px;
+      &.status-enabled { color: #4ecca3; }
+      &.status-disabled { color: #e94560; }
+      &.status-inactive { color: #e74c3c; font-weight: bold; }
+      &.status-engineering { color: #f5a623; }
+    }
+  }
+
+  .module-controls {
+    display: flex; align-items: center; gap: 16px;
+
+    .toggle-group {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      .toggle-label { font-size: 0.7rem; color: #888; }
+    }
+
+    .toggle-switch {
+      width: 48px; height: 26px; background: #444; border-radius: 13px;
+      position: relative; cursor: pointer; transition: background 0.3s;
+      border: none; padding: 0; outline: none; display: block;
+
+      .toggle-slider {
+        width: 22px; height: 22px; background: #999; border-radius: 50%;
+        position: absolute; top: 2px; left: 2px; transition: all 0.3s;
+        display: block;
+      }
+
+      &.on {
+        background: #4ecca3;
+        .toggle-slider { left: 24px; background: white; }
+      }
+
+      &.page.on {
+        background: #3498db;
+        .toggle-slider { left: 24px; background: white; }
+      }
+
+      &.eng.on {
+        background: #f5a623;
+        .toggle-slider { left: 24px; background: white; }
+      }
+
+      &.disabled {
+        opacity: 0.35; cursor: not-allowed;
+      }
+    }
+
+    .btn-go {
+      padding: 6px 14px; background: #533483; color: white;
+      border: none; border-radius: 4px; cursor: pointer; font-family: inherit;
+      &:hover { background: #6a42a0; }
+    }
+  }
+}
+
+/* === Dashboard === */
+.loading { text-align: center; color: #888; padding: 20px; }
+
+.dashboard-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+}
+
+.stat-card {
+  background: #0f3460; border-radius: 8px; padding: 20px; text-align: center;
+  display: flex; flex-direction: column; gap: 6px;
+  .stat-value { font-size: 2rem; font-weight: bold; color: #4ecca3; }
+  .stat-label { font-size: 0.8rem; color: #888; }
+  &.highlight .stat-value { color: #e94560; }
+}
+
+/* === Settings === */
+.settings-section {
+  margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #0f3460;
+
+  h3 { color: #533483; margin-bottom: 12px; }
+
+  .setting-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+    label { width: 200px; color: #888; font-size: 0.9rem; }
+    input {
+      padding: 8px; background: #0f3460; border: 1px solid #533483;
+      color: #e0e0e0; border-radius: 4px; font-family: inherit;
+      &:focus { outline: none; border-color: #e94560; }
+    }
+  }
+}
+
+.btn-save {
+  padding: 8px 20px; background: #4ecca3; color: #1a1a2e;
+  border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
+  &:hover { background: #3dbb92; }
+}
+
+.msg-success { color: #4ecca3; margin-top: 12px; }
+.msg-error { color: #e94560; margin-top: 12px; }
+
+/* === Reminder Popup === */
+.reminder-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: flex; justify-content: center; align-items: center; z-index: 9999;
+}
+
+.reminder-card {
+  background: #16213e; border: 2px solid #e94560; border-radius: 12px;
+  padding: 30px; text-align: center; max-width: 400px;
+
+  h3 { color: #e94560; margin-bottom: 12px; }
+  p { color: #e0e0e0; margin-bottom: 20px; }
+
+  .reminder-actions { display: flex; gap: 12px; justify-content: center; }
+  .btn-extend {
+    padding: 10px 24px; background: #4ecca3; color: #1a1a2e;
+    border: none; border-radius: 6px; cursor: pointer; font-weight: bold;
+    &:hover { background: #3dbb92; }
+  }
+  .btn-logout-sm {
+    padding: 10px 24px; background: transparent; border: 1px solid #e94560;
+    color: #e94560; border-radius: 6px; cursor: pointer;
+    &:hover { background: #e94560; color: white; }
+  }
+}

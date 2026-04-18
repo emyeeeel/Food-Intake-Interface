@@ -26,6 +26,8 @@ export class MealAssignmentComponent implements OnInit, OnChanges, OnDestroy {
   error: string | null = null;
   mealId: number | null = null;
   currentDayCycle: number = 1; // Current day cycle from date service
+  currentMenuMode: 'cyclic' | 'open' = 'cyclic';
+  currentSelectedDateStr: string = '';
 
   @Output() mealsStatus = new EventEmitter<boolean>();
 
@@ -65,17 +67,27 @@ export class MealAssignmentComponent implements OnInit, OnChanges, OnDestroy {
   private subscribeToDateChanges(): void {
     this.dateSubscription = this.dateService.selectedDate$.subscribe(selectedDate => {
       const newDayCycle = this.dateService.calculateDayCycleForDate(selectedDate);
-      
-      if (newDayCycle !== this.currentDayCycle) {
-        this.currentDayCycle = newDayCycle;
-        console.log(`MealAssignmentComponent (${this.mealType}): Date changed, new day cycle: ${newDayCycle}`);
-        
-        // Re-process existing assignments with new day cycle
-        if (this.mealAssignments.length > 0) {
-          this.processMealAssignments(this.mealAssignments);
-        }
+      const newMode = this.dateService.getCurrentMenuMode();
+      const newDateStr = this.formatDateISO(selectedDate);
+
+      const modeChanged = newMode !== this.currentMenuMode;
+      const dateChanged = newDateStr !== this.currentSelectedDateStr;
+      const cycleChanged = newDayCycle !== this.currentDayCycle;
+
+      this.currentDayCycle = newDayCycle;
+      this.currentMenuMode = newMode;
+      this.currentSelectedDateStr = newDateStr;
+
+      if ((modeChanged || dateChanged || cycleChanged) && this.mealAssignments.length > 0) {
+        this.processMealAssignments(this.mealAssignments);
       }
     });
+  }
+
+  private formatDateISO(d: Date): string {
+    return d.getFullYear() +
+      '-' + String(d.getMonth() + 1).padStart(2, '0') +
+      '-' + String(d.getDate()).padStart(2, '0');
   }
 
   /**
@@ -119,17 +131,26 @@ export class MealAssignmentComponent implements OnInit, OnChanges, OnDestroy {
 
     const targetMealTime = mealTimeMap[this.mealType] || '午餐';
 
-    console.log(`Processing assignments for meal type: ${targetMealTime}, day cycle: ${this.currentDayCycle}`);
+    console.log(`Processing assignments (${this.currentMenuMode}) for ${targetMealTime}, day=${this.currentDayCycle} date=${this.currentSelectedDateStr}`);
 
-    // Filter assignments by meal type and current day cycle
     let filteredAssignments = assignments.filter(assignment => {
       const matchesMealType = assignment.meal_type === targetMealTime;
-      const matchesDayCycle = parseInt(assignment.day_cycle) === this.currentDayCycle;
-      
-      return matchesMealType && matchesDayCycle;
+      if (!matchesMealType) return false;
+      const mode = (assignment as any).menu_mode || assignment.meal_detail?.menu_mode || 'cyclic';
+      if (this.currentMenuMode === 'open') {
+        const serveDate = (assignment as any).serve_date || assignment.meal_detail?.serve_date;
+        return mode === 'open' && serveDate === this.currentSelectedDateStr;
+      }
+      return mode === 'cyclic' && parseInt(assignment.day_cycle) === this.currentDayCycle;
     });
 
-    console.log(`Found ${filteredAssignments.length} matching assignments`);
+    // Stable sort by meal id (matches Excel import order) so the "first" meal
+    // shown is deterministic rather than depending on DB null-ordering quirks.
+    filteredAssignments = filteredAssignments.sort(
+      (a, b) => (a.meal_detail?.id ?? a.meal ?? 0) - (b.meal_detail?.id ?? b.meal ?? 0)
+    );
+
+    console.log(`Found ${filteredAssignments.length} matching assignments (sorted by meal id)`);
 
     if (filteredAssignments.length > 0) {
       // Use the meal detail from the assignment (no need for additional API call)
@@ -214,9 +235,13 @@ export class MealAssignmentComponent implements OnInit, OnChanges, OnDestroy {
 
     return this.mealAssignments.filter(assignment => {
       const matchesMealType = assignment.meal_type === targetMealTime;
-      const matchesDayCycle = parseInt(assignment.day_cycle) === this.currentDayCycle;
-      
-      return matchesMealType && matchesDayCycle;
+      if (!matchesMealType) return false;
+      const mode = (assignment as any).menu_mode || assignment.meal_detail?.menu_mode || 'cyclic';
+      if (this.currentMenuMode === 'open') {
+        const serveDate = (assignment as any).serve_date || assignment.meal_detail?.serve_date;
+        return mode === 'open' && serveDate === this.currentSelectedDateStr;
+      }
+      return mode === 'cyclic' && parseInt(assignment.day_cycle) === this.currentDayCycle;
     });
   }
 
@@ -237,18 +262,24 @@ export class MealAssignmentComponent implements OnInit, OnChanges, OnDestroy {
   // --- Meal code getter (updated to use current day cycle) ---
   get mealCode(): string {
     if (!this.assignedMeal) return '';
-    
-    // Use meal type mapping to letter codes
+
     const mealTypeToLetter: { [key: string]: string } = {
       'lunch': 'L',
       'dinner': 'D',
       'snack': 'S'
     };
-    
+
     const mealLetter = mealTypeToLetter[this.mealType] || 'U';
-    const dayCycle = this.currentDayCycle;
     const mealId = this.assignedMeal.id ?? '';
-    
+
+    if (this.currentMenuMode === 'open') {
+      // For open mode show MMDD derived from serve_date, since day_cycle is meaningless.
+      const dateStr = this.currentSelectedDateStr; // YYYY-MM-DD
+      const mmdd = dateStr ? dateStr.slice(5).replace('-', '') : '';
+      return `${mealLetter}-${mmdd}-${mealId}`;
+    }
+
+    const dayCycle = this.currentDayCycle;
     return `${mealLetter}-${dayCycle}-${mealId}`;
   }
 

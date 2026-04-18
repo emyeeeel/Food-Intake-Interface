@@ -1,5 +1,5 @@
 <div class="menu-container">
-  @for (option of menuOptions; track option) {
+  @for (option of visibleOptions; track option) {
     <div
       class="menu-option"
       [class.selected]="option.isSelected"
@@ -8,7 +8,7 @@
         [src]="option.isSelected ? option.selectedIcon : option.defaultIcon"
         [alt]="option.text + ' icon'"
         class="menu-icon">
-        <span class="menu-text">{{ option.text }}</span>
+        <span class="menu-text" [class.hidden]="collapsed">{{ option.text }}</span>
       </div>
     }
   </div>

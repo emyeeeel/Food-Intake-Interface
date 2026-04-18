@@ -6,8 +6,28 @@
     <div class="main-container">
       <div class="row-1">
         <app-back></app-back>
-        <div class="search-bar">
-          <app-search-bar></app-search-bar>
+        <div class="search-bar patient-search-wrapper">
+          <div class="patient-search" (click)="focusPatientSearch()">
+            <img src="assets/icons/search-icon.svg" alt="Search" class="search-icon" />
+            <input
+              type="text"
+              class="patient-search-input"
+              placeholder="搜尋住民（房號或姓名）..."
+              [(ngModel)]="patientSearchQuery"
+              (input)="onPatientSearch()"
+              (focus)="showPatientResults = true"
+              #patientSearchInput />
+          </div>
+          @if (showPatientResults && patientSearchResults.length > 0) {
+            <div class="patient-search-dropdown">
+              @for (p of patientSearchResults; track p.id) {
+                <div class="patient-search-item" (mousedown)="selectPatient(p.id)">
+                  <span class="psr-room">{{ p.room_number }}-{{ p.bed_number }}</span>
+                  <span class="psr-name">{{ p.name || '—' }}</span>
+                </div>
+              }
+            </div>
+          }
         </div>
         <app-notif></app-notif>
       </div>

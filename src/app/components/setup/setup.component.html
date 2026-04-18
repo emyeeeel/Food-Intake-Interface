@@ -8,7 +8,22 @@
         <input type="text" formControlName="careCenterName" />
       </div>
 
-      <div class="form-group">
+      <div class="form-group menu-mode-group">
+        <label>菜單模式</label>
+        <div class="menu-mode-options">
+          <label class="menu-mode-option">
+            <input type="radio" formControlName="menuMode" value="cyclic" />
+            <span>循環模式（N 天重複）</span>
+          </label>
+          <label class="menu-mode-option">
+            <input type="radio" formControlName="menuMode" value="open" />
+            <span>開放模式（每日獨立）</span>
+          </label>
+        </div>
+        <small class="hint">循環模式依「餐期循環開始日期」和「循環天數」對齊；開放模式依 Excel 的「日期」欄位匯入。</small>
+      </div>
+
+      <div class="form-group" *ngIf="settingsForm.get('menuMode')?.value === 'cyclic'">
         <label>餐期循環開始日期</label>
         <input type="date" formControlName="mealCycleStartDate" />
       </div>
@@ -33,7 +48,7 @@
         <input type="time" formControlName="dinnerEnd" />
       </div>
 
-      <div class="form-group">
+      <div class="form-group" *ngIf="settingsForm.get('menuMode')?.value === 'cyclic'">
         <label>餐期循環天數</label>
         <input type="number" formControlName="mealCycleLength" min="1" />
       </div>
@@ -50,6 +65,11 @@
         </small>
       </div>
 
+      <div class="form-group" *ngIf="deviceId">
+        <label>裝置 ID</label>
+        <input type="text" [value]="deviceId" disabled />
+      </div>
+
       <div class="button-group">
         <button type="submit" class="primary" [disabled]="saving">儲存設定</button>
       </div>
@@ -57,5 +77,94 @@
 
     <div *ngIf="error" class="error">{{ error }}</div>
     <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+  </div>
+
+  <!-- WLED Control -->
+  <div class="setup-card wled-card">
+    <h2 class="setup-title wled-toggle" (click)="wledExpanded = !wledExpanded">
+      LED 燈光控制
+      <span class="toggle-arrow">{{ wledExpanded ? '▲' : '▼' }}</span>
+    </h2>
+
+    <div class="wled-section" *ngIf="wledExpanded">
+      <!-- Scan -->
+      <div class="wled-scan-row">
+        <button class="wled-btn scan" (click)="scanWled()" [disabled]="wledScanning">
+          {{ wledScanning ? '掃描中...' : '掃描 WLED 裝置' }}
+        </button>
+        <button *ngIf="wledSelectedIp" class="wled-btn link" (click)="scanWled()">
+          重新掃描
+        </button>
+      </div>
+
+      <div *ngIf="wledError" class="wled-error">{{ wledError }}</div>
+
+      <!-- Device list -->
+      <div *ngIf="wledDevices.length > 0" class="wled-devices">
+        <div
+          *ngFor="let device of wledDevices"
+          class="wled-device-item"
+          [class.selected]="device.ip === wledSelectedIp"
+          (click)="selectWledDevice(device.ip)">
+          <span class="device-name">{{ device.name }}</span>
+          <span class="device-info">{{ device.ip }} | {{ device.leds }} LEDs | {{ device.arch }}</span>
+        </div>
+      </div>
+
+      <!-- Controls (shown after device selected) -->
+      <div *ngIf="wledSelectedIp" class="wled-controls">
+
+        <!-- On/Off + Open UI -->
+        <div class="wled-top-row">
+          <button class="wled-btn" [class.on]="wledOn" [class.off]="!wledOn" (click)="toggleWled()">
+            {{ wledOn ? '開燈' : '關燈' }}
+          </button>
+          <a class="wled-btn link" [href]="'http://' + wledSelectedIp" target="_blank">
+            前往 WLED 介面
+          </a>
+        </div>
+
+        <!-- Color picker -->
+        <div class="wled-control-group">
+          <label>顏色</label>
+          <div class="color-row">
+            <input
+              type="color"
+              [(ngModel)]="wledColor"
+              (change)="onWledColorChange()"
+              class="color-picker" />
+            <span class="color-value">{{ wledColor }}</span>
+          </div>
+        </div>
+
+        <!-- Presets -->
+        <div class="wled-control-group">
+          <label>快速選色</label>
+          <div class="preset-row">
+            <button class="preset-btn white" (click)="setWledPreset(255,255,255,'白光')"></button>
+            <button class="preset-btn warm" (click)="setWledPreset(255,180,100,'暖光')"></button>
+            <button class="preset-btn red" (click)="setWledPreset(255,0,0,'紅')"></button>
+            <button class="preset-btn green" (click)="setWledPreset(0,255,0,'綠')"></button>
+            <button class="preset-btn blue" (click)="setWledPreset(0,0,255,'藍')"></button>
+            <button class="preset-btn purple" (click)="setWledPreset(180,0,255,'紫')"></button>
+            <button class="preset-btn orange" (click)="setWledPreset(255,120,0,'橙')"></button>
+            <button class="preset-btn cyan" (click)="setWledPreset(0,255,255,'青')"></button>
+          </div>
+        </div>
+
+        <!-- Brightness -->
+        <div class="wled-control-group">
+          <label>亮度：{{ (wledBrightness / 255 * 100) | number:'1.0-0' }}%</label>
+          <input
+            type="range"
+            min="1"
+            max="255"
+            [(ngModel)]="wledBrightness"
+            (change)="onWledBrightnessChange()"
+            class="brightness-slider" />
+        </div>
+
+      </div>
+    </div>
   </div>
 </div>

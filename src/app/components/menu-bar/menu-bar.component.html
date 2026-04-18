@@ -1,4 +1,4 @@
-<div class="menu-container" [class.mobile-open]="isMobileOpen">
+<div class="menu-container" [class.mobile-open]="isMobileOpen" [class.collapsed]="isCollapsed">
   <!-- Logo -->
   <div class="logo-container">
     <!-- Hamburger button for mobile -->
@@ -7,19 +7,27 @@
       <span class="hamburger-line"></span>
       <span class="hamburger-line"></span>
     </button>
-    <img src="assets/logo/SpoonFull_Logo.png" alt="SpoonFull Logo" />
+    <img src="assets/logo/SpoonFull_Logo.png" alt="SpoonFull Logo" class="logo-full" />
   </div>
 
   <!-- Menu options -->
   <div class="menu-options">
-    <app-menu-option></app-menu-option>
+    <app-menu-option [collapsed]="isCollapsed"></app-menu-option>
 
     <!-- Logout inside mobile menu -->
     <div class="logout-option mobile-logout" (click)="logout()">
       <img src="assets/icons/logout-icon.svg" alt="Logout icon" class="logout-icon" />
-      <span class="logout-text">登出</span>
+      <span class="logout-text" *ngIf="!isCollapsed">登出</span>
     </div>
   </div>
+
+  <!-- Collapse toggle (desktop only) -->
+  <button class="collapse-btn" (click)="toggleCollapse()" aria-label="Toggle sidebar">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path *ngIf="!isCollapsed" d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path *ngIf="isCollapsed" d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
 
   <!-- Overlay for mobile menu -->
   @if (isMobileOpen) {

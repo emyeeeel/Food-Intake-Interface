@@ -3,16 +3,45 @@
     <h2>所有患者</h2>
     <div class="header-actions">
       @if (!isLoading && !error) {
-        <span class="total-count">
-          總計: {{ totalPatients }} 患者
-        </span>
+        <span class="total-count">總計: {{ totalPatients }} 患者</span>
       }
+
+      <button
+        type="button"
+        class="btn-template"
+        (click)="downloadTemplate()">
+        下載範本
+      </button>
+
+      <button
+        type="button"
+        class="btn-upload"
+        (click)="openExcelPicker()"
+        [disabled]="uploadInProgress">
+        @if (uploadInProgress) {
+          <span>上傳中...</span>
+        } @else {
+          <span>上傳住民資料 Excel</span>
+        }
+      </button>
+
+      <button
+        type="button"
+        class="btn-import"
+        (click)="importResidentExcel()"
+        [disabled]="importInProgress">
+        @if (importInProgress) {
+          <span>匯入中...</span>
+        } @else {
+          <span>匯入 Excel</span>
+        }
+      </button>
+
       <button
         type="button"
         class="btn-refresh"
         (click)="getPatients()"
-        [disabled]="isLoading"
-        >
+        [disabled]="isLoading">
         @if (!isLoading) {
           <span>重新整理</span>
         }
@@ -20,58 +49,77 @@
           <span>載入中...</span>
         }
       </button>
+
+      <input
+        #residentExcelInput
+        class="excel-file-input"
+        type="file"
+        accept=".xlsx,.xls"
+        (change)="onResidentExcelSelected($event)">
     </div>
   </div>
 
-  <!-- Loading State -->
+  @if (uploadedExcelName || excelStatusMessage) {
+    <div class="excel-status" [class.success]="excelStatusType === 'success'" [class.error]="excelStatusType === 'error'">
+      @if (uploadedExcelName) {
+        <span class="excel-file-name">目前伺服器檔案：{{ uploadedExcelName }}</span>
+      }
+      @if (excelStatusMessage) {
+        <span class="excel-message">{{ excelStatusMessage }}</span>
+      }
+    </div>
+  }
+
   @if (isLoading) {
     <div class="loading-state">
       <div class="loading-spinner"></div>
-      <p>正在載入患者...</p>
+      <p>正在載入患者資料...</p>
     </div>
   }
 
-  <!-- Error State -->
   @if (error && !isLoading) {
     <div class="error-state">
-      <div class="error-icon">❌</div>
+      <div class="error-icon">!</div>
       <p class="error-message">{{ error }}</p>
-      <button type="button" class="btn-retry" (click)="getPatients()">
-        再試一次
-      </button>
+      <button type="button" class="btn-retry" (click)="getPatients()">重新載入</button>
     </div>
   }
 
-  <!-- Patients Grid with Pagination -->
   @if (!isLoading && !error && patients.length > 0) {
     <div class="patients-grid-container">
-      <!-- Current Page Info -->
       <div class="page-info">
-        <span class="page-indicator">
-          第 {{ currentPage }} 頁，共 {{ totalPages }} 頁
-        </span>
+        <span class="page-indicator">第 {{ currentPage }} 頁，共 {{ totalPages }} 頁</span>
       </div>
-      <!-- Patients Grid -->
+
       <div class="patients-grid">
         @for (patient of paginatedPatients; track patient.id) {
           <div class="patient-item">
             <div class="patient-header">
               <span class="room-bed">{{ patient.room_number }}-{{ patient.bed_number }}</span>
-              <span class="name">( {{ patient.name }} )</span>
+              <span class="name">({{ patient.name || '未命名' }})</span>
             </div>
             <div class="patient-actions">
               <a [routerLink]="['/patient-info', patient.id, 'view']" class="btn-action view">查看</a>
               <a [routerLink]="['/patient-info', patient.id, 'edit']" class="btn-action edit">編輯</a>
+              <button
+                type="button"
+                class="btn-action delete"
+                (click)="deletePatient(patient)"
+                [disabled]="deletingPatientId === patient.id">
+                @if (deletingPatientId === patient.id) {
+                  <span>刪除中</span>
+                } @else {
+                  <span>刪除</span>
+                }
+              </button>
             </div>
           </div>
         }
       </div>
-      <!-- Pagination Controls -->
+
       <div class="pagination-container">
         <div class="pagination-info">
-          <span>
-            顯示 {{ paginatedPatients.length }} / {{ totalPatients }} 患者
-          </span>
+          <span>顯示 {{ paginatedPatients.length }} / {{ totalPatients }} 患者</span>
         </div>
         <div class="pagination-controls">
           <div class="nav-buttons">
@@ -80,17 +128,15 @@
               class="btn-page btn-first"
               [disabled]="currentPage === 1"
               (click)="goToPage(1)"
-              title="First Page"
-              >
-              ⏮
+              title="第一頁">
+              «
             </button>
             <button
               type="button"
               class="btn-page btn-prev"
               [disabled]="currentPage === 1"
-              (click)="previousPage()"
-              >
-              ◀
+              (click)="previousPage()">
+              ‹
             </button>
             <div class="page-numbers">
               @for (page of getPageNumbers(); track page) {
@@ -98,8 +144,7 @@
                   type="button"
                   class="btn-page"
                   [class.active]="page === currentPage"
-                  (click)="goToPage(page)"
-                  >
+                  (click)="goToPage(page)">
                   {{ page }}
                 </button>
               }
@@ -108,18 +153,16 @@
               type="button"
               class="btn-page btn-next"
               [disabled]="currentPage === totalPages"
-              (click)="nextPage()"
-              >
-              ▶
+              (click)="nextPage()">
+              ›
             </button>
             <button
               type="button"
               class="btn-page btn-last"
               [disabled]="currentPage === totalPages"
               (click)="goToPage(totalPages)"
-              title="Last Page"
-              >
-              ⏭
+              title="最後一頁">
+              »
             </button>
           </div>
         </div>
@@ -127,10 +170,9 @@
     </div>
   }
 
-  <!-- Empty State -->
   @if (!isLoading && !error && patients.length === 0) {
     <div class="empty-state">
-      <p>無患者數據</p>
+      <p>目前沒有任何患者資料。</p>
     </div>
   }
 </div>

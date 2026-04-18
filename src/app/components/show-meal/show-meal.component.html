@@ -1,3 +1,32 @@
-<div class="main-container">
-    <p>content here</p>
+<div class="show-meal-container">
+
+  <div *ngIf="isLoading" class="status-msg">載入中...</div>
+  <div *ngIf="error" class="status-msg error">{{ error }}</div>
+
+  <div *ngIf="meal && !isLoading" class="meal-detail">
+
+    <div class="detail-header">
+      <button class="back-btn" (click)="goBack()">&larr; 返回膳食目錄</button>
+    </div>
+
+    <!-- Meal group header -->
+    <div class="group-header">
+      <img [src]="getMealTimeIcon()" alt="meal time" class="meal-time-icon" />
+      <div class="group-title">
+        <h2>{{ getCycleDateLabel() }} {{ meal.meal_time }}</h2>
+        <span class="group-subtitle">共 {{ sameMealGroupMeals.length }} 道菜</span>
+      </div>
+    </div>
+
+    <!-- Full meal list -->
+    <div class="meal-list">
+      <div *ngFor="let m of sameMealGroupMeals; let i = index" class="meal-row">
+        <span class="meal-order">{{ i + 1 }}</span>
+        <span class="meal-code">{{ getMealCode(m) }}</span>
+        <span class="meal-name">{{ m.meal_name }}</span>
+        <span class="meal-plate">{{ m.plate_type || '' }}</span>
+      </div>
+    </div>
+
+  </div>
 </div>

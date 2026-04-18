@@ -4,14 +4,14 @@
     <input
       type="text"
       class="search-input"
-      placeholder="Search here"
+      [placeholder]="placeholder"
       [(ngModel)]="searchQuery"
       (blur)="onSearchBlur()"
       (keyup.enter)="performSearch()"
+      (input)="searchChanged.emit(searchQuery)"
       #searchInput>
   }
   @if (!isSearchActive) {
-    <span
-    class="search-text">搜尋</span>
+    <span class="search-text">{{ placeholder }}</span>
   }
 </div>

@@ -1,12 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MealsService } from '../../services/meals.service';
-import { DateService } from '../../services/date.service'; // Add DateService import
+import { DateService } from '../../services/date.service';
 import { Meal } from '../../models/meal.model';
-import { MealItemComponent } from '../meal-item/meal-item.component'; 
-import { environment } from '../../../environments/environment';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -14,20 +13,24 @@ import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-display-meal',
-  imports: [FormsModule, RouterModule, MealItemComponent], // Add MealItemComponent
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './display-meal.component.html',
   styleUrl: './display-meal.component.scss'
 })
-export class DisplayMealComponent implements OnInit {
+export class DisplayMealComponent implements OnInit, OnChanges {
+  @Input() searchQuery = '';
   meals: Meal[] = [];
+  filteredMeals: Meal[] = [];
   paginatedMeals: Meal[] = [];
   isLoading = false;
   error: string | null = null;
-  isDownloading: boolean = false; // Add this property
+  isDownloading = false;
 
-  // Pagination properties - Default to 4 items per page
+  filterDay = '';
+  filterTime = '';
+
   currentPage = 1;
-  pageSize = 2;
+  pageSize = 15;
   totalMeals = 0;
   totalPages = 0;
   targetPage: number | null = null;
@@ -35,11 +38,18 @@ export class DisplayMealComponent implements OnInit {
   constructor(
     private mealsService: MealsService,
     private dateService: DateService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
     this.getMeals();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['searchQuery']) {
+      this.applyFilter();
+    }
   }
 
   //utilize getMeals from meals services and log them on init
@@ -50,28 +60,7 @@ export class DisplayMealComponent implements OnInit {
     this.mealsService.getMeals().subscribe({
       next: (meals: Meal[]) => {
         this.meals = meals;
-        this.totalMeals = meals.length;
-        this.calculatePagination();
-        this.updatePaginatedMeals();
-        
-        console.log('Meals loaded successfully:', meals);
-        console.log(`Total meals count: ${meals.length}`);
-        console.log(`Displaying ${this.pageSize} meals per page`);
-        
-        // Log detailed meal information
-        meals.forEach((meal, index) => {
-          console.log(`Meal ${index + 1}:`, {
-            id: meal.id,
-            name: meal.meal_name,
-            mealTime: meal.meal_time,
-            dayCycle: meal.day_cycle,
-            plateType: meal.plate_type,
-            ingredientsCount: meal.ingredients?.length || 0,
-            createdAt: meal.created_at,
-            updatedAt: meal.updated_at
-          });
-        });
-
+        this.applyFilter();
         this.isLoading = false;
       },
       error: (error) => {
@@ -101,8 +90,7 @@ export class DisplayMealComponent implements OnInit {
   updatePaginatedMeals(): void {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    this.paginatedMeals = this.meals.slice(startIndex, endIndex);
-    console.log(`Page ${this.currentPage}: Showing ${this.paginatedMeals.length} meals`);
+    this.paginatedMeals = this.filteredMeals.slice(startIndex, endIndex);
   }
 
   goToPage(page: number | string): void {
@@ -206,7 +194,55 @@ export class DisplayMealComponent implements OnInit {
     return (this.currentPage - 1) * this.pageSize + index + 1;
   }
 
-  // Helper methods for meal-item component
+  applyFilter(): void {
+    let result = [...this.meals];
+    if (this.filterDay) {
+      result = result.filter(m => String(m.day_cycle) === this.filterDay);
+    }
+    if (this.filterTime) {
+      result = result.filter(m => m.meal_time === this.filterTime);
+    }
+    // Search query: match meal name, date (M/D), day number, meal time
+    const q = (this.searchQuery || '').trim().toLowerCase();
+    if (q) {
+      result = result.filter(m => {
+        const name = (m.meal_name || '').toLowerCase();
+        const isOpen = m.menu_mode === 'open';
+        const dayLabel = isOpen ? '' : `第${m.day_cycle}天`;
+        const dateLabel = isOpen
+          ? (m.serve_date || '')
+          : this.getDateForDay(m.day_cycle);
+        return name.includes(q) ||
+          (dayLabel && dayLabel.includes(q)) ||
+          dateLabel.includes(q) ||
+          (m.meal_time || '').includes(q);
+      });
+    }
+    // Sort: open meals by serve_date ascending; cyclic by day_cycle; then meal_time then id
+    result.sort((a, b) => {
+      const aOpen = a.menu_mode === 'open';
+      const bOpen = b.menu_mode === 'open';
+      if (aOpen && bOpen) {
+        const aDate = a.serve_date || '';
+        const bDate = b.serve_date || '';
+        if (aDate !== bDate) return aDate < bDate ? -1 : 1;
+      } else if (!aOpen && !bOpen) {
+        const aDay = a.day_cycle ?? 0;
+        const bDay = b.day_cycle ?? 0;
+        if (aDay !== bDay) return aDay - bDay;
+      } else {
+        return aOpen ? 1 : -1;
+      }
+      if (a.meal_time !== b.meal_time) return a.meal_time === '午餐' ? -1 : 1;
+      return a.id - b.id;
+    });
+    this.filteredMeals = result;
+    this.totalMeals = result.length;
+    this.currentPage = 1;
+    this.calculatePagination();
+    this.updatePaginatedMeals();
+  }
+
   getMealCode(meal: Meal): string {
     if (!meal) return '';
   
@@ -246,19 +282,15 @@ export class DisplayMealComponent implements OnInit {
   }
 
   editMeal(meal: Meal): void {
-    console.log('Edit meal:', meal);
-    // Navigate to edit meal page
-    // Example: this.router.navigate(['/edit-meal', meal.id]);
+    this.router.navigate(['/meal-catalog', meal.id, 'edit']);
   }
 
   deleteMeal(meal: Meal): void {
-    console.log('Delete meal:', meal);
-    // Show confirmation dialog and delete meal
-    if (confirm(`Are you sure you want to delete "${meal.meal_name}"?`)) {
-      // Call delete service method
-      // this.mealsService.deleteMeal(meal.id).subscribe(() => {
-      //   this.getMeals(); // Refresh the list
-      // });
+    if (confirm(`確定要刪除「${meal.meal_name}」(${this.getMealCode(meal)})？`)) {
+      this.mealsService.deleteMeal(meal.id).subscribe({
+        next: () => this.getMeals(),
+        error: (err) => alert('刪除失敗: ' + (err?.error?.detail || '未知錯誤')),
+      });
     }
   }
 
@@ -266,6 +298,15 @@ export class DisplayMealComponent implements OnInit {
   refreshMeals(): void {
     console.log('Refreshing meals...');
     this.getMeals();
+  }
+
+  getDateForDay(dayCycle: number): string {
+    try {
+      const d = this.dateService.getDateForCycleDay(dayCycle);
+      return `${d.getMonth() + 1}/${d.getDate()}`;
+    } catch {
+      return '';
+    }
   }
 
   trackByMealId(index: number, meal: Meal): number {

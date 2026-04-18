@@ -1,12 +1,13 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { finalize, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GetAnalysisService {
-  private baseUrl = `https://jqh2g82b-8000.asse.devtunnels.ms`;
+  private baseUrl = environment.apiBaseUrl;
   private apiUrl = `${this.baseUrl}/api/recommendations/generate`;
 
   constructor(private http: HttpClient) { }

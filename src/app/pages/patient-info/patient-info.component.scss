@@ -6,9 +6,6 @@
   overflow-x: hidden;
 }
 
-/* =========================================================
-   MEAL CATALOG CONTAINER
-========================================================= */
 .patient-info-container {
   display: flex;
   flex-direction: column;
@@ -16,9 +13,9 @@
   @media (min-width: 481px) {
     flex-direction: row;
   }
-} 
+}
 
-.patient-container{
+.patient-container {
   width: 100%;
 }
 
@@ -40,61 +37,50 @@
 
   @media (min-width: 1025px) {
     padding: 35px 20px;
-    gap: 25px;
+    gap: 20px;
   }
 
-  /* Global container width constraint */
-  div {
+  // Width constraint for direct layout rows only
+  > .row-1, > .row-2, > .row-3, > .row-4, > .row-5,
+  > .patient-container, > .edit-record-view,
+  > .patient-analysis, > .intake-analysis {
     width: 100%;
     max-width: 883px;
     margin: 0 auto;
     box-sizing: border-box;
   }
 
-  app-add-patient{
+  app-add-patient,
+  app-display-patient,
+  app-print-all-patients {
     width: 100%;
     max-width: 883px;
     margin: 0 auto;
     box-sizing: border-box;
   }
 
-  app-display-patient{
-    width: 100%;
-    max-width: 883px;
-    margin: 0 auto;
-    box-sizing: border-box;    
-  }
-
-  app-print-all-patients{
-    width: 100%;
-    max-width: 883px;
-    margin: 0 auto;
-    box-sizing: border-box;
-  }
-  
   &.mobile-menu-open {
     filter: brightness(0.7);
     pointer-events: none;
   }
 
-  /* =========================================================
-     ROW 1 — Search + Notification
-  ========================================================= */
+  // ========= ROW 1 — Search + Notification =========
   .row-1 {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 10px;
-    height: 44px; 
+    height: 44px;
 
-    @media (min-width: 481px) {
-      gap: 15px;
-    }
+    @media (min-width: 481px) { gap: 15px; }
+    @media (min-width: 768px) { gap: 12px; height: 48px; }
+    @media (min-width: 1024px) { gap: 15px; height: 45px; }
+    @media (min-width: 1280px) { gap: 15px; height: 56px; }
 
     .search-bar {
       flex: 1;
       min-width: 0;
-      height: 100%; 
+      height: 100%;
       app-search-bar {
         width: 100%;
         height: 100%;
@@ -104,141 +90,90 @@
 
     app-notif {
       flex-shrink: 0;
-      height: 100%; 
-    }
-  
-    @media (min-width: 768px) {
-      gap: 12px;
-      height: 48px; 
-    }
-  
-    @media (min-width: 1024px) {
-      gap: 15px;
-      height: 45px; 
-    }
-  
-    @media (min-width: 1280px) {
-      gap: 15px;
-      height: 56px; 
+      height: 100%;
     }
   }
 
-/* =========================================================
- ROW 2 — Filter Options 
-========================================================= */
-
-.row-2 {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0; 
-
-  app-patient-card {
-    min-width: 0; 
-    flex: 1 1 auto;
-  }
-
-  .medical-data {
-    width: 100%;
-    max-width: 390px;
+  // ========= ROW 2 — Patient Card + Medical Data =========
+  .row-2 {
     display: flex;
-    flex-direction: row;
-    gap: 15px;
-     
-    > * {
-      flex: 1 1 0;
-      min-width: 0;   
-      max-width: 100%;
-      overflow: hidden; 
+    flex-direction: column;
+    gap: 12px;
+
+    app-patient-card {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .medical-data {
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+
+      > * {
+        flex: 1 1 0;
+        min-width: 0;
+        overflow: hidden;
+      }
+    }
+
+    @media (min-width: 481px) {
+      flex-direction: row;
+      gap: 15px;
+      align-items: stretch;
     }
 
     @media (min-width: 1025px) {
-      max-width: none;     
-      width: auto;         
+      gap: 20px;
+    }
+  }
+
+  // ========= ROW 3 — Action Buttons =========
+  .row-3 {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    > * {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+
+    @media (min-width: 481px) {
+      flex-direction: row;
+      gap: 15px;
 
       > * {
-        flex: unset;       
-        min-width: unset;  
-        max-width: unset;  
-        overflow: unset;   
+        flex: 1 1 0;
+        max-height: 100px;
+      }
+    }
+
+    @media (min-width: 1025px) {
+      gap: 20px;
+
+      > * {
+        max-width: 300px;
+        max-height: 110px;
+      }
+    }
+
+    @media (min-width: 1280px) {
+      gap: 25px;
+
+      > * {
+        max-width: 340px;
       }
     }
   }
 
-  @media (min-width: 481px) {
-    flex-direction: row;
-    gap: 15px;
-    max-height: 205px;
-  }
-
-  @media (min-width: 1025px) {
-    flex-direction: row;
-    gap: 20px;
-    min-height: 260px;
-  }
-}
-
- /* =========================================================
-   ROW 3 — Main Options (Content contained)
-========================================================= */
-.row-3 {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 100%;
-  justify-content: flex-start;
-  flex-wrap: wrap;       
-  align-items: stretch;      
-
-  > * {
-    flex: 1 1 100%;          
-    min-width: 0;           
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  @media (min-width: 481px) {
-    flex-direction: row;    
-    gap: 15px;
-
-    > * {
-      flex: 1 1 0;           
-      min-width: 0;        
-      max-height: 100px;     
-      height: 100%;        
-    }
-  }
-
-  @media (min-width: 1025px) {
-    gap: 20px;
-
-    > * {
-      flex: 1 1 0;
-      max-width: 300px;   
-      max-height: 110px;     
-    }
-  }
-
-  @media (min-width: 1280px) {
-    gap: 25px;
-
-    > * {
-      max-width: 340px;  
-    }
-  }
-}
-
-/* =========================================================
-     ROW 4 — Recent Intake Title + Date
-  ========================================================== */
+  // ========= ROW 4 — Title + Date =========
   .row-4 {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    width: 100%;
 
     .text-title {
       font-family: 'Quicksand', sans-serif;
@@ -247,110 +182,114 @@
       color: #00313C;
       white-space: nowrap;
 
-      @media (min-width: 481px) {
-        font-size: 22px;
-      }
-
-      @media (min-width: 1025px) {
-        font-size: 24px;
-      }
-    }
-
-    @media (min-width: 481px) {
-      height: 40px;
-    }
-
-    @media (min-width: 1025px) {
-      height: 52px;
+      @media (min-width: 481px) { font-size: 22px; }
+      @media (min-width: 1025px) { font-size: 24px; }
     }
   }
 
-  .row-5{
-    width: 100%;
-    // border: 1px solid red;
+  // ========= ROW 5 — Meal Assignments =========
+  .row-5 {
     display: flex;
     gap: 15px;
     flex-direction: column;
 
     @media (min-width: 481px) {
       flex-direction: row;
-      flex: 1 1 100%;
-      min-width: 0;
-      max-height: 120px;
-    }
-
-    @media (min-width: 1025px) {
-      flex-direction: row;
-      justify-content: space-evenly;
-      max-height: 150px;
     }
   }
 }
 
-.no-meals-container{
+// --- Patient search dropdown ---
+.patient-search-wrapper {
+  position: relative;
+}
+
+.patient-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #E6FEF9;
+  border-radius: 12px;
+  padding: 0 14px;
+  height: 100%;
+  cursor: text;
+
+  .search-icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+}
+
+.patient-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.9rem;
+  color: #00313C;
+  outline: none;
+  min-width: 0;
+
+  &::placeholder { color: #aaa; }
+}
+
+.patient-search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #B8E6DC;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 4px 12px rgba(0, 49, 60, 0.12);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 200;
+}
+
+.patient-search-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.1s;
+
+  &:hover { background: #E0F7F4; }
+  &:not(:last-child) { border-bottom: 1px solid #f0f0f0; }
+}
+
+.psr-room {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #40C1AC;
+  width: 65px;
+  flex-shrink: 0;
+}
+
+.psr-name {
+  font-size: 0.9rem;
+  color: #00313C;
+  font-weight: 600;
+}
+
+.no-meals-container {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  .no-meals-text{
+  .no-meals-text {
     display: flex;
     align-items: center;
     justify-content: center;
 
-    p{
+    p {
       font-family: 'Quicksand', sans-serif;
       font-weight: bold;
       font-size: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: left;
       color: #00313C;
     }
   }
-}
-
-@media (min-width: 1024px) and (max-width: 1024px) and (min-height: 600px) and (max-height: 600px) {
-  // Add this with higher specificity
-.patient-info-container .main-container .row-4 {
-  ::ng-deep app-date-container {
-    .main-container .popup-container {
-      position: absolute !important;
-      top: auto !important;
-      bottom: calc(100% + 10px) !important; // Position above with 10px gap
-      left: 0 !important;
-      right: auto !important;
-      width: 200px !important;
-      z-index: 99999 !important;
-      
-      // Ensure it shows above everything
-      transform: none !important;
-      
-      // Animation
-      animation: popupSlideUp 0.3s ease-out !important;
-    }
-  }
-}
-
-@keyframes popupSlideUp {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// Adjust row-4 spacing
-.row-4 {
-  // Add to existing styles
-  position: relative;
-  margin-top: 50px; // Space for popup above
-  
-  @media (max-width: 480px) {
-    margin-top: 45px;
-  }
-}
-
 }

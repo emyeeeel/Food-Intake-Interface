@@ -41,6 +41,26 @@ export class PatientService {
     return this.http.put<LTCPatient>(`${this.baseUrl}/api/ltc-patients/${id}`, ltcPatient);
   }
 
+  deleteLTCPatient(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/api/ltc-patients/${id}`);
+  }
+
+  uploadResidentExcel(file: File): Observable<{ message: string; filename: string; stored_path: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ message: string; filename: string; stored_path: string }>(
+      `${this.baseUrl}/api/ltc-patients/resident-excel/upload`,
+      formData
+    );
+  }
+
+  importResidentExcel(): Observable<{ message: string; summary: { created: number; updated: number; skipped: number }; total_patients: number }> {
+    return this.http.post<{ message: string; summary: { created: number; updated: number; skipped: number }; total_patients: number }>(
+      `${this.baseUrl}/api/ltc-patients/resident-excel/import`,
+      {}
+    );
+  }
+
   getLTCPatientCount(): Observable<number> {
     return this.http.get<LTCPatient[]>(`${this.baseUrl}/api/ltc-patients`).pipe(
       map(ltcPatients => ltcPatients.length)

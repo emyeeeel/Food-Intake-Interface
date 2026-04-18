@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import jsQR from 'jsqr';
 import { MealAssignment } from '../../models/meal-assignment.mode';
 import { MealAssignmentService } from '../../services/meal-assignment.service';
@@ -42,6 +42,9 @@ export class AddIntakeComponent implements OnInit, OnDestroy {
   intakes: IntakeRecord[] = [];
 
   isLoadingPhase = false;
+  showErrorDialog = false;
+  errorDialogTitle = '伺服器錯誤';
+  errorDialogDetails: string[] = [];
 
   // Scanner state
   showScanner = false;
@@ -280,31 +283,58 @@ startScanner(): void {
     }
   }
 
-  setMealType(type: 'Before' | 'After'): void {
+  async setMealType(type: 'Before' | 'After'): Promise<void> {
+    if (!(await this.ensureMealAssignmentAvailable())) {
+      this.selectedMealType = null;
+      return;
+    }
+
     this.selectedMealType = type;
   }
 
   loadFilteredMeals(): void {
-    if (!this.scannedPatientId || !this.dayCycle) return;
+    if (!this.scannedPatientId) return;
+
+    const mode = this.dateService.getCurrentMenuMode();
+    if (mode === 'cyclic' && !this.dayCycle) return;
 
     const fetchAssignments$ =
-      this.mealTimePeriod === 0
-        ? this.mealAssignmentService.getMealAssignmentsByLTCPatient(this.scannedPatientId)
-        : this.intakeService.getAssignmentsByMealPeriod(
-            this.scannedPatientId,
-            this.mealTimePeriod,
-            this.dayCycle
-          );
+      this.mealAssignmentService.getMealAssignmentsByLTCPatient(this.scannedPatientId);
+
+    const todayStr = this.dateService.getMealFilterParamsForDate(this.currentSelectedDate)['serve_date'];
+    const currentDayCycle = Number(this.dayCycle);
 
     fetchAssignments$.subscribe(assignments => {
-      let filteredAssignments = assignments.filter(
-        a => a.meal_detail?.day_cycle === this.dayCycle
-      );
+      // Mode-aware filter: cyclic uses day_cycle match, open uses serve_date match.
+      let filteredAssignments = assignments.filter(a => {
+        const md: any = a.meal_detail;
+        if (!md) return false;
+        if (mode === 'open') {
+          return md.menu_mode === 'open' && md.serve_date === todayStr;
+        }
+        return (md.menu_mode ?? 'cyclic') === 'cyclic' && Number(md.day_cycle) === currentDayCycle;
+      });
 
       if (this.mealTimePeriod !== 0) {
         filteredAssignments = filteredAssignments.filter(
           a => a.meal_type === this.mealTimePeriod
         );
+      }
+
+      // Fallback: if today's cycle mismatch but assignments exist, keep meal-time matches
+      // so user can continue capture instead of being blocked.
+      if (filteredAssignments.length === 0 && assignments.length > 0) {
+        const mealTimeFallback =
+          this.mealTimePeriod === 0
+            ? assignments
+            : assignments.filter(a => a.meal_type === this.mealTimePeriod);
+
+        if (mealTimeFallback.length > 0) {
+          console.warn(
+            '[AddIntake] No matching assignment found for today. Using meal-time fallback assignments.'
+          );
+          filteredAssignments = mealTimeFallback;
+        }
       }
 
       this.mealAssignments = filteredAssignments;
@@ -329,6 +359,7 @@ startScanner(): void {
             console.warn('Assignment has no meal_time — cannot resolve meal period.');
           }
         }
+        this.checking = false;
       } else {
         console.warn('No meal assignments found for this patient and meal period');
         this.selectedMealAssignmentId = 0;
@@ -348,6 +379,8 @@ startScanner(): void {
 
     this.scannedPatientId = patientId;
     // Reset derived period for fresh scan
+    this.mealAssignments = [];
+    this.selectedMealAssignmentId = 0;
     this.effectiveMealPeriod = null;
     this.mealPhaseStatus = null;
     this.selectedMealType = null;
@@ -440,6 +473,63 @@ startScanner(): void {
     return assignments.filter(a => a.meal_type === type);
   }
 
+  private resolveSelectedMealAssignment(): MealAssignment | null {
+    if (!this.mealAssignments.length) {
+      return null;
+    }
+
+    if (this.selectedMealAssignmentId) {
+      const exactMatch = this.mealAssignments.find(
+        a => a.id === this.selectedMealAssignmentId
+      );
+      if (exactMatch) {
+        return exactMatch;
+      }
+    }
+
+    const fallbackAssignment = this.mealAssignments[0] ?? null;
+    if (fallbackAssignment) {
+      this.selectedMealAssignmentId = fallbackAssignment.id;
+      console.warn(
+        '[AddIntake] selectedMealAssignmentId missing or stale, using fallback assignment ID:',
+        fallbackAssignment.id
+      );
+    }
+
+    return fallbackAssignment;
+  }
+
+  private async ensureMealAssignmentAvailable(): Promise<boolean> {
+    if (this.checking || this.loadingAssignments) {
+      this.errorDialogTitle = '膳食指派載入中';
+      this.errorDialogDetails = ['目前正在檢查此住民的膳食指派，請稍候再試一次。'];
+      this.showErrorDialog = true;
+      return false;
+    }
+
+    const assignment = this.resolveSelectedMealAssignment();
+    if (assignment) {
+      return true;
+    }
+
+    const patientLabel = this.patient
+      ? `${this.patient.room_number} 房-${this.patient.bed_number} 床`
+      : '目前住民';
+
+    this.errorDialogTitle = '目前住民沒有指定餐點';
+    this.errorDialogDetails = [
+      `${patientLabel} 目前沒有可用的膳食指派。`,
+      '請先到住民資料或膳食分配頁面確認並指定餐點後，再進行餐前或餐後拍照。'
+    ];
+    this.showErrorDialog = true;
+
+    return false;
+  }
+
+  get hasAvailableAssignment(): boolean {
+    return this.resolveSelectedMealAssignment() !== null;
+  }
+
   hasMealsForToday(): boolean {
     return Object.keys(this.getMealsByDayCycle()).length > 0;
   }
@@ -455,6 +545,58 @@ startScanner(): void {
     this.effectiveMealPeriod = null;
     this.mealPhaseStatus = null;
     this.selectedMealType = null;
+    this.clearErrorDialog();
+  }
+
+  private clearErrorDialog(): void {
+    this.showErrorDialog = false;
+    this.errorDialogTitle = '伺服器錯誤';
+    this.errorDialogDetails = [];
+  }
+
+  closeErrorDialog(): void {
+    this.clearErrorDialog();
+  }
+
+  private async blobToText(blob: Blob): Promise<string> {
+    try {
+      return (await blob.text()).trim();
+    } catch {
+      return '';
+    }
+  }
+
+  private async presentServerError(error: unknown, fallbackTitle = '伺服器錯誤'): Promise<void> {
+    const details: string[] = [];
+    let title = fallbackTitle;
+
+    if (error instanceof HttpErrorResponse) {
+      title = `伺服器錯誤 ${error.status || ''}`.trim();
+      details.push(`HTTP 狀態碼：${error.status || '未知'}`);
+      details.push(`狀態文字：${error.statusText || '未知'}`);
+      if (error.url) {
+        details.push(`請求網址：${error.url}`);
+      }
+
+      if (error.error instanceof Blob) {
+        const bodyText = await this.blobToText(error.error);
+        if (bodyText) {
+          details.push(`錯誤內容：${bodyText}`);
+        }
+      } else if (typeof error.error === 'string' && error.error.trim()) {
+        details.push(`錯誤內容：${error.error.trim()}`);
+      } else if (error.message) {
+        details.push(`錯誤原因：${error.message}`);
+      }
+    } else if (error instanceof Error) {
+      details.push(`錯誤原因：${error.message}`);
+    } else {
+      details.push('發生未知錯誤，請檢查設備端服務與網路連線。');
+    }
+
+    this.errorDialogTitle = title;
+    this.errorDialogDetails = details;
+    this.showErrorDialog = true;
   }
 
   private redirectToQRLink(qrData: string): void {
@@ -494,13 +636,9 @@ startScanner(): void {
         next: async (zipBlob) => {
           try {
             console.log('now running tx2 backend');
-            if (!this.selectedMealAssignmentId) {
-              throw new Error('No meal assignment selected');
-            }
-
-            const assignment = this.mealAssignments.find(a => a.id === this.selectedMealAssignmentId);
+            const assignment = this.resolveSelectedMealAssignment();
             if (!assignment) {
-              throw new Error('Selected meal assignment not found');
+              throw new Error('No meal assignment selected');
             }
 
             const jszip = new JSZip();
@@ -582,25 +720,42 @@ startScanner(): void {
           } catch (err) {
             console.error('Failed to create intake record:', err);
             this.isProcessing = false;
+            await this.presentServerError(err, '建立攝取紀錄失敗');
             reject(err);
           }
         },
-        error: (error) => {
+        error: async (error) => {
           console.error('API Error:', error);
           this.isProcessing = false;
+          await this.presentServerError(error, '設備拍攝服務失敗');
           reject(error);
         }
       });
     });
   }
 
-  openCapturePopup(): void {
+  async openCapturePopup(): Promise<void> {
+    if (!(await this.ensureMealAssignmentAvailable())) {
+      return;
+    }
+    if (!(await this.ensureMealAssignmentAvailable())) {
+      alert('尚未找到可用餐點分配，請先確認住民當日餐點設定。');
+      return;
+    }
     this.showCapturePopup = true;
   }
 
-  onCaptureConfirmed(): void {
-    this.showCapturePopup = false;
-    this.capture();
+  async onCaptureConfirmed(): Promise<void> {
+    try {
+      if (!(await this.ensureMealAssignmentAvailable())) {
+        this.showCapturePopup = false;
+        return;
+      }
+      await this.capture();
+      this.showCapturePopup = false;
+    } catch (error) {
+      console.error('[AddIntake] Capture failed:', error);
+    }
   }
 
   onCaptureCancelled(): void {

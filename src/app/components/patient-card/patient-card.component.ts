@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input, EventEmitter, Output, ElementRef, HostListener } from '@angular/core';
 import { PatientService } from '../../services/patient.service';
 import { RecommendedIntakeService } from '../../services/recommended-intake.service';
 import { LTCPatient } from '../../models/ltc-patient.model';
@@ -13,8 +13,8 @@ import { Router } from '@angular/router';
   templateUrl: './patient-card.component.html',
   styleUrls: ['./patient-card.component.scss']
 })
-export class PatientCardComponent implements OnInit {
-  @Input() patientId: number = 1; 
+export class PatientCardComponent implements OnInit, OnChanges {
+  @Input() patientId: number = 0;
   @Output() patientIdChange = new EventEmitter<number>();  
 
   ltcPatient: LTCPatient | null = null;
@@ -34,8 +34,14 @@ export class PatientCardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadPatientCount(); 
+    this.loadPatientCount();
     if (this.patientId) {
+      this.fetchPatientData();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['patientId'] && !changes['patientId'].firstChange && this.patientId) {
       this.fetchPatientData();
     }
   }
@@ -126,8 +132,13 @@ export class PatientCardComponent implements OnInit {
 
   // Helper methods to display LTC patient and recommended intake data
   getDisplayName(): string {
-    // LTC patients use room-bed identifier instead of name
-    return this.ltcPatient ? `${this.ltcPatient.room_number}-${this.ltcPatient.bed_number}` : '未選擇病人';
+    if (!this.ltcPatient) return '未選擇病人';
+    return this.ltcPatient.name || `${this.ltcPatient.room_number}-${this.ltcPatient.bed_number}`;
+  }
+
+  getDisplayRoomBed(): string {
+    if (!this.ltcPatient) return '';
+    return `${this.ltcPatient.room_number}-${this.ltcPatient.bed_number}`;
   }
 
   getDisplayAge(): number | string {

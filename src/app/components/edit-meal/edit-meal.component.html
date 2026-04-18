@@ -1,1 +1,98 @@
-<p>edit-meal works!</p>
+<div class="edit-meal-container">
+
+  <div *ngIf="isLoading" class="status-msg">載入中...</div>
+  <div *ngIf="error && !isLoading" class="status-msg error">{{ error }}</div>
+
+  <div *ngIf="!isLoading" class="edit-panel">
+
+    <!-- Header -->
+    <div class="panel-header">
+      <button class="back-btn" (click)="goBack()">&larr; 返回列表</button>
+    </div>
+
+    <!-- Group header (like show-meal) -->
+    <div class="group-header">
+      <img [src]="getMealTimeIcon()" alt="meal time" class="meal-time-icon" />
+      <div class="group-title">
+        <h2>{{ getDayLabel() }} {{ mealTime }}</h2>
+        <span class="group-subtitle">共 {{ dishes.length }} 道菜 — 編輯模式</span>
+      </div>
+    </div>
+
+    <!-- Dish list -->
+    <div class="dish-list">
+
+      <div class="dish-header-row">
+        <span class="col-order">#</span>
+        <span class="col-code">代碼</span>
+        <span class="col-name">菜色名稱</span>
+        <span class="col-plate">餐盤類型</span>
+        <span class="col-action"></span>
+      </div>
+
+      <div *ngFor="let dish of dishes; let i = index" class="dish-row" [class.new-dish]="dish.isNew">
+
+        <span class="col-order">
+          <span class="order-badge">{{ i + 1 }}</span>
+        </span>
+
+        <span class="col-code">{{ getMealCode(dish) }}</span>
+
+        <!-- Searchable dropdown for dish name -->
+        <div class="col-name dish-name-cell">
+          <input
+            type="text"
+            class="dish-name-input"
+            [(ngModel)]="dish.meal_name"
+            (input)="onSearchInput(i, dish.meal_name)"
+            (focus)="onSearchFocus(i)"
+            placeholder="輸入或搜尋菜色..."
+            autocomplete="off"
+          />
+          <div class="dropdown-list" *ngIf="activeDropdownIndex === i && searchFiltered.length > 0">
+            <div
+              *ngFor="let name of searchFiltered"
+              class="dropdown-item"
+              [class.active]="name === dish.meal_name"
+              (mousedown)="selectName(i, name)"
+            >
+              {{ name }}
+            </div>
+          </div>
+        </div>
+
+        <div class="col-plate">
+          <select [(ngModel)]="dish.plate_type">
+            <option *ngFor="let pt of plateTypeOptions" [value]="pt">{{ pt }}</option>
+          </select>
+        </div>
+
+        <div class="col-action">
+          <button class="btn-remove" (click)="removeDish(i)" title="移除此菜色">&times;</button>
+        </div>
+
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="dishes.length === 0" class="empty-state">
+        尚無菜色，請點下方按鈕新增
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="bottom-actions">
+      <button class="btn-add" (click)="addDish()">+ 新增菜色</button>
+      <div class="save-group">
+        <button class="btn-cancel" (click)="goBack()">取消</button>
+        <button class="btn-save" (click)="save()" [disabled]="isSaving || dishes.length === 0">
+          {{ isSaving ? '儲存中...' : '全部儲存' }}
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="successMessage" class="msg-success">{{ successMessage }}</div>
+    <div *ngIf="error && !isLoading" class="msg-error">{{ error }}</div>
+
+  </div>
+</div>

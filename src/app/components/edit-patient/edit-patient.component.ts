@@ -1,16 +1,16 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, forkJoin, of } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
-import { PatientService } from '../../services/patient.service';
+import { LTCPatient } from '../../models/ltc-patient.model';
+import { MealAssignment } from '../../models/meal-assignment.mode';
+import { Meal } from '../../models/meal.model';
 import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { MealsService } from '../../services/meals.service';
-import { LTCPatient } from '../../models/ltc-patient.model';
-import { Meal } from '../../models/meal.model';
-import { MealAssignment } from '../../models/meal-assignment.mode';
+import { PatientService } from '../../services/patient.service';
 
 interface MealAssignmentForm {
   dayId: string;
@@ -19,6 +19,8 @@ interface MealAssignmentForm {
   selectedLunchMeals: number[];
   selectedDinnerMeals: number[];
 }
+
+type CalendarMode = 'gregorian' | 'roc';
 
 @Component({
   selector: 'app-edit-patient',
@@ -29,50 +31,51 @@ interface MealAssignmentForm {
 export class EditPatientComponent implements OnInit, OnDestroy {
   @Input() patientId?: number;
 
-  // Loading and error states
-  loading: boolean = true;
+  loading = true;
   error: string | null = null;
+  successMessage = '';
 
-  // Patient data
   ltcPatient: LTCPatient | null = null;
-  originalPatientData: LTCPatient | null = null; // For reset functionality
+  originalPatientData: LTCPatient | null = null;
 
-  // Form fields
-  roomNumber: string = '';
-  bedNumber: string = '';
-  name: string = '';
-  national_id: string = '';
+  roomNumber = '';
+  bedNumber = '';
+  name = '';
+  national_id = '';
+  birthdate = '';
+  birthdateDisplay = '';
+  calendarMode: CalendarMode = 'gregorian';
   age: number | null = null;
-  sex: string = '';
+  sex = '';
   height: number | null = null;
   weight: number | null = null;
-  activityLevel: string = '';
-  dietaryRestrictions: string = '';
+  activityLevel = '';
+  foodAllergies = '';
 
-  // Meal assignment data
   mealAssignments: MealAssignmentForm[] = [];
   existingMealAssignments: MealAssignment[] = [];
-  originalMealAssignments: MealAssignmentForm[] = []; // For reset functionality
-  availableDays = [
-    { value: '1', label: '第1天' },
-    { value: '2', label: '第2天' },
-    { value: '3', label: '第3天' },
-    { value: '4', label: '第4天' },
-    { value: '5', label: '第5天' },
-    { value: '6', label: '第6天' },
-    { value: '7', label: '第7天' },
-    { value: '8', label: '第8天' },
-    { value: '9', label: '第9天' },
-    { value: '10', label: '第10天' },
-    { value: '11', label: '第11天' },
-    { value: '12', label: '第12天' },
-    { value: '13', label: '第13天' },
-    { value: '14', label: '第14天' }
+  originalMealAssignments: MealAssignmentForm[] = [];
+
+  readonly availableDays = Array.from({ length: 14 }, (_, index) => ({
+    value: String(index + 1),
+    label: `第 ${index + 1} 天`
+  }));
+
+  readonly sexOptions = [
+    { value: '', label: '請選擇性別' },
+    { value: 'male', label: '男' },
+    { value: 'female', label: '女' }
   ];
 
-  private subscriptions: Subscription = new Subscription();
+  readonly activityLevelOptions = [
+    { value: '', label: '請選擇活動量' },
+    { value: 'inactive', label: '靜態活動量' },
+    { value: 'low_active', label: '輕度活動量' },
+    { value: 'active', label: '中等活動量' },
+    { value: 'very_active', label: '高度活動量' }
+  ];
 
-  successMessage: string = '';
+  private subscriptions = new Subscription();
 
   constructor(
     private patientService: PatientService,
@@ -83,19 +86,20 @@ export class EditPatientComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Get patient ID from input or route
     if (!this.patientId) {
-      this.route.params.subscribe(params => {
+      const routeSub = this.route.params.subscribe((params) => {
         if (params['id']) {
           this.patientId = +params['id'];
+          this.loadPatientData();
         }
       });
+      this.subscriptions.add(routeSub);
+    } else {
+      this.loadPatientData();
     }
 
-    if (this.patientId) {
-      this.loadPatientData();
-    } else {
-      this.error = '未提供病患 ID';
+    if (!this.patientId && !this.route.snapshot.params['id']) {
+      this.error = '找不到病患編號。';
       this.loading = false;
     }
   }
@@ -104,11 +108,55 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  /**
-   * Load patient data and populate form
-   */
+  get yearOptions(): { value: string; label: string }[] {
+    const currentYear = new Date().getFullYear();
+    const options: { value: string; label: string }[] = [];
+
+    for (let year = currentYear; year >= 1912; year -= 1) {
+      if (this.calendarMode === 'roc') {
+        options.push({
+          value: String(year),
+          label: `民國 ${year - 1911} 年`
+        });
+      } else {
+        options.push({
+          value: String(year),
+          label: `${year} 年`
+        });
+      }
+    }
+
+    return options;
+  }
+
+  get primaryDateExample(): string {
+    const formatted = this.calendarMode === 'roc'
+      ? this.getFormattedBirthdate('roc')
+      : this.getFormattedBirthdate('gregorian');
+
+    if (this.calendarMode === 'roc') {
+      return `民國年輸入範例：${formatted || '89/05/15'}`;
+    }
+
+    return `西元年輸入範例：${formatted || '2000/05/15'}`;
+  }
+
+  get alternateDateExample(): string {
+    const formatted = this.calendarMode === 'roc'
+      ? this.getFormattedBirthdate('gregorian')
+      : this.getFormattedBirthdate('roc');
+
+    if (this.calendarMode === 'roc') {
+      return `西元年對照範例：${formatted || '2000/05/15'}`;
+    }
+
+    return `民國年對照範例：${formatted || '89/05/15'}`;
+  }
+
   loadPatientData(): void {
-    if (!this.patientId) return;
+    if (!this.patientId) {
+      return;
+    }
 
     this.loading = true;
     this.error = null;
@@ -116,13 +164,13 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     const patientSub = this.patientService.getLTCPatient(this.patientId).subscribe({
       next: (patient: LTCPatient) => {
         this.ltcPatient = patient;
-        this.originalPatientData = { ...patient }; // Store original data for reset
+        this.originalPatientData = { ...patient };
         this.populateForm(patient);
         this.loadExistingMealAssignments();
       },
       error: (err) => {
         console.error('Error loading patient data:', err);
-        this.error = '載入病患資料失敗。請再試一次。';
+        this.error = '無法載入病患資料，請稍後再試。';
         this.loading = false;
       }
     });
@@ -130,24 +178,195 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     this.subscriptions.add(patientSub);
   }
 
-  /**
-   * Populate form with patient data
-   */
   private populateForm(patient: LTCPatient): void {
     this.roomNumber = patient.room_number || '';
     this.bedNumber = patient.bed_number || '';
-    this.age = patient.age || null;
+    this.name = patient.name || '';
+    this.national_id = patient.national_id || '';
+    this.birthdate = patient.birthdate || '';
     this.sex = patient.sex || '';
-    this.height = patient.height_cm || null;
-    this.weight = patient.weight_kg || null;
+    this.height = patient.height_cm ?? null;
+    this.weight = patient.weight_kg ?? null;
     this.activityLevel = patient.activity_level || '';
+    this.foodAllergies = patient.food_allergies || '';
+    this.age = patient.age ?? this.calculateAgeFromBirthdate(this.birthdate);
+    this.syncDateSelectorsFromBirthdate();
   }
 
-  /**
-   * Load existing meal assignments for the patient
-   */
+  onCalendarModeChange(): void {
+    this.birthdateDisplay = this.formatBirthdateForMode(this.birthdate, this.calendarMode);
+    this.age = this.calculateAgeFromBirthdate(this.birthdate);
+  }
+
+  onBirthdateInputChange(): void {
+    this.birthdateDisplay = this.formatBirthdateForMode(this.birthdate, this.calendarMode);
+    this.age = this.calculateAgeFromBirthdate(this.birthdate);
+  }
+
+  onBirthdateDisplayChange(): void {
+    const normalized = this.normalizeBirthdateInput(this.birthdateDisplay);
+    this.birthdateDisplay = normalized;
+  }
+
+  onBirthdateDisplayBlur(): void {
+    const parsedDate = this.parseBirthdateByMode(this.birthdateDisplay, this.calendarMode);
+    if (parsedDate) {
+      this.birthdate = parsedDate;
+      this.birthdateDisplay = this.formatBirthdateForMode(parsedDate, this.calendarMode);
+      this.age = this.calculateAgeFromBirthdate(this.birthdate);
+      return;
+    }
+
+    this.birthdateDisplay = this.formatBirthdateForMode(this.birthdate, this.calendarMode);
+  }
+
+  get birthdatePlaceholder(): string {
+    return this.calendarMode === 'roc' ? '089/05/15' : '2000/05/15';
+  }
+
+  get birthdateMaxLength(): number {
+    return this.calendarMode === 'roc' ? 10 : 10;
+  }
+
+  openNativeDatePicker(input: HTMLInputElement): void {
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+      return;
+    }
+
+    input.focus();
+  }
+
+  private normalizeBirthdateInput(value: string): string {
+    const digitsAndSlashOnly = (value || '').replace(/[^\d/]/g, '');
+    const parts = digitsAndSlashOnly.split('/').slice(0, 3);
+    const yearLimit = this.calendarMode === 'roc' ? 3 : 4;
+    const normalizedParts = parts.map((part, index) => {
+      if (index === 0) {
+        return part.slice(0, yearLimit);
+      }
+
+      return part.slice(0, 2);
+    });
+
+    return normalizedParts.join('/');
+  }
+
+  private parseBirthdateByMode(value: string, mode: CalendarMode): string | null {
+    const trimmed = (value || '').trim();
+    const match = trimmed.match(/^(\d{3,4})\/(\d{1,2})\/(\d{1,2})$/);
+    if (!match) {
+      return null;
+    }
+
+    let year = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10);
+    const day = parseInt(match[3], 10);
+
+    if (mode === 'gregorian' && match[1].length !== 4) {
+      return null;
+    }
+
+    if (mode === 'roc') {
+      if (match[1].length !== 3) {
+        return null;
+      }
+      year += 1911;
+    }
+
+    return this.buildIsoDate(year, month, day);
+  }
+
+  private buildIsoDate(year: number, month: number, day: number): string | null {
+    const candidate = new Date(year, month - 1, day);
+    if (
+      Number.isNaN(candidate.getTime()) ||
+      candidate.getFullYear() !== year ||
+      candidate.getMonth() !== month - 1 ||
+      candidate.getDate() !== day
+    ) {
+      return null;
+    }
+
+    const normalizedYear = String(candidate.getFullYear()).padStart(4, '0');
+    const normalizedMonth = String(candidate.getMonth() + 1).padStart(2, '0');
+    const normalizedDay = String(candidate.getDate()).padStart(2, '0');
+    return `${normalizedYear}-${normalizedMonth}-${normalizedDay}`;
+  }
+
+  private formatBirthdateForMode(value: string, mode: CalendarMode): string {
+    if (!value) {
+      return '';
+    }
+
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+      return '';
+    }
+
+    const month = String(parsed.getMonth() + 1).padStart(2, '0');
+    const day = String(parsed.getDate()).padStart(2, '0');
+
+    if (mode === 'roc') {
+      const rocYear = String(parsed.getFullYear() - 1911).padStart(3, '0');
+      return `${rocYear}/${month}/${day}`;
+    }
+
+    return `${parsed.getFullYear()}/${month}/${day}`;
+  }
+
+  private getFormattedBirthdate(mode: CalendarMode): string {
+    if (!this.birthdate) {
+      return '';
+    }
+
+    const parsed = new Date(this.birthdate);
+    if (Number.isNaN(parsed.getTime())) {
+      return '';
+    }
+
+    const month = String(parsed.getMonth() + 1).padStart(2, '0');
+    const day = String(parsed.getDate()).padStart(2, '0');
+
+    if (mode === 'roc') {
+      return `${parsed.getFullYear() - 1911}/${month}/${day}`;
+    }
+
+    return `${parsed.getFullYear()}/${month}/${day}`;
+  }
+
+  private syncDateSelectorsFromBirthdate(): void {
+    this.birthdateDisplay = this.formatBirthdateForMode(this.birthdate, this.calendarMode);
+    this.age = this.calculateAgeFromBirthdate(this.birthdate);
+  }
+
+  private calculateAgeFromBirthdate(birthdate: string): number | null {
+    if (!birthdate) {
+      return null;
+    }
+
+    const parsed = new Date(birthdate);
+    if (Number.isNaN(parsed.getTime())) {
+      return null;
+    }
+
+    const today = new Date();
+    let age = today.getFullYear() - parsed.getFullYear();
+    const hadBirthdayThisYear =
+      today.getMonth() > parsed.getMonth() ||
+      (today.getMonth() === parsed.getMonth() && today.getDate() >= parsed.getDate());
+
+    if (!hadBirthdayThisYear) {
+      age -= 1;
+    }
+
+    return age >= 0 ? age : null;
+  }
+
   private loadExistingMealAssignments(): void {
-    if (!this.patientId) return;
+    if (!this.patientId) {
+      return;
+    }
 
     const assignmentsSub = this.mealAssignmentService.getMealAssignmentsByLTCPatient(this.patientId).subscribe({
       next: (assignments: MealAssignment[]) => {
@@ -157,7 +376,6 @@ export class EditPatientComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error loading meal assignments:', err);
-        // Continue without meal assignments
         this.initializeEmptyMealAssignment();
         this.loading = false;
       }
@@ -166,14 +384,22 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     this.subscriptions.add(assignmentsSub);
   }
 
-  /**
-   * Populate meal assignments from existing data
-   */
+  private normalizeMealType(value: string): string {
+    if (['午餐', '午飯', 'lunch'].includes(value)) {
+      return '午餐';
+    }
+
+    if (['晚餐', '晚飯', 'dinner'].includes(value)) {
+      return '晚餐';
+    }
+
+    return value;
+  }
+
   private populateMealAssignments(assignments: MealAssignment[]): void {
-    // Group assignments by day cycle
     const assignmentsByDay: { [key: string]: MealAssignment[] } = {};
-    
-    assignments.forEach(assignment => {
+
+    assignments.forEach((assignment) => {
       const day = assignment.day_cycle;
       if (!assignmentsByDay[day]) {
         assignmentsByDay[day] = [];
@@ -181,18 +407,18 @@ export class EditPatientComponent implements OnInit, OnDestroy {
       assignmentsByDay[day].push(assignment);
     });
 
-    // Create form assignments
     this.mealAssignments = [];
-    
-    Object.keys(assignmentsByDay).forEach(day => {
+
+    Object.keys(assignmentsByDay).forEach((day) => {
       const dayAssignments = assignmentsByDay[day];
       const lunchMeals: number[] = [];
       const dinnerMeals: number[] = [];
-      
-      dayAssignments.forEach(assignment => {
-        if (assignment.meal_type === '午餐') {
+
+      dayAssignments.forEach((assignment) => {
+        const mealType = this.normalizeMealType(assignment.meal_type);
+        if (mealType === '午餐') {
           lunchMeals.push(assignment.meal);
-        } else if (assignment.meal_type === '晚餐') {
+        } else if (mealType === '晚餐') {
           dinnerMeals.push(assignment.meal);
         }
       });
@@ -206,23 +432,16 @@ export class EditPatientComponent implements OnInit, OnDestroy {
       };
 
       this.mealAssignments.push(assignmentForm);
-      
-      // Load meals for this day
       this.loadMealsForDay(day, this.mealAssignments.length - 1);
     });
 
-    // Store original assignments for reset functionality
     this.originalMealAssignments = JSON.parse(JSON.stringify(this.mealAssignments));
 
-    // If no existing assignments, create empty one
     if (this.mealAssignments.length === 0) {
       this.initializeEmptyMealAssignment();
     }
   }
 
-  /**
-   * Initialize empty meal assignment
-   */
   private initializeEmptyMealAssignment(): void {
     this.mealAssignments = [{
       dayId: '',
@@ -233,9 +452,6 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     }];
   }
 
-  /**
-   * Load meals for a specific day
-   */
   private loadMealsForDay(dayId: string, assignmentIndex: number): void {
     const mealsSub = this.mealsService.getMealsForDay(+dayId).subscribe({
       next: (mealsData: { lunch: Meal[]; dinner: Meal[] }) => {
@@ -253,16 +469,12 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     this.subscriptions.add(mealsSub);
   }
 
-  // --- Form Management Methods ---
-
-  /**
-   * Add new meal assignment
-   */
   addMealAssignment(): void {
-    if (this.mealAssignments.length >= this.availableDays.length) return;
+    if (this.mealAssignments.length >= this.availableDays.length) {
+      return;
+    }
 
-    // Auto-assign the next day cycle based on current count
-    const nextDayId = (this.mealAssignments.length + 1).toString();
+    const nextDayId = String(this.mealAssignments.length + 1);
     const newIndex = this.mealAssignments.length;
 
     this.mealAssignments.push({
@@ -276,47 +488,26 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     this.loadMealsForDay(nextDayId, newIndex);
   }
 
-  /**
-   * Remove meal assignment
-   */
   removeMealAssignment(index: number): void {
     if (this.mealAssignments.length > 1) {
       this.mealAssignments.splice(index, 1);
     }
   }
 
-  /**
-   * Handle day change for assignment
-   */
-  onDayChange(event: any, assignmentIndex: number): void {
-    const dayId = event.target.value;
+  onMealSelection(mealType: 'lunch' | 'dinner', meal: Meal, event: Event, assignmentIndex: number): void {
     const assignment = this.mealAssignments[assignmentIndex];
-    
-    if (assignment) {
-      assignment.dayId = dayId;
-      assignment.selectedLunchMeals = [];
-      assignment.selectedDinnerMeals = [];
-      
-      if (dayId) {
-        this.loadMealsForDay(dayId, assignmentIndex);
-      }
+    if (!assignment) {
+      return;
     }
-  }
-
-  /**
-   * Handle meal selection
-   */
-  onMealSelection(mealType: 'lunch' | 'dinner', meal: Meal, event: any, assignmentIndex: number): void {
-    const assignment = this.mealAssignments[assignmentIndex];
-    if (!assignment) return;
 
     const selectedArray = mealType === 'lunch' ? assignment.selectedLunchMeals : assignment.selectedDinnerMeals;
-    
-    if (event.target.checked) {
-      if (!selectedArray.includes(meal.id)) {
-        selectedArray.push(meal.id);
-      }
-    } else {
+    const checked = (event.target as HTMLInputElement).checked;
+
+    if (checked && !selectedArray.includes(meal.id)) {
+      selectedArray.push(meal.id);
+    }
+
+    if (!checked) {
       const index = selectedArray.indexOf(meal.id);
       if (index > -1) {
         selectedArray.splice(index, 1);
@@ -324,20 +515,14 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Track by function for assignments
-   */
   trackByAssignment(index: number, assignment: MealAssignmentForm): string {
     return `${index}-${assignment.dayId}`;
   }
 
-  // --- Form Actions ---
-
-  /**
-   * Update patient information
-   */
   updatePatient(): void {
-    if (!this.isFormValid() || !this.patientId) return;
+    if (!this.isFormValid() || !this.patientId) {
+      return;
+    }
 
     this.loading = true;
     this.error = null;
@@ -346,24 +531,25 @@ export class EditPatientComponent implements OnInit, OnDestroy {
       id: this.patientId,
       room_number: this.roomNumber,
       bed_number: this.bedNumber,
-      age: this.age ?? 0,
+      name: this.name.trim() || null,
+      national_id: this.national_id.trim() || null,
+      birthdate: this.birthdate || null,
+      age: this.age ?? null,
       sex: this.sex,
-      height_cm: this.height ?? 0,
-      weight_kg: this.weight ?? 0,
+      height_cm: this.height ?? null,
+      weight_kg: this.weight ?? null,
       activity_level: this.activityLevel,
+      food_allergies: this.foodAllergies.trim() || null
     };
 
-    // Update patient data
     const updateSub = this.patientService.updateLTCPatient(this.patientId, updatedPatient).subscribe({
-      next: (updated: LTCPatient) => {
-        console.log('Patient updated successfully:', updated);
-        // Use smart update instead of complete replacement
+      next: () => {
         this.updateMealAssignmentsSmartly();
-        this.showSuccessMessage('病患資料已更新成功！');
+        this.showSuccessMessage('病患資料已更新。');
       },
       error: (err) => {
         console.error('Error updating patient:', err);
-        this.error = '更新病患資料失敗。請再試一次。';
+        this.error = '更新病患資料失敗，請稍後再試。';
         this.loading = false;
       }
     });
@@ -371,102 +557,57 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     this.subscriptions.add(updateSub);
   }
 
-  /**
-   * Process meal assignments into a format suitable for comparison or updates
-   */
   private processMealAssignments(): any[] {
     if (!this.patientId) {
-      console.error('Patient ID is required for meal assignments');
       return [];
     }
-    
-    return this.mealAssignments.flatMap(assignment => {
-      if (!assignment.dayId) return []; // Skip assignments without day selected
-      
-      const dayCycle = assignment.dayId;
-      const lunchAssignments = assignment.selectedLunchMeals.map(mealId => ({
+
+    return this.mealAssignments.flatMap((assignment) => {
+      if (!assignment.dayId) {
+        return [];
+      }
+
+      const lunchAssignments = assignment.selectedLunchMeals.map((mealId) => ({
         meal: mealId,
-        day_cycle: dayCycle,
+        day_cycle: assignment.dayId,
         meal_type: '午餐',
         ltc_patient: this.patientId
       }));
-      const dinnerAssignments = assignment.selectedDinnerMeals.map(mealId => ({
+
+      const dinnerAssignments = assignment.selectedDinnerMeals.map((mealId) => ({
         meal: mealId,
-        day_cycle: dayCycle,
+        day_cycle: assignment.dayId,
         meal_type: '晚餐',
         ltc_patient: this.patientId
       }));
+
       return [...lunchAssignments, ...dinnerAssignments];
     });
   }
 
-  /**
-   * Smart update meal assignments - only update what changed
-   */
-  private updateMealAssignmentsSmartly(): void {
-    if (!this.patientId) {
-      this.completeUpdate();
-      return;
-    }
-
-    const currentAssignments = this.processMealAssignments();
-    const existingAssignments = this.existingMealAssignments;
-
-    // Compare and categorize changes
-    const changes = this.compareMealAssignments(existingAssignments, currentAssignments);
-    
-    console.log('Assignment changes:', changes);
-
-    if (changes.toDelete.length === 0 && changes.toCreate.length === 0) {
-      console.log('No meal assignment changes detected');
-      this.completeUpdate();
-      return;
-    }
-
-    // Execute only necessary operations
-    this.executeSmartMealAssignmentUpdates(changes)
-      .subscribe({
-        next: () => {
-          console.log('Smart meal assignment update completed');
-          this.completeUpdate();
-        },
-        error: (error) => {
-          console.error('Error in smart meal assignment update:', error);
-          this.error = '更新餐點分配失敗。';
-          this.completeUpdate();
-        }
-      });
-  }
-
-  /**
-   * Compare existing and new assignments to determine changes needed
-   */
-  private compareMealAssignments(existing: MealAssignment[], newAssignments: any[]) {
+  private compareMealAssignments(existing: MealAssignment[], nextAssignments: any[]) {
     const toDelete: MealAssignment[] = [];
     const toCreate: any[] = [];
 
-    // Create lookup maps for comparison
-    const existingMap = new Map();
-    existing.forEach(assignment => {
-      const key = `${assignment.meal}-${assignment.day_cycle}-${assignment.meal_type}`;
+    const existingMap = new Map<string, MealAssignment>();
+    existing.forEach((assignment) => {
+      const key = `${assignment.meal}-${assignment.day_cycle}-${this.normalizeMealType(assignment.meal_type)}`;
       existingMap.set(key, assignment);
     });
 
-    const newMap = new Map();
-    newAssignments.forEach(assignment => {
+    const nextMap = new Map<string, any>();
+    nextAssignments.forEach((assignment) => {
       const key = `${assignment.meal}-${assignment.day_cycle}-${assignment.meal_type}`;
-      newMap.set(key, assignment);
+      nextMap.set(key, assignment);
     });
 
-    // Find assignments to delete (exist in old but not in new)
     existingMap.forEach((assignment, key) => {
-      if (!newMap.has(key)) {
+      if (!nextMap.has(key)) {
         toDelete.push(assignment);
       }
     });
 
-    // Find assignments to create (exist in new but not in old)
-    newMap.forEach((assignment, key) => {
+    nextMap.forEach((assignment, key) => {
       if (!existingMap.has(key)) {
         toCreate.push(assignment);
       }
@@ -475,17 +616,13 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     return { toDelete, toCreate };
   }
 
-  /**
-   * Execute smart updates - only delete and create what's necessary
-   */
-  private executeSmartMealAssignmentUpdates(changes: { toDelete: MealAssignment[], toCreate: any[] }) {
+  private executeSmartMealAssignmentUpdates(changes: { toDelete: MealAssignment[]; toCreate: any[] }) {
     const operations = [];
 
-    // Add deletion operations
     if (changes.toDelete.length > 0) {
-      const deleteOps = changes.toDelete.map(assignment =>
+      const deleteOps = changes.toDelete.map((assignment) =>
         this.mealAssignmentService.deleteMealAssignment(assignment.id).pipe(
-          catchError(error => {
+          catchError((error) => {
             console.error(`Error deleting meal assignment ${assignment.id}:`, error);
             return of(null);
           })
@@ -494,11 +631,10 @@ export class EditPatientComponent implements OnInit, OnDestroy {
       operations.push(...deleteOps);
     }
 
-    // Add creation operations
     if (changes.toCreate.length > 0) {
-      const createOps = changes.toCreate.map(assignment =>
+      const createOps = changes.toCreate.map((assignment) =>
         this.mealAssignmentService.createMealAssignment(assignment).pipe(
-          catchError(error => {
+          catchError((error) => {
             console.error('Error creating meal assignment:', error);
             return of(null);
           })
@@ -514,32 +650,43 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     return forkJoin(operations);
   }
 
-  /**
-   * Complete the update process
-   */
+  private updateMealAssignmentsSmartly(): void {
+    if (!this.patientId) {
+      this.completeUpdate();
+      return;
+    }
+
+    const currentAssignments = this.processMealAssignments();
+    const changes = this.compareMealAssignments(this.existingMealAssignments, currentAssignments);
+
+    if (changes.toDelete.length === 0 && changes.toCreate.length === 0) {
+      this.completeUpdate();
+      return;
+    }
+
+    this.executeSmartMealAssignmentUpdates(changes).subscribe({
+      next: () => this.completeUpdate(),
+      error: (error) => {
+        console.error('Error in smart meal assignment update:', error);
+        this.error = '病患資料已更新，但餐點分配同步失敗。';
+        this.completeUpdate();
+      }
+    });
+  }
+
   private completeUpdate(): void {
     this.loading = false;
-    
-    const message = this.error 
-      ? '病患資料已更新，但餐點分配發生問題。'
-      : '病患資料與餐點分配已更新成功！';
-    
-    this.showSuccessMessage(message);
-    
+
     if (!this.error) {
-      // Navigate back to patient info page
       this.router.navigate(['/patient-info']);
     }
   }
 
-  /**
-   * Reset form to original values
-   */
   resetForm(): void {
     if (this.originalPatientData) {
       this.populateForm(this.originalPatientData);
     }
-    
+
     if (this.originalMealAssignments.length > 0) {
       this.mealAssignments = JSON.parse(JSON.stringify(this.originalMealAssignments));
     } else {
@@ -547,84 +694,20 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Cancel editing and navigate back
-   */
   cancelEdit(): void {
     this.router.navigate(['/patient-info']);
   }
 
-  /**
-   * Check if form is valid
-   */
   isFormValid(): boolean {
     return !!(this.roomNumber && this.bedNumber);
   }
 
-  /**
-   * Get form validation status
-   */
-  getFormValidationStatus(): any {
-    return {
-      isValid: this.isFormValid(),
-      roomNumber: !!this.roomNumber,
-      bedNumber: !!this.bedNumber,
-      hasPatientId: !!this.patientId
-    };
-  }
-
-  /**
-   * Get meal assignment changes summary
-   */
-  getMealAssignmentChangesSummary(): any {
-    const currentAssignments = this.processMealAssignments();
-    const originalCount = this.existingMealAssignments.length;
-    const newCount = currentAssignments.length;
-
-    return {
-      original: originalCount,
-      new: newCount,
-      change: newCount - originalCount,
-      hasChanges: JSON.stringify(this.mealAssignments) !== JSON.stringify(this.originalMealAssignments)
-    };
-  }
-
-  /**
-   * Check if there are unsaved changes
-   */
-  hasUnsavedChanges(): boolean {
-    const patientDataChanged = JSON.stringify(this.originalPatientData) !== JSON.stringify({
-      id: this.patientId,
-      room_number: this.roomNumber,
-      bed_number: this.bedNumber,
-      age: this.age,
-      sex: this.sex,
-      height_cm: this.height,
-      weight_kg: this.weight,
-      activity_level: this.activityLevel,
-      dietary_restrictions: this.dietaryRestrictions
-    });
-
-    const mealAssignmentsChanged = JSON.stringify(this.mealAssignments) !== JSON.stringify(this.originalMealAssignments);
-
-    return patientDataChanged || mealAssignmentsChanged;
-  }
-
-  /**
-   * Show success message
-   */
-  showSuccessMessage(message: string): void {
-    this.successMessage = message;
-    // Auto-hide after 5 seconds
-    setTimeout(() => {
-      this.clearSuccessMessage();
-    }, 5000);
-  }
-
-  /**
-   * Clear success message
-   */
   clearSuccessMessage(): void {
     this.successMessage = '';
+  }
+
+  showSuccessMessage(message: string): void {
+    this.successMessage = message;
+    setTimeout(() => this.clearSuccessMessage(), 5000);
   }
 }

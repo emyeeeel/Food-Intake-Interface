@@ -1,251 +1,247 @@
 <div class="patient-form-container">
-    <div class="header-info">
-      <h2>編輯病患資訊</h2>
+  <div class="header-info">
+    <h2>編輯病患資訊</h2>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <p>正在載入病患資料...</p>
+  </div>
+
+  <div *ngIf="error" class="error-container">
+    <p class="error-message">{{ error }}</p>
+    <button type="button" class="btn-retry" (click)="loadPatientData()">重新載入</button>
+  </div>
+
+  <div *ngIf="successMessage" class="success-container">
+    <div class="success-message">
+      <span class="success-text">{{ successMessage }}</span>
+      <button type="button" class="btn-close-success" (click)="clearSuccessMessage()" title="關閉">
+        ×
+      </button>
     </div>
+  </div>
 
-    <!-- Loading State -->
-    <div *ngIf="loading" class="loading-container">
-      <p>正在載入病患資訊...</p>
-    </div>
+  <form class="form-container" id="patientForm" *ngIf="!loading && !error">
+    <div class="form-content">
+      <fieldset class="required">
+        <legend>必填資訊</legend>
 
-    <!-- Error State -->
-    <div *ngIf="error" class="error-container">
-      <p class="error-message">{{ error }}</p>
-      <button type="button" class="btn-retry" (click)="loadPatientData()">重試</button>
-    </div>
+        <div class="patient-identifier">
+          <h2>病患識別</h2>
 
-    <!-- Success Message -->
-    <div *ngIf="successMessage" class="success-container">
-      <div class="success-message">
-        <span class="success-icon">✓</span>
-        <span class="success-text">{{ successMessage }}</span>
-        <button type="button" class="btn-close-success" (click)="clearSuccessMessage()" title="關閉">
-          ✕
-        </button>
-      </div>
-    </div>
-
-    <!-- Form -->
-    <form class="form-container" id="patientForm" *ngIf="!loading && !error">
-      <div class="form-content">
-        
-        <!-- REQUIRED SECTION -->
-        <fieldset class="required">
-          <legend>必填資訊</legend>
-  
-          <!-- Patient Identifier -->
-          <div class="patient-identifier">
-            <h2>病患識別</h2>
-            <div class="form-group">
-              <label for="roomNumber">房號</label>
-              <input type="text" id="roomNumber" name="roomNumber" [(ngModel)]="roomNumber" required />
-            </div>
-  
-            <div class="form-group">
-              <label for="bedNumber">床位</label>
-              <input type="text" id="bedNumber" name="bedNumber" [(ngModel)]="bedNumber" required />
-            </div>
-
-            <div class="form-group">
-              <label for="name">姓名</label>
-              <input type="text" id="name" name="name" [(ngModel)]="name" required />
-            </div>
-
-            <div class="form-group">
-              <label for="national_id">身證</label>
-              <input type="text" id="national_id" name="national_id" [(ngModel)]="national_id" required />
-            </div>
+          <div class="form-group">
+            <label for="roomNumber">房號</label>
+            <input type="text" id="roomNumber" name="roomNumber" [(ngModel)]="roomNumber" required />
           </div>
-  
-          <!-- Multiple Meal Assignments Container -->
-          <div class="meal-assignments">
-            <div class="meal-assignments-header">
-              <h2>病患餐點分配</h2>
-              <button 
-                type="button" 
-                class="btn-add-assignment" 
-                (click)="addMealAssignment()"
-                [disabled]="mealAssignments.length >= availableDays.length"
-              >
-                + 新增分配
-              </button>
-            </div>
-  
-            <!-- Dynamic Meal Assignment Sections -->
-            <div class="meal-assignments-list">
-              <div 
-                *ngFor="let assignment of mealAssignments; let i = index; trackBy: trackByAssignment" 
-                class="meal-assignment-item"
-                [attr.data-assignment-index]="i"
-              >
-                <!-- Assignment Header with Remove Button -->
-                <div class="assignment-header">
-                  <span class="assignment-label">分配 {{ i + 1 }}</span>
-                  <button 
-                    type="button" 
-                    class="btn-remove-assignment"
-                    (click)="removeMealAssignment(i)"
-                    [disabled]="mealAssignments.length === 1"
-                    title="移除分配"
-                  >
-                    ✕
-                  </button>
-                </div>
-  
-                <!-- Day Cycle Selection -->
-                <div class="form-group">
-                  <span>{{ assignment.dayId ? '第 ' + assignment.dayId + ' 天' : '-' }}</span>
-                </div>
-  
-                <!-- Meals Container for this assignment -->
-                <div class="form-group meals-container" *ngIf="assignment.dayId">
-                  
-                  <!-- Lunch Meals -->
-                  <div class="meal-time-section" *ngIf="assignment.lunchMeals && assignment.lunchMeals.length > 0">
-                    <h4>午餐</h4>
-                    <div class="meals-grid">
-                      <div *ngFor="let meal of assignment.lunchMeals" class="meal-option">
-                        <input 
-                          type="checkbox" 
-                          [id]="'lunch-' + meal.id + '-' + i" 
-                          [value]="meal.id"
-                          [checked]="assignment.selectedLunchMeals.includes(meal.id)"
-                          (change)="onMealSelection('lunch', meal, $event, i)"
-                        >
-                        <label [for]="'lunch-' + meal.id + '-' + i" class="meal-label">
-                          {{ meal.meal_name }}
-                        </label>
-                      </div>
+
+          <div class="form-group">
+            <label for="bedNumber">床位</label>
+            <input type="text" id="bedNumber" name="bedNumber" [(ngModel)]="bedNumber" required />
+          </div>
+
+          <div class="form-group">
+            <label for="name">姓名</label>
+            <input type="text" id="name" name="name" [(ngModel)]="name" />
+          </div>
+
+          <div class="form-group">
+            <label for="national_id">身分證字號</label>
+            <input type="text" id="national_id" name="national_id" [(ngModel)]="national_id" />
+          </div>
+        </div>
+
+        <div class="meal-assignments">
+          <div class="meal-assignments-header">
+            <h2>病患餐點分配</h2>
+            <button
+              type="button"
+              class="btn-add-assignment"
+              (click)="addMealAssignment()"
+              [disabled]="mealAssignments.length >= availableDays.length">
+              + 新增分配
+            </button>
+          </div>
+
+          <div class="meal-assignments-list">
+            <div
+              *ngFor="let assignment of mealAssignments; let i = index; trackBy: trackByAssignment"
+              class="meal-assignment-item"
+              [attr.data-assignment-index]="i">
+              <div class="assignment-header">
+                <span class="assignment-label">分配 {{ i + 1 }}</span>
+                <button
+                  type="button"
+                  class="btn-remove-assignment"
+                  (click)="removeMealAssignment(i)"
+                  [disabled]="mealAssignments.length === 1"
+                  title="移除此分配">
+                  ×
+                </button>
+              </div>
+
+              <div class="form-group">
+                <span>{{ assignment.dayId ? '第 ' + assignment.dayId + ' 天' : '-' }}</span>
+              </div>
+
+              <div class="form-group meals-container" *ngIf="assignment.dayId">
+                <div class="meal-time-section" *ngIf="assignment.lunchMeals && assignment.lunchMeals.length > 0">
+                  <h4>午餐</h4>
+                  <div class="meals-grid">
+                    <div *ngFor="let meal of assignment.lunchMeals" class="meal-option">
+                      <input
+                        type="checkbox"
+                        [id]="'lunch-' + meal.id + '-' + i"
+                        [value]="meal.id"
+                        [checked]="assignment.selectedLunchMeals.includes(meal.id)"
+                        (change)="onMealSelection('lunch', meal, $event, i)">
+                      <label [for]="'lunch-' + meal.id + '-' + i" class="meal-label">
+                        {{ meal.meal_name }}
+                      </label>
                     </div>
                   </div>
-  
-                  <!-- Dinner Meals -->
-                  <div class="meal-time-section" *ngIf="assignment.dinnerMeals && assignment.dinnerMeals.length > 0">
-                    <h4>晚餐</h4>
-                    <div class="meals-grid">
-                      <div *ngFor="let meal of assignment.dinnerMeals" class="meal-option">
-                        <input 
-                          type="checkbox" 
-                          [id]="'dinner-' + meal.id + '-' + i" 
-                          [value]="meal.id"
-                          [checked]="assignment.selectedDinnerMeals.includes(meal.id)"
-                          (change)="onMealSelection('dinner', meal, $event, i)"
-                        >
-                        <label [for]="'dinner-' + meal.id + '-' + i" class="meal-label">
-                          {{ meal.meal_name }}
-                        </label>
-                      </div>
+                </div>
+
+                <div class="meal-time-section" *ngIf="assignment.dinnerMeals && assignment.dinnerMeals.length > 0">
+                  <h4>晚餐</h4>
+                  <div class="meals-grid">
+                    <div *ngFor="let meal of assignment.dinnerMeals" class="meal-option">
+                      <input
+                        type="checkbox"
+                        [id]="'dinner-' + meal.id + '-' + i"
+                        [value]="meal.id"
+                        [checked]="assignment.selectedDinnerMeals.includes(meal.id)"
+                        (change)="onMealSelection('dinner', meal, $event, i)">
+                      <label [for]="'dinner-' + meal.id + '-' + i" class="meal-label">
+                        {{ meal.meal_name }}
+                      </label>
                     </div>
                   </div>
-  
-                  <!-- No meals message -->
-                  <div *ngIf="(!assignment.lunchMeals || assignment.lunchMeals.length === 0) && 
-                             (!assignment.dinnerMeals || assignment.dinnerMeals.length === 0)" 
-                       class="no-meals">
-                    <p>第 {{ assignment.dayId }} 天無可用餐點</p>
-                  </div>
+                </div>
+
+                <div
+                  *ngIf="(!assignment.lunchMeals || assignment.lunchMeals.length === 0) &&
+                         (!assignment.dinnerMeals || assignment.dinnerMeals.length === 0)"
+                  class="no-meals">
+                  <p>第 {{ assignment.dayId }} 天目前沒有餐點資料。</p>
                 </div>
               </div>
             </div>
           </div>
-        </fieldset>
-  
-        <!-- OPTIONAL SECTION -->
-        <fieldset class="optional">
-          <legend>選填資訊</legend>
-          
-          <!-- Patient Demographics Row 1 -->
-          <div class="form-row">
-            <div class="col-1">
-              <div class="form-group">
-                <label for="age">年齡</label>
-                <input 
-                  type="number" 
-                  id="age" 
-                  name="age"
-                  [(ngModel)]="age" 
-                  min="0" 
-                  max="120"
-                  placeholder="輸入年齡"
-                />
-              </div>
-    
-              <div class="form-group">
-                <label for="sex">性別</label>
-                <select id="sex" name="sex" [(ngModel)]="sex">
-                  <option value="" disabled>選擇性別</option>
-                  <option value="male">男</option>
-                  <option value="female">女</option>
-                </select>
-              </div>
-            </div>
-  
-            <div class="col-2">
-              <div class="form-group">
-                <label for="height">身高（cm）</label>
-                <input 
-                  type="number" 
-                  id="height" 
-                  name="height"
-                  [(ngModel)]="height" 
-                  min="50" 
-                  max="250"
-                  step="0.1"
-                  placeholder="輸入身高（cm）"
-                />
-              </div>
-    
-              <div class="form-group">
-                <label for="weight">體重（kg）</label>
-                <input 
-                  type="number" 
-                  id="weight" 
-                  name="weight" 
-                  [(ngModel)]="weight"
-                  min="10" 
-                  max="300"
-                  step="0.1"
-                  placeholder="輸入體重（kg）"
-                />
-              </div>
-            </div>
-            <div class="col-3">
-              <div class="form-group">
-                <label for="activityLevel">活動量</label>
-                <select id="activityLevel" name="activityLevel" [(ngModel)]="activityLevel">
-                  <option value="" disabled>選擇活動量</option>
-                  <option value="inactive">無活動</option>
-                  <option value="low_active">低活動量</option>
-                  <option value="active">中等活動量</option>
-                  <option value="very_active">高活動量</option>
-                </select>
-              </div>
-            </div>
-          </div>
-  
-          <!-- Activity Level and Dietary Restrictions -->
-          <div class="form-row">
+        </div>
+      </fieldset>
+
+      <fieldset class="optional">
+        <legend>選填資訊</legend>
+
+        <div class="form-row compact-grid">
+          <div class="col-1 compact-column">
             <div class="form-group">
-              <label for="dietaryRestrictions">飲食限制</label>
-              <textarea 
-                id="dietaryRestrictions" 
-                name="dietaryRestrictions"
-                [(ngModel)]="dietaryRestrictions"
-                rows="4"
-                placeholder="輸入飲食限制或特殊需求..."
-              ></textarea>
+              <label for="calendarMode">日期格式</label>
+              <select id="calendarMode" name="calendarMode" [(ngModel)]="calendarMode" (ngModelChange)="onCalendarModeChange()">
+                <option value="gregorian">西元年</option>
+                <option value="roc">民國年</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="birthdate">出生日期</label>
+              <div class="date-input-row">
+                <input
+                  type="text"
+                  id="birthdate"
+                  name="birthdate"
+                  [(ngModel)]="birthdateDisplay"
+                  (ngModelChange)="onBirthdateDisplayChange()"
+                  (blur)="onBirthdateDisplayBlur()"
+                  [attr.maxlength]="birthdateMaxLength"
+                  [placeholder]="birthdatePlaceholder">
+                <button type="button" class="calendar-trigger" (click)="openNativeDatePicker(nativeBirthdatePicker)" title="開啟日曆">
+                  📅
+                </button>
+                <input
+                  #nativeBirthdatePicker
+                  class="native-date-proxy"
+                  type="date"
+                  name="nativeBirthdatePicker"
+                  [ngModelOptions]="{ standalone: true }"
+                  [ngModel]="birthdate"
+                  (ngModelChange)="birthdate = $event; onBirthdateInputChange()">
+              </div>
+              <small class="date-example">{{ primaryDateExample }}</small>
+              <small class="date-example alternate">{{ alternateDateExample }}</small>
+            </div>
+
+            <div class="form-group">
+              <label for="activityLevel">活動量</label>
+              <select id="activityLevel" name="activityLevel" [(ngModel)]="activityLevel">
+                <option *ngFor="let option of activityLevelOptions" [value]="option.value" [disabled]="option.value === ''">
+                  {{ option.label }}
+                </option>
+              </select>
             </div>
           </div>
-        </fieldset>
-  
-      </div>
-  
-      <!-- FORM ACTIONS -->
-      <div class="form-buttons">
-        <button type="button" class="btn-cancel" (click)="cancelEdit()">取消</button>
-        <button type="button" class="btn-clear" (click)="resetForm()">全部清除</button>
-        <button type="button" class="btn-submit" (click)="updatePatient()" [disabled]="!isFormValid()">更新病患資訊</button>
-      </div>
-  
-    </form>
+
+          <div class="col-2 compact-column">
+            <div class="form-group">
+              <label for="age">年齡</label>
+              <input type="number" id="age" name="age" [(ngModel)]="age" readonly placeholder="依出生日期自動計算">
+            </div>
+
+            <div class="form-group">
+              <label for="sex">性別</label>
+              <select id="sex" name="sex" [(ngModel)]="sex">
+                <option *ngFor="let option of sexOptions" [value]="option.value" [disabled]="option.value === ''">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="height">身高 (cm)</label>
+              <input
+                type="number"
+                id="height"
+                name="height"
+                [(ngModel)]="height"
+                min="50"
+                max="250"
+                step="0.1"
+                placeholder="輸入身高">
+            </div>
+
+            <div class="form-group">
+              <label for="weight">體重 (kg)</label>
+              <input
+                type="number"
+                id="weight"
+                name="weight"
+                [(ngModel)]="weight"
+                min="10"
+                max="300"
+                step="0.1"
+                placeholder="輸入體重">
+            </div>
+          </div>
+
+          <div class="col-3 compact-column">
+            <div class="form-group stretch-group">
+              <label for="foodAllergies">食物過敏原限制</label>
+              <textarea
+                id="foodAllergies"
+                name="foodAllergies"
+                [(ngModel)]="foodAllergies"
+                rows="6"
+                placeholder="輸入需避免的食材、過敏原或特殊飲食提醒"></textarea>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="form-buttons">
+      <button type="button" class="btn-cancel" (click)="cancelEdit()">取消</button>
+      <button type="button" class="btn-clear" (click)="resetForm()">重設</button>
+      <button type="button" class="btn-submit" (click)="updatePatient()" [disabled]="!isFormValid()">儲存病患資料</button>
+    </div>
+  </form>
 </div>

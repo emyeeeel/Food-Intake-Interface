@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MenuOptionComponent } from '../menu-option/menu-option.component';
 import { Router } from '@angular/router';
 import { Auth, signOut } from '@angular/fire/auth';
@@ -6,7 +7,7 @@ import { Auth, signOut } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-menu-bar',
-  imports: [MenuOptionComponent],
+  imports: [CommonModule, MenuOptionComponent],
   templateUrl: './menu-bar.component.html',
   styleUrl: './menu-bar.component.scss'
 })
@@ -14,6 +15,11 @@ export class MenuBarComponent {
   @Output() mobileMenuToggle = new EventEmitter<boolean>();
 
   isMobileOpen = false;
+  isCollapsed = false;
+
+  toggleCollapse(): void {
+    this.isCollapsed = !this.isCollapsed;
+  }
 
   constructor(
     private router: Router,

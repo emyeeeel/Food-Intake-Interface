@@ -34,6 +34,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .total-count {
@@ -46,7 +47,10 @@
       border: 1px solid #B8D8D3;
     }
 
-    .btn-refresh {
+    .btn-refresh,
+    .btn-upload,
+    .btn-import,
+    .btn-template {
       background: linear-gradient(135deg, #40C1AC, #2FA695);
       color: white;
       border: none;
@@ -59,6 +63,10 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       box-shadow: 0 2px 6px rgba(64, 193, 172, 0.2);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
 
       &:disabled {
         background: #B8D8D3;
@@ -70,6 +78,51 @@
         background: linear-gradient(135deg, #2FA695, #258B7A);
       }
     }
+
+    .btn-template {
+      background: linear-gradient(135deg, #E0F7F4, #C7F0E8);
+      color: #00313C;
+      border: 1px solid #B8D8D3;
+      box-shadow: none;
+    }
+
+    .excel-file-input {
+      display: none;
+    }
+  }
+
+  .excel-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #f5fbfa, #edf8f6);
+    border: 1px solid #d8ebe7;
+    border-radius: 10px;
+    color: #34525b;
+    font-size: 11px;
+    font-weight: 600;
+    flex-wrap: wrap;
+  }
+
+  .excel-status.success {
+    border-color: #9fd8cc;
+    color: #1f6156;
+  }
+
+  .excel-status.error {
+    border-color: #e7b2b2;
+    color: #9a3d3d;
+  }
+
+  .excel-file-name {
+    color: #00313C;
+  }
+
+  .excel-message {
+    color: inherit;
   }
 
   .loading-state,
@@ -258,6 +311,7 @@
           text-align: center;
           border: none;
           color: white;
+          font-family: 'Quicksand', sans-serif;
 
           &.view {
             background: #40C1AC;
@@ -273,6 +327,19 @@
             &:hover {
               background: #258B7A;
             }
+          }
+
+          &.delete {
+            background: #d65c5c;
+
+            &:hover:not(:disabled) {
+              background: #bf4a4a;
+            }
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
           }
         }
       }

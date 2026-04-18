@@ -1,6 +1,4 @@
 <div class="main-container">
-
-  <!-- ── Auto-selection loading spinner ── -->
   @if (!autoSelectionReady && scannedPatientId) {
     <div class="phase-loading">
       <div class="spinner-small"></div>
@@ -8,74 +6,79 @@
     </div>
   }
 
-  <!-- ── Outside meal time ── -->
   <ng-container *ngIf="autoSelectionReady && mealSelectionStep && scannedPatientId && !currentMealPeriod">
     <div class="meal-selection-container">
       <div class="outside-meal-time">
-        <h4>目前非用餐時段</h4>
-        <p>請於用餐時間內進行記錄</p>
+        <h4>目前不在配餐餐期</h4>
+        <p>請在設定的午餐或晚餐時段內操作。</p>
       </div>
     </div>
   </ng-container>
 
-  <!-- ── Meal Type (Before / After) Selection ── -->
-  <ng-container *ngIf="autoSelectionReady && mealSelectionStep && scannedPatientId && currentMealPeriod">
+  <ng-container *ngIf="autoSelectionReady && mealSelectionStep && scannedPatientId && currentMealPeriod && hasCurrentMealAssignment">
     <div class="meal-selection-container">
-      <div class="selection-header">
-        <div class="label">
-          <h4>請選擇用餐時間</h4>
-          <p>{{ mealPeriodAssignmentLabel }}</p>
+
+      <div *ngIf="isBothPhaseDone()" class="phase-done-container">
+        <div class="phase-done-icon">✓</div>
+        <h4>今日{{currentMealPeriod}}已完成</h4>
+        <p>{{ mealPeriodAssignmentLabel }}</p>
+        <p>餐前與餐後記錄均已上傳。</p>
+      </div>
+
+      <ng-container *ngIf="!isBothPhaseDone()">
+        <div class="selection-header">
+          <div class="patient-info-bar" *ngIf="patient">
+            <span class="patient-room">{{ patient.room_number }}-{{ patient.bed_number }}</span>
+            <span class="patient-name">{{ patient.name || '未命名' }}</span>
+          </div>
+
+          <div class="label">
+            <h4>請選擇用餐時間</h4>
+            <p>{{ mealPeriodAssignmentLabel }}</p>
+          </div>
+
+          <div class="upload-section">
+            <button
+              class="nav-button primary"
+              [disabled]="!selectedMealType"
+              [class.disabled]="!selectedMealType"
+              (click)="selectedMealType && openCapturePopup()">
+              上傳食物攝取記錄
+            </button>
+          </div>
         </div>
 
-        <div class="upload-section">
+        <div class="meal-type-buttons">
           <button
-            class="nav-button primary"
-            [disabled]="!selectedMealType"
-            [class.disabled]="!selectedMealType"
-            (click)="selectedMealType && openCapturePopup()">
-            上傳食物攝取記錄
+            class="meal-type-btn before-meal"
+            [disabled]="isBeforeDisabled()"
+            [class.disabled]="isBeforeDisabled()"
+            [class.selected]="selectedMealType === 'Before'"
+            (click)="!isBeforeDisabled() && selectMealType('Before')">
+            <span class="btn-text">
+              <span>餐前</span>
+            </span>
+          </button>
+
+          <button
+            class="meal-type-btn after-meal"
+            [disabled]="isAfterDisabled()"
+            [class.disabled]="isAfterDisabled()"
+            [class.selected]="selectedMealType === 'After'"
+            (click)="!isAfterDisabled() && selectMealType('After')">
+            <span class="btn-text">
+              <span>餐後</span>
+            </span>
           </button>
         </div>
-      </div>
+      </ng-container>
 
-      <div class="meal-type-buttons">
-
-        <!-- 餐前: disabled once any record exists -->
-        <button
-          class="meal-type-btn before-meal"
-          [disabled]="isBeforeDisabled()"
-          [class.disabled]="isBeforeDisabled()"
-          [class.selected]="selectedMealType === 'Before'"
-          (click)="!isBeforeDisabled() && selectMealType('Before')">
-        </button>
-
-        <!-- 餐後: disabled until at least one record exists -->
-        <button
-          class="meal-type-btn after-meal"
-          [disabled]="isAfterDisabled()"
-          [class.disabled]="isAfterDisabled()"
-          [class.selected]="selectedMealType === 'After'"
-          (click)="!isAfterDisabled() && selectMealType('After')">
-        </button>
-
-      </div>
     </div>
   </ng-container>
 
-  <!-- ── Meal card list (after type selection) ── -->
-  <ng-container *ngIf="autoSelectionReady && !mealSelectionStep && hasMealsForToday()">
-    <div class="header-section">
-      <h2>新增食物攝取紀錄</h2>
-      <button class="nav-button primary" (click)="capture()">
-        上傳食物攝取記錄
-      </button>
-    </div>
-  </ng-container>
-
-  <!-- ── No meals for today ── -->
-  <ng-container *ngIf="autoSelectionReady && !mealSelectionStep && !hasMealsForToday()">
+  <ng-container *ngIf="autoSelectionReady && mealSelectionStep && scannedPatientId && currentMealPeriod && !hasCurrentMealAssignment">
     <div class="no-assignments">
-      <p>今日無可用餐點分配。</p>
+      <p>此住民目前沒有符合當前餐期的配餐資料，請先完成膳食指派。</p>
     </div>
   </ng-container>
 
@@ -85,12 +88,26 @@
     (cancelled)="onCaptureCancelled()">
   </app-pop-up>
 
-  <!-- ── Upload progress overlay ── -->
   <ng-container *ngIf="isProcessing">
     <div class="loading-overlay">
       <div class="spinner"></div>
-      <p class="loading-text">上傳食物攝取記錄中…</p>
+      <p class="loading-text">上傳食物攝取記錄中...</p>
     </div>
   </ng-container>
 
+  <div *ngIf="showAssignmentDialog" class="assignment-dialog-overlay" (click)="closeMealAssignmentDialog()">
+    <div class="assignment-dialog" (click)="$event.stopPropagation()">
+      <div class="assignment-dialog-title">{{ assignmentDialogTitle }}</div>
+      <div class="assignment-dialog-message">{{ assignmentDialogMessage }}</div>
+      <button class="assignment-dialog-button" (click)="closeMealAssignmentDialog()">確認</button>
+    </div>
+  </div>
+
+  <div *ngIf="showErrorDialog" class="assignment-dialog-overlay" (click)="closeErrorDialog()">
+    <div class="assignment-dialog error-dialog" (click)="$event.stopPropagation()">
+      <div class="assignment-dialog-title error-title">{{ errorDialogTitle }}</div>
+      <div class="assignment-dialog-message">{{ errorDialogMessage }}</div>
+      <button class="assignment-dialog-button" (click)="closeErrorDialog()">確認</button>
+    </div>
+  </div>
 </div>

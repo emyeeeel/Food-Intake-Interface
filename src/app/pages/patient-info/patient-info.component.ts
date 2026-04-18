@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, HostListener } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 
 import { MenuBarComponent } from "../../components/menu-bar/menu-bar.component";
@@ -23,6 +23,8 @@ import { PatientIntakeComponent } from "../../components/patient-intake/patient-
 import { DisplayPatientComponent } from "../../components/display-patient/display-patient.component";
 import { PrintAllPatientsComponent } from "../../components/print-all-patients/print-all-patients.component";
 import { IntakeService } from '../../services/intake.service';
+import { PatientService } from '../../services/patient.service';
+import { LTCPatient } from '../../models/ltc-patient.model';
 import { PatientAnalysisComponent } from '../../components/patient-analysis/patient-analysis.component';
 import { ViewIntakeComponent } from "../../components/view-intake/view-intake.component";
 
@@ -54,7 +56,7 @@ import { ViewIntakeComponent } from "../../components/view-intake/view-intake.co
   styleUrls: ['./patient-info.component.scss']
 })
 export class PatientInfoComponent implements OnInit {
-  patientId: number = 1;  
+  patientId: number = 0;
   loading: boolean = true;
   error: string | null = null;
 
@@ -63,7 +65,13 @@ export class PatientInfoComponent implements OnInit {
   lunchHasMeal: boolean = false;
   dinnerHasMeal: boolean = false;
 
-  isMobileMenuOpen = false; 
+  isMobileMenuOpen = false;
+
+  // Patient search
+  allPatients: LTCPatient[] = [];
+  patientSearchQuery = '';
+  patientSearchResults: LTCPatient[] = [];
+  showPatientResults = false;
 
   onLunchStatus(status: boolean) {
     this.lunchHasMeal = status;
@@ -77,10 +85,16 @@ export class PatientInfoComponent implements OnInit {
     console.log("Dinner meal assigned?", status);
   }
 
-  constructor(private router: Router, private cloudTestService: CloudTestService, private cdr: ChangeDetectorRef, private intakeService: IntakeService) {}
+  constructor(
+    private router: Router,
+    private cloudTestService: CloudTestService,
+    private cdr: ChangeDetectorRef,
+    private intakeService: IntakeService,
+    private patientService: PatientService,
+  ) {}
 
   ngOnInit(): void {
-    this.patientId = this.getPatientIdFromRoute() || 1;
+    this.patientId = this.getPatientIdFromRoute() || 0;
     console.log('Patient ID:',this.patientId)
 
     this.router.events
@@ -90,9 +104,7 @@ export class PatientInfoComponent implements OnInit {
         this.updateCurrentView(path);
       });
     this.updateCurrentView(this.router.url);
-    this.intakeService.getIntakeByLtcPatientId(1).subscribe(records => {
-      console.log(records);
-    });
+    this.loadAllPatients();
   }
 
   private updateCurrentView(path: string): void {
@@ -195,5 +207,57 @@ export class PatientInfoComponent implements OnInit {
 
   onMobileMenuToggle(isOpen: boolean) {
     this.isMobileMenuOpen = isOpen;
+  }
+
+  // --- Patient search ---
+
+  loadAllPatients(): void {
+    this.patientService.getLTCPatients().subscribe({
+      next: (patients) => {
+        this.allPatients = patients;
+        // If no patient selected, default to first one
+        if (!this.patientId && patients.length > 0) {
+          this.patientId = patients[0].id;
+          this.cdr.detectChanges();
+        }
+      },
+    });
+  }
+
+  onPatientSearch(): void {
+    const q = this.patientSearchQuery.trim().toLowerCase();
+    this.showPatientResults = true;
+    if (!q) {
+      this.patientSearchResults = this.allPatients.slice(0, 10);
+      return;
+    }
+    this.patientSearchResults = this.allPatients
+      .filter(p =>
+        `${p.room_number}-${p.bed_number}`.includes(q) ||
+        p.room_number.includes(q) ||
+        (p.name || '').toLowerCase().includes(q)
+      )
+      .slice(0, 10);
+  }
+
+  selectPatient(id: number): void {
+    this.patientId = id;
+    this.patientSearchQuery = '';
+    this.showPatientResults = false;
+    this.cdr.detectChanges();
+  }
+
+  focusPatientSearch(): void {
+    if (!this.allPatients.length) {
+      this.loadAllPatients();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.patient-search-wrapper')) {
+      this.showPatientResults = false;
+    }
   }
 }

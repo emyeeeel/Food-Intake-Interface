@@ -20,11 +20,10 @@ export class QrTestComponent implements AfterViewInit {
     // Just the patient ID
     qrData = this.patientId.toString();
   } else {
-    // Your existing URL logic
-    const detailsUrl = `https://h3vkhzth-4200.asse.devtunnels.ms/patient-info/${this.patientId}`;
-    const intakeUrl = `https://h3vkhzth-8000.asse.devtunnels.ms/api/patients/${this.patientId}/recommended-intake/`;
-    const captureBeforeUrl = `https://h3vkhzth-8000.asse.devtunnels.ms/api/segment/before`;
-    const captureAfterUrl = `https://h3vkhzth-8000.asse.devtunnels.ms//api/segment/after`;
+    const detailsUrl = `${environment.frontendBaseUrl}/patient-info/${this.patientId}`;
+    const intakeUrl = `${environment.apiBaseUrl}/api/patients/${this.patientId}/recommended-intake/`;
+    const captureBeforeUrl = `${environment.apiBaseUrl}/api/segment/before`;
+    const captureAfterUrl = `${environment.apiBaseUrl}/api/segment/after`;
     
     qrData = this.type === 'Intake' ? intakeUrl : 
              this.type === 'Before' ? captureBeforeUrl : 

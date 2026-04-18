@@ -34,7 +34,7 @@
   }
 
   <!-- Show Add Intake Section -->
-@if (scanResult && selectedMealAssignmentId != 0) {
+@if (scanResult && hasAvailableAssignment) {
   <div class="header-section">
     <h2>新增食物攝取紀錄</h2>
     <button class="nav-button primary"
@@ -87,7 +87,7 @@
 }
 
   <!-- Show "No assignments" only after scanning and no assignments -->
-  @if (scanResult && selectedMealAssignmentId == 0) {
+  @if (scanResult && !hasAvailableAssignment) {
     <div class="meal-selection-container">
       <div class="meal-type-buttons">
 
@@ -113,6 +113,22 @@
     (confirmed)="onCaptureConfirmed()"
     (cancelled)="onCaptureCancelled()">
   </app-pop-up>
+
+  <ng-container *ngIf="showErrorDialog">
+    <div class="error-dialog-backdrop" (click)="closeErrorDialog()">
+      <div class="error-dialog" (click)="$event.stopPropagation()">
+        <div class="error-dialog__header">
+          <h3>{{ errorDialogTitle }}</h3>
+        </div>
+        <div class="error-dialog__body">
+          <p *ngFor="let detail of errorDialogDetails">{{ detail }}</p>
+        </div>
+        <div class="error-dialog__footer">
+          <button class="error-dialog__button" (click)="closeErrorDialog()">關閉</button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
 
   <ng-container *ngIf="isProcessing">
     <div class="loading-overlay">

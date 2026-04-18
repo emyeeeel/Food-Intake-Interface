@@ -3,6 +3,9 @@
     <div class="name">
       <span>住民姓名</span>
       <h2 class="value">{{ getDisplayName() }}</h2>
+      @if (getDisplayRoomBed()) {
+        <span class="room-bed">{{ getDisplayRoomBed() }}</span>
+      }
     </div>
 
     <div class="option-wrapper">

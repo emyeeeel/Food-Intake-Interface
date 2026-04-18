@@ -40,6 +40,10 @@ export class MealsService {
     );
   }
 
+  deleteMeal(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}${id}/`);
+  }
+
   getMealByName(mealName: string): Observable<Meal[]> {
     const params = { meal_name: mealName };
     return this.http.get<Meal[]>(this.apiUrl, { params });
@@ -53,13 +57,50 @@ export class MealsService {
     return this.http.put<Meal>(`${this.apiUrl}${id}/`, data);
   }
 
+  updateMealJson(id: number, data: any): Observable<Meal> {
+    return this.http.patch<Meal>(`${this.apiUrl}${id}/`, data);
+  }
+
   updateMealCycle(excelFile: File): Observable<any> {
     const url = `${this.baseUrl}/api/add_ltc_meal_cycle/`;
-    
+
     const formData = new FormData();
     formData.append('excel_file', excelFile, excelFile.name);
-    
+
     return this.http.post<any>(url, formData);
+  }
+
+  /**
+   * Open-mode Excel import. Backend reads 日期/用餐時間/菜色名稱 and writes
+   * meals with menu_mode='open' + serve_date=<parsed date>.
+   */
+  addOpenMealCycle(excelFile: File, replaceExisting = false, serveDate?: string): Observable<any> {
+    const url = `${this.baseUrl}/api/add_open_meal_cycle/`;
+
+    const formData = new FormData();
+    formData.append('excel_file', excelFile, excelFile.name);
+    if (replaceExisting) {
+      formData.append('replace_existing', 'true');
+    }
+    if (serveDate) {
+      formData.append('serve_date', serveDate);
+    }
+    return this.http.post<any>(url, formData);
+  }
+
+  /**
+   * Generic filtered lookup. Pass any combination of backend filter params
+   * (menu_mode, day_cycle, serve_date, serve_date_from/to, meal_time).
+   */
+  getMealsFiltered(params: { [key: string]: string | number | undefined }): Observable<Meal[]> {
+    let httpParams = new HttpParams();
+    Object.keys(params).forEach(key => {
+      const value = params[key];
+      if (value !== undefined && value !== null && value !== '') {
+        httpParams = httpParams.set(key, String(value));
+      }
+    });
+    return this.http.get<Meal[]>(this.apiUrl, { params: httpParams });
   }
 
   /**

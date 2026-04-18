@@ -1,22 +1,16 @@
 <div class="meal-intake-container">
   <app-menu-bar (mobileMenuToggle)="onMobileMenuToggle($event)"></app-menu-bar>
 
-  <!-- DEFAULT VIEW -->
   @if (currentView === 'default') {
     <div class="main-container" [class.mobile-menu-open]="isMobileMenuOpen">
       <div class="row-1">
         <app-back></app-back>
         <div class="search-bar">
-          <app-search-bar></app-search-bar>
+          <app-search-bar placeholder="搜尋房號或姓名..." (searchChanged)="searchQuery = $event"></app-search-bar>
         </div>
         <app-notif></app-notif>
       </div>
-      <div class="row-2">
-        <app-filter-icon></app-filter-icon>
-        @for (filterOption of filterOptions; track filterOption) {
-          <app-filter-options [filterText]="filterOption"></app-filter-options>
-        }
-      </div>
+
       <div class="row-3">
         <app-main-options
           iconSrc="assets/icons/add-icon.svg"
@@ -28,7 +22,7 @@
         </app-main-options>
         <app-main-options
           iconSrc="assets/icons/all-icon.svg"
-          optionText="查詢所有紀錄"
+          optionText="查看所有紀錄"
           altText="See All Logs Icon"
           backgroundColor="#40C1AC"
           textColor="#E6FEF9"
@@ -43,32 +37,12 @@
           (click)="navigateToPrintLogs()">
         </app-main-options>
       </div>
-      <div class="row-4">
-        <div class="text-title">
-          近期攝取紀錄
-        </div>
-        <app-date-container></app-date-container>
-      </div>
-      <div class="row-5">
-        <app-intake-log
-          time="午餐"
-          assignedMeal="L-01-A"
-          [weight]="300"
-          [percent]="40"
-          [volume]="135">
-        </app-intake-log>
-        <app-intake-log
-          time="晚餐"
-          assignedMeal="D-01-A"
-          [weight]="350"
-          [percent]="25"
-          [volume]="87">
-        </app-intake-log>
-      </div>
+
+      <app-intake-dashboard [searchQuery]="searchQuery"></app-intake-dashboard>
+
     </div>
   }
 
-  <!-- ADD INTAKE VIEW -->
   @if (currentView === 'add') {
     <div class="main-container">
       <div class="row-1">
@@ -78,12 +52,10 @@
         </div>
         <app-notif></app-notif>
       </div>
-      <!-- Add intake form content here -->
       <app-add-intake></app-add-intake>
     </div>
   }
 
-  <!-- ALL LOGS VIEW -->
   @if (currentView === 'all') {
     <div class="main-container">
       <div class="row-1">
@@ -93,12 +65,10 @@
         </div>
         <app-notif></app-notif>
       </div>
-      <!-- Display all intake logs here -->
       <app-display-intake></app-display-intake>
     </div>
   }
 
-  <!-- PRINT LOGS VIEW -->
   @if (currentView === 'print') {
     <div class="main-container">
       <div class="row-1">
@@ -108,7 +78,6 @@
         </div>
         <app-notif></app-notif>
       </div>
-      <!-- Print intake logs content here -->
       <app-print-all-intakes></app-print-all-intakes>
     </div>
   }

@@ -1,9 +1,10 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { MealsService } from '../../services/meals.service';
 import { DateService } from '../../services/date.service';
 import { Meal } from '../../models/meal.model';
-import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-todays-meal',
@@ -13,18 +14,19 @@ import { Subscription } from 'rxjs';
 })
 export class TodaysMealComponent implements OnInit, OnDestroy {
   @Input() time!: string;
-  
-  iconSrc: string = '';
-  meals: Meal[] = []; // Now stores only filtered meals from backend
+
+  iconSrc = '';
+  meals: Meal[] = [];
   currentSelectedDate: Date = new Date();
-  isLoading: boolean = false;
-  loadingError: string = '';
-  
-  private dateSubscription: Subscription = new Subscription();
+  isLoading = false;
+  loadingError = '';
+
+  private dateSubscription = new Subscription();
 
   constructor(
     private mealsService: MealsService,
-    private dateService: DateService
+    private dateService: DateService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -37,145 +39,118 @@ export class TodaysMealComponent implements OnInit, OnDestroy {
     this.dateSubscription.unsubscribe();
   }
 
-  /**
-   * Subscribe to date changes from the date service
-   */
+  private normalizeMealTime(value: string): string {
+    const normalized = (value || '').trim().toLowerCase();
+
+    if (
+      normalized === '\u5348\u9910' ||
+      normalized.includes('å') ||
+      normalized.includes('\u5348')
+    ) {
+      return '\u5348\u9910';
+    }
+
+    if (
+      normalized === '\u665a\u9910' ||
+      normalized.includes('æ') ||
+      normalized.includes('\u665a')
+    ) {
+      return '\u665a\u9910';
+    }
+
+    if (normalized === '\u9ede\u5fc3' || normalized === 'snack') {
+      return '\u9ede\u5fc3';
+    }
+
+    return value;
+  }
+
   private subscribeToDateChanges(): void {
-    this.dateSubscription = this.dateService.selectedDate$.subscribe(date => {
+    this.dateSubscription = this.dateService.selectedDate$.subscribe((date) => {
       this.currentSelectedDate = date;
-      console.log('TodaysMealComponent: Date changed to:', date);
-      
-      // Load new meals when date changes
       this.loadMealsForCurrentDate();
     });
   }
 
   private setIconSrc(): void {
-    const timeToIconMap: { [key: string]: string } = {
-      '午餐': 'assets/icons/lunch-time.svg',
-      '晚餐': 'assets/icons/dinner-time.svg',
-      'snack': 'assets/icons/snack-time.svg'
+    const normalizedTime = this.normalizeMealTime(this.time);
+    const timeToIconMap: Record<string, string> = {
+      '\u5348\u9910': 'assets/icons/lunch-time.svg',
+      '\u665a\u9910': 'assets/icons/dinner-time.svg',
+      '\u9ede\u5fc3': 'assets/icons/snack-time.svg'
     };
 
-    if (this.time) {
-      this.iconSrc = timeToIconMap[this.time] || 'assets/icons/lunch-time.svg';
-    } else {
-      this.iconSrc = 'assets/icons/lunch-time.svg';
-    }
+    this.iconSrc = timeToIconMap[normalizedTime] || 'assets/icons/lunch-time.svg';
   }
-  
-  /**
-   * Load meals for current date and time using backend filtering
-   */
+
   private loadMealsForCurrentDate(): void {
     if (!this.time) {
-      console.warn('TodaysMealComponent: No time specified');
       return;
     }
 
     this.isLoading = true;
     this.loadingError = '';
-    
-    const currentDay = this.getCurrentDayInCycle();
-    
-    console.log(`Loading meals for Day ${currentDay}, Time: ${this.time}`);
-    
-    // Use the new backend filtering method
-    this.mealsService.getMealsByDayCycleAndTime(currentDay, this.time).subscribe({
+
+    const normalizedTime = this.normalizeMealTime(this.time);
+    const filterParams = {
+      ...this.dateService.getMealFilterParamsForDate(this.currentSelectedDate),
+      meal_time: normalizedTime,
+    };
+
+    this.mealsService.getMealsFiltered(filterParams).subscribe({
       next: (meals: Meal[]) => {
         this.meals = meals;
         this.isLoading = false;
-        console.log(`Loaded ${meals.length} meals for Day ${currentDay} ${this.time}:`, meals);
       },
       error: (error) => {
         console.error('Error loading meals:', error);
         this.meals = [];
         this.isLoading = false;
-        this.loadingError = 'Failed to load meals. Please try again.';
+        this.loadingError = '\u8f09\u5165\u9910\u9ede\u5931\u6557\uff0c\u8acb\u7a0d\u5f8c\u518d\u8a66\u3002';
       }
     });
   }
 
-  /**
-   * Calculate current day in the meal cycle using the selected date from DateService
-   * @returns Current day number in cycle (1-14 for a 14-day cycle)
-   */
   private getCurrentDayInCycle(): number {
     return this.dateService.calculateDayCycleForDate(this.currentSelectedDate);
   }
 
-  /**
-   * Generate custom meal code based on time input, day cycle, and meal ID
-   * @param meal The meal object
-   * @returns Custom meal code (e.g., 'L-6-49' for lunch, day 6, meal ID 49)
-   */
   getMealCode(meal: Meal): string {
     const currentDay = this.getCurrentDayInCycle();
-    
-    // Map time to letter code
-    const timeToLetterMap: { [key: string]: string } = {
-      '午餐': 'L', // Lunch
-      '晚餐': 'D', // Dinner
-      'snack': 'S'  // Snack
+    const normalizedTime = this.normalizeMealTime(this.time);
+
+    const timeToLetterMap: Record<string, string> = {
+      '\u5348\u9910': 'L',
+      '\u665a\u9910': 'D',
+      '\u9ede\u5fc3': 'S'
     };
-    
-    const timeCode = timeToLetterMap[this.time] || 'U'; // U for Unknown
-    
+
+    const timeCode = timeToLetterMap[normalizedTime] || 'U';
     return `${timeCode}-${currentDay}-${meal.id}`;
   }
 
-  /**
-   * Get the meals for template display (now directly from backend-filtered results)
-   * @returns Array of meals filtered by day cycle and time serving
-   */
-  getMealsForDisplay(): Meal[] {
+  expanded = false;
+
+  getMainMeal(): Meal | null {
+    return this.meals.length > 0 ? this.meals[0] : null;
+  }
+
+  getAllMeals(): Meal[] {
     return this.meals;
   }
 
-  /**
-   * Refresh meals for current date and time
-   */
-  refreshMeals(): void {
-    this.loadMealsForCurrentDate();
+  toggleExpand(): void {
+    this.expanded = !this.expanded;
   }
 
-  /**
-   * Check if there are meals to display
-   * @returns True if meals are available
-   */
-  hasMeals(): boolean {
-    return this.meals.length > 0;
+  viewMealDetail(): void {
+    const main = this.getMainMeal();
+    if (main) {
+      this.router.navigate(['/meal-catalog', main.id, 'view']);
+    }
   }
 
-  /**
-   * Get loading state
-   * @returns True if currently loading
-   */
-  isLoadingMeals(): boolean {
-    return this.isLoading;
-  }
-
-  /**
-   * Get error message if any
-   * @returns Error message or empty string
-   */
-  getErrorMessage(): string {
-    return this.loadingError;
-  }
-
-  /**
-   * Get the current day number for display purposes
-   * @returns Current day number in cycle
-   */
-  getCurrentDay(): number {
-    return this.getCurrentDayInCycle();
-  }
-
-  /**
-   * Get meal time for display
-   * @returns Formatted meal time
-   */
   getMealTime(): string {
-    return this.time;
+    return this.normalizeMealTime(this.time);
   }
 }

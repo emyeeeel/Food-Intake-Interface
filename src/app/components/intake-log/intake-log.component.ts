@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { TagsComponent } from "../tags/tags.component";
+import { TagsComponent } from '../tags/tags.component';
 
 @Component({
   selector: 'app-intake-log',
@@ -13,41 +13,77 @@ export class IntakeLogComponent implements OnInit {
   @Input() weight!: number;
   @Input() percent!: number;
   @Input() volume: string | number = 0;
-  
-  iconSrc: string = '';
+
+  iconSrc = '';
 
   ngOnInit(): void {
     this.setIconSrc();
   }
 
+  private normalizeMealTime(value: string): string {
+    const normalized = (value || '').trim().toLowerCase();
+
+    if (
+      normalized === '\u5348\u9910' ||
+      normalized.includes('å') ||
+      normalized.includes('\u5348')
+    ) {
+      return '\u5348\u9910';
+    }
+
+    if (
+      normalized === '\u665a\u9910' ||
+      normalized.includes('æ') ||
+      normalized.includes('\u665a')
+    ) {
+      return '\u665a\u9910';
+    }
+
+    if (normalized === '\u9ede\u5fc3' || normalized === 'snack') {
+      return '\u9ede\u5fc3';
+    }
+
+    return value;
+  }
+
   private setIconSrc(): void {
-    const timeToIconMap: { [key: string]: string } = {
-      '午餐': 'assets/icons/lunch-time.svg',
-      '晚餐': 'assets/icons/dinner-time.svg',
-      'snack': 'assets/icons/snack-time.svg'
+    const normalizedTime = this.normalizeMealTime(this.time);
+    const timeToIconMap: Record<string, string> = {
+      '\u5348\u9910': 'assets/icons/lunch-time.svg',
+      '\u665a\u9910': 'assets/icons/dinner-time.svg',
+      '\u9ede\u5fc3': 'assets/icons/snack-time.svg'
     };
 
-    const timeKey = this.time.toLowerCase();
-    this.iconSrc = timeToIconMap[timeKey] || 'assets/icons/lunch-time.svg';
+    this.iconSrc = timeToIconMap[normalizedTime] || 'assets/icons/lunch-time.svg';
   }
-  
+
+  get displayTime(): string {
+    return this.normalizeMealTime(this.time);
+  }
+
   get formattedAssignedMeal(): string {
-    if (!this.assignedMeal) return '';
+    if (!this.assignedMeal) {
+      return '';
+    }
 
     const [meal, id, phase] = this.assignedMeal.split('-');
+    const normalizedMeal = this.normalizeMealTime(meal);
 
-    const mealMap: { [key: string]: string } = {
-      '午餐': 'L',
-      '晚餐': 'D'
+    const mealMap: Record<string, string> = {
+      '\u5348\u9910': 'L',
+      '\u665a\u9910': 'D',
+      '\u9ede\u5fc3': 'S'
     };
 
-    const phaseMap: { [key: string]: string } = {
-      '前': 'B',
-      '後': 'A'
+    const phaseMap: Record<string, string> = {
+      before: 'B',
+      after: 'A',
+      A: 'A',
+      B: 'B'
     };
 
-    const mappedMeal = mealMap[meal] || meal;
-    const mappedPhase = phaseMap[phase] || phase;
+    const mappedMeal = mealMap[normalizedMeal] || meal;
+    const mappedPhase = phaseMap[phase] || phase || 'A';
 
     return `${mappedMeal}-${id}-${mappedPhase}`;
   }
