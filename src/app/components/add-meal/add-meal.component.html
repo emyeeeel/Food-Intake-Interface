@@ -35,6 +35,8 @@
               id="mealName"
               name="mealName"
               [(ngModel)]="meal.meal_name"
+              (input)="onMealNameInput()"
+              (blur)="onMealNameBlur()"
               class="form-input"
               placeholder="在這裡輸入餐點名稱"
               required
@@ -227,6 +229,21 @@
               <span>上傳檔案</span>
             }
           </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- New-name confirmation dialog (fires on blur of meal_name input) -->
+  @if (showNewNameDialog) {
+    <div class="new-name-modal-backdrop" (click)="rejectNewName()">
+      <div class="new-name-modal" (click)="$event.stopPropagation()">
+        <h3>確認新增菜色</h3>
+        <p>「<strong>{{ pendingNewNameText }}</strong>」不在既有菜色庫中。</p>
+        <p class="hint">按「確認新增」將在儲存時建立新菜色；按「我要修改」可回去調整名稱。</p>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="rejectNewName()">我要修改</button>
+          <button type="button" class="btn-primary" (click)="confirmNewName()">確認新增</button>
         </div>
       </div>
     </div>

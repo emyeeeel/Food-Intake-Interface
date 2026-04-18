@@ -22,6 +22,58 @@ export class AddMealComponent implements OnInit {
   ngOnInit(): void {
     console.log('AddMealComponent initialized');
     this.loadServeDateOptionsIfNeeded();
+    this.loadKnownMealNames();
+  }
+
+  /** Pre-fetches all existing meal names so the blur dialog can tell
+   *  novel names from existing ones without a per-blur round-trip. */
+  private loadKnownMealNames(): void {
+    this.mealsService.getMeals().subscribe({
+      next: (meals) => {
+        this.knownMealNames = new Set(
+          meals
+            .map(m => (m.meal_name || '').trim())
+            .filter((n): n is string => n.length > 0)
+        );
+      },
+      error: () => {
+        this.knownMealNames = new Set();
+      },
+    });
+  }
+
+  // New-dish-name confirmation state
+  knownMealNames: Set<string> = new Set();
+  nameConfirmed = false;
+  showNewNameDialog = false;
+  pendingNewNameText = '';
+
+  onMealNameInput(): void {
+    // Any edit invalidates a previous confirmation.
+    this.nameConfirmed = false;
+  }
+
+  onMealNameBlur(): void {
+    const name = (this.meal.meal_name || '').trim();
+    if (!name) return;
+    if (this.knownMealNames.has(name)) return;
+    if (this.nameConfirmed) return;
+    this.pendingNewNameText = name;
+    this.showNewNameDialog = true;
+  }
+
+  confirmNewName(): void {
+    this.nameConfirmed = true;
+    this.closeNewNameDialog();
+  }
+
+  rejectNewName(): void {
+    this.closeNewNameDialog();
+  }
+
+  private closeNewNameDialog(): void {
+    this.showNewNameDialog = false;
+    this.pendingNewNameText = '';
   }
 
   private loadServeDateOptionsIfNeeded(): void {
