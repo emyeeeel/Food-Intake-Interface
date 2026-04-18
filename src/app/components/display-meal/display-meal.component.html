@@ -3,7 +3,7 @@
     <h2>所有餐點</h2>
     <div class="header-actions">
       @if (!isLoading && !error) {
-        <span class="total-count">總計: {{ totalMeals }} 道餐點</span>
+        <span class="total-count">總計: {{ totalMeals }} 個時段（{{ filteredMeals.length }} 道菜）</span>
       }
       <button type="button" class="btn-action" (click)="refreshMeals()" [disabled]="isLoading">
         {{ isLoading ? '載入中...' : '重新整理' }}
@@ -70,7 +70,12 @@
             <td class="col-day">{{ formatDayLabel(meal) }}</td>
             <td class="col-date">{{ formatDateLabel(meal) }}</td>
             <td class="col-time">{{ meal.meal_time }}</td>
-            <td class="col-name">{{ meal.meal_name }}</td>
+            <td class="col-name">
+              {{ meal.meal_name }}
+              @if (siblingCount(meal) > 0) {
+                <span class="sibling-badge" title="此時段還有其他菜色，點編輯可查看全部">+{{ siblingCount(meal) }} 道</span>
+              }
+            </td>
             <td class="col-plate">{{ (meal.plate_type | plateTypeLabel) || '-' }}</td>
             <td class="col-actions">
               <button class="btn-edit" (click)="editMeal(meal)" title="編輯">✎</button>
@@ -84,7 +89,7 @@
 
     <!-- Pagination -->
     <div class="pagination">
-      <span class="page-info">{{ getStartIndex() }}-{{ getEndIndex() }} / {{ filteredMeals.length }}</span>
+      <span class="page-info">{{ getStartIndex() }}-{{ getEndIndex() }} / {{ displayMeals.length }}</span>
       <div class="page-buttons">
         <button class="btn-page" [disabled]="currentPage === 1" (click)="goToFirstPage()">&laquo;</button>
         <button class="btn-page" [disabled]="currentPage === 1" (click)="goToPreviousPage()">&lsaquo;</button>

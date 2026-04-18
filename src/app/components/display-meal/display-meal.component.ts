@@ -38,6 +38,14 @@ export class DisplayMealComponent implements OnInit, OnChanges {
   totalPages = 0;
   targetPage: number | null = null;
 
+  /**
+   * Display representatives — one Meal per (date/day × meal_time) slot.
+   * Derived from filteredMeals whenever filters change. Nutritionists
+   * care about the slot ("4/20 午餐"), not each individual dish, since
+   * clicking through shows all sibling dishes anyway.
+   */
+  displayMeals: Meal[] = [];
+
   constructor(
     private mealsService: MealsService,
     private dateService: DateService,
@@ -93,7 +101,7 @@ export class DisplayMealComponent implements OnInit, OnChanges {
   updatePaginatedMeals(): void {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    this.paginatedMeals = this.filteredMeals.slice(startIndex, endIndex);
+    this.paginatedMeals = this.displayMeals.slice(startIndex, endIndex);
   }
 
   goToPage(page: number | string): void {
@@ -244,10 +252,55 @@ export class DisplayMealComponent implements OnInit, OnChanges {
       return a.id - b.id;
     });
     this.filteredMeals = result;
-    this.totalMeals = result.length;
+    this.displayMeals = this.groupByShift(result);
+    this.totalMeals = this.displayMeals.length;
     this.currentPage = 1;
     this.calculatePagination();
     this.updatePaginatedMeals();
+  }
+
+  /**
+   * Collapse `meals` to one representative per (date/day × meal_time) shift.
+   * "First" is defined as lowest meal.id within the group, matching import
+   * order. Iteration order over the input preserves whatever sort came in.
+   */
+  private groupByShift(meals: Meal[]): Meal[] {
+    const groups = new Map<string, Meal[]>();
+    for (const m of meals) {
+      const key = this.shiftKey(m);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(m);
+    }
+    for (const siblings of groups.values()) {
+      siblings.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+    }
+    const seen = new Set<string>();
+    const reps: Meal[] = [];
+    for (const m of meals) {
+      const key = this.shiftKey(m);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      reps.push(groups.get(key)![0]);
+    }
+    return reps;
+  }
+
+  private shiftKey(meal: Meal): string {
+    const mode = meal.menu_mode ?? 'cyclic';
+    const slot = mode === 'open'
+      ? (meal.serve_date || '')
+      : `d${meal.day_cycle ?? ''}`;
+    return `${slot}::${meal.meal_time ?? ''}`;
+  }
+
+  /** How many other dishes share this meal's (date/day × meal_time) slot. */
+  siblingCount(meal: Meal): number {
+    const key = this.shiftKey(meal);
+    let count = 0;
+    for (const m of this.filteredMeals) {
+      if (this.shiftKey(m) === key) count++;
+    }
+    return Math.max(0, count - 1);
   }
 
   getMealCode(meal: Meal): string {
@@ -317,7 +370,11 @@ export class DisplayMealComponent implements OnInit, OnChanges {
   assignDialogMeals: Meal[] = [];
 
   openAssignDialog(meal: Meal): void {
-    this.assignDialogMeals = [meal];
+    // Clicking 📋 on a collapsed row assigns EVERY dish in that (date × meal_time)
+    // slot, not just the representative — nutritionist intent is "配餐 4/20 午餐",
+    // which spans all dishes served that shift.
+    const key = this.shiftKey(meal);
+    this.assignDialogMeals = this.filteredMeals.filter(m => this.shiftKey(m) === key);
     this.assignDialogOpen = true;
   }
 
