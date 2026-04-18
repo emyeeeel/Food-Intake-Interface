@@ -118,7 +118,7 @@
   font-size: 1.1rem;
 }
 
-.btn-edit, .btn-delete {
+.btn-edit, .btn-delete, .btn-assign {
   background: none;
   border: none;
   cursor: pointer;
@@ -131,6 +131,11 @@
 .btn-edit {
   color: #40C1AC;
   &:hover { background: #E0F7F4; }
+}
+
+.btn-assign {
+  color: #c2851f;
+  &:hover { background: #fff8e1; }
 }
 
 .btn-delete {

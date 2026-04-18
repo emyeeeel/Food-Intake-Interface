@@ -1,0 +1,102 @@
+@if (isOpen) {
+  <div class="dlg-overlay" (click)="close()">
+    <div class="dlg-content" (click)="$event.stopPropagation()">
+      <div class="dlg-header">
+        <h3>配餐給住民</h3>
+        <button class="dlg-close" (click)="close()" [disabled]="submitting">×</button>
+      </div>
+
+      <div class="dlg-body">
+        <!-- Target meals summary -->
+        <div class="target-summary">
+          <div class="target-summary-label">配餐目標（{{ meals.length }} 道菜）：</div>
+          <ul>
+            @for (m of meals; track m.id) {
+              <li>
+                <strong>{{ m.meal_name }}</strong>
+                <span class="small">
+                  · {{ m.meal_time }}
+                  · {{ (m.menu_mode ?? 'cyclic') === 'open' ? m.serve_date : '第 ' + m.day_cycle + ' 天' }}
+                </span>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <!-- Mode picker -->
+        <div class="mode-group">
+          <label class="mode-radio">
+            <input type="radio" name="assignMode" value="all" [(ngModel)]="mode" [disabled]="submitting" />
+            <span>
+              <strong>配發給所有住民</strong>
+              @if (!loadingPatients && !loadError) {
+                <span class="small">（{{ patients.length }} 位）</span>
+              }
+            </span>
+          </label>
+          <label class="mode-radio">
+            <input type="radio" name="assignMode" value="manual" [(ngModel)]="mode" [disabled]="submitting" />
+            <span><strong>手動選擇住民</strong><span class="small">（可多選）</span></span>
+          </label>
+        </div>
+
+        <!-- Loading / error for patient list -->
+        @if (loadingPatients) {
+          <div class="dlg-status">載入住民列表中...</div>
+        }
+        @if (loadError) {
+          <div class="dlg-status error">{{ loadError }}</div>
+        }
+
+        <!-- Manual patient picker (expanded inline) -->
+        @if (mode === 'manual' && !loadingPatients && !loadError) {
+          <div class="patient-picker">
+            <div class="picker-toolbar">
+              <span>已選 <strong>{{ selectedPatientIds.size }}</strong> / {{ patients.length }} 位</span>
+              <button type="button" class="link-btn" (click)="selectAllPatients()" [disabled]="submitting">全選</button>
+              <button type="button" class="link-btn" (click)="clearAllPatients()" [disabled]="submitting">全清</button>
+            </div>
+            <ul class="patient-list">
+              @for (p of patients; track p.id) {
+                <li>
+                  <label>
+                    <input
+                      type="checkbox"
+                      [checked]="isPatientSelected(p.id)"
+                      (change)="togglePatient(p.id)"
+                      [disabled]="submitting"
+                    />
+                    <span class="patient-label">{{ patientLabel(p) }}</span>
+                  </label>
+                </li>
+              }
+              @if (patients.length === 0) {
+                <li class="empty">尚無住民資料。</li>
+              }
+            </ul>
+          </div>
+        }
+
+        <!-- Impact preview -->
+        @if (!loadingPatients && !loadError && meals.length > 0) {
+          <div class="impact-preview">
+            預計建立 <strong>{{ projectedAssignmentCount }}</strong> 筆指派
+            （{{ meals.length }} 道菜 × {{ targetPatientCount }} 位住民）；
+            已存在的 (住民, 菜色) pair 會自動略過。
+          </div>
+        }
+
+        @if (submitError) {
+          <div class="dlg-status error">{{ submitError }}</div>
+        }
+      </div>
+
+      <div class="dlg-footer">
+        <button type="button" class="btn-cancel" (click)="close()" [disabled]="submitting">取消</button>
+        <button type="button" class="btn-submit" (click)="submit()" [disabled]="!canSubmit()">
+          @if (submitting) { <span>配餐中...</span> } @else { <span>確認配餐</span> }
+        </button>
+      </div>
+    </div>
+  </div>
+}

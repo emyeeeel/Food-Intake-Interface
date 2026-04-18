@@ -11,10 +11,12 @@ import { Meal } from '../../models/meal.model';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { SettingsService } from '../../services/settings.service';
+import { AssignMealDialogComponent } from '../assign-meal-dialog/assign-meal-dialog.component';
+import { BulkAssignResponse } from '../../services/meal-assignment.service';
 
 @Component({
   selector: 'app-display-meal',
-  imports: [CommonModule, FormsModule, RouterModule, PlateTypeLabelPipe],
+  imports: [CommonModule, FormsModule, RouterModule, PlateTypeLabelPipe, AssignMealDialogComponent],
   templateUrl: './display-meal.component.html',
   styleUrl: './display-meal.component.scss'
 })
@@ -307,6 +309,27 @@ export class DisplayMealComponent implements OnInit, OnChanges {
 
   editMeal(meal: Meal): void {
     this.router.navigate(['/meal-catalog', meal.id, 'edit']);
+  }
+
+  // === Assign-to-residents dialog (Phase 5) ===
+
+  assignDialogOpen = false;
+  assignDialogMeals: Meal[] = [];
+
+  openAssignDialog(meal: Meal): void {
+    this.assignDialogMeals = [meal];
+    this.assignDialogOpen = true;
+  }
+
+  closeAssignDialog(): void {
+    this.assignDialogOpen = false;
+    this.assignDialogMeals = [];
+  }
+
+  onAssignCompleted(res: BulkAssignResponse): void {
+    this.assignDialogOpen = false;
+    this.assignDialogMeals = [];
+    alert(`配餐完成：新建 ${res.created} 筆、略過 ${res.skipped} 筆重複。`);
   }
 
   deleteMeal(meal: Meal): void {

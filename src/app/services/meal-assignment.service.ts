@@ -4,6 +4,14 @@ import { Observable } from 'rxjs';
 import { MealAssignment, CreateMealAssignment, MealAssignmentRequest } from '../models/meal-assignment.mode';
 import { environment } from '../../environments/environment';
 
+export interface BulkAssignResponse {
+  detail: string;
+  created: number;
+  skipped: number;
+  meal_count: number;
+  patient_count: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -20,6 +28,20 @@ export class MealAssignmentService {
    */
   getAllMealAssignments(): Observable<MealAssignment[]> {
     return this.http.get<MealAssignment[]>(this.apiUrl);
+  }
+
+  /**
+   * Bulk-create assignments for the cartesian product of mealIds × patients.
+   * Pass `null` for ltcPatientIds to assign to all LTCPatients. Idempotent.
+   */
+  bulkAssign(
+    mealIds: number[],
+    ltcPatientIds: number[] | null,
+  ): Observable<BulkAssignResponse> {
+    return this.http.post<BulkAssignResponse>(
+      `${this.apiUrl}bulk_assign/`,
+      { meal_ids: mealIds, ltc_patient_ids: ltcPatientIds },
+    );
   }
 
   /**

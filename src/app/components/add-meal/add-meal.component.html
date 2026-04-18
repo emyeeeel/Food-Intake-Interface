@@ -222,4 +222,12 @@
       </div>
     </div>
   }
+
+  <!-- Assign-to-residents dialog (Phase 5) — fires after a successful batch submit -->
+  <app-assign-meal-dialog
+    [isOpen]="assignDialogOpen"
+    [meals]="assignDialogMeals"
+    (closed)="closeAssignDialog()"
+    (completed)="onAssignCompleted($event)"
+  ></app-assign-meal-dialog>
 </div>

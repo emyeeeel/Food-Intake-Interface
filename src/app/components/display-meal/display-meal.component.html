@@ -74,6 +74,7 @@
             <td class="col-plate">{{ (meal.plate_type | plateTypeLabel) || '-' }}</td>
             <td class="col-actions">
               <button class="btn-edit" (click)="editMeal(meal)" title="編輯">✎</button>
+              <button class="btn-assign" (click)="openAssignDialog(meal)" title="配餐給住民">📋</button>
               <button class="btn-delete" (click)="deleteMeal(meal)" title="刪除">✕</button>
             </td>
           </tr>
@@ -102,4 +103,12 @@
   @if (!isLoading && !error && filteredMeals.length === 0) {
     <div class="status-box">尚無餐點資料</div>
   }
+
+  <!-- Assign-to-residents dialog (Phase 5) -->
+  <app-assign-meal-dialog
+    [isOpen]="assignDialogOpen"
+    [meals]="assignDialogMeals"
+    (closed)="closeAssignDialog()"
+    (completed)="onAssignCompleted($event)"
+  ></app-assign-meal-dialog>
 </div>

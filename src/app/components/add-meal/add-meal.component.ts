@@ -12,11 +12,13 @@ import { DateService } from '../../services/date.service';
 import { SettingsService } from '../../services/settings.service';
 import { forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { AssignMealDialogComponent } from '../assign-meal-dialog/assign-meal-dialog.component';
+import { BulkAssignResponse } from '../../services/meal-assignment.service';
 
 
 @Component({
   selector: 'app-add-meal',
-  imports: [FormsModule, TagsComponent, CommonModule],
+  imports: [FormsModule, TagsComponent, CommonModule, AssignMealDialogComponent],
   templateUrl: './add-meal.component.html',
   styleUrl: './add-meal.component.scss'
 })
@@ -421,11 +423,31 @@ private buildMealFormData(): FormData {
     return base;
   }
 
+  // === Assign-to-residents dialog state (Phase 5) ===
+
+  assignDialogOpen = false;
+  assignDialogMeals: Meal[] = [];
+
+  closeAssignDialog(): void {
+    this.assignDialogOpen = false;
+    this.assignDialogMeals = [];
+    // Dialog closed without completing → go back to the catalog.
+    this.router.navigate(['/meal-catalog']);
+  }
+
+  onAssignCompleted(res: BulkAssignResponse): void {
+    this.assignDialogOpen = false;
+    this.assignDialogMeals = [];
+    alert(`配餐完成：新建 ${res.created} 筆、略過 ${res.skipped} 筆重複。`);
+    this.router.navigate(['/meal-catalog']);
+  }
+
   /**
    * Submit: batch-creates one meal per non-empty name, sharing 餐期 / 日期 /
    * 餐盤. Uses forkJoin with per-request catchError so a partial failure
-   * still reports what succeeded. Navigates back to /meal-catalog on
-   * success (even partial).
+   * still reports what succeeded. On success, immediately opens the
+   * assign-to-residents dialog (Phase 5) so the user doesn't have to
+   * re-find each meal to configure who eats it.
    */
   submitSingleMeal(): void {
     const err = this.validateSharedFields();
@@ -444,16 +466,19 @@ private buildMealFormData(): FormData {
 
     forkJoin(requests).subscribe(results => {
       this.isSubmitting = false;
-      const success = results.filter(r => r.ok).length;
+      const success = results.filter(r => r.ok);
       const failed = results.filter(r => !r.ok);
-      if (failed.length === 0) {
-        alert(`新增成功 ${success} 道菜色。`);
-      } else {
+
+      if (failed.length > 0) {
         const failedNames = failed.map(f => f.name).join('、');
-        alert(`成功 ${success} 道、失敗 ${failed.length} 道：${failedNames}`);
+        alert(`成功 ${success.length} 道、失敗 ${failed.length} 道：${failedNames}`);
       }
-      if (success > 0) {
-        this.router.navigate(['/meal-catalog']);
+
+      if (success.length > 0) {
+        // Hand the newly-created meals off to the assign dialog so the user
+        // can immediately decide who eats them.
+        this.assignDialogMeals = success.map(s => s.result);
+        this.assignDialogOpen = true;
       }
     });
   }
