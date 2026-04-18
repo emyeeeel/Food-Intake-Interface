@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { saveAs } from 'file-saver';
 
-import { MealsService } from '../../services/meals.service';
+import { MealsService, MergePreviewResponse } from '../../services/meals.service';
 import { MealAssignmentService } from '../../services/meal-assignment.service';
 import { IntakeService } from '../../services/intake.service';
 import { DateService } from '../../services/date.service';
@@ -129,6 +129,7 @@ export class MealAdminComponent implements OnInit {
 
   refresh(): void {
     this.cancelEdit();
+    this.clearSelection();
     this.loadAll();
   }
 
@@ -410,6 +411,144 @@ export class MealAdminComponent implements OnInit {
     this.router.navigate(['/engineering']);
   }
 
+  // === Multi-select (Phase 4 merge) ===
+
+  selectedIds: Set<number> = new Set();
+
+  toggleSelection(meal: Meal, event?: Event): void {
+    if (event) event.stopPropagation();
+    if (this.selectedIds.has(meal.id)) {
+      this.selectedIds.delete(meal.id);
+    } else {
+      this.selectedIds.add(meal.id);
+    }
+  }
+
+  isSelected(meal: Meal): boolean {
+    return this.selectedIds.has(meal.id);
+  }
+
+  clearSelection(): void {
+    this.selectedIds.clear();
+  }
+
+  get selectedCount(): number {
+    return this.selectedIds.size;
+  }
+
+  get selectedMealsList(): Meal[] {
+    return this.allMeals.filter(m => this.selectedIds.has(m.id));
+  }
+
+  // === Merge flow (Phase 4) ===
+
+  showMergeModal = false;
+  mergeStep: 'pick' | 'preview' = 'pick';
+  mergeCanonicalId: number | null = null;
+  mergePreviewData: MergePreviewResponse | null = null;
+  mergePreviewLoading = false;
+  mergeExecuting = false;
+  mergeError: string | null = null;
+
+  openMergeModal(): void {
+    if (this.selectedIds.size < 2) {
+      alert('請至少選 2 道菜才能合併。');
+      return;
+    }
+    // Default canonical: first non-archived selected meal (or just first if all archived).
+    const selected = this.selectedMealsList;
+    const firstActive = selected.find(m => !m.is_archived);
+    this.mergeCanonicalId = (firstActive ?? selected[0]).id;
+    this.mergeStep = 'pick';
+    this.mergePreviewData = null;
+    this.mergeError = null;
+    this.showMergeModal = true;
+  }
+
+  closeMergeModal(): void {
+    if (this.mergeExecuting || this.mergePreviewLoading) return;
+    this.showMergeModal = false;
+    this.mergeCanonicalId = null;
+    this.mergePreviewData = null;
+    this.mergeError = null;
+    this.mergeStep = 'pick';
+  }
+
+  setMergeCanonical(id: number): void {
+    this.mergeCanonicalId = id;
+    this.mergePreviewData = null;
+    this.mergeError = null;
+  }
+
+  loadMergePreview(): void {
+    if (this.mergeCanonicalId == null) {
+      this.mergeError = '請先選一個 canonical（保留的菜）。';
+      return;
+    }
+    const canonical = this.allMeals.find(m => m.id === this.mergeCanonicalId);
+    if (canonical?.is_archived) {
+      this.mergeError = 'canonical 不能是已停用的菜，請先啟用或換選另一道。';
+      return;
+    }
+    const sources = Array.from(this.selectedIds).filter(id => id !== this.mergeCanonicalId);
+    if (sources.length === 0) {
+      this.mergeError = '需要至少 1 筆 source（canonical 以外的菜）。';
+      return;
+    }
+    this.mergePreviewLoading = true;
+    this.mergeError = null;
+    this.mealsService.mergePreview(this.mergeCanonicalId, sources).subscribe({
+      next: (res) => {
+        this.mergePreviewData = res;
+        this.mergeStep = 'preview';
+        this.mergePreviewLoading = false;
+      },
+      error: (err) => {
+        console.error('[MealAdmin] merge preview failed:', err);
+        this.mergeError = err?.error?.detail || err?.message || '預覽失敗';
+        this.mergePreviewLoading = false;
+      },
+    });
+  }
+
+  backToPickCanonical(): void {
+    this.mergeStep = 'pick';
+    this.mergePreviewData = null;
+    this.mergeError = null;
+  }
+
+  executeMerge(): void {
+    if (this.mergeCanonicalId == null || !this.mergePreviewData) return;
+    const sources = this.mergePreviewData.sources.map(s => s.id);
+
+    const ok = confirm(
+      `最終確認：把 ${sources.length} 道菜合併進「${this.mergePreviewData.canonical.meal_name}」(#${this.mergePreviewData.canonical.id})？\n\n` +
+      `會重新指派 ${this.mergePreviewData.impact.reassigned_assignments} 筆住民指派、${this.mergePreviewData.impact.reassigned_intakes} 筆攝取紀錄，` +
+      `並永久刪除 ${this.mergePreviewData.impact.sources_to_delete} 道 source 菜色。\n\n此動作無法復原。`
+    );
+    if (!ok) return;
+
+    this.mergeExecuting = true;
+    this.mergeError = null;
+    this.mealsService.mergeMeals(this.mergeCanonicalId, sources).subscribe({
+      next: (res) => {
+        this.mergeExecuting = false;
+        this.showMergeModal = false;
+        this.clearSelection();
+        alert(
+          `合併完成：刪除 ${res.deleted_meals} 道 source，` +
+          `重新指派 ${res.reassigned_assignments} 筆指派 + ${res.reassigned_intakes} 筆攝取。`
+        );
+        this.loadAll();
+      },
+      error: (err) => {
+        console.error('[MealAdmin] merge failed:', err);
+        this.mergeError = err?.error?.detail || err?.message || '合併失敗';
+        this.mergeExecuting = false;
+      },
+    });
+  }
+
   // === Archive / Unarchive (Phase 2) ===
 
   archivingIds: Set<number> = new Set();
@@ -524,6 +663,7 @@ export class MealAdminComponent implements OnInit {
       next: (res) => {
         this.allMeals = this.allMeals.filter(m => m.id !== meal.id);
         this.usageByMealId.delete(meal.id);
+        this.selectedIds.delete(meal.id);
         this.deletingIds.delete(meal.id);
         this.applyFilter();
         const orphans = res?.orphaned_assignments ?? 0;

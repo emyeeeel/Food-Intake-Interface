@@ -4,6 +4,38 @@ import { Meal } from '../models/meal.model';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+export interface MealSummary {
+  id: number;
+  meal_name: string;
+  meal_time: string;
+  menu_mode: 'cyclic' | 'open';
+  day_cycle: number | null;
+  serve_date: string | null;
+  plate_type: string | null;
+  is_archived: boolean;
+}
+
+export interface MergePreviewResponse {
+  canonical: MealSummary;
+  sources: MealSummary[];
+  impact: {
+    reassigned_assignments: number;
+    reassigned_intakes: number;
+    sources_to_delete: number;
+  };
+  warnings: string[];
+}
+
+export interface MergeResponse {
+  detail: string;
+  canonical_id: number;
+  merged_count: number;
+  reassigned_assignments: number;
+  reassigned_intakes: number;
+  deleted_meals: number;
+  warnings: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -72,6 +104,22 @@ export class MealsService {
   unarchiveMeal(id: number): Observable<{ id: number; is_archived: boolean }> {
     return this.http.post<{ id: number; is_archived: boolean }>(
       `${this.apiUrl}${id}/unarchive/`, {}
+    );
+  }
+
+  /** Phase 4 merge dry-run. Returns impact counts + warnings without mutating anything. */
+  mergePreview(canonicalId: number, sourceIds: number[]): Observable<MergePreviewResponse> {
+    return this.http.post<MergePreviewResponse>(
+      `${this.baseUrl}/api/meals/merge_preview/`,
+      { canonical_id: canonicalId, source_ids: sourceIds }
+    );
+  }
+
+  /** Phase 4 merge. Atomic: re-points assignments + intakes, then deletes sources. */
+  mergeMeals(canonicalId: number, sourceIds: number[]): Observable<MergeResponse> {
+    return this.http.post<MergeResponse>(
+      `${this.baseUrl}/api/meals/merge/`,
+      { canonical_id: canonicalId, source_ids: sourceIds }
     );
   }
 

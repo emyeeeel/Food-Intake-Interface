@@ -73,11 +73,26 @@
       </div>
     </div>
 
+    <!-- Merge toolbar (Phase 4): shows when items selected -->
+    @if (selectedCount > 0) {
+      <div class="merge-bar">
+        <span class="merge-count">已選 <strong>{{ selectedCount }}</strong> 道</span>
+        <button
+          class="btn-merge"
+          (click)="openMergeModal()"
+          [disabled]="selectedCount < 2"
+          [title]="selectedCount < 2 ? '至少選 2 道才能合併' : '合併所選菜色'"
+        >⚙ 合併所選 ({{ selectedCount }})</button>
+        <button class="link-btn" (click)="clearSelection()">清除選取</button>
+      </div>
+    }
+
     <!-- Table -->
     <div class="table-wrap">
       <table class="meal-table">
         <thead>
           <tr>
+            <th class="col-select"><!-- checkbox header; no select-all to avoid accidental bulk action --></th>
             <th class="col-code sortable" (click)="setSort('id')">代碼{{ sortIndicator('id') }}</th>
             <th class="col-mode sortable" (click)="setSort('menu_mode')">模式{{ sortIndicator('menu_mode') }}</th>
             <th class="col-name sortable" (click)="setSort('meal_name')">菜色名稱{{ sortIndicator('meal_name') }}</th>
@@ -96,7 +111,16 @@
               [class.high-risk]="isHighRiskMeal(meal)"
               [class.unused]="totalUsage(meal) === 0"
               [class.archived]="meal.is_archived"
+              [class.selected]="isSelected(meal)"
             >
+              <td class="col-select">
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(meal)"
+                  (change)="toggleSelection(meal, $event)"
+                  [title]="'選取此菜以進行合併'"
+                />
+              </td>
               <td class="col-code">{{ getMealCode(meal) }}</td>
               <td class="col-mode">
                 <span class="mode-badge" [class.cyclic]="(meal.menu_mode ?? 'cyclic') === 'cyclic'" [class.open]="meal.menu_mode === 'open'">
@@ -164,7 +188,7 @@
             </tr>
           }
           @if (paginatedMeals.length === 0) {
-            <tr><td colspan="9" class="empty-state">{{ searchQuery || modeFilter ? '沒有符合條件的菜色' : '尚無菜色資料' }}</td></tr>
+            <tr><td colspan="10" class="empty-state">{{ searchQuery || modeFilter ? '沒有符合條件的菜色' : '尚無菜色資料' }}</td></tr>
           }
         </tbody>
       </table>
@@ -201,10 +225,130 @@
       <ul>
         <li><s><strong>停用／啟用</strong>：Phase 2 已完成 ✅</s></li>
         <li><s><strong>真刪除</strong>：Phase 3 已完成 ✅ — 零攝取才顯示按鈕；有指派會雙重確認；後端 FoodIntake 引用硬擋</s></li>
-        <li><strong>合併重複菜</strong>：Phase 4 — 需要新後端 endpoint（重新指向 foreign keys 後刪除源頭）</li>
+        <li><s><strong>合併重複菜</strong>：Phase 4 已完成 ✅ — 勾選 ≥2 道 → 合併所選 → 挑 canonical → 預覽影響 → 確認</s></li>
       </ul>
-      <p class="hint">合併功能會先寫 plan 跟你對齊再動後端。</p>
       <p class="hint">💡 新增菜色時，後端會自動比對同名菜並繼承 plate_type + ingredients（<code>_inherit_from_existing_dish</code>）。</p>
+      <p class="hint">合併會把所有 source 的指派／攝取紀錄重新指向 canonical，再刪除 source。交易性操作，中途失敗會 rollback。</p>
     </aside>
+  }
+
+  <!-- Phase 4 merge modal -->
+  @if (showMergeModal) {
+    <div class="modal-overlay" (click)="closeMergeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>
+            @if (mergeStep === 'pick') { 合併菜色 — 步驟 1／2：選擇保留的 canonical }
+            @if (mergeStep === 'preview') { 合併菜色 — 步驟 2／2：確認影響 }
+          </h3>
+          <button class="btn-close" (click)="closeMergeModal()" [disabled]="mergeExecuting || mergePreviewLoading">×</button>
+        </div>
+
+        <div class="modal-body">
+          @if (mergeStep === 'pick') {
+            <p class="modal-hint">所選 <strong>{{ selectedCount }}</strong> 道菜中，請選一道作為保留的 canonical。其他道會被重新指派到 canonical 然後刪除。</p>
+            <ul class="canonical-picker">
+              @for (meal of selectedMealsList; track meal.id) {
+                <li [class.archived]="meal.is_archived">
+                  <label>
+                    <input
+                      type="radio"
+                      name="canonical"
+                      [value]="meal.id"
+                      [checked]="mergeCanonicalId === meal.id"
+                      [disabled]="meal.is_archived"
+                      (change)="setMergeCanonical(meal.id)"
+                    />
+                    <span class="picker-code">{{ getMealCode(meal) }}</span>
+                    <span class="picker-name">
+                      @if (meal.is_archived) { <span class="archived-tag">[停用]</span> }
+                      {{ meal.meal_name }}
+                    </span>
+                    <span class="picker-meta">
+                      {{ meal.meal_time }} · {{ getDayOrDate(meal) }} ·
+                      {{ meal.plate_type | plateTypeLabel }}
+                    </span>
+                    <span class="picker-usage">
+                      {{ getUsage(meal).assignments }} 指派 · {{ getUsage(meal).intakes }} 攝取
+                    </span>
+                  </label>
+                </li>
+              }
+            </ul>
+            @if (mergeError) {
+              <div class="state-msg error inline">{{ mergeError }}</div>
+            }
+          }
+
+          @if (mergeStep === 'preview' && mergePreviewData) {
+            <div class="preview-summary">
+              <div class="preview-block canonical-block">
+                <h4>保留（canonical）</h4>
+                <div class="preview-meal">
+                  <strong>{{ mergePreviewData.canonical.meal_name }}</strong>
+                  <span class="small">#{{ mergePreviewData.canonical.id }} · {{ mergePreviewData.canonical.meal_time }} · {{ mergePreviewData.canonical.menu_mode === 'open' ? '開放' : '循環' }}</span>
+                </div>
+              </div>
+              <div class="preview-block sources-block">
+                <h4>刪除（sources，共 {{ mergePreviewData.sources.length }} 道）</h4>
+                <ul>
+                  @for (s of mergePreviewData.sources; track s.id) {
+                    <li>
+                      <strong>{{ s.meal_name }}</strong>
+                      <span class="small">#{{ s.id }} · {{ s.meal_time }} · {{ s.menu_mode === 'open' ? '開放' : '循環' }}</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+              <div class="preview-impact">
+                <h4>影響</h4>
+                <ul>
+                  <li>{{ mergePreviewData.impact.reassigned_assignments }} 筆住民指派 → 指向 canonical</li>
+                  <li>{{ mergePreviewData.impact.reassigned_intakes }} 筆攝取紀錄 → 指向 canonical</li>
+                  <li>{{ mergePreviewData.impact.sources_to_delete }} 道 source 菜色 → 永久刪除</li>
+                </ul>
+              </div>
+              @if (mergePreviewData.warnings.length > 0) {
+                <div class="preview-warnings">
+                  <h4>⚠ 警告</h4>
+                  <ul>
+                    @for (w of mergePreviewData.warnings; track w) {
+                      <li>{{ w }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+            @if (mergeError) {
+              <div class="state-msg error inline">{{ mergeError }}</div>
+            }
+          }
+        </div>
+
+        <div class="modal-footer">
+          @if (mergeStep === 'pick') {
+            <button class="btn-cancel" (click)="closeMergeModal()" [disabled]="mergePreviewLoading">取消</button>
+            <button
+              class="btn-save"
+              (click)="loadMergePreview()"
+              [disabled]="mergePreviewLoading || mergeCanonicalId == null"
+            >
+              {{ mergePreviewLoading ? '載入中...' : '下一步：預覽影響' }}
+            </button>
+          }
+          @if (mergeStep === 'preview') {
+            <button class="btn-cancel" (click)="backToPickCanonical()" [disabled]="mergeExecuting">← 返回</button>
+            <button class="btn-cancel" (click)="closeMergeModal()" [disabled]="mergeExecuting">取消</button>
+            <button
+              class="btn-delete"
+              (click)="executeMerge()"
+              [disabled]="mergeExecuting"
+            >
+              {{ mergeExecuting ? '合併中...' : '確認合併' }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
   }
 </div>
