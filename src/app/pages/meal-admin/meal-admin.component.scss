@@ -369,7 +369,8 @@
 .btn-save,
 .btn-cancel,
 .btn-archive,
-.btn-unarchive {
+.btn-unarchive,
+.btn-delete {
   padding: 5px 12px;
   border-radius: 5px;
   font-size: 0.8rem;
@@ -399,6 +400,18 @@
   border-color: #4FAFA3;
   color: #ffffff;
   &:hover:not(:disabled) { background: #3b8f88; border-color: #3b8f88; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-delete {
+  background: #ffffff;
+  border-color: #e9b0a6;
+  color: #a63a23;
+  &:hover:not(:disabled) {
+    background: #a63a23;
+    border-color: #a63a23;
+    color: #ffffff;
+  }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 

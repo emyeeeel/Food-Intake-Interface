@@ -149,6 +149,16 @@
                       {{ isArchiving(meal) ? '...' : '停用' }}
                     </button>
                   }
+                  @if (canDelete(meal)) {
+                    <button
+                      class="btn-delete"
+                      (click)="deleteMeal(meal)"
+                      [disabled]="isDeleting(meal)"
+                      [title]="getUsage(meal).assignments > 0 ? '有 ' + getUsage(meal).assignments + ' 筆指派連結，刪除會產生孤兒' : '無使用，可安全刪除'"
+                    >
+                      {{ isDeleting(meal) ? '...' : '刪除' }}
+                    </button>
+                  }
                 }
               </td>
             </tr>
@@ -187,13 +197,13 @@
 
     <!-- Deferred features notice -->
     <aside class="deferred-notice">
-      <h3>📦 以下功能於 Phase 3+ 開通</h3>
+      <h3>📦 功能進度</h3>
       <ul>
         <li><s><strong>停用／啟用</strong>：Phase 2 已完成 ✅</s></li>
-        <li><strong>真刪除</strong>：需要 cascade 警告 + 使用量門檻（有攝取紀錄禁刪）</li>
-        <li><strong>合併重複菜</strong>：需要新後端 endpoint（重新指向 foreign keys 後刪除源頭）</li>
+        <li><s><strong>真刪除</strong>：Phase 3 已完成 ✅ — 零攝取才顯示按鈕；有指派會雙重確認；後端 FoodIntake 引用硬擋</s></li>
+        <li><strong>合併重複菜</strong>：Phase 4 — 需要新後端 endpoint（重新指向 foreign keys 後刪除源頭）</li>
       </ul>
-      <p class="hint">每一步都會先寫 plan 跟你對齊再動後端 schema。</p>
+      <p class="hint">合併功能會先寫 plan 跟你對齊再動後端。</p>
       <p class="hint">💡 新增菜色時，後端會自動比對同名菜並繼承 plate_type + ingredients（<code>_inherit_from_existing_dish</code>）。</p>
     </aside>
   }

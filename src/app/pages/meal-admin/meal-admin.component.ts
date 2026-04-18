@@ -413,9 +413,26 @@ export class MealAdminComponent implements OnInit {
   // === Archive / Unarchive (Phase 2) ===
 
   archivingIds: Set<number> = new Set();
+  deletingIds: Set<number> = new Set();
 
   isArchiving(meal: Meal): boolean {
     return this.archivingIds.has(meal.id);
+  }
+
+  isDeleting(meal: Meal): boolean {
+    return this.deletingIds.has(meal.id);
+  }
+
+  /**
+   * Whether a hard-delete button should be shown for this meal.
+   * Two gates:
+   *   - No archived rows (archive first, then the "undo" path is clearer)
+   *   - Zero FoodIntakes (backend blocks anyway; hiding the button avoids a confusing 409)
+   * Rows with assignments but no intakes CAN be deleted — user gets an extra confirm dialog.
+   */
+  canDelete(meal: Meal): boolean {
+    if (meal.is_archived) return false;
+    return this.getUsage(meal).intakes === 0;
   }
 
   archiveMeal(meal: Meal): void {
@@ -457,6 +474,72 @@ export class MealAdminComponent implements OnInit {
         console.error('[MealAdmin] unarchive failed:', err);
         alert('啟用失敗：' + (err?.error?.detail || err?.message || '未知錯誤'));
         this.archivingIds.delete(meal.id);
+      },
+    });
+  }
+
+  /**
+   * Hard delete (Phase 3). Tiered confirmation:
+   *   - intakes > 0: blocked by canDelete() gate, button shouldn't show at all.
+   *     Backend also returns 409 if the UI gate somehow lies.
+   *   - assignments > 0, intakes == 0: double-confirm. Explain the orphan impact.
+   *   - zero usage: single confirm.
+   * On success the row is removed from allMeals and the usage map.
+   */
+  deleteMeal(meal: Meal): void {
+    if (this.deletingIds.has(meal.id)) return;
+
+    const usage = this.getUsage(meal);
+
+    if (usage.intakes > 0) {
+      // Hard stop — backend would 409 anyway. Should never reach here if canDelete is honored.
+      alert(`「${meal.meal_name}」有 ${usage.intakes} 筆攝取紀錄，不能刪除。請改用「停用」隱藏。`);
+      return;
+    }
+
+    const code = this.getMealCode(meal);
+
+    if (usage.assignments > 0) {
+      const ok1 = confirm(
+        `⚠️ 「${meal.meal_name}」(${code}) 有 ${usage.assignments} 筆住民指派連結。\n\n` +
+        `刪除後這些指派會變成「孤兒」(meal=NULL)，住民那邊會看不到對應菜色。\n\n` +
+        `要繼續嗎？（下一步還會再確認一次）`
+      );
+      if (!ok1) return;
+
+      const ok2 = confirm(
+        `再次確認：真的要刪除「${meal.meal_name}」嗎？此動作無法復原。\n\n` +
+        `如果只是想隱藏不使用，建議改用「停用」。`
+      );
+      if (!ok2) return;
+    } else {
+      const ok = confirm(
+        `確定刪除「${meal.meal_name}」(${code})？\n\n此動作無法復原。`
+      );
+      if (!ok) return;
+    }
+
+    this.deletingIds.add(meal.id);
+    this.mealsService.deleteMeal(meal.id).subscribe({
+      next: (res) => {
+        this.allMeals = this.allMeals.filter(m => m.id !== meal.id);
+        this.usageByMealId.delete(meal.id);
+        this.deletingIds.delete(meal.id);
+        this.applyFilter();
+        const orphans = res?.orphaned_assignments ?? 0;
+        if (orphans > 0) {
+          alert(`已刪除。連帶 ${orphans} 筆指派變成孤兒（meal=NULL）。`);
+        }
+      },
+      error: (err) => {
+        console.error('[MealAdmin] delete failed:', err);
+        this.deletingIds.delete(meal.id);
+        const msg = err?.error?.detail || err?.message || '未知錯誤';
+        if (err?.status === 409) {
+          alert(`刪除被拒：${msg}`);
+        } else {
+          alert(`刪除失敗：${msg}`);
+        }
       },
     });
   }
