@@ -338,59 +338,105 @@ export class DisplayMealComponent implements OnInit, OnChanges {
   }
 
   downloadMealCycleAsExcel(): void {
-    console.log('Downloading meal cycle as Excel...');
-    
-    if (this.meals.length === 0) {
-      alert('No meals available to export');
+    // Respect the system's current menu mode. Produces two genuinely different Excel files:
+    //   cyclic → 4 columns (日期, 日週期, 用餐時間, 菜色名稱), YYYYMMDD date strings
+    //   open   → 3 columns (日期, 用餐時間, 菜色名稱), ISO date strings
+    // Filenames follow the durable 機構名稱-菜單-模式-日期.xlsx convention.
+    const mode = this.settingsService.menuMode;
+    console.log(`Downloading ${mode} mode menu as Excel...`);
+
+    // Export what's actually visible/filtered, not the entire raw meals array.
+    // filteredMeals already has the hard mode-filter applied in applyFilter().
+    if (this.filteredMeals.length === 0) {
+      alert('目前沒有可匯出的菜色。');
       return;
     }
 
     this.isDownloading = true;
 
     try {
-      // Use the grouped format with day cycle
-      const excelData = this.prepareExcelDataFromArray2(this.meals);
-      
-      // Create workbook and worksheet
+      const excelData = mode === 'open'
+        ? this.prepareOpenExcelData(this.filteredMeals)
+        : this.prepareExcelDataFromArray2(this.filteredMeals);
+
       const workbook = XLSX.utils.book_new();
       const worksheet = XLSX.utils.json_to_sheet(excelData);
-      
-      // Set column widths for better formatting - Updated for 4 columns
-      const columnWidths = [
-        { wch: 12 },  // 日期 (Date)
-        { wch: 10 },  // 日週期 (Day Cycle)
-        { wch: 15 },  // 用餐時間 (Meal Time)
-        { wch: 60 },  // 菜色名稱 (Meals - wider for multiple meal names)
-      ];
-      worksheet['!cols'] = columnWidths;
-      
-      // Add worksheet to workbook
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Meal Cycle Menu');
-      
-      // Generate filename using environment and DateService
+
+      worksheet['!cols'] = mode === 'open'
+        ? [{ wch: 12 }, { wch: 15 }, { wch: 60 }]
+        : [{ wch: 12 }, { wch: 10 }, { wch: 15 }, { wch: 60 }];
+
+      const sheetName = mode === 'open' ? '開放菜單' : '循環菜單';
+      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+      // Filename: 機構名稱-菜單-模式-YYYYMMDD.xlsx
       const today = this.dateService.getTodayDate();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const day = String(today.getDate()).padStart(2, '0');
-      const dateString = `${year}${month}${day}`;
-      const filename = `${this.settingsService.careCenterName}-循環選單-${dateString}.xlsx`;
-      
-      // Save the file
+      const dateString =
+        today.getFullYear() +
+        String(today.getMonth() + 1).padStart(2, '0') +
+        String(today.getDate()).padStart(2, '0');
+      const modeLabel = mode === 'open' ? '開放' : '循環';
+      const filename = `${this.settingsService.careCenterName}-菜單-${modeLabel}-${dateString}.xlsx`;
+
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([excelBuffer], { 
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      const blob = new Blob([excelBuffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       });
-      
+
       saveAs(blob, filename);
-      
-      console.log(`Meal cycle Excel file exported successfully: ${filename}`);
-      
+      console.log(`Excel exported: ${filename}`);
     } catch (error) {
-      console.error('Error exporting meal cycle to Excel:', error);
-      alert('Failed to export Excel file. Please try again.');
+      console.error('Error exporting menu to Excel:', error);
+      alert('匯出失敗，請再試一次。');
     } finally {
       this.isDownloading = false;
     }
+  }
+
+  /**
+   * Open-mode Excel: group by serve_date + meal_time, ISO dates,
+   * same column schema as the add_open_meal_cycle backend importer expects
+   * (日期 / 用餐時間 / 菜色名稱).
+   */
+  private prepareOpenExcelData(mealsArray: Meal[]): any[] {
+    const grouped = new Map<string, Map<string, string[]>>();
+
+    for (const m of mealsArray) {
+      if ((m.menu_mode ?? 'cyclic') !== 'open') continue;
+      if (!m.serve_date) continue;
+      const dateKey = m.serve_date;
+      const time = m.meal_time || '未分類';
+      if (!grouped.has(dateKey)) grouped.set(dateKey, new Map());
+      const byTime = grouped.get(dateKey)!;
+      if (!byTime.has(time)) byTime.set(time, []);
+      byTime.get(time)!.push(m.meal_name || '');
+    }
+
+    const mealTimeOrder = ['早餐', '午餐', '晚餐', '點心'];
+    const rows: any[] = [];
+    const sortedDates = Array.from(grouped.keys()).sort();
+
+    for (const dateKey of sortedDates) {
+      const byTime = grouped.get(dateKey)!;
+      const sortedTimes = Array.from(byTime.keys()).sort((a, b) => {
+        const ia = mealTimeOrder.indexOf(a);
+        const ib = mealTimeOrder.indexOf(b);
+        if (ia !== -1 && ib !== -1) return ia - ib;
+        if (ia === -1 && ib !== -1) return 1;
+        if (ia !== -1 && ib === -1) return -1;
+        return a.localeCompare(b);
+      });
+      for (const time of sortedTimes) {
+        const names = byTime.get(time)!.filter(n => n.trim()).join(', ');
+        rows.push({
+          '日期': dateKey,
+          '用餐時間': time,
+          '菜色名稱': names,
+        });
+      }
+    }
+
+    return rows;
   }
 
   private prepareExcelDataFromArray2(mealsArray: any[]): any[] {
