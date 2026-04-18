@@ -1720,3 +1720,67 @@
     }
   }
 }
+
+// === Simplified single-meal add form (mirrors meal-admin quick-add modal) ===
+.form-hint-top {
+  margin: 0 0 16px 0;
+  padding: 10px 14px;
+  background: #e9f6f1;
+  border: 1px solid #b8e0d3;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: #00313C;
+  strong { color: #4FAFA3; font-weight: 700; }
+}
+
+.simple-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 520px;
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 0.9rem;
+      color: #00313C;
+      font-weight: 600;
+
+      .required { color: #a63a23; }
+    }
+
+    .form-input,
+    .form-select {
+      padding: 8px 12px;
+      border: 1px solid #d0e6e3;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      color: #00313C;
+      background: #ffffff;
+      width: 100%;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: #4FAFA3;
+        box-shadow: 0 0 0 3px rgba(79, 175, 163, 0.15);
+      }
+
+      &:disabled {
+        background: #f0f4f3;
+        color: #8a9599;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+  }
+}
