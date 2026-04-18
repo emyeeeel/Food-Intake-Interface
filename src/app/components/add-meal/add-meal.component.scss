@@ -1837,3 +1837,122 @@
     strong { color: #4FAFA3; font-weight: 700; }
   }
 }
+
+// === Mode-mismatch modal (Excel upload defensive check) ===
+.mismatch-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 49, 60, 0.5);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.mismatch-modal {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 49, 60, 0.28);
+  max-width: 520px;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.mismatch-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #fff4e1;
+  border-bottom: 1px solid #f5e3a4;
+
+  .warn-icon {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #7a4b00;
+  }
+}
+
+.mismatch-body {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #00313C;
+    line-height: 1.5;
+
+    .mode-current { color: #4FAFA3; font-weight: 700; }
+    .mode-wrong { color: #a63a23; font-weight: 700; }
+  }
+
+  .mismatch-hint {
+    font-size: 0.85rem;
+    color: #7a8a8d;
+  }
+
+  .mismatch-diff {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
+    background: #f8fbfa;
+    border: 1px solid #d0e6e3;
+    border-radius: 6px;
+
+    .diff-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 0.82rem;
+
+      .diff-label { font-weight: 600; color: #00313C; }
+      .diff-cols { color: #5a6a6d; strong { color: #a07404; } }
+    }
+  }
+
+  .btn-download-template {
+    align-self: stretch;
+    padding: 12px 18px;
+    background: #4FAFA3;
+    border: 1px solid #4FAFA3;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover { background: #3b8f88; border-color: #3b8f88; }
+  }
+}
+
+.mismatch-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 20px;
+  border-top: 1px solid #e6ecea;
+  background: #f8fbfa;
+
+  .btn-ok {
+    padding: 8px 18px;
+    background: #00313C;
+    border: 1px solid #00313C;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover { background: #004455; border-color: #004455; }
+  }
+}

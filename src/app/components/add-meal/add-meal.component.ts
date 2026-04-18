@@ -786,8 +786,64 @@ private buildMealFormData(): FormData {
     });
   }
 
-  uploadExcelFile(): void {
+  // === Mode-mismatch modal state ===
+
+  showModeMismatchModal = false;
+  mismatchDetectedMode: 'cyclic' | 'open' | null = null;
+
+  closeModeMismatchModal(): void {
+    this.showModeMismatchModal = false;
+    this.mismatchDetectedMode = null;
+    // Clear the selection so the user can't hit upload again by accident.
+    this.selectedFile = null;
+  }
+
+  /** Called from inside the mismatch modal to download the correct template. */
+  downloadTemplateFromMismatch(): void {
+    this.downloadTemplate();
+  }
+
+  /** Human-readable mode label for the mismatch modal copy. */
+  modeLabel(mode: 'cyclic' | 'open' | null): string {
+    if (mode === 'cyclic') return '循環模式';
+    if (mode === 'open') return '開放模式';
+    return '未知';
+  }
+
+  private async detectExcelMode(file: File): Promise<'cyclic' | 'open' | 'unknown'> {
+    const XLSX = await import('xlsx');
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: 'array' });
+    const firstSheet = wb.SheetNames[0];
+    if (!firstSheet) return 'unknown';
+    const ws = wb.Sheets[firstSheet];
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1 }) as any[][];
+    if (!rows.length) return 'unknown';
+
+    const headers = (rows[0] || []).map(h => String(h ?? '').trim());
+    const hasDayCycle = headers.includes('日週期');
+    const hasDate = headers.includes('日期');
+    const hasMealTime = headers.includes('用餐時間');
+    const hasMealName = headers.includes('菜色名稱');
+
+    // Cyclic template carries a 日週期 column; open template does not.
+    if (hasDayCycle) return 'cyclic';
+    if (hasDate && hasMealTime && hasMealName) return 'open';
+    return 'unknown';
+  }
+
+  async uploadExcelFile(): Promise<void> {
     if (!this.selectedFile) return;
+
+    // Pre-upload sniff: don't let the user pour a cyclic template into the
+    // open-mode importer (or vice-versa). Show the mismatch modal with a
+    // shortcut to download the correct template instead.
+    const detected = await this.detectExcelMode(this.selectedFile);
+    if (detected !== 'unknown' && detected !== this.menuMode) {
+      this.mismatchDetectedMode = detected;
+      this.showModeMismatchModal = true;
+      return;
+    }
 
     // Initialize upload state
     this.isUploading = true;

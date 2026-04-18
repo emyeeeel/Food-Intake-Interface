@@ -230,4 +230,50 @@
     (closed)="closeAssignDialog()"
     (completed)="onAssignCompleted($event)"
   ></app-assign-meal-dialog>
+
+  <!-- Mode-mismatch warning modal -->
+  @if (showModeMismatchModal) {
+    <div class="mismatch-overlay" (click)="closeModeMismatchModal()">
+      <div class="mismatch-modal" (click)="$event.stopPropagation()">
+        <div class="mismatch-header">
+          <span class="warn-icon">⚠️</span>
+          <h3>檔案模式與系統模式不符</h3>
+        </div>
+        <div class="mismatch-body">
+          <p>
+            系統目前是 <strong class="mode-current">{{ menuModeLabel }}</strong>，
+            但偵測到您上傳的是
+            <strong class="mode-wrong">{{ modeLabel(mismatchDetectedMode) }}</strong>
+            的 Excel 範本。
+          </p>
+          <p class="mismatch-hint">
+            請改用對應模式的範本，以免菜色被匯到錯的地方。
+          </p>
+          <div class="mismatch-diff">
+            <div class="diff-item">
+              <div class="diff-label">循環模式範本</div>
+              <div class="diff-cols">欄位：日期 / <strong>日週期</strong> / 用餐時間 / 菜色名稱</div>
+            </div>
+            <div class="diff-item">
+              <div class="diff-label">開放模式範本</div>
+              <div class="diff-cols">欄位：日期 / 用餐時間 / 菜色名稱（ISO 日期）</div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="btn-download-template"
+            (click)="downloadTemplateFromMismatch()"
+          >📥 下載「{{ menuModeLabel }}」範本</button>
+        </div>
+        <div class="mismatch-footer">
+          <button
+            type="button"
+            class="btn-ok"
+            (click)="closeModeMismatchModal()"
+          >我知道了</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
