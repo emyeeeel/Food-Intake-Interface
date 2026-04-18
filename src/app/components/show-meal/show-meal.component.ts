@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MealsService } from '../../services/meals.service';
+import { DateService } from '../../services/date.service';
 import { Meal } from '../../models/meal.model';
 
 @Component({
@@ -20,6 +21,7 @@ export class ShowMealComponent implements OnInit {
 
   constructor(
     private mealService: MealsService,
+    private dateService: DateService,
     private route: ActivatedRoute,
     private router: Router,
   ) {}
@@ -43,7 +45,7 @@ export class ShowMealComponent implements OnInit {
     this.mealService.getMeal(this.mealId).subscribe({
       next: (meal) => {
         this.meal = meal;
-        this.loadSameDayMeals(meal.day_cycle, meal.meal_time);
+        this.loadSameGroupMeals(meal);
       },
       error: (err) => {
         console.error('[ShowMeal] Error:', err);
@@ -53,8 +55,23 @@ export class ShowMealComponent implements OnInit {
     });
   }
 
-  private loadSameDayMeals(dayCycle: number, mealTime: string): void {
-    this.mealService.getMealsByDayCycleAndTime(dayCycle, mealTime).subscribe({
+  /**
+   * Load the sibling meals that share this meal's group.
+   * Group key differs by mode: cyclic = (day_cycle, meal_time); open = (serve_date, meal_time).
+   */
+  private loadSameGroupMeals(meal: Meal): void {
+    const mode = meal.menu_mode ?? 'cyclic';
+    const params: { [key: string]: string | number | undefined } = {
+      menu_mode: mode,
+      meal_time: meal.meal_time,
+    };
+    if (mode === 'open' && meal.serve_date) {
+      params['serve_date'] = meal.serve_date;
+    } else if (meal.day_cycle) {
+      params['day_cycle'] = meal.day_cycle;
+    }
+
+    this.mealService.getMealsFiltered(params).subscribe({
       next: (meals) => {
         this.sameMealGroupMeals = meals;
         this.isLoading = false;
@@ -68,6 +85,11 @@ export class ShowMealComponent implements OnInit {
   getMealCode(meal: Meal): string {
     const timeMap: Record<string, string> = { '午餐': 'L', '晚餐': 'D', '點心': 'S' };
     const code = timeMap[meal.meal_time] || 'U';
+    const mode = meal.menu_mode ?? 'cyclic';
+    if (mode === 'open' && meal.serve_date) {
+      const compactDate = meal.serve_date.replace(/-/g, '');
+      return `${code}-${compactDate}-${meal.id}`;
+    }
     return `${code}-${meal.day_cycle}-${meal.id}`;
   }
 
@@ -78,6 +100,10 @@ export class ShowMealComponent implements OnInit {
 
   getCycleDateLabel(): string {
     if (!this.meal) return '';
+    const mode = this.meal.menu_mode ?? 'cyclic';
+    if (mode === 'open' && this.meal.serve_date) {
+      return `${this.meal.serve_date} (${this.dateService.getWeekdayLabel(this.meal.serve_date)})`;
+    }
     return `第 ${this.meal.day_cycle} 天`;
   }
 
