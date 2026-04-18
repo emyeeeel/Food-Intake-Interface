@@ -46,6 +46,7 @@
             [(ngModel)]="dish.meal_name"
             (input)="onSearchInput(i, dish.meal_name)"
             (focus)="onSearchFocus(i)"
+            (blur)="onDishNameBlur(i)"
             placeholder="輸入或搜尋菜色..."
             autocomplete="off"
           />
@@ -94,5 +95,18 @@
     <div *ngIf="successMessage" class="msg-success">{{ successMessage }}</div>
     <div *ngIf="error && !isLoading" class="msg-error">{{ error }}</div>
 
+  </div>
+
+  <!-- New-name confirmation dialog -->
+  <div *ngIf="showNewNameDialog" class="new-name-modal-backdrop" (click)="rejectNewName()">
+    <div class="new-name-modal" (click)="$event.stopPropagation()">
+      <h3>確認新增菜色</h3>
+      <p>「<strong>{{ pendingNewNameText }}</strong>」不在既有菜色庫中。</p>
+      <p class="hint">按「確認新增」將在儲存時建立新菜色；按「我要修改」可回去調整名稱。</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="rejectNewName()">我要修改</button>
+        <button type="button" class="btn-primary" (click)="confirmNewName()">確認新增</button>
+      </div>
+    </div>
   </div>
 </div>

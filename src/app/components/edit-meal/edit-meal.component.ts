@@ -12,6 +12,9 @@ interface EditableDish {
   meal_name: string;
   plate_type: string;
   isNew: boolean;
+  /** True once the user has acknowledged via dialog that this is a new name.
+   * Cleared when meal_name is edited so the user is re-prompted if they change it. */
+  nameConfirmed?: boolean;
 }
 
 @Component({
@@ -45,6 +48,11 @@ export class EditMealComponent implements OnInit, OnChanges {
   searchFiltered: string[] = [];
 
   plateTypeOptions = ['金属板', '金属碗', '陶瓷碗'];
+
+  // New-name confirmation dialog state
+  showNewNameDialog = false;
+  pendingNewNameIndex: number | null = null;
+  pendingNewNameText = '';
 
   constructor(
     private mealsService: MealsService,
@@ -139,6 +147,9 @@ export class EditMealComponent implements OnInit, OnChanges {
 
   onSearchInput(index: number, value: string): void {
     this.dishes[index].meal_name = value;
+    // Any edit to the name invalidates a previous confirmation,
+    // so the blur dialog re-asks if the new value is still novel.
+    this.dishes[index].nameConfirmed = false;
     this.activeDropdownIndex = index;
     this.filterNames(value);
   }
@@ -161,12 +172,49 @@ export class EditMealComponent implements OnInit, OnChanges {
 
   selectName(index: number, name: string): void {
     this.dishes[index].meal_name = name;
+    // Picking from the dropdown means the name already exists, no confirmation needed.
+    this.dishes[index].nameConfirmed = true;
     // Auto-fill plate_type from existing dish with same name
     const donor = this.mealsByName.get(name);
     if (donor?.plate_type) {
       this.dishes[index].plate_type = donor.plate_type;
     }
     this.activeDropdownIndex = null;
+  }
+
+  /**
+   * Fires when the dish-name input loses focus. If the typed name is neither
+   * empty, already in the meal library, nor previously confirmed by the user,
+   * pops the confirmation dialog so they can catch typos before a new DB row
+   * is silently created at save time.
+   */
+  onDishNameBlur(index: number): void {
+    const dish = this.dishes[index];
+    const name = (dish.meal_name || '').trim();
+    if (!name) return;
+    if (this.mealsByName.has(name)) return;
+    if (dish.nameConfirmed) return;
+    this.pendingNewNameIndex = index;
+    this.pendingNewNameText = name;
+    this.showNewNameDialog = true;
+  }
+
+  confirmNewName(): void {
+    if (this.pendingNewNameIndex !== null) {
+      this.dishes[this.pendingNewNameIndex].nameConfirmed = true;
+    }
+    this.closeNewNameDialog();
+  }
+
+  rejectNewName(): void {
+    this.closeNewNameDialog();
+    // Intentionally do not refocus — user can click back into the input to edit.
+  }
+
+  private closeNewNameDialog(): void {
+    this.showNewNameDialog = false;
+    this.pendingNewNameIndex = null;
+    this.pendingNewNameText = '';
   }
 
   @HostListener('document:click', ['$event'])
