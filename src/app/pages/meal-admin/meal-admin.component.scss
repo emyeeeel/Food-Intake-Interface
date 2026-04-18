@@ -201,6 +201,9 @@
 
   .result-count-wrap {
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
   .result-count {
@@ -208,6 +211,24 @@
     color: #7a8a8d;
 
     strong { color: #00313C; font-weight: 700; }
+  }
+
+  .btn-export {
+    padding: 6px 14px;
+    border: 1px solid #4FAFA3;
+    background: #ffffff;
+    color: #4FAFA3;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) { background: #4FAFA3; color: #ffffff; }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
 }
 

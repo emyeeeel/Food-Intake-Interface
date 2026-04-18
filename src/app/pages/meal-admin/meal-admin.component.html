@@ -47,6 +47,12 @@
       </div>
       <div class="result-count-wrap">
         <span class="result-count">共 <strong>{{ filteredMeals.length }}</strong> 筆</span>
+        <button
+          class="btn-export"
+          (click)="exportCSV()"
+          [disabled]="filteredMeals.length === 0"
+          title="將目前篩選後的清單匯出為 CSV（可用 Excel 開啟）"
+        >⬇ 匯出 CSV</button>
       </div>
     </div>
 

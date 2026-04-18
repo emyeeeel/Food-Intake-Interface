@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { saveAs } from 'file-saver';
 
 import { MealsService } from '../../services/meals.service';
 import { MealAssignmentService } from '../../services/meal-assignment.service';
@@ -356,6 +357,51 @@ export class MealAdminComponent implements OnInit {
 
   isSaving(meal: Meal): boolean {
     return this.savingIds.has(meal.id);
+  }
+
+  // === CSV export ===
+
+  /**
+   * Export current filtered/sorted list to CSV. Respects search + mode + archive filters,
+   * so users can export "unused" subset, "archived" subset, etc. by filtering first.
+   * UTF-8 BOM prefix for Excel-on-Windows compatibility.
+   */
+  exportCSV(): void {
+    if (!this.filteredMeals.length) return;
+
+    const plateLabel = (v: string | null | undefined): string => {
+      const match = this.plateTypeOptions.find(p => p.value === v);
+      return match ? match.label : (v ?? '');
+    };
+
+    const header = ['代碼', '模式', '菜名', '餐期', '日期/天數', '餐盤', '指派數', '攝取數', '更新時間', '狀態'];
+    const rows = this.filteredMeals.map(m => {
+      const u = this.getUsage(m);
+      return [
+        this.getMealCode(m),
+        (m.menu_mode ?? 'cyclic') === 'open' ? '開放' : '循環',
+        m.meal_name ?? '',
+        m.meal_time ?? '',
+        this.getDayOrDate(m),
+        plateLabel(m.plate_type),
+        String(u.assignments),
+        String(u.intakes),
+        this.formatUpdatedAt(m),
+        m.is_archived ? '停用中' : '使用中',
+      ];
+    });
+
+    const esc = (v: string) => {
+      if (/[",\n]/.test(v)) return `"${v.replace(/"/g, '""')}"`;
+      return v;
+    };
+    const csv = [header, ...rows].map(r => r.map(esc).join(',')).join('\r\n');
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+
+    const ts = new Date();
+    const stamp = `${ts.getFullYear()}${String(ts.getMonth() + 1).padStart(2, '0')}${String(ts.getDate()).padStart(2, '0')}-${String(ts.getHours()).padStart(2, '0')}${String(ts.getMinutes()).padStart(2, '0')}`;
+    saveAs(blob, `菜色管理-${stamp}.csv`);
   }
 
   // === Navigation ===
