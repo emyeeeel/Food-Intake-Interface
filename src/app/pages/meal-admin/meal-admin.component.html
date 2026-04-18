@@ -6,15 +6,15 @@
       <button class="back-btn" (click)="goBackToEngineering()" title="返回工程模式">←</button>
       <div class="title-text">
         <h1>菜色管理</h1>
-        <p class="subtitle">跨模式檢視、編輯；封存 / 刪除 / 合併見 Phase 2+（見 HANDOVER §2）</p>
+        <p class="subtitle">跨模式檢視、編輯、停用；刪除 / 合併見 Phase 3+（見 HANDOVER §2）</p>
       </div>
       <button class="refresh-btn" (click)="refresh()" [disabled]="loading" title="重新載入">⟳</button>
     </div>
 
     <div class="stats-row">
       <div class="stat"><span class="stat-label">總數</span><span class="stat-value">{{ totalCount }}</span></div>
-      <div class="stat"><span class="stat-label">啟用中</span><span class="stat-value">{{ activeCount }}</span></div>
-      <div class="stat archived"><span class="stat-label">已封存</span><span class="stat-value">{{ archivedCount }}</span></div>
+      <div class="stat"><span class="stat-label">使用中</span><span class="stat-value">{{ activeCount }}</span></div>
+      <div class="stat archived"><span class="stat-label">停用中</span><span class="stat-value">{{ archivedCount }}</span></div>
       <div class="stat"><span class="stat-label">循環</span><span class="stat-value">{{ cyclicCount }}</span></div>
       <div class="stat"><span class="stat-label">開放</span><span class="stat-value">{{ openCount }}</span></div>
       <div class="stat unused"><span class="stat-label">無使用</span><span class="stat-value">{{ unusedCount }}</span></div>
@@ -61,8 +61,8 @@
 
       <span class="filter-label">狀態：</span>
       <div class="filter-chips">
-        <button class="chip" [class.active]="archiveFilter === 'active'" (click)="setArchiveFilter('active')">啟用中</button>
-        <button class="chip archived-chip" [class.active]="archiveFilter === 'archived'" (click)="setArchiveFilter('archived')">已封存</button>
+        <button class="chip" [class.active]="archiveFilter === 'active'" (click)="setArchiveFilter('active')">使用中</button>
+        <button class="chip archived-chip" [class.active]="archiveFilter === 'archived'" (click)="setArchiveFilter('archived')">停用中</button>
         <button class="chip" [class.active]="archiveFilter === 'all'" (click)="setArchiveFilter('all')">全部</button>
       </div>
     </div>
@@ -102,7 +102,7 @@
                   <input type="text" class="edit-input" [(ngModel)]="editBuffer.meal_name" placeholder="菜名" />
                 } @else {
                   <span class="meal-name">
-                    @if (meal.is_archived) { <span class="archived-tag">[封存]</span> }
+                    @if (meal.is_archived) { <span class="archived-tag">[停用]</span> }
                     {{ meal.meal_name }}
                   </span>
                 }
@@ -136,11 +136,11 @@
                   <button class="btn-edit" (click)="startEdit(meal)" [disabled]="!!meal.is_archived">編輯</button>
                   @if (meal.is_archived) {
                     <button class="btn-unarchive" (click)="unarchiveMeal(meal)" [disabled]="isArchiving(meal)">
-                      {{ isArchiving(meal) ? '...' : '解封存' }}
+                      {{ isArchiving(meal) ? '...' : '啟用' }}
                     </button>
                   } @else {
                     <button class="btn-archive" (click)="archiveMeal(meal)" [disabled]="isArchiving(meal)">
-                      {{ isArchiving(meal) ? '...' : '封存' }}
+                      {{ isArchiving(meal) ? '...' : '停用' }}
                     </button>
                   }
                 }
@@ -183,11 +183,12 @@
     <aside class="deferred-notice">
       <h3>📦 以下功能於 Phase 3+ 開通</h3>
       <ul>
-        <li><s><strong>封存／解封存</strong>：Phase 2 已完成 ✅</s></li>
+        <li><s><strong>停用／啟用</strong>：Phase 2 已完成 ✅</s></li>
         <li><strong>真刪除</strong>：需要 cascade 警告 + 使用量門檻（有攝取紀錄禁刪）</li>
         <li><strong>合併重複菜</strong>：需要新後端 endpoint（重新指向 foreign keys 後刪除源頭）</li>
       </ul>
       <p class="hint">每一步都會先寫 plan 跟你對齊再動後端 schema。</p>
+      <p class="hint">💡 新增菜色時，後端會自動比對同名菜並繼承 plate_type + ingredients（<code>_inherit_from_existing_dish</code>）。</p>
     </aside>
   }
 </div>

@@ -374,7 +374,7 @@ export class MealAdminComponent implements OnInit {
 
   archiveMeal(meal: Meal): void {
     if (this.archivingIds.has(meal.id)) return;
-    if (!confirm(`封存「${meal.meal_name}」？既有指派與攝取紀錄不受影響，可以隨時解封存。`)) return;
+    if (!confirm(`停用「${meal.meal_name}」？既有指派與攝取紀錄不受影響，可以隨時啟用。`)) return;
 
     this.archivingIds.add(meal.id);
     this.mealsService.archiveMeal(meal.id).subscribe({
@@ -388,7 +388,7 @@ export class MealAdminComponent implements OnInit {
       },
       error: (err) => {
         console.error('[MealAdmin] archive failed:', err);
-        alert('封存失敗：' + (err?.error?.detail || err?.message || '未知錯誤'));
+        alert('停用失敗：' + (err?.error?.detail || err?.message || '未知錯誤'));
         this.archivingIds.delete(meal.id);
       },
     });
@@ -409,7 +409,7 @@ export class MealAdminComponent implements OnInit {
       },
       error: (err) => {
         console.error('[MealAdmin] unarchive failed:', err);
-        alert('解封存失敗：' + (err?.error?.detail || err?.message || '未知錯誤'));
+        alert('啟用失敗：' + (err?.error?.detail || err?.message || '未知錯誤'));
         this.archivingIds.delete(meal.id);
       },
     });
