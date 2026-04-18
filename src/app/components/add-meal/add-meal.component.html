@@ -96,13 +96,26 @@
                 </select>
               </div>
               <div class="dropdown-wrapper">
-                <label for="dayCycle">日循環</label>
-                <select id="dayCycle" name="dayCycle" [(ngModel)]="meal.day_cycle" class="form-select" required>
-                  <option value="" disabled>選擇日期周期</option>
-                  @for (option of dayCycleOptions; track option) {
-                    <option [value]="option.value">{{ option.label }}</option>
+                @if (menuMode === 'cyclic') {
+                  <label for="dayCycle">日循環</label>
+                  <select id="dayCycle" name="dayCycle" [(ngModel)]="meal.day_cycle" class="form-select" required>
+                    <option value="" disabled>選擇日期周期</option>
+                    @for (option of dayCycleOptions; track option) {
+                      <option [value]="option.value">{{ option.label }}</option>
+                    }
+                  </select>
+                } @else {
+                  <label for="serveDate">日期</label>
+                  <select id="serveDate" name="serveDate" [(ngModel)]="meal.serve_date" class="form-select" required>
+                    <option value="" disabled>選擇日期</option>
+                    @for (option of serveDateOptions; track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
+                    }
+                  </select>
+                  @if (serveDateOptions.length === 0 && !loadingServeDates) {
+                    <small class="form-hint">尚無開放模式菜單可選，請先匯入 Excel。</small>
                   }
-                </select>
+                }
               </div>
               <div class="dropdown-wrapper">
                 <label for="plateType">餐盤類型</label>

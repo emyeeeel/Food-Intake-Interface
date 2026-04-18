@@ -20,13 +20,34 @@ import { SettingsService } from '../../services/settings.service';
 })
 export class AddMealComponent implements OnInit {
   ngOnInit(): void {
-    // Initialization logic can be added here if needed
     console.log('AddMealComponent initialized');
+    this.loadServeDateOptionsIfNeeded();
   }
+
+  private loadServeDateOptionsIfNeeded(): void {
+    if (this.menuMode === 'open') {
+      this.loadingServeDates = true;
+      this.dateService.getAvailableServeDates().subscribe({
+        next: (dates) => {
+          this.serveDateOptions = dates;
+          this.loadingServeDates = false;
+        },
+        error: () => {
+          this.serveDateOptions = [];
+          this.loadingServeDates = false;
+        },
+      });
+    }
+  }
+
+  serveDateOptions: { value: string; label: string }[] = [];
+  loadingServeDates = false;
+
   meal: Partial<Meal> = {
     meal_name: '',
     meal_time: '',
-    day_cycle: undefined, // Changed from empty string to undefined
+    day_cycle: undefined,      // meaningful only in cyclic mode
+    serve_date: undefined,     // meaningful only in open mode
     plate_type: '',
     ingredients: [] as number[]
   };
@@ -138,7 +159,11 @@ export class AddMealComponent implements OnInit {
           if (apiMeal.day_cycle && !this.meal.day_cycle) {
             this.meal.day_cycle = apiMeal.day_cycle;
           }
-          
+
+          if (apiMeal.serve_date && !this.meal.serve_date) {
+            this.meal.serve_date = apiMeal.serve_date;
+          }
+
           if (apiMeal.plate_type && !this.meal.plate_type) {
             this.meal.plate_type = apiMeal.plate_type;
           }
@@ -205,8 +230,12 @@ export class AddMealComponent implements OnInit {
         formData.append('meal_time', this.meal.meal_time);
       }
 
-      if (this.meal.day_cycle) {
-        formData.append('day_cycle', String(this.meal.day_cycle)); // Convert number to string for FormData
+      if (this.menuMode === 'open' && this.meal.serve_date) {
+        formData.append('menu_mode', 'open');
+        formData.append('serve_date', this.meal.serve_date);
+      } else if (this.meal.day_cycle) {
+        formData.append('menu_mode', 'cyclic');
+        formData.append('day_cycle', String(this.meal.day_cycle));
       }
 
       if (this.meal.plate_type) {
@@ -230,7 +259,12 @@ private buildMealFormData(): FormData {
 
   formData.append('meal_name', this.meal.meal_name!);
   formData.append('meal_time', this.meal.meal_time!);
-  formData.append('day_cycle', String(this.meal.day_cycle!)); // Convert number to string for FormData
+  formData.append('menu_mode', this.menuMode);
+  if (this.menuMode === 'open' && this.meal.serve_date) {
+    formData.append('serve_date', this.meal.serve_date);
+  } else {
+    formData.append('day_cycle', String(this.meal.day_cycle!));
+  }
   formData.append('plate_type', this.meal.plate_type!);
 
   console.log('Ingredients List: ', this.generatedIngredients)
@@ -286,10 +320,14 @@ private buildMealFormData(): FormData {
   }
 
   private isValidMeal(): boolean {
+    const timeUnitOk =
+      this.menuMode === 'open'
+        ? !!this.meal.serve_date
+        : !!this.meal.day_cycle;
     return !!(
       this.meal.meal_name?.trim() &&
       this.meal.meal_time &&
-      this.meal.day_cycle &&
+      timeUnitOk &&
       this.meal.plate_type
     );
   }
@@ -298,7 +336,8 @@ private buildMealFormData(): FormData {
     this.meal = {
       meal_name: '',
       meal_time: '',
-      day_cycle: undefined, // Changed from empty string to undefined
+      day_cycle: undefined,
+      serve_date: undefined,
       plate_type: '',
       ingredients: []
     };
@@ -369,7 +408,8 @@ private buildMealFormData(): FormData {
     this.meal = {
       meal_name: '',
       meal_time: '',
-      day_cycle: undefined, // Changed from empty string to undefined
+      day_cycle: undefined,
+      serve_date: undefined,
       plate_type: '',
       image: '',
       ingredients: []
