@@ -7,8 +7,6 @@ import { NotifComponent } from '../../components/notif/notif.component';
 import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
 import { MainOptionsComponent } from '../../components/main-options/main-options.component';
 import { DateContainerComponent } from '../../components/date-container/date-container.component';
-import { MealsService } from '../../services/meals.service';
-import { Meal } from '../../models/meal.model';
 import { AddMealComponent } from '../../components/add-meal/add-meal.component';
 import { DisplayMealComponent } from '../../components/display-meal/display-meal.component';
 import { PrintAllMealsComponent } from '../../components/print-all-meals/print-all-meals.component';
@@ -39,15 +37,13 @@ import { TodaysMealComponent } from '../../components/todays-meal/todays-meal.co
 export class MealCatalogComponent implements OnInit {
   currentView = 'default';
   mealDescription = '';
-  meals: Meal[] = [];
   mealId: number | null = null;
   isMobileMenuOpen = false;
   searchQuery = '';
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute,
-    private mealsService: MealsService
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -57,19 +53,6 @@ export class MealCatalogComponent implements OnInit {
     this.route.url.subscribe((segments) => {
       const path = segments.map((segment) => segment.path).join('/');
       this.updateCurrentView(path);
-    });
-
-    this.getAllMeals();
-  }
-
-  getAllMeals(): void {
-    this.mealsService.getMeals().subscribe({
-      next: (data: Meal[]) => {
-        this.meals = data;
-      },
-      error: (err) => {
-        console.error('Error fetching meals:', err);
-      }
     });
   }
 
@@ -127,41 +110,7 @@ export class MealCatalogComponent implements OnInit {
     this.mealDescription = '';
   }
 
-  getMealCode(meal: Meal): string {
-    if (!meal) {
-      return '';
-    }
-
-    const mealTypeMap: Record<string, string> = {
-      '\u5348\u9910': 'L',
-      '\u665a\u9910': 'D',
-      '\u9ede\u5fc3': 'S'
-    };
-
-    const mealLetter = mealTypeMap[meal.meal_time] || '';
-    const dayCycle = meal.day_cycle ?? '';
-    const mealId = meal.id ?? '';
-
-    return `${mealLetter}-${dayCycle}-${mealId}`;
-  }
-
   onMobileMenuToggle(isOpen: boolean): void {
     this.isMobileMenuOpen = isOpen;
-  }
-
-  getMealIdFromRoute(): number | null {
-    const url = this.router.url;
-
-    let match = url.match(/\/meal-catalog\/(\d+)\/edit/);
-    if (match) {
-      return parseInt(match[1], 10);
-    }
-
-    match = url.match(/\/meal-catalog\/(\d+)\/view/);
-    if (match) {
-      return parseInt(match[1], 10);
-    }
-
-    return null;
   }
 }
