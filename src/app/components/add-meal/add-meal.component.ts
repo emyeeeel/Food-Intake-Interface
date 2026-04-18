@@ -339,33 +339,34 @@ private buildMealFormData(): FormData {
 
 
 
+  /** Recently added meals in this session (for quickAdd batch feedback). */
+  recentlyAdded: Array<{ id: number; meal_name: string; meal_time: string }> = [];
+
   /**
-   * Simplified single-meal create (mirrors meal-admin quick-add modal).
-   * No photo, no AI ingredient generation; just a POST to /api/meals/ with the
-   * minimal fields the system needs. Backend's _inherit_from_existing_dish
-   * auto-copies plate_type + ingredients when the meal name matches a prior row.
+   * Validates the current form against menuMode + required fields.
+   * Returns null when valid, or an error message to display.
    */
-  submitSingleMeal(): void {
+  private validateCurrentMeal(): string | null {
     const name = (this.meal.meal_name || '').trim();
-    if (!name) {
-      alert('請輸入菜名。');
-      return;
-    }
-    if (!this.meal.meal_time) {
-      alert('請選擇餐期。');
-      return;
-    }
+    if (!name) return '請輸入菜名。';
+    if (!this.meal.meal_time) return '請選擇餐期。';
     if (this.menuMode === 'cyclic' && (!this.meal.day_cycle || Number(this.meal.day_cycle) < 1)) {
-      alert('循環模式需要輸入有效的天數（≥1）。');
-      return;
+      return '循環模式需要輸入有效的天數（≥1）。';
     }
     if (this.menuMode === 'open' && !this.meal.serve_date) {
-      alert('開放模式需要選擇日期。');
-      return;
+      return '開放模式需要選擇日期。';
     }
+    return null;
+  }
 
+  /** Cheap (sync) check used to enable/disable the inline "+" button. */
+  canQuickAdd(): boolean {
+    return this.validateCurrentMeal() === null && !this.isSubmitting;
+  }
+
+  private buildAddPayload(): any {
     const payload: any = {
-      meal_name: name,
+      meal_name: (this.meal.meal_name || '').trim(),
       meal_time: this.meal.meal_time,
       menu_mode: this.menuMode,
       plate_type: this.meal.plate_type || null,
@@ -378,9 +379,19 @@ private buildMealFormData(): FormData {
       payload.serve_date = this.meal.serve_date;
       payload.day_cycle = null;
     }
+    return payload;
+  }
+
+  /**
+   * Bottom-button path: add one meal, then navigate back to the catalog.
+   * Mirrors the meal-admin quick-add modal behaviour.
+   */
+  submitSingleMeal(): void {
+    const err = this.validateCurrentMeal();
+    if (err) { alert(err); return; }
 
     this.isSubmitting = true;
-    this.mealsService.addMeal(payload).subscribe({
+    this.mealsService.addMeal(this.buildAddPayload()).subscribe({
       next: (created) => {
         this.isSubmitting = false;
         const plateHint = created.plate_type ? `，餐盤 ${created.plate_type}` : '';
@@ -390,6 +401,40 @@ private buildMealFormData(): FormData {
       error: (err) => {
         this.isSubmitting = false;
         console.error('[AddMeal] add failed:', err);
+        alert('新增失敗：' + (err?.error?.detail || err?.message || '未知錯誤'));
+      },
+    });
+  }
+
+  /**
+   * Inline "+" button path: add one meal, stay on this page, clear only the
+   * meal name, keep 餐期 / 天數·日期 / 餐盤. Useful for rapidly entering
+   * several dishes in the same meal slot.
+   */
+  quickAdd(): void {
+    const err = this.validateCurrentMeal();
+    if (err) { alert(err); return; }
+
+    this.isSubmitting = true;
+    this.mealsService.addMeal(this.buildAddPayload()).subscribe({
+      next: (created) => {
+        this.isSubmitting = false;
+        this.recentlyAdded = [
+          { id: created.id, meal_name: created.meal_name, meal_time: created.meal_time },
+          ...this.recentlyAdded,
+        ].slice(0, 10);  // cap list to the 10 most recent
+        // Clear only the name; keep context for the next dish.
+        this.meal.meal_name = '';
+        this.nameConfirmed = false;
+        // Refocus the name input so the user can immediately type the next one.
+        setTimeout(() => {
+          const el = document.getElementById('mealName') as HTMLInputElement | null;
+          el?.focus();
+        }, 0);
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        console.error('[AddMeal] quick-add failed:', err);
         alert('新增失敗：' + (err?.error?.detail || err?.message || '未知錯誤'));
       },
     });
