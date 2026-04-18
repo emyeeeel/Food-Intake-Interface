@@ -33,41 +33,38 @@
 
       <form class="simple-add-form" (ngSubmit)="submitSingleMeal()" #addForm="ngForm">
         <div class="form-group">
-          <label for="mealName">菜名 <span class="required">*</span></label>
-          <div class="input-with-action">
-            <input
-              type="text"
-              id="mealName"
-              name="mealName"
-              [(ngModel)]="meal.meal_name"
-              (input)="onMealNameInput()"
-              (blur)="onMealNameBlur()"
-              (keydown.enter)="$event.preventDefault(); quickAdd()"
-              class="form-input"
-              placeholder="例：紅燒豆腐"
-              required
-            />
-            <button
-              type="button"
-              class="btn-quick-add"
-              (click)="quickAdd()"
-              [disabled]="!canQuickAdd()"
-              title="快速新增（保留其他欄位、繼續新增下一道）"
-            >＋</button>
-          </div>
-          <small class="form-hint">按 <strong>＋</strong> 或 Enter：新增後保留餐期／日期／餐盤，繼續加下一道。</small>
-        </div>
+          <label>菜名 <span class="required">*</span></label>
 
-        @if (recentlyAdded.length > 0) {
-          <div class="recent-adds">
-            <div class="recent-adds-label">剛才新增（{{ recentlyAdded.length }} 道）：</div>
-            <ul>
-              @for (m of recentlyAdded; track m.id) {
-                <li><span class="time-tag">{{ m.meal_time }}</span> {{ m.meal_name }} <span class="small">#{{ m.id }}</span></li>
-              }
-            </ul>
-          </div>
-        }
+          @for (name of mealNames; track $index; let i = $index) {
+            <div class="input-with-action">
+              <input
+                type="text"
+                class="form-input meal-name-input"
+                [name]="'mealName' + i"
+                [(ngModel)]="mealNames[i]"
+                (keydown.enter)="onMealNameEnter(i, $event)"
+                placeholder="例：紅燒豆腐"
+              />
+              <button
+                type="button"
+                class="btn-name-add"
+                (click)="addMealNameAt(i)"
+                title="再加一道"
+              >＋</button>
+              <button
+                type="button"
+                class="btn-name-remove"
+                (click)="removeMealNameAt(i)"
+                [disabled]="mealNames.length <= 1"
+                [title]="mealNames.length <= 1 ? '至少保留一列' : '移除這列'"
+              >×</button>
+            </div>
+          }
+          <small class="form-hint">
+            一次可輸入多道，共用下方的餐期／日期／餐盤。
+            按 <strong>Enter</strong> 或 <strong>＋</strong> 會新增一列、<strong>×</strong> 移除。
+          </small>
+        </div>
 
         <div class="form-group">
           <label for="mealTime">餐期 <span class="required">*</span></label>
@@ -119,8 +116,12 @@
 
         <div class="form-actions">
           <button type="button" class="btn-secondary" (click)="goBackToOptions()" [disabled]="isSubmitting">取消</button>
-          <button type="submit" class="btn-primary" [disabled]="!addForm.valid || isSubmitting">
-            @if (isSubmitting) { <span>新增中...</span> } @else { <span>新增餐點</span> }
+          <button type="submit" class="btn-primary" [disabled]="filledNameCount === 0 || isSubmitting">
+            @if (isSubmitting) {
+              <span>新增中...</span>
+            } @else {
+              <span>{{ filledNameCount > 1 ? '新增 ' + filledNameCount + ' 道餐點' : '新增餐點' }}</span>
+            }
           </button>
         </div>
       </form>

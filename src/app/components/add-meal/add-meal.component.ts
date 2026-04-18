@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DateService } from '../../services/date.service';
 import { SettingsService } from '../../services/settings.service';
+import { forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 
 @Component({
@@ -339,16 +341,54 @@ private buildMealFormData(): FormData {
 
 
 
-  /** Recently added meals in this session (for quickAdd batch feedback). */
-  recentlyAdded: Array<{ id: number; meal_name: string; meal_time: string }> = [];
+  /**
+   * Dynamic list of dish names entered in this form. The + button inserts
+   * a new empty slot below; × removes that slot (disabled when only one
+   * slot remains). All non-empty names are submitted in one batch below,
+   * sharing the same 餐期 / 天數·日期 / 餐盤 fields.
+   */
+  mealNames: string[] = [''];
+
+  trackByIndex(index: number): number { return index; }
+
+  addMealNameAt(index: number): void {
+    this.mealNames.splice(index + 1, 0, '');
+    setTimeout(() => {
+      const inputs = document.querySelectorAll<HTMLInputElement>('.meal-name-input');
+      inputs[index + 1]?.focus();
+    }, 0);
+  }
+
+  removeMealNameAt(index: number): void {
+    if (this.mealNames.length <= 1) return;
+    this.mealNames.splice(index, 1);
+  }
 
   /**
-   * Validates the current form against menuMode + required fields.
-   * Returns null when valid, or an error message to display.
+   * Enter in a name field adds a new row below and jumps focus there.
+   * Does NOT submit — submit is only via the explicit bottom button so
+   * users don't accidentally POST before filling 餐期 / 日期.
    */
-  private validateCurrentMeal(): string | null {
-    const name = (this.meal.meal_name || '').trim();
-    if (!name) return '請輸入菜名。';
+  onMealNameEnter(index: number, event: Event): void {
+    event.preventDefault();
+    // If the last row is already empty, just focus it instead of piling rows.
+    const isLast = index === this.mealNames.length - 1;
+    const currentEmpty = !(this.mealNames[index] || '').trim();
+    if (isLast && currentEmpty) return;
+    if (isLast) {
+      this.addMealNameAt(index);
+    } else {
+      // Move focus to the next existing row.
+      setTimeout(() => {
+        const inputs = document.querySelectorAll<HTMLInputElement>('.meal-name-input');
+        inputs[index + 1]?.focus();
+      }, 0);
+    }
+  }
+
+  private validateSharedFields(): string | null {
+    const names = this.mealNames.map(n => (n || '').trim()).filter(n => n.length > 0);
+    if (names.length === 0) return '請至少輸入一道菜名。';
     if (!this.meal.meal_time) return '請選擇餐期。';
     if (this.menuMode === 'cyclic' && (!this.meal.day_cycle || Number(this.meal.day_cycle) < 1)) {
       return '循環模式需要輸入有效的天數（≥1）。';
@@ -359,84 +399,62 @@ private buildMealFormData(): FormData {
     return null;
   }
 
-  /** Cheap (sync) check used to enable/disable the inline "+" button. */
-  canQuickAdd(): boolean {
-    return this.validateCurrentMeal() === null && !this.isSubmitting;
+  /** Count of non-empty names — used for the submit button label. */
+  get filledNameCount(): number {
+    return this.mealNames.reduce((acc, n) => acc + ((n || '').trim() ? 1 : 0), 0);
   }
 
-  private buildAddPayload(): any {
-    const payload: any = {
-      meal_name: (this.meal.meal_name || '').trim(),
+  private buildBasePayload(): any {
+    const base: any = {
       meal_time: this.meal.meal_time,
       menu_mode: this.menuMode,
       plate_type: this.meal.plate_type || null,
       ingredients: [],
     };
     if (this.menuMode === 'cyclic') {
-      payload.day_cycle = Number(this.meal.day_cycle);
-      payload.serve_date = null;
+      base.day_cycle = Number(this.meal.day_cycle);
+      base.serve_date = null;
     } else {
-      payload.serve_date = this.meal.serve_date;
-      payload.day_cycle = null;
+      base.serve_date = this.meal.serve_date;
+      base.day_cycle = null;
     }
-    return payload;
+    return base;
   }
 
   /**
-   * Bottom-button path: add one meal, then navigate back to the catalog.
-   * Mirrors the meal-admin quick-add modal behaviour.
+   * Submit: batch-creates one meal per non-empty name, sharing 餐期 / 日期 /
+   * 餐盤. Uses forkJoin with per-request catchError so a partial failure
+   * still reports what succeeded. Navigates back to /meal-catalog on
+   * success (even partial).
    */
   submitSingleMeal(): void {
-    const err = this.validateCurrentMeal();
+    const err = this.validateSharedFields();
     if (err) { alert(err); return; }
 
+    const names = this.mealNames.map(n => (n || '').trim()).filter(n => n.length > 0);
+    const base = this.buildBasePayload();
+
     this.isSubmitting = true;
-    this.mealsService.addMeal(this.buildAddPayload()).subscribe({
-      next: (created) => {
-        this.isSubmitting = false;
-        const plateHint = created.plate_type ? `，餐盤 ${created.plate_type}` : '';
-        alert(`新增成功：${created.meal_name}（#${created.id}）${plateHint}`);
+    const requests = names.map(name =>
+      this.mealsService.addMeal({ ...base, meal_name: name }).pipe(
+        map(result => ({ ok: true as const, name, result })),
+        catchError((e: any) => of({ ok: false as const, name, err: e })),
+      ),
+    );
+
+    forkJoin(requests).subscribe(results => {
+      this.isSubmitting = false;
+      const success = results.filter(r => r.ok).length;
+      const failed = results.filter(r => !r.ok);
+      if (failed.length === 0) {
+        alert(`新增成功 ${success} 道菜色。`);
+      } else {
+        const failedNames = failed.map(f => f.name).join('、');
+        alert(`成功 ${success} 道、失敗 ${failed.length} 道：${failedNames}`);
+      }
+      if (success > 0) {
         this.router.navigate(['/meal-catalog']);
-      },
-      error: (err) => {
-        this.isSubmitting = false;
-        console.error('[AddMeal] add failed:', err);
-        alert('新增失敗：' + (err?.error?.detail || err?.message || '未知錯誤'));
-      },
-    });
-  }
-
-  /**
-   * Inline "+" button path: add one meal, stay on this page, clear only the
-   * meal name, keep 餐期 / 天數·日期 / 餐盤. Useful for rapidly entering
-   * several dishes in the same meal slot.
-   */
-  quickAdd(): void {
-    const err = this.validateCurrentMeal();
-    if (err) { alert(err); return; }
-
-    this.isSubmitting = true;
-    this.mealsService.addMeal(this.buildAddPayload()).subscribe({
-      next: (created) => {
-        this.isSubmitting = false;
-        this.recentlyAdded = [
-          { id: created.id, meal_name: created.meal_name, meal_time: created.meal_time },
-          ...this.recentlyAdded,
-        ].slice(0, 10);  // cap list to the 10 most recent
-        // Clear only the name; keep context for the next dish.
-        this.meal.meal_name = '';
-        this.nameConfirmed = false;
-        // Refocus the name input so the user can immediately type the next one.
-        setTimeout(() => {
-          const el = document.getElementById('mealName') as HTMLInputElement | null;
-          el?.focus();
-        }, 0);
-      },
-      error: (err) => {
-        this.isSubmitting = false;
-        console.error('[AddMeal] quick-add failed:', err);
-        alert('新增失敗：' + (err?.error?.detail || err?.message || '未知錯誤'));
-      },
+      }
     });
   }
 
