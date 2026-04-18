@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MealsService } from '../../services/meals.service';
 import { DateService } from '../../services/date.service';
+import { PlateTypeLabelPipe } from '../../pipes/plate-type-label.pipe';
 import { Meal } from '../../models/meal.model';
 import { forkJoin } from 'rxjs';
 
@@ -19,7 +20,7 @@ interface EditableDish {
 
 @Component({
   selector: 'app-edit-meal',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PlateTypeLabelPipe],
   templateUrl: './edit-meal.component.html',
   styleUrl: './edit-meal.component.scss',
 })

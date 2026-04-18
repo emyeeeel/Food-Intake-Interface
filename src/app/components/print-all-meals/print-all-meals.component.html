@@ -203,7 +203,7 @@
                           <td>{{ meal.meal_name }}</td>
                           <td>{{ meal.meal_time }}</td>
                           <td>Day {{ meal.day_cycle }}</td>
-                          <td>{{ meal.plate_type }}</td>
+                          <td>{{ meal.plate_type | plateTypeLabel }}</td>
                           <td>{{ getMealIngredients(meal) }}</td>
                           <td>{{ meal.created_at | date:'short' }}</td>
                         </tr>

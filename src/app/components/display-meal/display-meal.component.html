@@ -71,7 +71,7 @@
             <td class="col-date">{{ formatDateLabel(meal) }}</td>
             <td class="col-time">{{ meal.meal_time }}</td>
             <td class="col-name">{{ meal.meal_name }}</td>
-            <td class="col-plate">{{ meal.plate_type || '-' }}</td>
+            <td class="col-plate">{{ (meal.plate_type | plateTypeLabel) || '-' }}</td>
             <td class="col-actions">
               <button class="btn-edit" (click)="editMeal(meal)" title="編輯">✎</button>
               <button class="btn-delete" (click)="deleteMeal(meal)" title="刪除">✕</button>

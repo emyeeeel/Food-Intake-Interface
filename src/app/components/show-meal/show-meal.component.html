@@ -24,7 +24,7 @@
         <span class="meal-order">{{ i + 1 }}</span>
         <span class="meal-code">{{ getMealCode(m) }}</span>
         <span class="meal-name">{{ m.meal_name }}</span>
-        <span class="meal-plate">{{ m.plate_type || '' }}</span>
+        <span class="meal-plate">{{ m.plate_type | plateTypeLabel }}</span>
       </div>
     </div>
 

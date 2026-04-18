@@ -167,7 +167,7 @@
                       @if (assignment.meal_detail.plate_type) {
                         <div class="plate-type">
                           <span class="label">餐盤類型:</span>
-                          <span class="value">{{ assignment.meal_detail.plate_type }}</span>
+                          <span class="value">{{ assignment.meal_detail.plate_type | plateTypeLabel }}</span>
                         </div>
                       }
                     </div>

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MealsService } from '../../services/meals.service';
 import { DateService } from '../../services/date.service';
+import { PlateTypeLabelPipe } from '../../pipes/plate-type-label.pipe';
 import { Meal } from '../../models/meal.model';
 
 import * as XLSX from 'xlsx';
@@ -13,7 +14,7 @@ import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-display-meal',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, PlateTypeLabelPipe],
   templateUrl: './display-meal.component.html',
   styleUrl: './display-meal.component.scss'
 })

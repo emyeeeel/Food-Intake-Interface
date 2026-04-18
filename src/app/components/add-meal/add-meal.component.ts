@@ -73,11 +73,13 @@ export class AddMealComponent implements OnInit {
 }));
 
 
+  // Values match backend PLATE_TYPE_CHOICES (stored as simplified Chinese);
+  // labels are Taiwan traditional for display.
   plateTypeOptions = [
-  { value: '金属板', label: '金属板' },
-  { value: '金属碗', label: '金属碗' },
-  { value: '陶瓷碗', label: '陶瓷碗' }
-];
+    { value: '金属板', label: '金屬鐵盤' },
+    { value: '金属碗', label: '金屬碗' },
+    { value: '陶瓷碗', label: '陶瓷碗' }
+  ];
 
 
   constructor(

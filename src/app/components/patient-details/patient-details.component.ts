@@ -12,6 +12,7 @@ import { GetAnalysisService } from '../../services/get-analysis.service';
 import { MealAssignment } from '../../models/meal-assignment.mode';
 import { MealsService } from '../../services/meals.service';
 import { RecommenderService } from '../../services/recommender.service';
+import { PlateTypeLabelPipe } from '../../pipes/plate-type-label.pipe';
 
 interface MealIntakeChunk {
   result: number;
@@ -39,7 +40,7 @@ interface MealIntakeSummaryResponse {
 
 @Component({
   selector: 'app-patient-details',
-  imports: [QrTestComponent],
+  imports: [QrTestComponent, PlateTypeLabelPipe],
   templateUrl: './patient-details.component.html',
   styleUrls: ['./patient-details.component.scss']
 })

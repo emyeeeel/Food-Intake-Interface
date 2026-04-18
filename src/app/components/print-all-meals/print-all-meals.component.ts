@@ -6,11 +6,12 @@ import { Ingredient } from '../../models/ingredient.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
+import { PlateTypeLabelPipe } from '../../pipes/plate-type-label.pipe';
 
 @Component({
   selector: 'app-print-all-meals',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PlateTypeLabelPipe],
   templateUrl: './print-all-meals.component.html',
   styleUrl: './print-all-meals.component.scss'
 })

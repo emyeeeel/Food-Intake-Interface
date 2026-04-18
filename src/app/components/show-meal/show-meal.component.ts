@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MealsService } from '../../services/meals.service';
 import { DateService } from '../../services/date.service';
+import { PlateTypeLabelPipe } from '../../pipes/plate-type-label.pipe';
 import { Meal } from '../../models/meal.model';
 
 @Component({
   selector: 'app-show-meal',
-  imports: [CommonModule],
+  imports: [CommonModule, PlateTypeLabelPipe],
   templateUrl: './show-meal.component.html',
   styleUrl: './show-meal.component.scss',
 })
