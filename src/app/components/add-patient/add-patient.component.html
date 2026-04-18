@@ -33,96 +33,157 @@
           </div>
         </div>
 
-        <!-- Multiple Meal Assignments Container -->
+        <!-- Meal Assignments Container (mode-aware) -->
         <div class="meal-assignments">
           <div class="meal-assignments-header">
             <h2>病患餐點分配</h2>
-            <button 
-              type="button" 
-              class="btn-add-assignment" 
-              (click)="addMealAssignment()"
-              [disabled]="mealAssignments.length >= 5"
-            >
-              + 新增分配
-            </button>
+            @if (currentMenuMode === 'cyclic') {
+              <button
+                type="button"
+                class="btn-add-assignment"
+                (click)="addMealAssignment()"
+                [disabled]="mealAssignments.length >= 5"
+              >
+                + 新增分配
+              </button>
+            }
           </div>
 
-          <!-- Dynamic Meal Assignment Sections -->
-          <div class="meal-assignments-list">
-            <div 
-              *ngFor="let assignment of mealAssignments; let i = index; trackBy: trackByAssignment" 
-              class="meal-assignment-item"
-              [attr.data-assignment-index]="i"
-            >
-              <!-- Assignment Header with Remove Button -->
-              <div class="assignment-header">
-                <span class="assignment-label">分配 {{ i + 1 }}</span>
-                <button 
-                  type="button" 
-                  class="btn-remove-assignment"
-                  (click)="removeMealAssignment(i)"
-                  [disabled]="mealAssignments.length === 1"
-                  title="移除分配"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <!-- Day Cycle Selection -->
-              <div class="form-group">
-                <span>{{ assignment.dayId ? '第 ' + assignment.dayId + ' 天' : '-' }}</span>
-              </div>
-
-              <!-- Meals Container for this assignment -->
-              <div class="form-group meals-container" *ngIf="assignment.dayId">
-                
-                <!-- Lunch Meals -->
-                <div class="meal-time-section" *ngIf="assignment.lunchMeals && assignment.lunchMeals.length > 0">
-                  <h4>午餐</h4>
-                  <div class="meals-grid">
-                    <div *ngFor="let meal of assignment.lunchMeals" class="meal-option">
-                      <input 
-                        type="checkbox" 
-                        [id]="'lunch-' + meal.id + '-' + i" 
-                        [value]="meal.id"
-                        [checked]="assignment.selectedLunchMeals.includes(meal.id)"
-                        (change)="onMealSelection('lunch', meal, $event, i)"
-                      >
-                      <label [for]="'lunch-' + meal.id + '-' + i" class="meal-label">
-                        {{ meal.meal_name }}
-                      </label>
-                    </div>
-                  </div>
+          @if (currentMenuMode === 'cyclic') {
+            <!-- Cyclic-mode: per-day assignments -->
+            <div class="meal-assignments-list">
+              <div
+                *ngFor="let assignment of mealAssignments; let i = index; trackBy: trackByAssignment"
+                class="meal-assignment-item"
+                [attr.data-assignment-index]="i"
+              >
+                <div class="assignment-header">
+                  <span class="assignment-label">分配 {{ i + 1 }}</span>
+                  <button
+                    type="button"
+                    class="btn-remove-assignment"
+                    (click)="removeMealAssignment(i)"
+                    [disabled]="mealAssignments.length === 1"
+                    title="移除分配"
+                  >
+                    ✕
+                  </button>
                 </div>
 
-                <!-- Dinner Meals -->
-                <div class="meal-time-section" *ngIf="assignment.dinnerMeals && assignment.dinnerMeals.length > 0">
-                  <h4>晚餐</h4>
-                  <div class="meals-grid">
-                    <div *ngFor="let meal of assignment.dinnerMeals" class="meal-option">
-                      <input 
-                        type="checkbox" 
-                        [id]="'dinner-' + meal.id + '-' + i" 
-                        [value]="meal.id"
-                        [checked]="assignment.selectedDinnerMeals.includes(meal.id)"
-                        (change)="onMealSelection('dinner', meal, $event, i)"
-                      >
-                      <label [for]="'dinner-' + meal.id + '-' + i" class="meal-label">
-                        {{ meal.meal_name }}
-                      </label>
-                    </div>
-                  </div>
+                <div class="form-group">
+                  <span>{{ assignment.dayId ? '第 ' + assignment.dayId + ' 天' : '-' }}</span>
                 </div>
 
-                <!-- No meals message -->
-                <div *ngIf="(!assignment.lunchMeals || assignment.lunchMeals.length === 0) && 
-                           (!assignment.dinnerMeals || assignment.dinnerMeals.length === 0)" 
-                     class="no-meals">
-                  <p>第 {{ assignment.dayId }} 天無可用餐點</p>
+                <div class="form-group meals-container" *ngIf="assignment.dayId">
+                  <div class="meal-time-section" *ngIf="assignment.lunchMeals && assignment.lunchMeals.length > 0">
+                    <h4>午餐</h4>
+                    <div class="meals-grid">
+                      <div *ngFor="let meal of assignment.lunchMeals" class="meal-option">
+                        <input
+                          type="checkbox"
+                          [id]="'lunch-' + meal.id + '-' + i"
+                          [value]="meal.id"
+                          [checked]="assignment.selectedLunchMeals.includes(meal.id)"
+                          (change)="onMealSelection('lunch', meal, $event, i)"
+                        >
+                        <label [for]="'lunch-' + meal.id + '-' + i" class="meal-label">
+                          {{ meal.meal_name }}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="meal-time-section" *ngIf="assignment.dinnerMeals && assignment.dinnerMeals.length > 0">
+                    <h4>晚餐</h4>
+                    <div class="meals-grid">
+                      <div *ngFor="let meal of assignment.dinnerMeals" class="meal-option">
+                        <input
+                          type="checkbox"
+                          [id]="'dinner-' + meal.id + '-' + i"
+                          [value]="meal.id"
+                          [checked]="assignment.selectedDinnerMeals.includes(meal.id)"
+                          (change)="onMealSelection('dinner', meal, $event, i)"
+                        >
+                        <label [for]="'dinner-' + meal.id + '-' + i" class="meal-label">
+                          {{ meal.meal_name }}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="(!assignment.lunchMeals || assignment.lunchMeals.length === 0) &&
+                             (!assignment.dinnerMeals || assignment.dinnerMeals.length === 0)"
+                       class="no-meals">
+                    <p>第 {{ assignment.dayId }} 天無可用餐點</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          } @else {
+            <!-- Open-mode: flat checkbox list grouped by serve_date -->
+            <div class="open-mode-picker">
+              <div class="picker-header">
+                <p>本系統目前為<strong>開放模式</strong>。勾選要指派給本住民的餐點：</p>
+                <div class="picker-actions">
+                  <button type="button" class="btn-small" (click)="selectAllOpenMeals()">全選</button>
+                  <button type="button" class="btn-small" (click)="clearAllOpenMeals()">全不選</button>
+                  <span class="count-badge">已選 {{ selectedOpenMealIds.size }} 道</span>
+                </div>
+              </div>
+
+              @if (openMealsByDate.length === 0) {
+                <p class="empty-hint">尚無開放模式菜單可分配，請先在「膳食目錄 → 新增膳食 → 匯入 Excel」上傳本週菜單。</p>
+              } @else {
+                <div class="open-meals-list">
+                  @for (group of openMealsByDate; track group.serveDate) {
+                    <div class="date-group">
+                      <h3>{{ group.label }}</h3>
+                      @if (group.lunch.length > 0) {
+                        <div class="meal-time-section">
+                          <h4>午餐</h4>
+                          <div class="meals-grid">
+                            @for (meal of group.lunch; track meal.id) {
+                              <div class="meal-option">
+                                <input
+                                  type="checkbox"
+                                  [id]="'open-lunch-' + meal.id"
+                                  [checked]="isOpenMealSelected(meal.id)"
+                                  (change)="toggleOpenMealSelection(meal.id)"
+                                />
+                                <label [for]="'open-lunch-' + meal.id" class="meal-label">
+                                  {{ meal.meal_name }}
+                                </label>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                      @if (group.dinner.length > 0) {
+                        <div class="meal-time-section">
+                          <h4>晚餐</h4>
+                          <div class="meals-grid">
+                            @for (meal of group.dinner; track meal.id) {
+                              <div class="meal-option">
+                                <input
+                                  type="checkbox"
+                                  [id]="'open-dinner-' + meal.id"
+                                  [checked]="isOpenMealSelected(meal.id)"
+                                  (change)="toggleOpenMealSelection(meal.id)"
+                                />
+                                <label [for]="'open-dinner-' + meal.id" class="meal-label">
+                                  {{ meal.meal_name }}
+                                </label>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
         </div>
       </fieldset>
 

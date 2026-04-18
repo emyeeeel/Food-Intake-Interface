@@ -505,3 +505,86 @@ fieldset {
     border-color: #3b8f88;
   }
 }
+
+// --- Open-mode multi-select (Task C 3e) ---
+.open-mode-picker {
+  .picker-header {
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: #f5fbfa;
+    border: 1px solid #d8ece9;
+    border-radius: 8px;
+
+    p {
+      margin: 0 0 8px 0;
+      font-size: 0.95rem;
+      color: #00313C;
+    }
+
+    .picker-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+
+      .btn-small {
+        padding: 6px 14px;
+        font-size: 0.85rem;
+        border: 1px solid #4FAFA3;
+        background: #ffffff;
+        color: #4FAFA3;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+          background: #4FAFA3;
+          color: #ffffff;
+        }
+      }
+
+      .count-badge {
+        margin-left: auto;
+        padding: 4px 12px;
+        background: #4FAFA3;
+        color: #ffffff;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .empty-hint {
+    padding: 24px;
+    text-align: center;
+    color: #888;
+    background: #f9f9f9;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+  }
+
+  .open-meals-list {
+    .date-group {
+      margin-bottom: 20px;
+      padding: 16px;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+
+      > h3 {
+        margin: 0 0 12px 0;
+        padding-bottom: 8px;
+        font-size: 1.05rem;
+        color: #00313C;
+        border-bottom: 2px solid #4FAFA3;
+      }
+
+      .meal-time-section {
+        margin-bottom: 12px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}

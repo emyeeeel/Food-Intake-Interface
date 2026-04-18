@@ -4,11 +4,19 @@ import { Router } from '@angular/router';
 import { MealsService } from '../../services/meals.service';
 import { PatientService } from '../../services/patient.service';
 import { MealAssignmentService } from '../../services/meal-assignment.service';
+import { DateService } from '../../services/date.service';
 import { Meal } from '../../models/meal.model';
 import { LTCPatient } from '../../models/ltc-patient.model';
 import { MealAssignment } from '../../models/meal-assignment.mode';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+
+export interface OpenDateGroup {
+  serveDate: string;
+  label: string;
+  lunch: Meal[];
+  dinner: Meal[];
+}
 
 export interface MealAssignmentForm {
   id: string;
@@ -43,6 +51,14 @@ export class AddPatientComponent implements OnInit {
   availableDays: { value: string, label: string }[] = [];
   allMeals: Meal[] = [];
 
+  // Mode-aware state
+  currentMenuMode: 'cyclic' | 'open' = 'cyclic';
+
+  // Open-mode-only state: all current open meals grouped by serve_date,
+  // plus the checkbox selection (set of meal ids the user picked).
+  openMealsByDate: OpenDateGroup[] = [];
+  selectedOpenMealIds: Set<number> = new Set();
+
   // Form state
   isSubmitting: boolean = false;
   submitError: string = '';
@@ -51,17 +67,67 @@ export class AddPatientComponent implements OnInit {
     private mealsService: MealsService,
     private patientService: PatientService,
     private mealAssignmentService: MealAssignmentService,
+    private dateService: DateService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    const totalDays = 14; 
-    this.availableDays = Array.from({ length: totalDays }, (_, i) => ({
-      value: (i + 1).toString(),
-      label: `第${i + 1}天`
-    }));
-    // Load all meals on component initialization
-    this.loadMeals();
+    this.currentMenuMode = this.dateService.getCurrentMenuMode();
+
+    if (this.currentMenuMode === 'open') {
+      this.loadOpenMeals();
+    } else {
+      const totalDays = 14;
+      this.availableDays = Array.from({ length: totalDays }, (_, i) => ({
+        value: (i + 1).toString(),
+        label: `第${i + 1}天`
+      }));
+      this.loadMeals();
+    }
+  }
+
+  private loadOpenMeals(): void {
+    this.mealsService.getMealsFiltered({ menu_mode: 'open' }).subscribe({
+      next: (meals) => {
+        const byDate: Map<string, Meal[]> = new Map();
+        for (const m of meals) {
+          if (!m.serve_date) continue;
+          if (!byDate.has(m.serve_date)) byDate.set(m.serve_date, []);
+          byDate.get(m.serve_date)!.push(m);
+        }
+        this.openMealsByDate = [...byDate.entries()]
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map(([serveDate, group]) => ({
+            serveDate,
+            label: `${serveDate} (${this.dateService.getWeekdayLabel(serveDate)})`,
+            lunch: group.filter(m => m.meal_time === '午餐'),
+            dinner: group.filter(m => m.meal_time === '晚餐'),
+          }));
+      },
+      error: (err) => console.error('[AddPatient] load open meals failed', err),
+    });
+  }
+
+  toggleOpenMealSelection(mealId: number): void {
+    if (this.selectedOpenMealIds.has(mealId)) {
+      this.selectedOpenMealIds.delete(mealId);
+    } else {
+      this.selectedOpenMealIds.add(mealId);
+    }
+  }
+
+  isOpenMealSelected(mealId: number): boolean {
+    return this.selectedOpenMealIds.has(mealId);
+  }
+
+  selectAllOpenMeals(): void {
+    this.openMealsByDate.forEach(group => {
+      [...group.lunch, ...group.dinner].forEach(m => this.selectedOpenMealIds.add(m.id));
+    });
+  }
+
+  clearAllOpenMeals(): void {
+    this.selectedOpenMealIds.clear();
   }
 
   private loadMeals(): void {
@@ -199,15 +265,18 @@ export class AddPatientComponent implements OnInit {
   }
 
   /**
-   * Create meal assignments for the newly created patient
+   * Create meal assignments for the newly created patient.
+   * Branches on current menu mode: cyclic uses day_cycle + meal_type,
+   * open uses just ltc_patient + meal (matches Task B backfill pattern).
    */
   private createMealAssignments(patientId: number): void {
-    console.log('Creating meal assignments for patient ID:', patientId);
-    console.log('Current meal assignments: ', this.mealAssignments);
+    console.log('Creating meal assignments for patient ID:', patientId, 'mode:', this.currentMenuMode);
 
-    // Process meal assignments into the format expected by the service
-    const mealAssignmentsToCreate = this.processMealAssignments(patientId);
-    
+    const mealAssignmentsToCreate =
+      this.currentMenuMode === 'open'
+        ? this.processOpenModeAssignments(patientId)
+        : this.processMealAssignments(patientId);
+
     if (mealAssignmentsToCreate.length === 0) {
       console.log('No meal assignments to create');
       this.onMealAssignmentsComplete(patientId, []);
@@ -216,8 +285,7 @@ export class AddPatientComponent implements OnInit {
 
     console.log('Processed meal assignments:', mealAssignmentsToCreate);
 
-    // Create all meal assignments using forkJoin for parallel execution
-    const assignmentObservables = mealAssignmentsToCreate.map(assignment => 
+    const assignmentObservables = mealAssignmentsToCreate.map(assignment =>
       this.mealAssignmentService.createMealAssignment(assignment)
     );
 
@@ -228,12 +296,21 @@ export class AddPatientComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error creating meal assignments:', error);
-        
-        // Patient was created but meal assignments failed
         alert(`病患建立成功，但建立餐點分配時發生錯誤：${error.message || '未知錯誤'}`);
         this.onMealAssignmentsComplete(patientId, [], error);
       }
     });
+  }
+
+  /**
+   * Build open-mode assignment payloads from selectedOpenMealIds.
+   * Matches Task B backfill payload shape: just {ltc_patient, meal}.
+   */
+  private processOpenModeAssignments(patientId: number): any[] {
+    return Array.from(this.selectedOpenMealIds).map(mealId => ({
+      ltc_patient: patientId,
+      meal: mealId,
+    }));
   }
 
   /**
@@ -344,9 +421,13 @@ export class AddPatientComponent implements OnInit {
     this.activityLevel = '';
     this.dietaryRestrictions = '';
 
-    // Reset meal assignments
-    this.mealAssignments = [];
-    this.addMealAssignment();
+    // Reset meal assignments (mode-aware)
+    if (this.currentMenuMode === 'open') {
+      this.selectedOpenMealIds.clear();
+    } else {
+      this.mealAssignments = [];
+      this.addMealAssignment();
+    }
 
     // Reset form state
     this.isSubmitting = false;
@@ -373,11 +454,14 @@ export class AddPatientComponent implements OnInit {
   }
 
   /**
-   * Check if form has any meal assignments
+   * Check if form has any meal assignments (mode-aware).
    */
   hasMealAssignments(): boolean {
-    return this.mealAssignments.some(assignment => 
-      assignment.dayId && 
+    if (this.currentMenuMode === 'open') {
+      return this.selectedOpenMealIds.size > 0;
+    }
+    return this.mealAssignments.some(assignment =>
+      assignment.dayId &&
       (assignment.selectedLunchMeals.length > 0 || assignment.selectedDinnerMeals.length > 0)
     );
   }
