@@ -71,9 +71,30 @@
             <td class="col-date">{{ formatDateLabel(meal) }}</td>
             <td class="col-time">{{ meal.meal_time }}</td>
             <td class="col-name">
-              {{ meal.meal_name }}
-              @if (siblingCount(meal) > 0) {
-                <span class="sibling-badge" title="此時段還有其他菜色，點編輯可查看全部">+{{ siblingCount(meal) }} 道</span>
+              <div class="name-row">
+                <span class="meal-name-text">{{ meal.meal_name }}</span>
+                @if (siblingCount(meal) > 0) {
+                  <button
+                    type="button"
+                    class="sibling-badge"
+                    [class.expanded]="isSlotExpanded(meal)"
+                    (click)="toggleSlotExpand(meal, $event)"
+                    [title]="isSlotExpanded(meal) ? '收合' : '點擊查看此時段所有菜色'"
+                  >
+                    {{ isSlotExpanded(meal) ? '▲ 收合' : '+' + siblingCount(meal) + ' 道 ▼' }}
+                  </button>
+                }
+              </div>
+              @if (isSlotExpanded(meal)) {
+                <ul class="sibling-list">
+                  @for (s of getSlotDishes(meal); track s.id) {
+                    <li [class.representative]="s.id === meal.id">
+                      <span class="dot">•</span>
+                      <span class="sibling-name">{{ s.meal_name }}</span>
+                      @if (s.id === meal.id) { <span class="rep-tag">首選</span> }
+                    </li>
+                  }
+                </ul>
               }
             </td>
             <td class="col-plate">{{ (meal.plate_type | plateTypeLabel) || '-' }}</td>

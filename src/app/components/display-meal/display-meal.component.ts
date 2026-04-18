@@ -303,6 +303,31 @@ export class DisplayMealComponent implements OnInit, OnChanges {
     return Math.max(0, count - 1);
   }
 
+  /** Slots currently showing their sibling-dish preview (click-to-expand). */
+  expandedSlots = new Set<string>();
+
+  toggleSlotExpand(meal: Meal, event: Event): void {
+    event.stopPropagation();
+    const key = this.shiftKey(meal);
+    if (this.expandedSlots.has(key)) {
+      this.expandedSlots.delete(key);
+    } else {
+      this.expandedSlots.add(key);
+    }
+  }
+
+  isSlotExpanded(meal: Meal): boolean {
+    return this.expandedSlots.has(this.shiftKey(meal));
+  }
+
+  /** All dishes sharing this meal's slot, representative first, then by id. */
+  getSlotDishes(meal: Meal): Meal[] {
+    const key = this.shiftKey(meal);
+    return this.filteredMeals
+      .filter(m => this.shiftKey(m) === key)
+      .sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+  }
+
   getMealCode(meal: Meal): string {
     if (!meal) return '';
 
