@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MealsService } from '../../services/meals.service';
+import { DateService } from '../../services/date.service';
 import { Meal } from '../../models/meal.model';
 import { forkJoin } from 'rxjs';
 
@@ -28,7 +29,9 @@ export class EditMealComponent implements OnInit, OnChanges {
   successMessage = '';
 
   // Meal group info
-  dayCycle = 1;
+  dayCycle = 1;                                   // meaningful only in cyclic mode
+  serveDate: string | null = null;                // meaningful only in open mode
+  currentMenuMode: 'cyclic' | 'open' = 'cyclic';  // derived from the meal being edited
   mealTime = '午餐';
 
   // All dishes in this meal group (editable)
@@ -45,6 +48,7 @@ export class EditMealComponent implements OnInit, OnChanges {
 
   constructor(
     private mealsService: MealsService,
+    private dateService: DateService,
     private route: ActivatedRoute,
     private router: Router,
   ) {}
@@ -76,7 +80,9 @@ export class EditMealComponent implements OnInit, OnChanges {
 
     this.mealsService.getMeal(this.mealId).subscribe({
       next: (meal) => {
-        this.dayCycle = meal.day_cycle;
+        this.currentMenuMode = meal.menu_mode ?? 'cyclic';
+        this.dayCycle = meal.day_cycle ?? 1;
+        this.serveDate = meal.serve_date ?? null;
         this.mealTime = meal.meal_time;
         this.loadGroupAndNames();
       },
@@ -88,8 +94,19 @@ export class EditMealComponent implements OnInit, OnChanges {
   }
 
   private loadGroupAndNames(): void {
+    // Mode-aware group query: cyclic uses (day_cycle, meal_time); open uses (serve_date, meal_time).
+    const groupParams: { [key: string]: string | number | undefined } = {
+      menu_mode: this.currentMenuMode,
+      meal_time: this.mealTime,
+    };
+    if (this.currentMenuMode === 'open' && this.serveDate) {
+      groupParams['serve_date'] = this.serveDate;
+    } else {
+      groupParams['day_cycle'] = this.dayCycle;
+    }
+
     forkJoin({
-      group: this.mealsService.getMealsByDayCycleAndTime(this.dayCycle, this.mealTime),
+      group: this.mealsService.getMealsFiltered(groupParams),
       all: this.mealsService.getMeals(),
     }).subscribe({
       next: ({ group, all }) => {
@@ -208,13 +225,21 @@ export class EditMealComponent implements OnInit, OnChanges {
 
     const creates$ = this.dishes
       .filter(d => d.isNew)
-      .map(d => this.mealsService.addMeal({
-        meal_name: d.meal_name.trim(),
-        meal_time: this.mealTime,
-        day_cycle: this.dayCycle,
-        plate_type: d.plate_type,
-        ingredients: [],
-      } as any));
+      .map(d => {
+        const payload: any = {
+          meal_name: d.meal_name.trim(),
+          meal_time: this.mealTime,
+          plate_type: d.plate_type,
+          ingredients: [],
+          menu_mode: this.currentMenuMode,
+        };
+        if (this.currentMenuMode === 'open' && this.serveDate) {
+          payload.serve_date = this.serveDate;
+        } else {
+          payload.day_cycle = this.dayCycle;
+        }
+        return this.mealsService.addMeal(payload);
+      });
 
     const deletes$ = this.removedIds.map(id => this.mealsService.deleteMeal(id));
 
@@ -254,12 +279,19 @@ export class EditMealComponent implements OnInit, OnChanges {
   }
 
   getDayLabel(): string {
+    if (this.currentMenuMode === 'open' && this.serveDate) {
+      return `${this.serveDate} (${this.dateService.getWeekdayLabel(this.serveDate)})`;
+    }
     return `第 ${this.dayCycle} 天`;
   }
 
   getMealCode(dish: EditableDish): string {
     if (!dish.id) return 'NEW';
     const letter = this.mealTime === '午餐' ? 'L' : 'D';
+    if (this.currentMenuMode === 'open' && this.serveDate) {
+      const compactDate = this.serveDate.replace(/-/g, '');
+      return `${letter}-${compactDate}-${dish.id}`;
+    }
     return `${letter}-${this.dayCycle}-${dish.id}`;
   }
 }
