@@ -101,7 +101,7 @@
             <td class="col-actions">
               <button class="btn-edit" (click)="editMeal(meal)" title="編輯">✎</button>
               <button class="btn-assign" (click)="openAssignDialog(meal)" title="配餐給住民">📋</button>
-              <button class="btn-delete" (click)="deleteMeal(meal)" title="刪除">✕</button>
+              <button class="btn-delete" (click)="deleteMeal(meal)" [title]="siblingCount(meal) > 0 ? '刪除整個時段（' + (siblingCount(meal) + 1) + ' 道）' : '刪除'">✕</button>
             </td>
           </tr>
         }

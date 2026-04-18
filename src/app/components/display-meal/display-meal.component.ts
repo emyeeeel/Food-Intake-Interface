@@ -10,6 +10,8 @@ import { Meal } from '../../models/meal.model';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { SettingsService } from '../../services/settings.service';
 import { AssignMealDialogComponent } from '../assign-meal-dialog/assign-meal-dialog.component';
 import { BulkAssignResponse } from '../../services/meal-assignment.service';
@@ -414,13 +416,58 @@ export class DisplayMealComponent implements OnInit, OnChanges {
     alert(`配餐完成：新建 ${res.created} 筆、略過 ${res.skipped} 筆重複。`);
   }
 
+  /**
+   * Slot-level delete: clicking × on a collapsed row deletes EVERY dish in
+   * that (date × meal_time) slot, not just the representative. Matches the
+   * mental model of the row visually representing the whole shift.
+   *
+   * Each sibling goes through Phase 3's FoodIntake safety gate on the
+   * backend (returns 409 if any has intakes). Partial failures are
+   * reported — successes are kept.
+   */
   deleteMeal(meal: Meal): void {
-    if (confirm(`確定要刪除「${meal.meal_name}」(${this.getMealCode(meal)})？`)) {
-      this.mealsService.deleteMeal(meal.id).subscribe({
-        next: () => this.getMeals(),
-        error: (err) => alert('刪除失敗: ' + (err?.error?.detail || '未知錯誤')),
-      });
-    }
+    const siblings = this.getSlotDishes(meal);
+    const slotLabel = this.getSlotLabel(meal);
+    const n = siblings.length;
+
+    const namesPreview = siblings.map(s => s.meal_name).join('、');
+    const msg = n === 1
+      ? `確定刪除「${slotLabel}」的「${namesPreview}」？此動作無法復原。`
+      : `確定刪除「${slotLabel}」全部 ${n} 道菜？\n\n含：${namesPreview}\n\n此動作無法復原（有攝取紀錄的菜會被後端擋住、改用「停用」）。`;
+
+    if (!confirm(msg)) return;
+
+    const requests = siblings.map(s =>
+      this.mealsService.deleteMeal(s.id).pipe(
+        map(() => ({ ok: true as const, meal: s })),
+        catchError((e: any) => of({ ok: false as const, meal: s, err: e })),
+      ),
+    );
+
+    forkJoin(requests).subscribe(results => {
+      const success = results.filter(r => r.ok);
+      const blocked = results.filter(r => !r.ok);
+
+      if (blocked.length > 0) {
+        const blockedSummary = blocked
+          .map((b: any) => `${b.meal.meal_name}（${b.err?.error?.detail || b.err?.message || '未知錯誤'}）`)
+          .join('\n');
+        alert(
+          `已刪除 ${success.length} 道。\n` +
+          `${blocked.length} 道被擋下：\n${blockedSummary}`
+        );
+      }
+      this.getMeals();
+    });
+  }
+
+  /** "2026-05-01 晚餐" (open) or "第 3 天 午餐" (cyclic). */
+  private getSlotLabel(meal: Meal): string {
+    const mode = meal.menu_mode ?? 'cyclic';
+    const when = mode === 'open'
+      ? (meal.serve_date || '?')
+      : `第 ${meal.day_cycle ?? '?'} 天`;
+    return `${when} ${meal.meal_time || ''}`.trim();
   }
 
   // Utility methods
