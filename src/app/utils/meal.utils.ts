@@ -36,17 +36,20 @@ export function getMealCode(meal: Meal | null | undefined): string {
 
 // Slot bucket key — callers compose meal_time / patient id themselves.
 // cyclic "cyclic:d3" / open "open:2026-04-19".
-export function getSlotKey(
-  meal: Pick<Meal, 'menu_mode' | 'day_cycle' | 'serve_date'>,
-): string {
+export function getSlotKey(meal: {
+  menu_mode?: MenuMode;
+  day_cycle?: number | null;
+  serve_date?: string | null;
+}): string {
   if (getMealMode(meal) === 'open') return `open:${meal.serve_date ?? ''}`;
   return `cyclic:d${meal.day_cycle ?? ''}`;
 }
 
 // "第 3 天" for cyclic, "-" for open.
-export function formatDayLabel(
-  meal: Pick<Meal, 'menu_mode' | 'day_cycle'>,
-): string {
+export function formatDayLabel(meal: {
+  menu_mode?: MenuMode;
+  day_cycle?: number | null;
+}): string {
   if (getMealMode(meal) === 'open') return '-';
   return `第 ${meal.day_cycle ?? '?'} 天`;
 }

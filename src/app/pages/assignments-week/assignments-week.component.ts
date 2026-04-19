@@ -11,10 +11,11 @@ import { SettingsService } from '../../services/settings.service';
 import { LTCPatient } from '../../models/ltc-patient.model';
 import { Meal } from '../../models/meal.model';
 import { MealAssignment } from '../../models/meal-assignment.mode';
+import { toISODate, getSlotKey } from '../../utils/meal.utils';
 
 interface WeekDay {
   label: string;
-  key: string;       // 'd1'..'d7' for cyclic, ISO YYYY-MM-DD for open
+  key: string;       // Matches getSlotKey format: 'cyclic:d1' or 'open:2026-04-19'
   date: Date;
   isToday: boolean;
 }
@@ -87,10 +88,7 @@ export class AssignmentsWeekComponent implements OnInit {
   }
 
   private toISO(d: Date): string {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${dd}`;
+    return toISODate(d);
   }
 
   loadAll(): void {
@@ -146,7 +144,7 @@ export class AssignmentsWeekComponent implements OnInit {
       if (!meal) continue;
       const patientId = a.ltc_patient;
       if (patientId == null) continue;
-      const slotKey = this.slotKeyForMeal(meal);
+      const slotKey = getSlotKey(meal);
       if (!slotKey) continue;
       const fullKey = `${patientId}::${slotKey}::${meal.meal_time}`;
       if (!m.has(fullKey)) m.set(fullKey, []);
@@ -157,12 +155,6 @@ export class AssignmentsWeekComponent implements OnInit {
       list.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
     }
     return m;
-  }
-
-  private slotKeyForMeal(meal: any): string {
-    const mode = meal.menu_mode || 'cyclic';
-    if (mode === 'open') return meal.serve_date || '';
-    return `d${meal.day_cycle ?? ''}`;
   }
 
   // === Visible week days ===
@@ -178,7 +170,7 @@ export class AssignmentsWeekComponent implements OnInit {
         const iso = this.toISO(date);
         return {
           label: `第 ${dc} 天 · ${date.getMonth() + 1}/${date.getDate()} (週${this.WEEKDAY_LABELS[date.getDay()]})`,
-          key: `d${dc}`,
+          key: getSlotKey({ menu_mode: 'cyclic', day_cycle: dc, serve_date: null }),
           date,
           isToday: iso === todayISO,
         };
@@ -192,7 +184,7 @@ export class AssignmentsWeekComponent implements OnInit {
       const iso = this.toISO(d);
       return {
         label: `${d.getMonth() + 1}/${d.getDate()} (週${this.WEEKDAY_LABELS[d.getDay()]})`,
-        key: iso,
+        key: getSlotKey({ menu_mode: 'open', day_cycle: null, serve_date: iso }),
         date: d,
         isToday: iso === todayISO,
       };
