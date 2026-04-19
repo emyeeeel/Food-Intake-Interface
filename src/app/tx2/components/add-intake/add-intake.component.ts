@@ -171,6 +171,11 @@ export class AddIntakeComponent implements OnInit, OnChanges {
 
     console.log('[AddIntake] Filtered assignments for today & meal period:', filtered);
 
+    // Pick the lowest meal.id as "首選" — matches display-meal's slot representative
+    // logic, so the Nano auto-selects the same dish the care-center staff sees as
+    // the primary one in the catalog.
+    filtered.sort((a, b) => (a.meal_detail?.id ?? 0) - (b.meal_detail?.id ?? 0));
+
     if (filtered.length === 0) {
       this.hasCurrentMealAssignment = false;
       this.autoSelectionReady = true;
