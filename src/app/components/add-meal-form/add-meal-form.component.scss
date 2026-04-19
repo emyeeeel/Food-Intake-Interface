@@ -205,6 +205,42 @@ $ink: #00313C;
       min-width: 0;
     }
 
+    .form-input {
+      &.status-existing {
+        background: #f2fff6;
+        border-color: #52c87a;
+        border-bottom: 2px solid #52c87a;
+      }
+      &.status-new {
+        background: #fffde7;
+        border-color: #e6b800;
+        border-bottom: 2px solid #e6b800;
+      }
+    }
+
+    .name-status-icon {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      align-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 0.9rem;
+      line-height: 1;
+
+      &.is-existing {
+        color: #1d7a3a;
+        background: #d4f4e0;
+      }
+      &.is-new {
+        color: #7a5c00;
+        background: #fff3cd;
+      }
+    }
+
     .btn-name-add,
     .btn-name-remove {
       flex-shrink: 0;

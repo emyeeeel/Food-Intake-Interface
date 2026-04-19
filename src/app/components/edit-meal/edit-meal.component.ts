@@ -7,6 +7,10 @@ import { DateService } from '../../services/date.service';
 import { PlateTypeLabelPipe } from '../../pipes/plate-type-label.pipe';
 import { Meal } from '../../models/meal.model';
 import { forkJoin } from 'rxjs';
+import {
+  findSlotDuplicates,
+  buildSlotDuplicateErrorMessage,
+} from '../../policies/meal-creation.policy';
 
 interface EditableDish {
   id: number | null;
@@ -45,6 +49,7 @@ export class EditMealComponent implements OnInit, OnChanges {
   // Searchable dropdown
   allMealNames: string[] = [];
   mealsByName: Map<string, Meal> = new Map(); // for inheriting plate_type
+  allMeals: Meal[] = [];                       // for Rule B slot-duplicate check
   activeDropdownIndex: number | null = null;
   searchFiltered: string[] = [];
 
@@ -125,6 +130,8 @@ export class EditMealComponent implements OnInit, OnChanges {
           plate_type: m.plate_type || '金属板',
           isNew: false,
         }));
+
+        this.allMeals = all;
 
         // Unique meal names for dropdown, sorted; keep first match for plate_type lookup
         this.mealsByName = new Map();
@@ -261,6 +268,36 @@ export class EditMealComponent implements OnInit, OnChanges {
       return;
     }
 
+    // Intra-form duplicate check: two rows in the same form with the same name.
+    // Rule B (below) excludes current dish IDs so it can't catch this case.
+    const nameSet = new Set<string>();
+    for (const d of this.dishes) {
+      const n = d.meal_name.trim();
+      if (nameSet.has(n)) {
+        this.error = `「${n}」在此餐期中出現兩次，請修正後再儲存。`;
+        return;
+      }
+      nameSet.add(n);
+    }
+
+    // Rule B: slot-duplicate check for new dishes and renamed existing dishes.
+    // excludeIds = ids of dishes already in this slot (self-edit is allowed).
+    const existingIds = this.dishes.filter(d => d.id != null).map(d => d.id as number);
+    const allNames = this.dishes.map(d => d.meal_name.trim()).filter(n => n.length > 0);
+    const slotDupes = findSlotDuplicates(
+      allNames,
+      this.allMeals,
+      this.currentMenuMode,
+      this.mealTime,
+      this.dayCycle,
+      this.serveDate,
+      existingIds,
+    );
+    if (slotDupes.length > 0) {
+      this.error = buildSlotDuplicateErrorMessage(slotDupes);
+      return;
+    }
+
     this.isSaving = true;
     this.error = '';
     this.successMessage = '';
@@ -309,7 +346,8 @@ export class EditMealComponent implements OnInit, OnChanges {
         this.loadData();
       },
       error: (err) => {
-        this.error = '儲存失敗: ' + (err?.error?.detail || '部分操作未完成');
+        const detail = err?.error?.meal_name?.[0] || err?.error?.detail || '部分操作未完成';
+        this.error = `儲存失敗：${detail}`;
         this.isSaving = false;
       },
     });

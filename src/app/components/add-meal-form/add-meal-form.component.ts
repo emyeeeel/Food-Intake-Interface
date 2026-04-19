@@ -13,9 +13,12 @@ import {
 } from '../../models/meal-constants';
 import { MealsService } from '../../services/meals.service';
 import { DateService } from '../../services/date.service';
-import { SettingsService } from '../../services/settings.service';
 import { BulkAssignResponse } from '../../services/meal-assignment.service';
 import { AssignMealDialogComponent } from '../assign-meal-dialog/assign-meal-dialog.component';
+import {
+  findSlotDuplicates,
+  buildSlotDuplicateErrorMessage,
+} from '../../policies/meal-creation.policy';
 
 /**
  * Single-/batch-add dish form. The + button inserts a new empty slot below;
@@ -51,6 +54,7 @@ export class AddMealFormComponent implements OnInit {
   mealNames: string[] = [''];
   isSubmitting = false;
 
+  allMeals: Meal[] = [];
   knownMealNames: Set<string> = new Set();
   nameConfirmed = false;
   showNewNameDialog = false;
@@ -65,7 +69,6 @@ export class AddMealFormComponent implements OnInit {
   constructor(
     private mealsService: MealsService,
     private dateService: DateService,
-    private settingsService: SettingsService,
     private router: Router,
   ) {}
 
@@ -123,14 +126,21 @@ export class AddMealFormComponent implements OnInit {
     }
   }
 
-  // === New-name confirmation dialog (fires on blur of legacy single-name field) ===
+  /** 回傳輸入框的狀態：existing = 資料庫有此菜名，new = 新菜名，'' = 空白 */
+  getMealNameStatus(name: string): 'existing' | 'new' | '' {
+    const trimmed = (name || '').trim();
+    if (!trimmed) return '';
+    return this.knownMealNames.has(trimmed) ? 'existing' : 'new';
+  }
+
+  // === New-name confirmation dialog ===
 
   onMealNameInput(): void {
     this.nameConfirmed = false;
   }
 
-  onMealNameBlur(): void {
-    const name = (this.meal.meal_name || '').trim();
+  onMealNameBlurAt(index: number): void {
+    const name = (this.mealNames[index] || '').trim();
     if (!name) return;
     if (this.knownMealNames.has(name)) return;
     if (this.nameConfirmed) return;
@@ -152,19 +162,21 @@ export class AddMealFormComponent implements OnInit {
     this.pendingNewNameText = '';
   }
 
-  /** Pre-fetch existing meal names so blur-dialog avoids per-blur round-trip. */
+  /** Pre-fetch existing meals for blur-dialog and duplicate detection. */
   private loadKnownMealNames(): void {
     this.mealsService.getMeals().subscribe({
       next: (meals) => {
+        this.allMeals = meals;
         this.knownMealNames = new Set(
           meals
             .map(m => (m.meal_name || '').trim())
             .filter((n): n is string => n.length > 0)
         );
       },
-      error: () => { this.knownMealNames = new Set(); },
+      error: () => { this.allMeals = []; this.knownMealNames = new Set(); },
     });
   }
+
 
   private loadServeDateOptionsIfNeeded(): void {
     if (this.menuMode !== 'open') return;
@@ -223,6 +235,24 @@ export class AddMealFormComponent implements OnInit {
     if (err) { alert(err); return; }
 
     const names = this.mealNames.map(n => (n || '').trim()).filter(n => n.length > 0);
+
+    // Intra-list duplicate check: user entered the same name twice in the form
+    const listDupes = [...new Set(names.filter((n, i) => names.indexOf(n) !== i))];
+    if (listDupes.length > 0) {
+      alert(`菜名清單中有重複名稱：${listDupes.join('、')}，請修正後再送出。`);
+      return;
+    }
+
+    const dupes = findSlotDuplicates(
+      names,
+      this.allMeals,
+      this.menuMode,
+      this.meal.meal_time!,
+      this.meal.day_cycle,
+      this.meal.serve_date,
+    );
+    if (dupes.length > 0) { alert(buildSlotDuplicateErrorMessage(dupes)); return; }
+
     const base = this.buildBasePayload();
 
     this.isSubmitting = true;
@@ -239,8 +269,11 @@ export class AddMealFormComponent implements OnInit {
       const failed = results.filter(r => !r.ok);
 
       if (failed.length > 0) {
-        const failedNames = failed.map(f => f.name).join('、');
-        alert(`成功 ${success.length} 道、失敗 ${failed.length} 道：${failedNames}`);
+        const failedLines = (failed as any[]).map(f => {
+          const reason = f.err?.error?.meal_name?.[0] || f.err?.error?.detail || '新增失敗';
+          return `${f.name}（${reason}）`;
+        }).join('\n');
+        alert(`成功 ${success.length} 道、失敗 ${failed.length} 道：\n${failedLines}`);
       }
 
       if (success.length > 0) {

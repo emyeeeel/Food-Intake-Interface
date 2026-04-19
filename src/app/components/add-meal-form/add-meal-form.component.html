@@ -18,11 +18,23 @@
           <input
             type="text"
             class="form-input meal-name-input"
+            [class.status-existing]="getMealNameStatus(mealNames[i]) === 'existing'"
+            [class.status-new]="getMealNameStatus(mealNames[i]) === 'new'"
             [name]="'mealName' + i"
             [(ngModel)]="mealNames[i]"
             (keydown.enter)="onMealNameEnter(i, $event)"
+            (input)="onMealNameInput()"
+            (blur)="onMealNameBlurAt(i)"
             placeholder="例：紅燒豆腐"
           />
+          @if (getMealNameStatus(mealNames[i]) !== '') {
+            <span
+              class="name-status-icon"
+              [class.is-existing]="getMealNameStatus(mealNames[i]) === 'existing'"
+              [class.is-new]="getMealNameStatus(mealNames[i]) === 'new'"
+              [title]="getMealNameStatus(mealNames[i]) === 'existing' ? '資料庫已有此菜名' : '新菜色'"
+            >{{ getMealNameStatus(mealNames[i]) === 'existing' ? '✓' : '!' }}</span>
+          }
           <button
             type="button"
             class="btn-name-add"

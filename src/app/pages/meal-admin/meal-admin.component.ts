@@ -17,6 +17,10 @@ import {
   formatDayLabel,
   formatOpenDateLabel,
 } from '../../utils/meal.utils';
+import {
+  findDuplicateMealNames,
+  buildDuplicateErrorMessage,
+} from '../../policies/meal-creation.policy';
 
 /**
  * MVP scope (Phase 1, 2026-04-18):
@@ -482,6 +486,12 @@ export class MealAdminComponent implements OnInit {
     } else {
       payload.serve_date = this.addForm.serve_date;
       payload.day_cycle = null;
+    }
+
+    const dupes = findDuplicateMealNames([name], this.allMeals);
+    if (dupes.length > 0) {
+      this.addError = buildDuplicateErrorMessage(dupes);
+      return;
     }
 
     this.addSaving = true;
