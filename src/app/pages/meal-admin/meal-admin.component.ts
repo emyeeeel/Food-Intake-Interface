@@ -12,6 +12,11 @@ import { DateService } from '../../services/date.service';
 import { SettingsService } from '../../services/settings.service';
 import { Meal, MenuMode } from '../../models/meal.model';
 import { PlateTypeLabelPipe } from '../../pipes/plate-type-label.pipe';
+import {
+  getMealCode as sharedGetMealCode,
+  formatDayLabel,
+  formatOpenDateLabel,
+} from '../../utils/meal.utils';
 
 /**
  * MVP scope (Phase 1, 2026-04-18):
@@ -259,22 +264,14 @@ export class MealAdminComponent implements OnInit {
 
   /** "L-1-231" for cyclic, "L-20260420-286" for open. Matches show-meal/edit-meal. */
   getMealCode(meal: Meal): string {
-    const timeMap: Record<string, string> = { '午餐': 'L', '晚餐': 'D', '點心': 'S' };
-    const letter = timeMap[meal.meal_time] || 'U';
-    const mode = meal.menu_mode ?? 'cyclic';
-    if (mode === 'open' && meal.serve_date) {
-      return `${letter}-${meal.serve_date.replace(/-/g, '')}-${meal.id}`;
-    }
-    return `${letter}-${meal.day_cycle ?? '?'}-${meal.id}`;
+    return sharedGetMealCode(meal);
   }
 
   /** "第 3 天" for cyclic, "2026-04-20 (週一)" for open. */
   getDayOrDate(meal: Meal): string {
-    const mode = meal.menu_mode ?? 'cyclic';
-    if (mode === 'open' && meal.serve_date) {
-      return `${meal.serve_date} (${this.dateService.getWeekdayLabel(meal.serve_date)})`;
-    }
-    return `第 ${meal.day_cycle ?? '?'} 天`;
+    return (meal.menu_mode ?? 'cyclic') === 'open' && meal.serve_date
+      ? formatOpenDateLabel(meal, this.dateService.getWeekdayLabel(meal.serve_date))
+      : formatDayLabel(meal);
   }
 
   getUsage(meal: Meal): UsageCount {
