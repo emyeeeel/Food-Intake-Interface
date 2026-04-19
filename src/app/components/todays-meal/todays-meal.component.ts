@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { MealsService } from '../../services/meals.service';
 import { DateService } from '../../services/date.service';
 import { Meal } from '../../models/meal.model';
+import { compactDate, getMealMode } from '../../utils/meal.utils';
 
 @Component({
   selector: 'app-todays-meal',
@@ -124,15 +125,13 @@ export class TodaysMealComponent implements OnInit, OnDestroy {
     };
     const timeCode = timeToLetterMap[normalizedTime] || 'U';
 
-    // Mode-aware middle segment: open uses compact serve_date,
-    // cyclic uses current day_cycle. Matches show-meal formatting.
-    const mode = meal.menu_mode ?? 'cyclic';
-    if (mode === 'open' && meal.serve_date) {
-      const compactDate = meal.serve_date.replace(/-/g, '');
-      return `${timeCode}-${compactDate}-${meal.id}`;
+    // Open branch matches meal.utils (compact serve_date). Cyclic branch stays
+    // local: uses today's cycle position rather than meal.day_cycle so the
+    // code always reflects "today" even if the meal record is stale.
+    if (getMealMode(meal) === 'open' && meal.serve_date) {
+      return `${timeCode}-${compactDate(meal.serve_date)}-${meal.id}`;
     }
-    const currentDay = this.getCurrentDayInCycle();
-    return `${timeCode}-${currentDay}-${meal.id}`;
+    return `${timeCode}-${this.getCurrentDayInCycle()}-${meal.id}`;
   }
 
   expanded = false;
