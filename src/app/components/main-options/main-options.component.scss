@@ -1,3 +1,8 @@
+:host {
+  display: block;
+  border-radius: 16px;
+}
+
 .main-option {
   display: flex;
   flex-direction: row;
@@ -7,12 +12,12 @@
   border-radius: 16px;
   font-family: 'Quicksand', sans-serif;
   font-weight: 500;
-  font-size: 18px; /* mobile default */
+  font-size: 16px; /* mobile default */
   color: inherit;
   background-color: inherit;
   flex: 1 1 auto;  /* allow shrink/grow */
   min-width: 0;     /* prevents overflow */
-  min-height: 100px;     /* default mobile height */
+  min-height: 76px;
   height: 100%;
   padding: 0 10px;
   text-align: center;
@@ -39,9 +44,9 @@
      Tablet ≥481px
   ====================== */
   @media (min-width: 481px) {
-    font-size: 20px;
+    font-size: 18px;
     gap: 15px;
-    height: 90px;
+    height: 72px;
     padding: 0 15px;
 
     .option-icon {
@@ -54,9 +59,9 @@
      Desktop ≥1024px
   ====================== */
   @media (min-width: 1024px) {
-    font-size: 22px;
+    font-size: 20px;
     gap: 10px;
-    height: 100px;
+    height: 80px;
     min-width: 200px;
     max-width: 282px;
     padding: 0 25px;
@@ -75,9 +80,9 @@
      Large Desktop ≥1280px
   ====================== */
   @media (min-width: 1280px) {
-    font-size: 24px;
+    font-size: 22px;
     gap: 20px;
-    min-height: 110px;
+    min-height: 88px;
     min-width: 220px;
     max-width: 320px;
 

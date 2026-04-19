@@ -122,16 +122,19 @@ export class AssignmentsWeekComponent implements OnInit {
 
   private fetchAssignmentsForVisibleWeek(): Observable<MealAssignment[]> {
     if (this.menuMode === 'cyclic') {
-      // Cyclic meals don't have serve_date; just pull all cyclic assignments.
-      return this.mealAssignmentService.getMealAssignmentsWithRawFilters({ menu_mode: 'cyclic' });
+      // Cyclic slots have serve_date=null. Use serve_date_isnull so Rule C
+      // reused meals (which keep menu_mode='cyclic' but have serve_date set)
+      // don't bleed into the cyclic view.
+      return this.mealAssignmentService.getMealAssignmentsWithRawFilters({
+        menu_mode: 'cyclic',
+        serve_date_isnull: 'true',
+      });
     }
-    // open: bounded serve_date range, one request covers the visible week.
     const start = this.toISO(this.weekStartDate);
     const endDate = new Date(this.weekStartDate);
     endDate.setDate(endDate.getDate() + 6);
     const end = this.toISO(endDate);
     return this.mealAssignmentService.getMealAssignmentsWithRawFilters({
-      menu_mode: 'open',
       serve_date_from: start,
       serve_date_to: end,
     });
@@ -144,7 +147,13 @@ export class AssignmentsWeekComponent implements OnInit {
       if (!meal) continue;
       const patientId = a.ltc_patient;
       if (patientId == null) continue;
-      const slotKey = getSlotKey(meal);
+      // Build the slot key from the assignment's own serve_date when present.
+      // getSlotKey format: 'open:YYYY-MM-DD' or 'cyclic:dN'.
+      // Rule C may reuse Meal rows with menu_mode='cyclic', so the meal's
+      // mode field can't be trusted — use the assignment's serve_date instead.
+      const slotKey = a.serve_date
+        ? getSlotKey({ menu_mode: 'open', serve_date: a.serve_date, day_cycle: null })
+        : getSlotKey(meal);
       if (!slotKey) continue;
       const fullKey = `${patientId}::${slotKey}::${meal.meal_time}`;
       if (!m.has(fullKey)) m.set(fullKey, []);
