@@ -5,6 +5,7 @@ import { MealsService } from '../../services/meals.service';
 import { DateService } from '../../services/date.service';
 import { PlateTypeLabelPipe } from '../../pipes/plate-type-label.pipe';
 import { Meal } from '../../models/meal.model';
+import { getMealCode as sharedGetMealCode } from '../../utils/meal.utils';
 
 @Component({
   selector: 'app-show-meal',
@@ -84,14 +85,7 @@ export class ShowMealComponent implements OnInit {
   }
 
   getMealCode(meal: Meal): string {
-    const timeMap: Record<string, string> = { '午餐': 'L', '晚餐': 'D', '點心': 'S' };
-    const code = timeMap[meal.meal_time] || 'U';
-    const mode = meal.menu_mode ?? 'cyclic';
-    if (mode === 'open' && meal.serve_date) {
-      const compactDate = meal.serve_date.replace(/-/g, '');
-      return `${code}-${compactDate}-${meal.id}`;
-    }
-    return `${code}-${meal.day_cycle}-${meal.id}`;
+    return sharedGetMealCode(meal);
   }
 
   getMealTimeIcon(): string {
