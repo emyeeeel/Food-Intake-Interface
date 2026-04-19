@@ -115,3 +115,66 @@ export function buildSlotDuplicateErrorMessage(duplicates: string[]): string {
   }
   return `以下菜色在此餐期／日期已存在，無法重複新增：\n${duplicates.join('、')}`;
 }
+
+// ─────────────────────────────────────────────────────────────────
+// Rule C — 匯入前查名沿用（鐵條）
+// ─────────────────────────────────────────────────────────────────
+
+/**
+ * Rule C — 匯入前查名沿用（鐵條規定，不得例外）
+ *
+ * 業務規則（WHY）：
+ *   一道菜在系統中只能有一個 id。匯入時若菜名已存在，
+ *   必須沿用現有的 Meal row，不得新建。避免「炒時蔬」
+ *   在 DB 中累積成多筆各自獨立的 id，造成 DB 膨脹與查詢效率惡化。
+ *   使用者只看菜名，不在乎 id。
+ *
+ *   Rule A（手動新增）遇到重複就擋；
+ *   Rule C（匯入）遇到重複就沿用 — 兩者方向不同，請勿混用。
+ *
+ * Phase 13 相容性：
+ *   若未來 serve_date 從 Meal 移至 MealAssignment（schema 根治），
+ *   只需修改本函式內部邏輯，所有呼叫端不用動。
+ *
+ * 調用方（所有匯入路徑必須在此登記，違者視為違反鐵條）：
+ *   - （前端）add-meal-form.component.ts — 待補
+ *   - （後端）meals/views/excel_import.py — 待補
+ *   - （後端）任何程式自動建立 Meal 的路徑
+ */
+
+/**
+ * 以菜名查找現有 Meal，找到就回傳（沿用），找不到回傳 null（呼叫方再建新 row）。
+ *
+ * 刻意不比對 meal_time / serve_date / menu_mode：
+ * 同一道菜跨日期、跨模式都是同一個 id。
+ */
+export function findMealByName(name: string, allMeals: Meal[]): Meal | null {
+  const target = (name || '').trim().toLowerCase();
+  if (!target) return null;
+  return allMeals.find(m => (m.meal_name || '').trim().toLowerCase() === target) ?? null;
+}
+
+/**
+ * 將一批菜名分成「已存在（沿用）」和「新菜（需建立）」兩組，供匯入函式使用。
+ *
+ * 使用範例：
+ *   const { reuse, create } = partitionMealsByName(names, allMeals);
+ *   // reuse → 直接取 .id 寫入 MealAssignment
+ *   // create → 呼叫 MealsService.addMeal() 後再寫入 MealAssignment
+ */
+export function partitionMealsByName(
+  names: string[],
+  allMeals: Meal[],
+): { reuse: Meal[]; create: string[] } {
+  const reuse: Meal[] = [];
+  const create: string[] = [];
+  for (const name of names) {
+    const existing = findMealByName(name, allMeals);
+    if (existing) {
+      reuse.push(existing);
+    } else {
+      create.push(name);
+    }
+  }
+  return { reuse, create };
+}
