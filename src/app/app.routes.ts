@@ -18,6 +18,7 @@ import { PopUpComponent } from './components/pop-up/pop-up.component';
 import { EngineeringComponent } from './pages/engineering/engineering.component';
 import { ForbiddenComponent } from './pages/forbidden/forbidden.component';
 import { MealAdminComponent } from './pages/meal-admin/meal-admin.component';
+import { AssignmentsWeekComponent } from './pages/assignments-week/assignments-week.component';
 import { moduleGuard } from './guards/module.guard';
 import { engineeringAuthGuard } from './guards/engineering-auth.guard';
 
@@ -36,6 +37,7 @@ export const routes: Routes = [
     { path: 'meal-catalog/add', canActivate: [authGuard, moduleGuard], component: MealCatalogComponent },
     { path: 'meal-catalog/all', canActivate: [authGuard, moduleGuard], component: MealCatalogComponent },
     { path: 'meal-catalog/print', canActivate: [authGuard, moduleGuard], component: MealCatalogComponent },
+    { path: 'meal-catalog/assignments-week', canActivate: [authGuard, moduleGuard], component: AssignmentsWeekComponent },
     { path: 'meal-catalog/:id/edit', canActivate: [authGuard, moduleGuard], component: MealCatalogComponent },
     { path: 'meal-catalog/:id/view', canActivate: [authGuard, moduleGuard], component: MealCatalogComponent },
 

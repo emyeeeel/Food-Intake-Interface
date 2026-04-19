@@ -98,6 +98,10 @@ export class MealCatalogComponent implements OnInit {
     this.router.navigate(['/meal-catalog/print']);
   }
 
+  navigateToAssignmentsWeek(): void {
+    this.router.navigate(['/meal-catalog/assignments-week']);
+  }
+
   navigateToEditMeal(mealId: number): void {
     this.router.navigate(['/meal-catalog', mealId, 'edit']);
   }
