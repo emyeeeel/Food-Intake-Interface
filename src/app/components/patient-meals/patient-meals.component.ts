@@ -6,7 +6,7 @@ import { PatientService } from '../../services/patient.service';
 import { DateService } from '../../services/date.service';
 import { MealAssignment } from '../../models/meal-assignment.mode';
 import { LTCPatient } from '../../models/ltc-patient.model';
-import { Subscription } from 'rxjs';
+import { Subscription, skip } from 'rxjs';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -38,6 +38,12 @@ export class PatientMealsComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit() {
     this.currentMenuMode = this.dateService.getCurrentMenuMode();
+    this.subscriptions.add(
+      this.dateService.menuMode$.pipe(skip(1)).subscribe(mode => {
+        this.currentMenuMode = mode;
+        if (this.patientId) this.loadPatientMeals(this.patientId);
+      })
+    );
 
     if (!this.patientId) {
       const routePatientId = this.route.snapshot.paramMap.get('id');

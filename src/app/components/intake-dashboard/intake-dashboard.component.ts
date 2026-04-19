@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { forkJoin, Subscription, interval } from 'rxjs';
+import { forkJoin, Subscription, interval, skip } from 'rxjs';
 import { IntakeService } from '../../services/intake.service';
 import { PatientService } from '../../services/patient.service';
 import { DateService } from '../../services/date.service';
@@ -51,6 +51,7 @@ export class IntakeDashboardComponent implements OnInit, OnDestroy {
   showMissing = false;
   isLoading = true;
   private refreshSub?: Subscription;
+  private modeSub?: Subscription;
 
   constructor(
     private intakeService: IntakeService,
@@ -62,10 +63,12 @@ export class IntakeDashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadDashboard();
     this.refreshSub = interval(30000).subscribe(() => this.loadDashboard());
+    this.modeSub = this.dateService.menuMode$.pipe(skip(1)).subscribe(() => this.loadDashboard());
   }
 
   ngOnDestroy(): void {
     this.refreshSub?.unsubscribe();
+    this.modeSub?.unsubscribe();
   }
 
   // Filtered getters — react to searchQuery changes without re-fetching

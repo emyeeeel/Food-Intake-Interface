@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface MealCycle {
@@ -28,6 +28,8 @@ export interface LTCSettings {
 export class SettingsService {
 
   private _settings: LTCSettings | null = null;
+  private _menuMode$ = new BehaviorSubject<MenuMode>('cyclic');
+  readonly menuMode$ = this._menuMode$.asObservable();
 
   // Exposed publicly so components can call PUT without accessing private members
   readonly http: HttpClient;
@@ -58,6 +60,7 @@ export class SettingsService {
         },
       };
 
+      this._menuMode$.next(this._settings.menuMode);
       console.log(`Settings loaded for machine ID ${id}:`, this._settings);
 
     } catch (error) {
@@ -82,6 +85,7 @@ export class SettingsService {
     );
     if (this._settings) {
       this._settings.menuMode = mode;
+      this._menuMode$.next(mode);
     }
   }
 }

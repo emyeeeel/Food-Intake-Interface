@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, map } from 'rxjs';
-import { SettingsService } from './settings.service';
+import { SettingsService, MenuMode } from './settings.service';
 import { MealsService } from './meals.service';
 
 export interface MealCycleInfo {
@@ -18,6 +18,7 @@ export interface MealCycleInfo {
 export class DateService implements OnDestroy {
   private selectedDateSubject = new BehaviorSubject<Date>(new Date());
   public selectedDate$: Observable<Date> = this.selectedDateSubject.asObservable();
+  readonly menuMode$: Observable<MenuMode>;
 
   private selectedDateStringSubject = new BehaviorSubject<string>(this.formatDate(new Date()));
   public selectedDateString$: Observable<string> = this.selectedDateStringSubject.asObservable();
@@ -38,6 +39,7 @@ export class DateService implements OnDestroy {
     private settingsService: SettingsService,
     private mealsService: MealsService,
   ) {
+    this.menuMode$ = this.settingsService.menuMode$;
     // Load settings first
     if (!this.settingsService.settings) {
       this.settingsService.load().then(() => {
