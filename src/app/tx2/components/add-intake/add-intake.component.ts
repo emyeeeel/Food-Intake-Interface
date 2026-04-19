@@ -15,6 +15,7 @@ import { PatientService } from '../../../services/patient.service';
 import { SettingsService } from '../../../services/settings.service';
 import { NotificationService } from '../../services/notification.service';
 import { PopUpComponent } from '../../../components/pop-up/pop-up.component';
+import { toISODate, isAssignmentForToday } from '../../../utils/meal.utils';
 
 type MealPeriod = '午餐' | '晚餐' | 0;
 type MealPhaseStatus = 'before' | 'after' | 'done' | null;
@@ -137,8 +138,7 @@ export class AddIntakeComponent implements OnInit, OnChanges {
     // to equal today's cycle position, and the recorded FoodIntake would
     // point at the wrong Meal row.
     const mode = this.settingsService.menuMode;
-    const today = this.dateService.getTodayDate();
-    const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const todayISO = toISODate(this.dateService.getTodayDate());
     const todayCycleDay = this.dateService.getTodaysCycleDay().toString();
     const mealPeriod = this.dateService.getCurrentMealPeriod();
     this.currentMealPeriod = mealPeriod as MealPeriod;
@@ -151,24 +151,10 @@ export class AddIntakeComponent implements OnInit, OnChanges {
       return;
     }
 
-    const filtered = this.mealAssignments.filter((assignment) => {
-      const meal = assignment.meal_detail;
-      if (!meal) return false; // orphan (meal=NULL)
-
-      const mealMode = (meal.menu_mode || 'cyclic') as 'cyclic' | 'open';
-      if (mealMode !== mode) return false;
-
-      if (meal.meal_time !== mealPeriod) return false;
-
-      if (mode === 'open') {
-        return meal.serve_date === todayISO;
-      }
-      const assignmentDay =
-        assignment.day_cycle?.toString() ??
-        meal.day_cycle?.toString() ??
-        '';
-      return assignmentDay === todayCycleDay;
-    });
+    const filtered = this.mealAssignments.filter((a) =>
+      isAssignmentForToday(a, mode, todayISO, todayCycleDay) &&
+      a.meal_detail?.meal_time === mealPeriod
+    );
 
     console.log('[AddIntake] Filtered assignments for today & meal period:', filtered);
 
@@ -343,22 +329,14 @@ export class AddIntakeComponent implements OnInit, OnChanges {
 
   openPatientMenu(): void {
     const mode = this.settingsService.menuMode;
-    const today = this.dateService.getTodayDate();
-    const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const todayISO = toISODate(this.dateService.getTodayDate());
     const todayCycleDay = this.dateService.getTodaysCycleDay().toString();
 
     this.patientMenuDateLabel = mode === 'open' ? todayISO : `第 ${todayCycleDay} 天（${todayISO}）`;
 
-    const matchesToday = (a: MealAssignment): boolean => {
-      const meal = a.meal_detail;
-      if (!meal) return false;
-      if ((meal.menu_mode || 'cyclic') !== mode) return false;
-      if (mode === 'open') return meal.serve_date === todayISO;
-      const day = a.day_cycle?.toString() ?? meal.day_cycle?.toString() ?? '';
-      return day === todayCycleDay;
-    };
-
-    const todaysAssignments = this.mealAssignments.filter(matchesToday);
+    const todaysAssignments = this.mealAssignments.filter((a) =>
+      isAssignmentForToday(a, mode, todayISO, todayCycleDay)
+    );
 
     const extractMealsByTime = (mealTime: '午餐' | '晚餐'): Meal[] => {
       const seen = new Set<number>();
