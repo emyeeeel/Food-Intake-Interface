@@ -706,9 +706,10 @@ private buildMealFormData(): FormData {
 
         for (let day = 1; day <= 7; day++) {
           const dateForDay = this.dateService.getDateForCycleDay(day);
+          // ISO YYYY-MM-DD, aligns with open template and human-readable
           const dateStr = dateForDay.getFullYear() +
-            String(dateForDay.getMonth() + 1).padStart(2, '0') +
-            String(dateForDay.getDate()).padStart(2, '0');
+            '-' + String(dateForDay.getMonth() + 1).padStart(2, '0') +
+            '-' + String(dateForDay.getDate()).padStart(2, '0');
 
           for (const mealTime of mealTimeOrder) {
             const dayMeals = allMeals.filter(
@@ -730,9 +731,13 @@ private buildMealFormData(): FormData {
       error: () => {
         const templateData: any[] = [];
         for (let day = 1; day <= 7; day++) {
+          const dateForDay = this.dateService.getDateForCycleDay(day);
+          const dateStr = dateForDay.getFullYear() +
+            '-' + String(dateForDay.getMonth() + 1).padStart(2, '0') +
+            '-' + String(dateForDay.getDate()).padStart(2, '0');
           for (const mealTime of ['午餐', '晚餐']) {
             templateData.push({
-              '日期': '',
+              '日期': dateStr,
               '日週期': day,
               '用餐時間': mealTime,
               '菜色名稱': '請填入菜色名稱'

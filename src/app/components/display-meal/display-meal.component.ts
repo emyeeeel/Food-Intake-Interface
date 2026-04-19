@@ -672,21 +672,23 @@ export class DisplayMealComponent implements OnInit, OnChanges {
     return excelData;
   }
 
-  private calculateDateFromDayCycle(dayCycle: number | null): string {
-    if (!dayCycle || dayCycle < 1) {
+  private calculateDateFromDayCycle(dayCycle: number | string | null): string {
+    const dc = typeof dayCycle === 'string' ? parseInt(dayCycle, 10) : dayCycle;
+    if (!dc || dc < 1) {
       return 'N/A';
     }
 
     try {
       // Use DateService to get the date for the cycle day
-      const date = this.dateService.getDateForCycleDay(dayCycle);
-      
-      // Format as YYYYMMDD
+      const date = this.dateService.getDateForCycleDay(dc);
+
+      // Format as ISO YYYY-MM-DD — aligns with open template + add-meal
+      // cyclic template, so all exports share one date convention.
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
-      
-      return `${year}${month}${day}`;
+
+      return `${year}-${month}-${day}`;
     } catch (error) {
       console.error('Error calculating date from day cycle:', error);
       return 'N/A';
@@ -694,11 +696,8 @@ export class DisplayMealComponent implements OnInit, OnChanges {
   }
 
   private formatDateForDisplay(dateString: string): string {
-    if (dateString === 'N/A' || dateString.length !== 8) {
-      return dateString;
-    }
-
-    // Return as-is since calculateDateFromDayCycle already provides YYYYMMDD format
+    // calculateDateFromDayCycle now emits ISO YYYY-MM-DD (or 'N/A') —
+    // nothing to reformat, just pass through.
     return dateString;
   }
 }
