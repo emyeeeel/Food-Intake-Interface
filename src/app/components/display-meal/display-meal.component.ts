@@ -15,6 +15,12 @@ import { map, catchError } from 'rxjs/operators';
 import { SettingsService } from '../../services/settings.service';
 import { AssignMealDialogComponent } from '../assign-meal-dialog/assign-meal-dialog.component';
 import { BulkAssignResponse } from '../../services/meal-assignment.service';
+import {
+  getMealCode as sharedGetMealCode,
+  getSlotKey,
+  formatDayLabel as sharedFormatDayLabel,
+  formatOpenDateLabel,
+} from '../../utils/meal.utils';
 
 @Component({
   selector: 'app-display-meal',
@@ -288,11 +294,7 @@ export class DisplayMealComponent implements OnInit, OnChanges {
   }
 
   private shiftKey(meal: Meal): string {
-    const mode = meal.menu_mode ?? 'cyclic';
-    const slot = mode === 'open'
-      ? (meal.serve_date || '')
-      : `d${meal.day_cycle ?? ''}`;
-    return `${slot}::${meal.meal_time ?? ''}`;
+    return `${getSlotKey(meal)}::${meal.meal_time ?? ''}`;
   }
 
   /** How many other dishes share this meal's (date/day × meal_time) slot. */
@@ -331,39 +333,18 @@ export class DisplayMealComponent implements OnInit, OnChanges {
   }
 
   getMealCode(meal: Meal): string {
-    if (!meal) return '';
-
-    const mealTypeMap: Record<string, string> = {
-      '午餐': 'L',
-      '晚餐': 'D',
-      '點心': 'S',
-    };
-
-    const mealLetter = meal.meal_time && mealTypeMap[meal.meal_time]
-      ? mealTypeMap[meal.meal_time]
-      : '';
-
-    const mode = meal.menu_mode ?? 'cyclic';
-    if (mode === 'open' && meal.serve_date) {
-      const compactDate = meal.serve_date.replace(/-/g, '');
-      return `${mealLetter}-${compactDate}-${meal.id ?? ''}`;
-    }
-
-    const dayCycle = meal.day_cycle ?? '';
-    const mealId = meal.id ?? '';
-    return `${mealLetter}-${dayCycle}-${mealId}`;
+    return sharedGetMealCode(meal);
   }
 
   /** Cell content for 天數 column. cyclic shows "第 N 天"; open shows "-". */
   formatDayLabel(meal: Meal): string {
-    if ((meal.menu_mode ?? 'cyclic') === 'open') return '-';
-    return `第 ${meal.day_cycle} 天`;
+    return sharedFormatDayLabel(meal);
   }
 
   /** Cell content for 日期 column. cyclic shows computed M/D; open shows "YYYY-MM-DD (週X)". */
   formatDateLabel(meal: Meal): string {
     if ((meal.menu_mode ?? 'cyclic') === 'open' && meal.serve_date) {
-      return `${meal.serve_date} (${this.dateService.getWeekdayLabel(meal.serve_date)})`;
+      return formatOpenDateLabel(meal, this.dateService.getWeekdayLabel(meal.serve_date));
     }
     return this.getDateForDay(meal.day_cycle);
   }
