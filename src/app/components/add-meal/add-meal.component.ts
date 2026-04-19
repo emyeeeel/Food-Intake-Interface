@@ -14,6 +14,7 @@ import { forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { AssignMealDialogComponent } from '../assign-meal-dialog/assign-meal-dialog.component';
 import { BulkAssignResponse } from '../../services/meal-assignment.service';
+import { toISODate, compactDate } from '../../utils/meal.utils';
 
 
 @Component({
@@ -156,11 +157,7 @@ export class AddMealComponent implements OnInit {
   }
 
   private buildTemplateFilename(): string {
-    const today = this.dateService.getTodayDate();
-    const dateStr =
-      today.getFullYear() +
-      String(today.getMonth() + 1).padStart(2, '0') +
-      String(today.getDate()).padStart(2, '0');
+    const dateStr = compactDate(toISODate(this.dateService.getTodayDate()));
     const center = this.settingsService.careCenterName || '長照中心';
     const modeLabel = this.menuMode === 'open' ? '開放' : '循環';
     return `${center}-菜單-${modeLabel}-${dateStr}.xlsx`;
@@ -706,10 +703,7 @@ private buildMealFormData(): FormData {
 
         for (let day = 1; day <= 7; day++) {
           const dateForDay = this.dateService.getDateForCycleDay(day);
-          // ISO YYYY-MM-DD, aligns with open template and human-readable
-          const dateStr = dateForDay.getFullYear() +
-            '-' + String(dateForDay.getMonth() + 1).padStart(2, '0') +
-            '-' + String(dateForDay.getDate()).padStart(2, '0');
+          const dateStr = toISODate(dateForDay);
 
           for (const mealTime of mealTimeOrder) {
             const dayMeals = allMeals.filter(
@@ -732,9 +726,7 @@ private buildMealFormData(): FormData {
         const templateData: any[] = [];
         for (let day = 1; day <= 7; day++) {
           const dateForDay = this.dateService.getDateForCycleDay(day);
-          const dateStr = dateForDay.getFullYear() +
-            '-' + String(dateForDay.getMonth() + 1).padStart(2, '0') +
-            '-' + String(dateForDay.getDate()).padStart(2, '0');
+          const dateStr = toISODate(dateForDay);
           for (const mealTime of ['午餐', '晚餐']) {
             templateData.push({
               '日期': dateStr,
@@ -757,9 +749,7 @@ private buildMealFormData(): FormData {
     for (let i = 0; i < 7; i++) {
       const d = new Date(today);
       d.setDate(today.getDate() + i);
-      const iso = d.getFullYear() +
-        '-' + String(d.getMonth() + 1).padStart(2, '0') +
-        '-' + String(d.getDate()).padStart(2, '0');
+      const iso = toISODate(d);
       for (const mealTime of ['午餐', '晚餐']) {
         templateData.push({
           '日期': iso,
