@@ -115,8 +115,15 @@ export class IntakesComponent implements OnInit {
         return;
       }
 
+      // Mode-aware filter: cyclic matches on day_cycle, open matches on serve_date.
+      // Without this branch, an open-mode system with leftover cyclic assignments
+      // (e.g. post-migration patients) would falsely resolve today's meal to the
+      // stale cyclic meal that happens to share today's cycle day.
+      const mode = this.settingsService.menuMode;
+      const today = this.dateService.getTodayDate();
+      const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
       const todayCycleDay = this.dateService.getTodaysCycleDay().toString();
-      console.log('[Intakes] todayCycleDay:', todayCycleDay);
+      console.log('[Intakes] mode:', mode, 'todayISO:', todayISO, 'todayCycleDay:', todayCycleDay);
 
       const assignments = await firstValueFrom(
         this.mealAssignmentService
@@ -127,16 +134,25 @@ export class IntakesComponent implements OnInit {
       console.log('[Intakes] assignments raw:', assignments);
 
       const currentMealAssignments = (assignments ?? []).filter((assignment) => {
+        const meal = assignment.meal_detail;
+        if (!meal) return false; // orphan assignment (meal=NULL)
+
+        // Must be the system's current mode — otherwise a leftover cyclic
+        // assignment could satisfy an open-mode shift, or vice versa.
+        const mealMode = (meal.menu_mode || 'cyclic') as 'cyclic' | 'open';
+        if (mealMode !== mode) return false;
+
+        if (meal.meal_time !== currentMealPeriod) return false;
+
+        if (mode === 'open') {
+          return meal.serve_date === todayISO;
+        }
+        // cyclic: match today's position in the cycle
         const assignmentDay =
           assignment.day_cycle?.toString() ??
-          assignment.meal_detail?.day_cycle?.toString() ??
+          meal.day_cycle?.toString() ??
           '';
-        const assignmentMealTime = assignment.meal_detail?.meal_time;
-
-        return (
-          assignmentDay === todayCycleDay &&
-          assignmentMealTime === currentMealPeriod
-        );
+        return assignmentDay === todayCycleDay;
       });
 
       console.log('[Intakes] currentMealAssignments:', currentMealAssignments);
