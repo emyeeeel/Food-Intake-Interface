@@ -10,7 +10,7 @@
 
 .mode-banner {
   margin-bottom: 16px;
-  padding: 12px 16px;
+  padding: 14px 18px;
   border-radius: 10px;
   font-size: 0.95rem;
   color: #00313C;
@@ -36,6 +36,46 @@
     margin-top: 4px;
     font-size: 0.82rem;
     color: #6a7a78;
+  }
+
+  .mode-banner-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    .mode-banner-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+
+      .mode-icon { font-size: 1.3rem; }
+    }
+
+    .btn-template-inline {
+      padding: 8px 16px;
+      background: #ffffff;
+      border: 1px solid #4FAFA3;
+      color: #4FAFA3;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
+
+      &:hover { background: #4FAFA3; color: #ffffff; }
+    }
+  }
+
+  .mode-banner-desc {
+    margin: 10px 0 0 0;
+    font-size: 0.85rem;
+    color: #5a6a6d;
+    line-height: 1.5;
+    strong { color: #00313C; }
   }
 }
   

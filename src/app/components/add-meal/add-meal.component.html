@@ -2,6 +2,29 @@
   <!-- Initial Option Selection -->
   @if (!selectedOption) {
     <div class="option-selection-container">
+
+      <!-- Current mode banner + quick template download -->
+      <div class="mode-banner" [class.open]="menuMode === 'open'" [class.cyclic]="menuMode === 'cyclic'">
+        <div class="mode-banner-main">
+          <div class="mode-banner-label">
+            <span class="mode-icon">{{ menuMode === 'open' ? '📅' : '🔁' }}</span>
+            <span>
+              目前模式：<strong>{{ menuModeLabel }}</strong>
+            </span>
+          </div>
+          <button type="button" class="btn-template-inline" (click)="downloadTemplate()">
+            📥 下載「{{ menuModeLabel }}」範本
+          </button>
+        </div>
+        <p class="mode-banner-desc">
+          @if (menuMode === 'open') {
+            <strong>開放模式</strong>依 Excel 的「日期」欄位匯入（YYYY-MM-DD），每個日期獨立。欄位：日期 / 用餐時間 / 菜色名稱。
+          } @else {
+            <strong>循環模式</strong>依「日週期」(1-14) 重複循環。欄位：日期 / 日週期 / 用餐時間 / 菜色名稱；日期欄僅供參考，排程實際上看 day_cycle。
+          }
+        </p>
+      </div>
+
       <h3>選擇操作方式</h3>
       <div class="options-grid">
         <button class="option-card" (click)="selectOption('addMeal')">
