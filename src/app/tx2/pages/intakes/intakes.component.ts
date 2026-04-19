@@ -7,10 +7,8 @@ import { firstValueFrom, timeout } from 'rxjs';
 import { HeaderComponent } from '../../components/header/header.component';
 import { AddIntakeComponent } from '../../components/add-intake/add-intake.component';
 import { LTCPatient } from '../../../models/ltc-patient.model';
-import { Meal } from '../../../models/meal.model';
 import { PatientService } from '../../../services/patient.service';
 import { MealAssignmentService } from '../../../services/meal-assignment.service';
-import { MealsService } from '../../../services/meals.service';
 import { DateService } from '../../../services/date.service';
 import { SettingsService } from '../../../services/settings.service';
 
@@ -37,7 +35,6 @@ export class IntakesComponent implements OnInit {
   constructor(
     private patientService: PatientService,
     private mealAssignmentService: MealAssignmentService,
-    private mealsService: MealsService,
     private dateService: DateService,
     private http: HttpClient,
     public settingsService: SettingsService,
@@ -215,56 +212,5 @@ export class IntakesComponent implements OnInit {
     this.assignmentDialogMessage = message;
     this.assignmentDialogVisible = true;
     console.log('[Intakes] showAssignmentDialog:', { title, message });
-  }
-
-  // === 今日菜單 modal ===
-  // Read-only peek at today's menu so care-center staff can glance at what's
-  // being served before they scan. Mode-aware: open → serve_date=today,
-  // cyclic → day_cycle=today's cycle day. Groups by 午餐 / 晚餐.
-
-  todayMenuVisible = false;
-  todayMenuLoading = false;
-  todayMenuError: string | null = null;
-  todayMenuDate = '';
-  todayLunchMeals: Meal[] = [];
-  todayDinnerMeals: Meal[] = [];
-
-  openTodayMenu(): void {
-    this.todayMenuVisible = true;
-    this.todayMenuError = null;
-    this.todayLunchMeals = [];
-    this.todayDinnerMeals = [];
-
-    const mode = this.settingsService.menuMode;
-    const today = this.dateService.getTodayDate();
-    const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    this.todayMenuDate = todayISO;
-
-    const filters: { [key: string]: string | number } = { menu_mode: mode };
-    if (mode === 'open') {
-      filters['serve_date'] = todayISO;
-    } else {
-      filters['day_cycle'] = this.dateService.getTodaysCycleDay();
-    }
-
-    this.todayMenuLoading = true;
-    this.mealsService.getMealsFiltered(filters).subscribe({
-      next: (meals) => {
-        const active = (meals ?? []).filter(m => !m.is_archived);
-        active.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
-        this.todayLunchMeals = active.filter(m => m.meal_time === '午餐');
-        this.todayDinnerMeals = active.filter(m => m.meal_time === '晚餐');
-        this.todayMenuLoading = false;
-      },
-      error: (err) => {
-        console.error('[Intakes] today menu fetch failed:', err);
-        this.todayMenuError = '無法載入今日菜單';
-        this.todayMenuLoading = false;
-      },
-    });
-  }
-
-  closeTodayMenu(): void {
-    this.todayMenuVisible = false;
   }
 }

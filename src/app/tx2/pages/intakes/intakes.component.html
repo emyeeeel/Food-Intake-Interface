@@ -2,10 +2,7 @@
   <app-header></app-header>
 
   <div *ngIf="deviceId" class="device-id-bar">
-    <span>裝置：{{ deviceId }}</span>
-    <button class="btn-today-menu" (click)="openTodayMenu()" title="查看今日所有菜色">
-      📋 今日菜單
-    </button>
+    裝置：{{ deviceId }}
   </div>
 
   <div class="main-container">
@@ -65,55 +62,5 @@
       </div>
     </div>
 
-    <!-- Today menu modal -->
-    <div *ngIf="todayMenuVisible" class="today-menu-overlay" (click)="closeTodayMenu()">
-      <div class="today-menu-dialog" (click)="$event.stopPropagation()">
-        <div class="today-menu-header">
-          <div>
-            <div class="today-menu-title">📋 今日菜單</div>
-            <div class="today-menu-sub">
-              {{ todayMenuDate }}
-              · {{ settingsService.menuMode === 'open' ? '開放模式' : '循環模式' }}
-            </div>
-          </div>
-          <button class="today-menu-close" (click)="closeTodayMenu()">×</button>
-        </div>
-
-        <div class="today-menu-body">
-          <div *ngIf="todayMenuLoading" class="today-menu-state">載入中...</div>
-          <div *ngIf="todayMenuError" class="today-menu-state error">{{ todayMenuError }}</div>
-
-          <ng-container *ngIf="!todayMenuLoading && !todayMenuError">
-            <div class="meal-section">
-              <div class="meal-section-title lunch">☀ 午餐（{{ todayLunchMeals.length }} 道）</div>
-              <ul *ngIf="todayLunchMeals.length > 0" class="meal-list">
-                <li *ngFor="let m of todayLunchMeals">
-                  <span class="dot">•</span>
-                  <span class="meal-name">{{ m.meal_name }}</span>
-                  <span class="meal-plate" *ngIf="m.plate_type">({{ m.plate_type }})</span>
-                </li>
-              </ul>
-              <div *ngIf="todayLunchMeals.length === 0" class="meal-empty">今日尚未配置午餐菜色</div>
-            </div>
-
-            <div class="meal-section">
-              <div class="meal-section-title dinner">🌙 晚餐（{{ todayDinnerMeals.length }} 道）</div>
-              <ul *ngIf="todayDinnerMeals.length > 0" class="meal-list">
-                <li *ngFor="let m of todayDinnerMeals">
-                  <span class="dot">•</span>
-                  <span class="meal-name">{{ m.meal_name }}</span>
-                  <span class="meal-plate" *ngIf="m.plate_type">({{ m.plate_type }})</span>
-                </li>
-              </ul>
-              <div *ngIf="todayDinnerMeals.length === 0" class="meal-empty">今日尚未配置晚餐菜色</div>
-            </div>
-          </ng-container>
-        </div>
-
-        <div class="today-menu-footer">
-          <button class="today-menu-btn-ok" (click)="closeTodayMenu()">關閉</button>
-        </div>
-      </div>
-    </div>
   </div>
 </div>

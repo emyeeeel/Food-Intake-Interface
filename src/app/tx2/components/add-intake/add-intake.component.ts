@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { MealAssignment } from '../../../models/meal-assignment.mode';
+import { Meal } from '../../../models/meal.model';
 import { LTCPatient } from '../../../models/ltc-patient.model';
 import { MealAssignmentService } from '../../../services/meal-assignment.service';
 import { IntakeService } from '../../../services/intake.service';
@@ -328,6 +329,58 @@ export class AddIntakeComponent implements OnInit, OnChanges {
 
   closeErrorDialog(): void {
     this.showErrorDialog = false;
+  }
+
+  // === Per-patient today menu modal ===
+  // Button beside "請選擇用餐時間" — peeks at THIS patient's 午餐 + 晚餐
+  // assignments for today. Uses the same mode-aware filter as
+  // autoSelectMealAssignment so numbers match what the scan flow uses.
+
+  patientMenuVisible = false;
+  patientMenuDateLabel = '';
+  patientTodayLunchMeals: Meal[] = [];
+  patientTodayDinnerMeals: Meal[] = [];
+
+  openPatientMenu(): void {
+    const mode = this.settingsService.menuMode;
+    const today = this.dateService.getTodayDate();
+    const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const todayCycleDay = this.dateService.getTodaysCycleDay().toString();
+
+    this.patientMenuDateLabel = mode === 'open' ? todayISO : `第 ${todayCycleDay} 天（${todayISO}）`;
+
+    const matchesToday = (a: MealAssignment): boolean => {
+      const meal = a.meal_detail;
+      if (!meal) return false;
+      if ((meal.menu_mode || 'cyclic') !== mode) return false;
+      if (mode === 'open') return meal.serve_date === todayISO;
+      const day = a.day_cycle?.toString() ?? meal.day_cycle?.toString() ?? '';
+      return day === todayCycleDay;
+    };
+
+    const todaysAssignments = this.mealAssignments.filter(matchesToday);
+
+    const extractMealsByTime = (mealTime: '午餐' | '晚餐'): Meal[] => {
+      const seen = new Set<number>();
+      const meals: Meal[] = [];
+      for (const a of todaysAssignments) {
+        const m = a.meal_detail;
+        if (!m || m.meal_time !== mealTime) continue;
+        if (m.id == null || seen.has(m.id)) continue;
+        seen.add(m.id);
+        meals.push(m as Meal);
+      }
+      meals.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+      return meals;
+    };
+
+    this.patientTodayLunchMeals = extractMealsByTime('午餐');
+    this.patientTodayDinnerMeals = extractMealsByTime('晚餐');
+    this.patientMenuVisible = true;
+  }
+
+  closePatientMenu(): void {
+    this.patientMenuVisible = false;
   }
 
   private showMealAssignmentDialog(title: string, message: string): void {

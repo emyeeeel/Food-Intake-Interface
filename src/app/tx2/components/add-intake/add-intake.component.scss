@@ -59,6 +59,32 @@
         gap: 4px;
         flex: 1;
 
+        .label-heading-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+          width: 100%;
+
+          .btn-patient-menu {
+            padding: 5px 12px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid #40C1AC;
+            color: #E6FEF9;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.15s, color 0.15s;
+
+            &:hover {
+              background: #40C1AC;
+              color: #00313C;
+            }
+          }
+        }
+
         h4 {
           color: #ffffff;
           font-weight: 800;
@@ -844,4 +870,158 @@ button {
 
 .error-title {
   color: #e74c3c !important;
+}
+
+/* ============================================================
+   Per-patient today menu modal
+============================================================ */
+.patient-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 49, 60, 0.55);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.patient-menu-dialog {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 14px 38px rgba(0, 49, 60, 0.3);
+  width: 100%;
+  max-width: 520px;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.patient-menu-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #e8f7f3;
+  border-bottom: 1px solid #b8e0d3;
+
+  .patient-menu-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #00313C;
+  }
+
+  .patient-menu-sub {
+    margin-top: 2px;
+    font-size: 0.82rem;
+    color: #4FAFA3;
+  }
+
+  .patient-menu-close {
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: #7a8a8d;
+    cursor: pointer;
+    padding: 0 4px;
+
+    &:hover { color: #00313C; }
+  }
+}
+
+.patient-menu-body {
+  padding: 16px 18px;
+  overflow-y: auto;
+  flex: 1;
+
+  .meal-section {
+    margin-bottom: 16px;
+    &:last-child { margin-bottom: 0; }
+  }
+
+  .meal-section-title {
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+
+    &.lunch { background: #fff8e1; color: #a07404; border: 1px solid #f5e3a4; }
+    &.dinner { background: #e6f0ff; color: #2a4e7a; border: 1px solid #b8cde8; }
+  }
+
+  .meal-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 8px;
+
+    li {
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: #00313C;
+      border-bottom: 1px solid #f0f4f3;
+
+      &:last-child { border-bottom: none; }
+
+      .dot { color: #4FAFA3; }
+
+      .meal-name { flex: 1; }
+
+      .first-tag {
+        padding: 1px 8px;
+        background: #c2851f;
+        color: #ffffff;
+        border-radius: 10px;
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+
+      .meal-plate {
+        color: #7a8a8d;
+        font-size: 0.82rem;
+      }
+
+      &.primary .meal-name {
+        font-weight: 700;
+      }
+    }
+  }
+
+  .meal-empty {
+    padding: 12px;
+    text-align: center;
+    color: #a63a23;
+    font-style: italic;
+    background: #fdecea;
+    border: 1px dashed #f4c2bb;
+    border-radius: 6px;
+    font-size: 0.88rem;
+  }
+}
+
+.patient-menu-footer {
+  display: flex;
+  justify-content: center;
+  padding: 12px 18px;
+  border-top: 1px solid #e6ecea;
+  background: #f8fbfa;
+
+  .patient-menu-btn-ok {
+    padding: 10px 30px;
+    background: #2d9f8c;
+    border: 1px solid #2d9f8c;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover { background: #1f8373; }
+  }
 }
