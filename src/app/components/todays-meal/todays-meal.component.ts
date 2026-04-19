@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { skip, Subscription } from 'rxjs';
 import { MealsService } from '../../services/meals.service';
 import { DateService } from '../../services/date.service';
 import { Meal } from '../../models/meal.model';
@@ -23,6 +23,7 @@ export class TodaysMealComponent implements OnInit, OnDestroy {
   loadingError = '';
 
   private dateSubscription = new Subscription();
+  private modeSubscription = new Subscription();
 
   constructor(
     private mealsService: MealsService,
@@ -33,11 +34,13 @@ export class TodaysMealComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.setIconSrc();
     this.subscribeToDateChanges();
+    this.subscribeToModeChanges();
     this.loadMealsForCurrentDate();
   }
 
   ngOnDestroy(): void {
     this.dateSubscription.unsubscribe();
+    this.modeSubscription.unsubscribe();
   }
 
   private normalizeMealTime(value: string): string {
@@ -69,6 +72,12 @@ export class TodaysMealComponent implements OnInit, OnDestroy {
   private subscribeToDateChanges(): void {
     this.dateSubscription = this.dateService.selectedDate$.subscribe((date) => {
       this.currentSelectedDate = date;
+      this.loadMealsForCurrentDate();
+    });
+  }
+
+  private subscribeToModeChanges(): void {
+    this.modeSubscription = this.dateService.menuMode$.pipe(skip(1)).subscribe(() => {
       this.loadMealsForCurrentDate();
     });
   }
