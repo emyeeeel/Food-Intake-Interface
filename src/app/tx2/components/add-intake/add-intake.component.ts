@@ -130,12 +130,19 @@ export class AddIntakeComponent implements OnInit, OnChanges {
   }
 
   private autoSelectMealAssignment(patientId: number): void {
+    // Mode-aware filter — mirrors the /intakes page guard. Without this, an
+    // open-mode system with leftover cyclic assignments on the same patient
+    // would resolve today's meal to the cyclic meal whose day_cycle happens
+    // to equal today's cycle position, and the recorded FoodIntake would
+    // point at the wrong Meal row.
+    const mode = this.settingsService.menuMode;
+    const today = this.dateService.getTodayDate();
+    const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const todayCycleDay = this.dateService.getTodaysCycleDay().toString();
     const mealPeriod = this.dateService.getCurrentMealPeriod();
     this.currentMealPeriod = mealPeriod as MealPeriod;
 
-    console.log('[AddIntake] Today cycle day:', todayCycleDay);
-    console.log('[AddIntake] Current meal period:', mealPeriod);
+    console.log('[AddIntake] mode:', mode, 'todayISO:', todayISO, 'todayCycleDay:', todayCycleDay, 'mealPeriod:', mealPeriod);
 
     if (!mealPeriod) {
       this.autoSelectionReady = true;
@@ -144,13 +151,22 @@ export class AddIntakeComponent implements OnInit, OnChanges {
     }
 
     const filtered = this.mealAssignments.filter((assignment) => {
+      const meal = assignment.meal_detail;
+      if (!meal) return false; // orphan (meal=NULL)
+
+      const mealMode = (meal.menu_mode || 'cyclic') as 'cyclic' | 'open';
+      if (mealMode !== mode) return false;
+
+      if (meal.meal_time !== mealPeriod) return false;
+
+      if (mode === 'open') {
+        return meal.serve_date === todayISO;
+      }
       const assignmentDay =
         assignment.day_cycle?.toString() ??
-        assignment.meal_detail?.day_cycle?.toString() ??
+        meal.day_cycle?.toString() ??
         '';
-      const assignmentMealTime = assignment.meal_detail?.meal_time;
-
-      return assignmentDay === todayCycleDay && assignmentMealTime === mealPeriod;
+      return assignmentDay === todayCycleDay;
     });
 
     console.log('[AddIntake] Filtered assignments for today & meal period:', filtered);
