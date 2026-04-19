@@ -9,6 +9,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable } from 'rxjs';
 import { PlateTypeLabelPipe } from '../../pipes/plate-type-label.pipe';
+import {
+  getMealCode as sharedGetMealCode,
+  formatOpenDateLabel,
+} from '../../utils/meal.utils';
 
 @Component({
   selector: 'app-print-all-meals',
@@ -484,36 +488,14 @@ export class PrintAllMealsComponent implements OnInit {
     return ingredientName;
   }
 
-  // Utility methods for meal codes (similar to display-meal component)
   getMealCode(meal: Meal): string {
-    if (!meal) return '';
-
-    const mealTypeMap: Record<string, string> = {
-      '午餐': 'L',
-      '晚餐': 'D',
-      '點心': 'S',
-    };
-
-    const mealLetter = meal.meal_time && mealTypeMap[meal.meal_time]
-      ? mealTypeMap[meal.meal_time]
-      : '';
-
-    const mode = meal.menu_mode ?? 'cyclic';
-    if (mode === 'open' && meal.serve_date) {
-      const compactDate = meal.serve_date.replace(/-/g, '');
-      return `${mealLetter}-${compactDate}-${meal.id ?? ''}`;
-    }
-
-    const dayCycle = meal.day_cycle ?? '';
-    const mealId = meal.id ?? '';
-    return `${mealLetter}-${dayCycle}-${mealId}`;
+    return sharedGetMealCode(meal);
   }
 
   /** Cell content for the Day/Date column. cyclic → "Day N"; open → "YYYY-MM-DD (週X)". */
   formatDayLabel(meal: Meal): string {
-    const mode = meal.menu_mode ?? 'cyclic';
-    if (mode === 'open' && meal.serve_date) {
-      return `${meal.serve_date} (${this.dateService.getWeekdayLabel(meal.serve_date)})`;
+    if ((meal.menu_mode ?? 'cyclic') === 'open' && meal.serve_date) {
+      return formatOpenDateLabel(meal, this.dateService.getWeekdayLabel(meal.serve_date));
     }
     return `Day ${meal.day_cycle ?? ''}`;
   }
