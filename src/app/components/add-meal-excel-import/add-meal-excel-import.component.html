@@ -1,0 +1,111 @@
+<div class="excel-upload-container">
+  <div class="header-with-back">
+    <button class="btn-back" (click)="onBackClick()">← 返回</button>
+    <h3>透過 Excel 匯入菜單</h3>
+  </div>
+
+  <div class="upload-section">
+    <div class="mode-banner" [class.open]="menuMode === 'open'" [class.cyclic]="menuMode === 'cyclic'">
+      目前模式：<strong>{{ menuModeLabel }}</strong>
+      @if (menuMode === 'open') {
+        <span class="mode-hint">匯入將建立「日期型」菜單（欄位：日期 / 用餐時間 / 菜色名稱）</span>
+      } @else {
+        <span class="mode-hint">匯入將建立「日週期型」菜單（欄位：日期 / 日週期 / 用餐時間 / 菜色名稱）</span>
+      }
+    </div>
+
+    <div class="upload-instructions">
+      <h4>上傳說明</h4>
+      <ul>
+        <li>請使用提供的 Excel 模板（下方按鈕下載當前模式模板）</li>
+        <li>確保所有必填欄位都已填寫</li>
+        <li>檔案格式必須為 .xlsx 或 .xls</li>
+        <li>最大檔案大小: 10MB</li>
+      </ul>
+    </div>
+
+    <div class="file-upload-area">
+      <div class="upload-dropzone"
+           [class.drag-active]="isDragActive"
+           (dragover)="onDragOver($event)"
+           (dragleave)="onDragLeave($event)"
+           (drop)="onFileDrop($event)"
+           (click)="fileInput.click()">
+        <input #fileInput type="file"
+               accept=".xlsx,.xls"
+               (change)="onFileSelected($event)"
+               style="display: none;">
+        <div class="upload-content">
+          @if (!selectedFile) {
+            <div class="upload-icon">📁</div>
+            <p class="upload-text">點擊選擇檔案或拖放Excel檔案到此處</p>
+            <p class="upload-subtext">支援 .xlsx, .xls 格式</p>
+          }
+          @if (selectedFile) {
+            <div class="file-info">
+              <div class="file-icon">📄</div>
+              <div class="file-details">
+                <p class="file-name">{{ selectedFile.name }}</p>
+                <p class="file-size">{{ formatFileSize(selectedFile.size) }}</p>
+              </div>
+              <button class="btn-remove" (click)="removeFile($event)">✕</button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="upload-actions">
+      <button class="btn-secondary" (click)="downloadTemplate()">
+        📥 下載Excel模板
+      </button>
+      <button class="btn-secondary"
+              (click)="uploadExcelFile()"
+              [disabled]="!selectedFile || isUploading">
+        @if (isUploading) {
+          <span>上傳中...</span>
+        } @else {
+          <span>上傳檔案</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>
+
+@if (showModeMismatchModal) {
+  <div class="mismatch-overlay" (click)="closeModeMismatchModal()">
+    <div class="mismatch-modal" (click)="$event.stopPropagation()">
+      <div class="mismatch-header">
+        <span class="warn-icon">⚠️</span>
+        <h3>檔案模式與系統模式不符</h3>
+      </div>
+      <div class="mismatch-body">
+        <p>
+          系統目前是 <strong class="mode-current">{{ menuModeLabel }}</strong>，
+          但偵測到您上傳的是
+          <strong class="mode-wrong">{{ modeLabel(mismatchDetectedMode) }}</strong>
+          的 Excel 範本。
+        </p>
+        <p class="mismatch-hint">
+          請改用對應模式的範本，以免菜色被匯到錯的地方。
+        </p>
+        <div class="mismatch-diff">
+          <div class="diff-item">
+            <div class="diff-label">循環模式範本</div>
+            <div class="diff-cols">欄位：日期 / <strong>日週期</strong> / 用餐時間 / 菜色名稱</div>
+          </div>
+          <div class="diff-item">
+            <div class="diff-label">開放模式範本</div>
+            <div class="diff-cols">欄位：日期 / 用餐時間 / 菜色名稱（ISO 日期）</div>
+          </div>
+        </div>
+        <button type="button" class="btn-download-template" (click)="downloadTemplateFromMismatch()">
+          📥 下載「{{ menuModeLabel }}」範本
+        </button>
+      </div>
+      <div class="mismatch-footer">
+        <button type="button" class="btn-ok" (click)="closeModeMismatchModal()">我知道了</button>
+      </div>
+    </div>
+  </div>
+}

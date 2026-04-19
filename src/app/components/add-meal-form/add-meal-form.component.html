@@ -1,0 +1,127 @@
+<div class="add-meal-container">
+  <div class="header-with-back">
+    <button class="btn-back" (click)="onBackClick()">← 返回</button>
+    <h3>新增餐點</h3>
+  </div>
+
+  <p class="form-hint-top">
+    目前為 <strong>{{ menuModeLabel }}</strong>，新增的菜色會自動寫入對應模式。
+    若菜名已存在，後端會自動繼承既有的餐盤與食材。
+  </p>
+
+  <form class="simple-add-form" (ngSubmit)="submitSingleMeal()" #addForm="ngForm">
+    <div class="form-group">
+      <label>菜名 <span class="required">*</span></label>
+
+      @for (name of mealNames; track $index; let i = $index) {
+        <div class="input-with-action">
+          <input
+            type="text"
+            class="form-input meal-name-input"
+            [name]="'mealName' + i"
+            [(ngModel)]="mealNames[i]"
+            (keydown.enter)="onMealNameEnter(i, $event)"
+            placeholder="例：紅燒豆腐"
+          />
+          <button
+            type="button"
+            class="btn-name-add"
+            (click)="addMealNameAt(i)"
+            title="再加一道"
+          >＋</button>
+          <button
+            type="button"
+            class="btn-name-remove"
+            (click)="removeMealNameAt(i)"
+            [disabled]="mealNames.length <= 1"
+            [title]="mealNames.length <= 1 ? '至少保留一列' : '移除這列'"
+          >×</button>
+        </div>
+      }
+      <small class="form-hint">
+        一次可輸入多道，共用下方的餐期／日期／餐盤。
+        按 <strong>Enter</strong> 或 <strong>＋</strong> 會新增一列、<strong>×</strong> 移除。
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label for="mealTime">餐期 <span class="required">*</span></label>
+      <select id="mealTime" name="mealTime" [(ngModel)]="meal.meal_time" class="form-select" required>
+        <option value="" disabled>選擇餐期</option>
+        @for (t of mealTimeOptions; track t.value) {
+          <option [value]="t.value">{{ t.label }}</option>
+        }
+      </select>
+    </div>
+
+    @if (menuMode === 'cyclic') {
+      <div class="form-group">
+        <label for="dayCycle">天數 <span class="required">*</span></label>
+        <input
+          type="number"
+          id="dayCycle"
+          name="dayCycle"
+          [(ngModel)]="meal.day_cycle"
+          min="1"
+          max="30"
+          class="form-input"
+          required
+        />
+      </div>
+    } @else {
+      <div class="form-group">
+        <label for="serveDate">日期 <span class="required">*</span></label>
+        <input
+          type="date"
+          id="serveDate"
+          name="serveDate"
+          [(ngModel)]="meal.serve_date"
+          class="form-input"
+          required
+        />
+      </div>
+    }
+
+    <div class="form-group">
+      <label for="plateType">餐盤</label>
+      <select id="plateType" name="plateType" [(ngModel)]="meal.plate_type" class="form-select">
+        <option value="">— 留空讓後端繼承同名菜 —</option>
+        @for (option of plateTypeOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="onBackClick()" [disabled]="isSubmitting">取消</button>
+      <button type="submit" class="btn-primary" [disabled]="filledNameCount === 0 || isSubmitting">
+        @if (isSubmitting) {
+          <span>新增中...</span>
+        } @else {
+          <span>{{ filledNameCount > 1 ? '新增 ' + filledNameCount + ' 道餐點' : '新增餐點' }}</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>
+
+@if (showNewNameDialog) {
+  <div class="new-name-modal-backdrop" (click)="rejectNewName()">
+    <div class="new-name-modal" (click)="$event.stopPropagation()">
+      <h3>確認新增菜色</h3>
+      <p>「<strong>{{ pendingNewNameText }}</strong>」不在既有菜色庫中。</p>
+      <p class="hint">按「確認新增」將在儲存時建立新菜色；按「我要修改」可回去調整名稱。</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="rejectNewName()">我要修改</button>
+        <button type="button" class="btn-primary" (click)="confirmNewName()">確認新增</button>
+      </div>
+    </div>
+  </div>
+}
+
+<app-assign-meal-dialog
+  [isOpen]="assignDialogOpen"
+  [meals]="assignDialogMeals"
+  (closed)="closeAssignDialog()"
+  (completed)="onAssignCompleted($event)"
+></app-assign-meal-dialog>
