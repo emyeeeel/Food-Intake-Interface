@@ -15,7 +15,7 @@ export class RecommenderService {
    * GET /api/patient/<pk>/meal-intake
    */
   getDailyMealIntakeSummary(patientId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/patient/${patientId}/meal-intake`);
+    return this.http.get(`https://fgktksbk-8001.jpe1.devtunnels.ms/api/patient/${patientId}/meal-intake`);
   }
 
   /**

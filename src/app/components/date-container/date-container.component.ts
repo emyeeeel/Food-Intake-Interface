@@ -69,22 +69,8 @@ export class DateContainerComponent implements OnInit, OnDestroy {
     this.showPopup = false;
   }
 
-  private updateWeekRangeFromDate(date: Date) {
-    const dayIndex = date.getDay();
-  
-    const startOfWeek = new Date(date);
-    startOfWeek.setDate(date.getDate() - dayIndex);
-  
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-  
-    const startMonth = (startOfWeek.getMonth() + 1).toString().padStart(2, '0');
-    const startDay = startOfWeek.getDate().toString().padStart(2, '0');
-  
-    const endMonth = (endOfWeek.getMonth() + 1).toString().padStart(2, '0');
-    const endDay = endOfWeek.getDate().toString().padStart(2, '0');
-  
-    this.currentWeekRange = `${startMonth}/${startDay} - ${endMonth}/${endDay}`;
+  private updateWeekRangeFromDate(date: Date): void {
+    this.currentWeekRange = this.buildWeekRange(date);
   }
 
   private updateDayFromDate(date: Date) {
@@ -101,20 +87,7 @@ export class DateContainerComponent implements OnInit, OnDestroy {
 
   private setCurrentWeekRange(): void {
     const today = new Date();
-    const currentDayIndex = today.getDay();
-
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - currentDayIndex);
-
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-    const startMonth = (startOfWeek.getMonth() + 1).toString().padStart(2, '0');
-    const startDay = startOfWeek.getDate().toString().padStart(2, '0');
-    const endMonth = (endOfWeek.getMonth() + 1).toString().padStart(2, '0');
-    const endDay = endOfWeek.getDate().toString().padStart(2, '0');
-
-    this.currentWeekRange = `${startMonth}/${startDay} - ${endMonth}/${endDay}`;
+    this.currentWeekRange = this.buildWeekRange(today);
   }
 
   private setCurrentDay(): void {
@@ -127,5 +100,17 @@ export class DateContainerComponent implements OnInit, OnDestroy {
 
   private formatDate(date: Date): string {
     return date.toISOString().split("T")[0];
+  }
+
+  private buildWeekRange(endDate: Date): string {
+    const startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - 6);
+
+    const startMonth = (startDate.getMonth() + 1).toString().padStart(2, '0');
+    const startDay   = startDate.getDate().toString().padStart(2, '0');
+    const endMonth   = (endDate.getMonth() + 1).toString().padStart(2, '0');
+    const endDay     = endDate.getDate().toString().padStart(2, '0');
+
+    return `${startMonth}/${startDay} - ${endMonth}/${endDay}`;
   }
 }
