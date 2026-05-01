@@ -15,7 +15,9 @@ import { PrintAllIngredientsComponent } from '../../components/print-all-ingredi
 
 @Component({
   selector: 'app-ingredients',
-  imports: [MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent, FilterIconComponent, FilterOptionsComponent, MainOptionsComponent, IngredientsCategoriesComponent, DisplayIngredientsComponent, PrintAllIngredientsComponent],
+  imports: [MenuBarComponent, BackComponent, SearchBarComponent, NotifComponent, 
+    // FilterIconComponent, FilterOptionsComponent, 
+    MainOptionsComponent, IngredientsCategoriesComponent, DisplayIngredientsComponent, PrintAllIngredientsComponent],
   templateUrl: './ingredients.component.html',
   styleUrl: './ingredients.component.scss'
 })

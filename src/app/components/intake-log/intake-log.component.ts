@@ -11,7 +11,7 @@ export class IntakeLogComponent implements OnInit {
   @Input() time!: string;
   @Input() assignedMeal!: string;
   @Input() weight!: number;
-  @Input() percent!: number;
+  @Input() patient!: string;
   @Input() volume: string | number = 0;
   
   iconSrc: string = '';

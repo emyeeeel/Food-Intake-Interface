@@ -112,6 +112,15 @@ export class DisplayIntakeComponent implements OnInit {
     }
   }
 
+  formatPatientIdentifier(intake: IntakeRecord): string {
+    const room = intake.ltc_patient_detail?.room_number;
+    const bed = intake.ltc_patient_detail?.bed_number;
+
+    if (!room && !bed) return '-';
+
+    return `${room ?? ''}-${bed ?? ''}`;
+  }
+
   goToFirstPage(): void { this.goToPage(1); }
   goToLastPage(): void { this.goToPage(this.totalPages); }
   goToNextPage(): void { if (this.currentPage < this.totalPages) this.goToPage(this.currentPage + 1); }

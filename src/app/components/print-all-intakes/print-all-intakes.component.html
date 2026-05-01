@@ -83,12 +83,16 @@
                       (change)="toggleIntakeSelection(intake.id, $event)">
                   </td>
                   <!-- Room -->
-                  <td class="intake-room">ㄋ
+                  <td class="intake-room">
                     {{ intake.ltc_patient_detail!.room_number || '-' }}
                   </td>
                   <!-- Bed -->
                   <td class="intake-bed">
                     {{ intake.ltc_patient_detail!.bed_number || '-' }}
+                  </td>
+                  <!-- Name -->
+                  <td class="intake-meal">
+                    {{ intake.ltc_patient_detail!.name || '-'  }}
                   </td>
                   <!-- Meal -->
                   <td class="intake-meal">
@@ -104,7 +108,7 @@
                   </td>
                   <!-- Recorded At -->
                   <td class="intake-recorded-at">
-                    {{ intake.recorded_at | date:'short' }}
+                    {{ formatDate(intake.recorded_at) | date:'short' }}
                   </td>
                 </tr>
               }

@@ -50,20 +50,26 @@
         <app-date-container></app-date-container>
       </div>
       <div class="row-5">
-        <app-intake-log
-          time="午餐"
-          assignedMeal="L-01-A"
-          [weight]="300"
-          [percent]="40"
-          [volume]="135">
-        </app-intake-log>
-        <app-intake-log
-          time="晚餐"
-          assignedMeal="D-01-A"
-          [weight]="350"
-          [percent]="25"
-          [volume]="87">
-        </app-intake-log>
+        @if (latestIntakes.length === 0 && !isLoading) {
+          <div class="empty-state">
+            <p>此日期尚無攝取紀錄</p>
+          </div>
+        }
+         @for (record of latestIntakes; track record.intake.id) {
+
+            <app-intake-log
+              [time]="record.intake.meal_detail.meal_time"
+              [assignedMeal]="
+                record.intake.meal_detail.meal_time + '-' +
+                record.intake.meal_detail.id + '-' +
+                record.intake.meal_phase
+              "
+              [weight]="record.intake.weight_g"
+              [patient]="formatPatientIdentifier(record.intake)"
+              [volume]="getFormattedVolume(record)">
+            </app-intake-log>
+
+          }
       </div>
     </div>
   }

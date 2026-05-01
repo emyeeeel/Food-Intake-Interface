@@ -40,6 +40,7 @@ export class PrintAllIntakesComponent implements OnInit {
     this.intakeService.getIntakes().subscribe({
       next: (response) => {
         this.intakes = response;
+        console.log(this.intakes)
         this.totalIntakes = response.length;
         this.calculatePagination();
         this.updatePaginatedIntakes();
@@ -51,6 +52,10 @@ export class PrintAllIntakesComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  formatDate(dateStr: string): Date {
+    return new Date(dateStr.split('.')[0] + 'Z');
   }
 
   calculatePagination(): void {
