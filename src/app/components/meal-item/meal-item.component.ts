@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 export class MealItemComponent {
   @Input() mealImageSrc: string = '';
   @Input() mealImageAlt: string = '';
-  @Input() mealCode: string = '';
+  @Input() mealName: string = '';
   @Input() dayCycleLabel: string = '天數';
   @Input() dayCycleValue: string = '';
   @Input() mealTimeLabel: string = '餐別';

@@ -19,7 +19,7 @@ export class PrintAllIntakesComponent implements OnInit {
 
   // Pagination properties
   currentPage = 1;
-  pageSize = 10; // Items per page
+  pageSize = 6; // Items per page
   totalIntakes = 0;
   totalPages = 0;
   targetPage: number | null = null;

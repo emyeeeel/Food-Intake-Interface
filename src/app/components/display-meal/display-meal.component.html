@@ -76,7 +76,7 @@
         <app-meal-item
           [mealId]="meal.id"
           [mealImageSrc]="meal.image || 'assets/images/meals/meal_placeholder.jpg'"
-          [mealCode]="getMealCode(meal)"
+          [mealName]="meal.meal_name"
           [dayCycleValue]="'第' + (meal.day_cycle || '') + '天'"
           [mealTimeValue]="meal.meal_time || ''"
           [plateTypeValue]="meal.plate_type || 'Standard'"

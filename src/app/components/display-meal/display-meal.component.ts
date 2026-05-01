@@ -206,25 +206,25 @@ export class DisplayMealComponent implements OnInit {
     return (this.currentPage - 1) * this.pageSize + index + 1;
   }
 
-  // Helper methods for meal-item component
-  getMealCode(meal: Meal): string {
-    if (!meal) return '';
+  // // Helper methods for meal-item component
+  // getMealCode(meal: Meal): string {
+  //   if (!meal) return '';
   
-    const mealTypeMap: Record<string, string> = {
-      '午餐': 'L',    
-      '晚餐': 'D',    
-      '點心': 'S',    
-    };
+  //   const mealTypeMap: Record<string, string> = {
+  //     '午餐': 'L',    
+  //     '晚餐': 'D',    
+  //     '點心': 'S',    
+  //   };
   
-    const mealLetter = meal.meal_time && mealTypeMap[meal.meal_time]
-      ? mealTypeMap[meal.meal_time]
-      : '';  // fallback if undefined
+  //   const mealLetter = meal.meal_time && mealTypeMap[meal.meal_time]
+  //     ? mealTypeMap[meal.meal_time]
+  //     : '';  // fallback if undefined
   
-    const dayCycle = meal.day_cycle ?? '';
-    const mealId = meal.id ?? '';
+  //   const dayCycle = meal.day_cycle ?? '';
+  //   const mealId = meal.id ?? '';
   
-    return `${mealLetter}-${dayCycle}-${mealId}`;
-  }
+  //   return `${mealLetter}-${dayCycle}-${mealId}`;
+  // }
 
   truncateDescription(description: string | null | undefined, maxLength: number): string {
     if (!description) return 'No description available';
