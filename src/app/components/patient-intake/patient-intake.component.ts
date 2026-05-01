@@ -138,9 +138,7 @@ public getConsumedPercentage(intake: IntakeRecord): string {
         'Period': intake.meal_phase || '-',
         'Weight (g)': intake.weight_g ?? '-',
         'Volume (ml)': intake.volume_ml ?? '-',
-        'Recorded At': intake.recorded_at
-          ? new Date(intake.recorded_at).toLocaleString()
-          : '-',
+        'Recorded At': intake.recorded_at ?? '-',
         'Recorded By': intake.recorded_by ?? '-'
       };
     });

@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://h3vkhzth-8000.asse.devtunnels.ms', // https://h3vkhzth-8000.asse.devtunnels.ms
+  apiBaseUrl: 'https://q30gkzkn-8000.asse.devtunnels.ms', // https://h3vkhzth-8000.asse.devtunnels.ms
   firebase: {
     apiKey: "AIzaSyBy7BBj2uglhn79_ezYXfiswBjl-C6dwcQ",
     authDomain: "mobile-food-intake.firebaseapp.com",

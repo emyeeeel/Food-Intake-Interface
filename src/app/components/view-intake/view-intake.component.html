@@ -12,7 +12,7 @@
     <div class="segmentation-result">
       <div class="segment-section">
         <h3>飯前</h3>
-        <img [src]="estimationBefore!.segmented_image" alt="Before Segmented Image">
+        <img [src]="estimationBefore!.segmented_image || this.altImage" alt="Before Segmented Image">
         <p><strong>已識別的食物數量:</strong> {{ estimationBefore!.food_items!.length }}</p>
         <ul>
           <!-- Replace ! with ! everywhere -->
@@ -31,7 +31,7 @@
 
       <div class="segment-section" *ngIf="estimationAfter">
         <h3>餐後</h3>
-        <img [src]="estimationAfter!.segmented_image" alt="After Segmented Image">
+        <img [src]="estimationAfter!.segmented_image || this.altImage" alt="After Segmented Image">
         <p><strong>已識別的食物數量:</strong> {{ estimationAfter!.food_items!.length }}</p>
         <ul>
           <li *ngFor="let item of estimationAfter!.food_items">
@@ -94,15 +94,15 @@
                 <div class="item-stats">
                   <div class="stat">
                     <span class="stat-label">之前:</span>
-                    <span class="stat-value">{{ item.before }} ml</span>
+                    <span class="stat-value">{{ item.before | number:'1.2-2' }} ml</span>
                   </div>
                   <div class="stat">
                     <span class="stat-label">之後:</span>
-                    <span class="stat-value">{{ item.after }} ml</span>
+                    <span class="stat-value">{{ item.after | number:'1.2-2' }} ml</span>
                   </div>
                   <div class="stat consumption">
                     <span class="stat-label">已食用的食物:</span>
-                    <span class="stat-value">{{ item.consumed }} ml</span>
+                    <span class="stat-value">{{ item.consumed | number:'1.2-2' }} ml</span>
                   </div>
                   <div class="stat percentage">
                     <span class="stat-label">百分比:</span>

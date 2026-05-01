@@ -19,6 +19,7 @@ export interface LTCSettings {
   machineIp: string | null;       // ← added
   mealCycle: MealCycle;
   mealTimeRanges: MealTimeRanges;
+  yoloModel: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -52,6 +53,7 @@ export class SettingsService {
           lunch:  { start: raw.lunch_start,  end: raw.lunch_end  },
           dinner: { start: raw.dinner_start, end: raw.dinner_end },
         },
+        yoloModel: raw.model_filepath ?? null,
       };
 
       console.log(`Settings loaded for machine ID ${id}:`, this._settings);

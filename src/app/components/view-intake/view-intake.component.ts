@@ -33,6 +33,7 @@ export class ViewIntakeComponent implements OnInit {
 
   estimationBefore: EstimationResult | null = null;
   estimationAfter: EstimationResult | null = null;
+  altImage: string | null = '';
 
   intakeData: any = {};
 
@@ -51,6 +52,8 @@ export class ViewIntakeComponent implements OnInit {
     console.log('Intake ID:', this.intakeId);
 
     this.loadPairedIntake();
+
+    //method to get intake by id given url path as 'http://localhost:4200/patient-info/1/intakes/68/view' where in this case the 68 is the intake id and log it.
   }
 
   private loadPairedIntake(): void {
@@ -65,9 +68,15 @@ export class ViewIntakeComponent implements OnInit {
         const mealPeriod = intake.meal_detail.meal_time as '午餐' | '晚餐';
         const phase = intake.meal_phase as '前' | '後';
         const intakeDate = new Date(intake.recorded_at);
+        this.altImage = String(intake.image ?? '');
+
+        console.log(intake.image)
+        console.log(this.altImage)
 
         if (phase === '前') {
           this.beforeIntake = intake;
+
+          console.log(this.beforeIntake)
 
           this.loadEstimationForIntake(intake.id).subscribe({
             next: result => {

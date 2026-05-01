@@ -18,7 +18,7 @@ export class RecommendedIntakeService {
   // }
 
   getRecommendedIntake(patientId: number): Observable<RecommendedIntakeApiResponse> {
-    return this.http.post<RecommendedIntakeApiResponse>(
+    return this.http.get<RecommendedIntakeApiResponse>(
       `${this.apiUrl}${patientId}/recommended-intake/`,
       {} // required body
     );

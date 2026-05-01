@@ -50,6 +50,22 @@
         </small>
       </div>
 
+      <div class="form-group">
+        <label>YOLO model</label>
+
+        <select formControlName="yoloModel">
+          <option value="" disabled>請選擇模型</option>
+          <option *ngFor="let model of yoloModels" [value]="model.replace('.pt','')">
+            {{ model }}
+          </option>
+        </select>
+
+        <small class="field-error"
+          *ngIf="settingsForm.get('yoloModel')?.invalid && settingsForm.get('yoloModel')?.touched">
+          請選擇模型
+        </small>
+      </div>
+
       <div class="button-group">
         <button type="submit" class="primary" [disabled]="saving">儲存設定</button>
       </div>

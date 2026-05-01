@@ -76,7 +76,7 @@ export class PatientDetailsComponent implements OnInit, OnChanges{
     const mealText = this.mealAssignments
       .map((assignment, index) => {
         const intakeGrams = Math.floor(Math.random() * (700 - 150 + 1)) + 150;
-        const mealName = assignment.meal_detail?.meal_name || 'Unknown Meal';
+        const mealName = assignment.meal_detail?.meal_name || '--';
         return `Meal ${index + 1}: ${assignment.meal_type.charAt(0).toUpperCase() + assignment.meal_type.slice(1)}, ${mealName}, ${intakeGrams} g`;
       })
       .join('\n');
@@ -133,12 +133,12 @@ LTC PATIENT DETAILS:
 Patient ID: ${patientIdentifier}
 Room: ${this.ltcPatient.room_number || 'N/A'}
 Bed: ${this.ltcPatient.bed_number || 'N/A'}
-Age: ${this.ltcPatient.age || 'Unknown'} years
-Gender: ${this.ltcPatient.sex || 'Unknown'}
+Age: ${this.ltcPatient.age || '--'} years
+Gender: ${this.ltcPatient.sex || '--'}
 Height: ${this.ltcPatient.height_cm || 'N/A'} cm
 Weight: ${this.ltcPatient.weight_kg || 'N/A'} kg
 BMI: ${bmi || 'N/A'}
-Activity Level: ${this.ltcPatient.activity_level || 'Unknown'}
+Activity Level: ${this.ltcPatient.activity_level || '--'}
 
 RECOMMENDED DAILY INTAKE:
 Calories: ${this.recommendedIntake.daily_caloric_needs} kcal
@@ -293,7 +293,7 @@ Return ONLY the formatted text exactly as specified above. No extra text.
    * Get patient age display
    */
   getPatientAge(): string {
-    return this.ltcPatient?.age?.toString() || 'Unknown';
+    return this.ltcPatient?.age?.toString() || '--';
   }
 
   /**
@@ -304,15 +304,15 @@ Return ONLY the formatted text exactly as specified above. No extra text.
     
     switch (activityLevel) {
       case 'inactive':
-        return 'Inactive';
+        return '無活動量';
       case 'low_active':
-        return 'Low Active';
+        return '低活動量';
       case 'active':
-        return 'Active';
+        return '中活動量';
       case 'very_active':
-        return 'Very Active';
+        return '高活動量';
       default:
-        return 'Unknown';
+        return '--';
     }
   }
 

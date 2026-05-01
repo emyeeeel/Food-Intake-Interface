@@ -21,6 +21,12 @@ export class SetupComponent implements OnInit {
   error: string | null = null;
   successMessage: string | null = null;
 
+  yoloModels: string[] = [
+    'custom.pt',
+    'merge.pt',
+    'fine_640.pt',
+  ];
+
   constructor(private fb: FormBuilder, private settingsService: SettingsService) {}
 
   async ngOnInit() {
@@ -39,6 +45,7 @@ export class SetupComponent implements OnInit {
         dinnerEnd:          [s.mealTimeRanges.dinner.end,   Validators.required],
         mealCycleStartDate: [s.mealCycle.startDate,         Validators.required],
         mealCycleLength:    [s.mealCycle.cycleLength,       [Validators.required, Validators.min(1)]],
+        yoloModel:          [s.yoloModel ?? '', Validators.required],
       });
     } catch (err) {
       console.error(err);
@@ -76,6 +83,7 @@ export class SetupComponent implements OnInit {
       dinner_end:             v.dinnerEnd,
       meal_cycle_start_date:  v.mealCycleStartDate,
       meal_cycle_length:      v.mealCycleLength,
+      yolo_model:             v.yoloModel,
     };
 
     try {
