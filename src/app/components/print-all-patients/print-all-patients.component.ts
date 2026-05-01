@@ -186,7 +186,7 @@ export class PrintAllPatientsComponent implements OnInit {
         <tr>
           <td>${p.room_number}</td>
           <td>${p.bed_number}</td>
-          <td>${p.age}</td>
+          <td>${p.birthdate}</td>
           <td>${p.sex === 'M' ? 'Male' : p.sex === 'F' ? 'Female' : p.sex}</td>
           <td>${p.height_cm}</td>
           <td>${p.weight_kg}</td>
@@ -246,7 +246,7 @@ export class PrintAllPatientsComponent implements OnInit {
         <tr>
           <td>${p.room_number}</td>
           <td>${p.bed_number}</td>
-          <td>${p.age}</td>
+          <td>${p.birthdate}</td>
           <td>${p.sex === 'M' ? 'Male' : p.sex === 'F' ? 'Female' : p.sex}</td>
           <td>${p.height_cm}</td>
           <td>${p.weight_kg}</td>

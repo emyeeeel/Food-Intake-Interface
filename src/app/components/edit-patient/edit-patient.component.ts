@@ -42,7 +42,7 @@ export class EditPatientComponent implements OnInit, OnDestroy {
   bedNumber: string = '';
   name: string = '';
   national_id: string = '';
-  age: number | null = null;
+  birthdate: string = '';
   sex: string = '';
   height: number | null = null;
   weight: number | null = null;
@@ -136,7 +136,9 @@ export class EditPatientComponent implements OnInit, OnDestroy {
   private populateForm(patient: LTCPatient): void {
     this.roomNumber = patient.room_number || '';
     this.bedNumber = patient.bed_number || '';
-    this.age = patient.age || null;
+    this.name  = patient.name || '';   
+    this.national_id  = patient.national_id || '';
+    this.birthdate = patient.birthdate || '';
     this.sex = patient.sex || '';
     this.height = patient.height_cm || null;
     this.weight = patient.weight_kg || null;
@@ -346,7 +348,7 @@ export class EditPatientComponent implements OnInit, OnDestroy {
       id: this.patientId,
       room_number: this.roomNumber,
       bed_number: this.bedNumber,
-      age: this.age ?? 0,
+      birthdate: this.birthdate,
       sex: this.sex,
       height_cm: this.height ?? 0,
       weight_kg: this.weight ?? 0,
@@ -597,7 +599,7 @@ export class EditPatientComponent implements OnInit, OnDestroy {
       id: this.patientId,
       room_number: this.roomNumber,
       bed_number: this.bedNumber,
-      age: this.age,
+      birthdate: this.birthdate, 
       sex: this.sex,
       height_cm: this.height,
       weight_kg: this.weight,
@@ -619,6 +621,20 @@ export class EditPatientComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.clearSuccessMessage();
     }, 5000);
+  }
+
+  calcAge(gregorianDateStr: string | null | undefined): string {
+    if (!gregorianDateStr) return '';
+    const birth = new Date(gregorianDateStr);
+    if (isNaN(birth.getTime())) return '';
+
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const birthdayPassedThisYear =
+      today.getMonth() > birth.getMonth() ||
+      (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate());
+    if (!birthdayPassedThisYear) age--;
+    return String(age);
   }
 
   /**

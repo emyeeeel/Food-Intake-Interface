@@ -26,7 +26,7 @@ export class PrintAllMealsComponent implements OnInit {
   
   // Pagination properties
   currentPage = 1;
-  pageSize = 6; // Default to 5 items per page for table view
+  pageSize = 5; // Default to 5 items per page for table view
   totalMeals = 0;
   totalPages = 0;
   targetPage: number | null = null;

@@ -46,4 +46,13 @@ export class PatientService {
       map(ltcPatients => ltcPatients.length)
     );
   }
+
+  addPatientsUsingExcel(excelFile: File): Observable<any> {
+    const url = `${this.baseUrl}/api/ltc-patients/bulk/`;
+    
+    const formData = new FormData();
+    formData.append('file', excelFile, excelFile.name);
+    
+    return this.http.post<any>(url, formData);
+  }
 }

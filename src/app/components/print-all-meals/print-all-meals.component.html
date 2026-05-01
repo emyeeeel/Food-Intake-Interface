@@ -60,6 +60,9 @@
                 <th>Meal Name</th>
                 <th>Meal Time</th>
                 <th>Day Cycle</th>
+                <th>Plate Type</th>
+                <th>Ingredients</th>
+                <th>Created</th>
               </tr>
             </thead>
             <tbody>
@@ -75,14 +78,14 @@
                       (click)="$event.stopPropagation()"
                       (change)="toggleMealSelection(meal.id, $event)">
                     </td>
-                    <!-- Meal Name -->
                     <td class="meal-name">
                       {{ meal.meal_name }}
                     </td>
-                    <!-- Meal Time -->
                     <td class="meal-time">{{ meal.meal_time }}</td>
-                    <!-- Day Cycle -->
                     <td class="day-cycle">Day {{ meal.day_cycle }}</td>
+                    <td class="plate-type">{{ meal.plate_type }}</td>
+                    <td class="ingredients">{{ getMealIngredients(meal) }}</td>
+                    <td class="created-at">{{ meal.created_at | date:'short' }}</td>
                   </tr>
                 }
               </tbody>
@@ -182,7 +185,7 @@
                     <h1>Meal Records Report</h1>
                     <p>Generated on: {{ currentDate | date:'full' }}</p>
                     <p>Total Records: {{ mealsForPrint.length }}</p>
-                    <p>Print Mode: {{ getPrintModeTitle() }}</p>
+                    <!-- <p>Print Mode: {{ getPrintModeTitle() }}</p> -->
                   </div>
                   <table class="print-table">
                     <thead>

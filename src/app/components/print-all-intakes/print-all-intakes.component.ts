@@ -191,6 +191,7 @@ export class PrintAllIntakesComponent implements OnInit {
         <tr>
           <td>${i.ltc_patient_detail?.room_number || '-'}</td>
           <td>${i.ltc_patient_detail?.bed_number || '-'}</td>
+          <td>${i.ltc_patient_detail?.name || '-'}</td>
           <td>${i.meal_detail?.meal_name || '-'}</td>
           <td>${i.weight_g || '-'}</td>
           <td>${i.volume_ml || '-'}</td>
@@ -250,6 +251,7 @@ export class PrintAllIntakesComponent implements OnInit {
         <tr>
           <td>${i.ltc_patient_detail?.room_number || '-'}</td>
           <td>${i.ltc_patient_detail?.bed_number || '-'}</td>
+          <td>${i.ltc_patient_detail?.name || '-'}</td>
           <td>${i.meal_detail?.meal_name || '-'}</td>
           <td>${i.weight_g || '-'}</td>
           <td>${i.volume_ml || '-'}</td>
