@@ -308,6 +308,7 @@ startScanner(): void {
       }
 
       this.mealAssignments = filteredAssignments;
+      console.log("Current date today: ", new Date().toISOString())
       console.log('Filtered assignments for today & meal period:', filteredAssignments);
 
       if (filteredAssignments.length > 0) {
@@ -515,20 +516,54 @@ startScanner(): void {
             const weightText = await weightBlob.text();
             console.log('Raw JSON text:', weightText);
 
-            const imageFile = new File([rgbFileData], `intake_${Date.now()}.png`, { type: 'image/png' });
+            // Original zip extraction (commented out for manual test URL input)
+            // const imageFile = new File([rgbFileData], `intake_${Date.now()}.png`, { type: 'image/png' });
 
-            const csvBlob = await zip.file('depth.csv')?.async('blob');
-            if (!csvBlob) throw new Error('depth.csv not found in ZIP');
+            // const csvBlob = await zip.file('depth.csv')?.async('blob');
+            // if (!csvBlob) throw new Error('depth.csv not found in ZIP');
 
-            const csvFile = new File([csvBlob], `depth_${Date.now()}.csv`, { type: 'text/csv' });
+            // const csvFile = new File([csvBlob], `depth_${Date.now()}.csv`, { type: 'text/csv' });
 
-            let netWeight = 0;
-            try {
-              const weightData = JSON.parse(weightText);
-              netWeight = weightData?.net_weight ?? 0;
-            } catch (error) {
-              console.error('Failed to parse weight JSON:', error);
+            // Manual test URLs based on meal phase
+            const meal_phase_temp = this.selectedMealType === 'Before' ? '前' : '後';
+            let testImageUrl = '';
+            let testCsvUrl = '';
+
+            if (meal_phase_temp === '後') {
+              testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/後/intake_test_1777569606762.png';
+              testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/後/depth_test_1777569606763.csv';
+            } else {
+              testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/前/intake_test_1777569548690.png';
+              testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/前/depth_test_1777569548690.csv';
             }
+
+            const [imgRes, csvRes] = await Promise.all([fetch(testImageUrl), fetch(testCsvUrl)]);
+            if (!imgRes.ok || !csvRes.ok) {
+              throw new Error(`Failed to fetch test files: image=${imgRes.status}, csv=${csvRes.status}`);
+            }
+
+            const imgBlob = await imgRes.blob();
+            const csvBlobFetched = await csvRes.blob();
+
+            const imageFile = new File([imgBlob], `intake_test_${Date.now()}.png`, { type: imgBlob.type || 'image/png' });
+            const csvFile = new File([csvBlobFetched], `depth_test_${Date.now()}.csv`, { type: 'text/csv' });
+
+            // Fixed test weight outputs based on meal phase
+            let netWeight = 0;
+            if (meal_phase_temp === '前') {
+              netWeight = 667.12;
+            } else {
+              netWeight = 215.78;
+            }
+            console.log('Fixed test netWeight:', netWeight);
+
+            // Original weight parsing (commented out for test)
+            // try {
+            //   const weightData = JSON.parse(weightText);
+            //   netWeight = weightData?.net_weight ?? 0;
+            // } catch (error) {
+            //   console.error('Failed to parse weight JSON:', error);
+            // }
 
             const meal_phase = this.selectedMealType === 'Before' ? '前' : '後';
             console.log('meal_phase:', meal_phase);
@@ -541,13 +576,28 @@ startScanner(): void {
             if (meal_phase === '前') {
               formData.append('volume_ml', '100');
             } else {
+              const period = this.getActiveMealPeriod();
+
+              if (period) {
+                await firstValueFrom(
+                  this.intakeService.getIntakesByMealPeriod(this.scannedPatientId!, period)
+                ).then(freshIntakes => {
+                  this.intakes = freshIntakes;
+                });
+              }
+
               const beforeRecord = this.intakes.find(r => r.meal_phase === '前');
+
               if (beforeRecord && beforeRecord.weight_g > 0) {
-                const consumed = ((beforeRecord.weight_g - netWeight) / beforeRecord.weight_g) * 100;
-                formData.append('volume_ml', Math.max(0, Math.min(100, consumed)).toFixed(2));
+                const remaining =
+                  (netWeight / beforeRecord.weight_g) * 100;
+
+                const clamped = Math.max(0, Math.min(100, remaining));
+
+                formData.append('volume_ml', clamped.toFixed(2));
               }
             }
-
+            
             formData.append('recorded_at', new Date().toISOString());
             formData.append('meal_phase', meal_phase);
             formData.append('image', imageFile);

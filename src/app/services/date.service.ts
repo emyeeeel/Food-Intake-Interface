@@ -215,14 +215,18 @@ export class DateService implements OnDestroy {
       throw new Error(`Day in cycle must be between 1 and ${cycleLength}`);
     }
 
-    const startDate = new Date(cycle.startDate);
+    const [year, month, day] = cycle.startDate.split('-').map(Number);
+    const startDate = new Date(year, month - 1, day); 
     const targetDate = new Date(startDate);
     targetDate.setDate(startDate.getDate() + (dayInCycle - 1));
     return targetDate;
   }
 
   private formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   ngOnDestroy(): void {
