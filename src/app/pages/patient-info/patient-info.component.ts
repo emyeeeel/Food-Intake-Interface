@@ -91,7 +91,7 @@ export class PatientInfoComponent implements OnInit {
       });
     this.updateCurrentView(this.router.url);
     this.intakeService.getIntakeByLtcPatientId(1).subscribe(records => {
-      console.log(records);
+      // console.log(records);
     });
   }
 

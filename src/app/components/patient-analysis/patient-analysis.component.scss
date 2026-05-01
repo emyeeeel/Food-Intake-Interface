@@ -1,39 +1,194 @@
+// .main-container {
+//   width: 100%;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   height: 100%;   
+// //   border: 1px solid red;
+
+//   display: flex;
+//   flex-direction: column;
+//   gap: 10px;
+// }
+
+// .row-1{
+// //   border: 1px solid red;
+//     width: 100%;
+//     max-height: 250px;
+//     display: flex;
+//     flex-direction: row;
+//     align-items: center;
+//     justify-content: center;
+//     gap: 20px;
+// }
+
+// .row-2{
+//     width: 100%;
+//     height: 100%;
+//     min-height: 250px;
+//     display: flex;
+//     flex-direction: column;
+// }
+
+
+// .linechart-container, .barchart-container {
+//   width: 100%;
+//   min-width: 350px;
+//   height: 180px;
+//   padding: 20px;
+//   border-radius: 16px;
+//   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+//   box-sizing: border-box;
+// }
+
+// canvas {
+//   display: block;
+// }
+
+// .header{
+//     display: flex;
+//     flex-direction: row;
+//     justify-content: space-between;
+//     padding: 10px 0;
+
+//     h2{
+//       max-width: 300px;
+//       align-items: center;
+//       font-size: 20px;
+//     }
+
+//   .selection {
+//   display: flex;
+//   align-items: center;
+
+//   select {
+//     padding: 6px 12px;
+//     border-radius: 10px;
+//     border: 1px solid #d8e2e7;
+//     background: linear-gradient(180deg, #ffffff 0%, #f7fbfc 100%);
+//     font-size: 14px;
+//     font-weight: 500;
+//     color: #2c3e50;
+//     cursor: pointer;
+//     transition: all 0.2s ease;
+//     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+
+//     &:hover {
+//       border-color: #7cc7c1;
+//       background-color: #f0fbfa;
+//     }
+
+//     &:focus {
+//       outline: none;
+//       border-color: #4fb6b0;
+//       box-shadow: 0 0 0 2px rgba(79,182,176,0.15);
+//     }
+//   }
+// }
+// }
+
+// .analysis-content {
+//   min-height: 120px;
+//   max-width: 100%;
+//   padding: 16px 18px;
+
+//   background: #f9fcfd;
+//   border-radius: 12px;
+//   border: 1px solid #e4eef2;
+
+//   box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+
+//   overflow-wrap: break-word;
+//   word-break: break-word;
+//   white-space: pre-wrap;
+
+//   overflow-x: hidden;
+//   overflow-y: auto;
+
+//   font-family: 'Quicksand', sans-serif;
+//   font-size: 10px;
+//   line-height: 1.6;
+//   color: #2f3b45;
+
+//   scrollbar-width: thin;
+//   scrollbar-color: #cfdde3 transparent;
+
+//   pre {
+//     margin: 0;
+//     padding: 0;
+//     white-space: pre-wrap;
+//     word-break: break-word;
+//     font-family: inherit;
+//     font-size: inherit;
+//     line-height: inherit;
+//   }
+// }
+  
+
 .main-container {
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;   
-//   border: 1px solid red;
+  height: 100%;
+  //   border: 1px solid red;
 
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.row-1{
-//   border: 1px solid red;
-    width: 100%;
-    max-height: 250px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
+.patient-info-container {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 12px rgba(0, 49, 60, 0.1);
 }
 
-.row-2{
-    width: 100%;
-    height: 100%;
-    min-height: 250px;
-    display: flex;
-    flex-direction: column;
+.patient-info-container p {
+  padding: 0;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 
-.linechart-container, .barchart-container {
+
+.row-1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
   width: 100%;
-  min-width: 350px;
+
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+// FOR MOBILE VERSION (450px or less width) IN CHARTS
+@media (max-width: 450px) {
+  .row-1 {
+    grid-template-columns: 1fr;
+  }
+
+  .linechart-container {
+    width: 330px;
+  }
+}
+
+
+.row-2 {
+  width: 100%;
+  height: 100%;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.linechart-container,
+.barchart-container {
+  width: 100%;
   height: 180px;
   padding: 20px;
   border-radius: 16px;
@@ -41,50 +196,60 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 450px) {
+
+  .linechart-container,
+  .barchart-container {
+    width: 99%;
+    margin: 0 auto;
+  }
+}
+
 canvas {
   display: block;
 }
 
-.header{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 10px 0;
-
-    h2{
-      max-width: 300px;
-      align-items: center;
-      font-size: 20px;
-    }
-
-  .selection {
+.header {
   display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px 0;
   align-items: center;
 
-  select {
-    padding: 6px 12px;
-    border-radius: 10px;
-    border: 1px solid #d8e2e7;
-    background: linear-gradient(180deg, #ffffff 0%, #f7fbfc 100%);
-    font-size: 14px;
-    font-weight: 500;
-    color: #2c3e50;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  p {
+    max-width: 300px;
+    align-items: center;
+    font-size: 20px;
+  }
 
-    &:hover {
-      border-color: #7cc7c1;
-      background-color: #f0fbfa;
-    }
+  .selection {
+    display: flex;
+    align-items: center;
 
-    &:focus {
-      outline: none;
-      border-color: #4fb6b0;
-      box-shadow: 0 0 0 2px rgba(79,182,176,0.15);
+    select {
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: 1px solid #d8e2e7;
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbfc 100%);
+      font-size: 14px;
+      font-weight: 500;
+      color: #2c3e50;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+      &:hover {
+        border-color: #7cc7c1;
+        background-color: #f0fbfa;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: #4fb6b0;
+        box-shadow: 0 0 0 2px rgba(79, 182, 176, 0.15);
+      }
     }
   }
-}
 }
 
 .analysis-content {
@@ -96,7 +261,7 @@ canvas {
   border-radius: 12px;
   border: 1px solid #e4eef2;
 
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 
   overflow-wrap: break-word;
   word-break: break-word;
@@ -123,4 +288,18 @@ canvas {
     line-height: inherit;
   }
 }
-  
+
+.analysis-content h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+.title p {
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2c6f6b;
+}

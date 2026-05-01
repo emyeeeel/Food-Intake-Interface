@@ -1,0 +1,168 @@
+.section-space {
+    height: 20px;
+}
+
+//   TABLE
+.recommendation-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Quicksand', sans-serif;
+    border-radius: 10px;
+    overflow: hidden;
+    min-width: 310px;
+    /* forces scroll */
+
+}
+
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* HEADER (TEAL GRADIENT LIKE IMAGE) */
+.recommendation-table th {
+    text-align: left;
+    padding: 10px;
+    font-size: 11px;
+    font-weight: 700;
+
+    background: linear-gradient(90deg, #2bbbad, #3dc1a9);
+    color: white;
+
+    border: none;
+}
+
+/* CELLS */
+.recommendation-table td {
+    padding: 9px;
+    font-size: 11px;
+    color: #2c3e50;
+
+    border-bottom: 1px solid #e6f4f1;
+}
+
+/* ROW STYLE */
+.recommendation-table tr {
+    transition: background 0.2s ease;
+}
+
+.recommendation-table tr:nth-child(even) {
+    background-color: #f7fcfb;
+}
+
+.recommendation-table tr:nth-child(odd) {
+    background-color: #ffffff64;
+}
+
+.recommendation-table tr:hover {
+    background-color: #eef9f7;
+}
+
+/* ===============================
+   STATUS BADGE (IMPORTANT VISUAL)
+================================ */
+.remark {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* ===============================
+   CELL CLASSIFICATION
+================================ */
+.cell-below {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.cell-meets {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.cell-above {
+    color: #f39c12;
+    font-weight: 600;
+}
+
+.cell-none {
+    color: #aab5bb;
+}
+
+.cell-icon {
+    font-size: 11px;
+}
+
+.cell-value {
+    font-size: 11px;
+}
+
+/* ===============================
+   RECOMMENDATIONS CARD
+================================ */
+.recommendations-section {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 16px;
+    padding: 15px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* TITLE */
+.recommendations-section h3 {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #00313C;
+    margin-bottom: 10px;
+}
+
+/* FOOD TEXT */
+.foods {
+    display: block;
+    margin-top: 5px;
+
+    color: #555;
+    font-style: italic;
+}
+
+/* RESPONSIVE POLISH */
+@media (min-width: 768px) {
+    .patient-title {
+        font-size: 22px;
+    }
+
+    .recommendation-table th,
+    .recommendation-table td {
+        font-size: 12px;
+    }
+
+    .recommendation-item {
+        font-size: 12px;
+    }
+}
+
+
+// RESPONSIVE TEXT
+.desktop-text {
+    display: inline;
+}
+
+.mobile-text {
+    display: none;
+}
+
+@media (max-width: 450px) {
+    .desktop-text {
+        display: none;
+    }
+
+    .mobile-text {
+        display: inline;
+    }
+}
+
+
+.current-date {
+    padding: 0 0 10px 0;
+    color: #007360;
+}

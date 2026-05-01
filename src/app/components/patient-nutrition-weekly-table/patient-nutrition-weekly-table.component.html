@@ -1,0 +1,41 @@
+<div class="table-container">
+  <table class="recommendation-table">
+
+    <!-- HEADER -->
+    <thead>
+      <tr>
+        <th>Nutrient</th>
+        <th>DRIs</th>
+        <th *ngFor="let d of days">
+          {{ getWeekDay(d?.date) }}<br>
+          {{ d?.date | date:'MM/dd' }}
+        </th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+
+    <!-- BODY -->
+    <tbody>
+      <tr *ngFor="let row of rows">
+
+        <td>{{ row.nutrient }}</td>
+
+        <td>
+          {{ row.recommended.min | number:'1.0-1' }} – {{ row.recommended.max | number:'1.0-1' }} {{ row.unit }}
+        </td>
+
+        <td *ngFor="let v of row.values"
+            [ngClass]="'cell-' + classify(v, row.recommended.min, row.recommended.max)">
+          <span class="cell-icon">{{ getIcon(v, row.recommended.min, row.recommended.max) }}</span>
+          <span class="cell-value" *ngIf="v !== 0"> {{ v | number:'1.0-1' }} {{ row.unit }}</span>
+        </td>
+
+        <td class="remark">{{ row.frequencyRemark }}</td>
+
+      </tr>
+    </tbody>
+
+  </table>
+</div>
+
+<div class="section-space"></div>

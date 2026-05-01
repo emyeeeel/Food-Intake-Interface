@@ -1,0 +1,48 @@
+<div class="table-container">
+
+  <table class="recommendation-table">
+      <thead>
+      <tr>
+          <th>Nutrient</th>
+          <th>
+            Daily Recommended Intakes (DRIs)
+          </th>
+          <th>Lunch</th>
+          <th>Dinner</th>
+          <th>Total</th>
+          <th>Intake Remarks</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let item of nutritionData">
+          <td>
+            {{ item.nutrient }}
+          </td>
+
+          <td>
+              {{ item.recommended.min | number:'1.0-1' }} - {{ item.recommended.max | number:'1.0-1' }}
+              {{ item.nutrient === 'Calories' ? 'kcal' : 'g' }}
+          </td>
+
+          <td>
+              {{ item.lunch | number:'1.0-1' }}
+              {{ item.nutrient === 'Calories' ? 'kcal' : 'g' }}
+          </td>
+
+          <td>
+              {{ item.dinner | number:'1.0-1' }}
+              {{ item.nutrient === 'Calories' ? 'kcal' : 'g' }}
+          </td>
+
+          <td [ngClass]="'cell-' + item.classification">
+            <span class="cell-icon">{{ getIcon(item.classification) }}</span>
+            <span class="cell-value"> {{ item.total | number:'1.0-1' }} {{ item.nutrient === 'Calories' ? 'kcal' : 'g' }}</span>
+          </td>
+
+          <td class="remark">{{ item.remark }}</td>
+      </tr>
+      </tbody>
+  </table>
+  </div>
+
+<div class="section-space"></div>

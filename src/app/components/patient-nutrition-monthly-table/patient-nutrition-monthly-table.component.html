@@ -1,0 +1,50 @@
+<div class="table-container">
+  <table class="recommendation-table">
+
+    <thead>
+      <tr>
+        <th>Nutrient</th>
+        <th>DRIs</th>
+
+        <th *ngFor="let w of weeks">
+          <div class="week-header">
+            <div class="week-title">W{{ w.week }} Avg</div>
+            <div class="week-range">
+              {{ w.start }} – {{ w.end }}
+            </div>
+          </div>
+        </th>
+
+        <th>Monthly Avg</th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let row of rows">
+
+        <td>{{ row.nutrient }}</td>
+
+        <td>
+          {{ row.recommended.min | number:'1.0-1' }} - {{ row.recommended.max | number:'1.0-1' }} {{ row.unit }}
+        </td>
+
+        <td *ngFor="let v of row.values"
+            [ngClass]="'cell-' + classify(v, row.recommended.min, row.recommended.max)">
+          <span class="cell-icon">{{ getIcon(v, row.recommended.min, row.recommended.max) }}</span>
+          <span class="cell-value" *ngIf="v !== 0"> {{ v | number:'1.0-1' }} {{ row.unit }}</span>
+        </td>
+
+        <td>
+          {{ row.monthlyAvg | number:'1.0-1' }} {{ row.unit }}
+        </td>
+
+        <td class="remark">{{ row.frequencyRemark }}</td>
+
+      </tr>
+    </tbody>
+
+  </table>
+</div>
+
+<div class="section-space"></div>
