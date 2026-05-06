@@ -26,11 +26,23 @@
 
         <td *ngFor="let v of row.values"
             [ngClass]="'cell-' + classify(v, row.recommended.min, row.recommended.max)">
-          <span class="cell-icon">{{ getIcon(v, row.recommended.min, row.recommended.max) }}</span>
-          <span class="cell-value" *ngIf="v !== 0"> {{ v | number:'1.0-1' }} {{ row.unit }}</span>
+          <div class="cell-content">
+            <div class="status-badge" [ngClass]="'badge-' + classify(v, row.recommended.min, row.recommended.max)">
+              <span class="material-icons status-icon">{{ getIcon(v, row.recommended.min, row.recommended.max) }}</span>
+            </div>
+            <span class="cell-value" *ngIf="v !== 0">{{ v | number:'1.0-1' }} {{ row.unit }}</span>
+          </div>
         </td>
 
-        <td class="remark">{{ row.frequencyRemark }}</td>
+        <td class="remark">
+          <div class="remark-chips">
+            <div *ngFor="let part of row.remarkParts"
+                 class="remark-chip" [ngClass]="'chip-' + part.cls">
+              <span class="material-icons chip-icon">{{ part.icon }}</span>
+              <span class="chip-label">{{ part.label }}</span>
+            </div>
+          </div>
+        </td>
 
       </tr>
     </tbody>

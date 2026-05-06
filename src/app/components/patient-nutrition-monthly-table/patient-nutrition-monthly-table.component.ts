@@ -75,7 +75,7 @@ export class PatientNutritionMonthlyTableComponent implements OnChanges {
       recommended,
       values,
       monthlyAvg: this.monthlyAvg[key],
-      frequencyRemark: this.getFrequencyRemark(values, recommended.min, recommended.max)
+      remarkParts: this.getRemarkParts(values, recommended.min, recommended.max)
     };
   }
 
@@ -88,27 +88,22 @@ export class PatientNutritionMonthlyTableComponent implements OnChanges {
 
   getIcon(value: number, min: number, max: number): string {
     const c = this.classify(value, min, max);
-    if (c === 'none')  return '—';
-    if (c === 'below') return '↓';
-    if (c === 'above') return '↑';
-    return '✓';
+    if (c === 'none')  return 'remove';
+    if (c === 'below') return 'arrow_downward';
+    if (c === 'above') return 'arrow_upward';
+    return 'check_circle';
   }
 
-  getFrequencyRemark(values: number[], min: number, max: number): string {
-    const total = values.length;
+  getRemarkParts(values: number[], min: number, max: number): {icon: string, label: string, cls: string}[] {
     const recorded = values.filter(v => v > 0);
-    if (recorded.length === 0) return 'No intake recorded';
+    if (recorded.length === 0) return [{icon: 'remove', label: 'No data', cls: 'none'}];
 
-    const below = recorded.filter(v => v < min).length;
-    const meets = recorded.filter(v => v >= min && v <= max).length;
-    const above = recorded.filter(v => v > max).length;
+    const parts: {icon: string, label: string, cls: string}[] = [];
+    if (recorded.some(v => v < min))              parts.push({icon: 'arrow_downward', label: 'Below', cls: 'below'});
+    if (recorded.some(v => v >= min && v <= max)) parts.push({icon: 'check_circle',   label: 'Meets', cls: 'meets'});
+    if (recorded.some(v => v > max))              parts.push({icon: 'arrow_upward',   label: 'Above', cls: 'above'});
 
-    const parts: string[] = [];
-    if (below > 0) parts.push(`↓ Below: ${below}/${total} wks`);
-    if (meets > 0) parts.push(`✓ Meets: ${meets}/${total} wks`);
-    if (above > 0) parts.push(`↑ Above: ${above}/${total} wks`);
-
-    return parts.join(' | ');
+    return parts;
   }
 
   formatDate(dateStr: string) {

@@ -23,7 +23,7 @@
 .recommendation-table th {
     text-align: left;
     padding: 10px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
 
     background: linear-gradient(90deg, #2bbbad, #3dc1a9);
@@ -34,8 +34,8 @@
 
 /* CELLS */
 .recommendation-table td {
-    padding: 9px;
-    font-size: 11px;
+    padding: 6px;
+    font-size: 10px;
     color: #2c3e50;
 
     border-bottom: 1px solid #e6f4f1;
@@ -59,42 +59,95 @@
 }
 
 /* ===============================
-   STATUS BADGE (IMPORTANT VISUAL)
+   REMARK CELL
 ================================ */
 .remark {
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 600;
+    text-align: left;
+}
+
+/* ===============================
+   CELL CONTENT WRAPPER
+================================ */
+.cell-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ===============================
+   STATUS BADGE
+================================ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.badge-below { background-color: #e74c3c; }
+.badge-meets { background-color: #27ae60; }
+.badge-above { background-color: #f39c12; }
+.badge-none  { background-color: #b2bec3; }
+
+.status-icon {
+    font-size: 14px !important;
+    color: white;
+    line-height: 1 !important;
+    user-select: none;
 }
 
 /* ===============================
    CELL CLASSIFICATION
 ================================ */
-.cell-below {
-    color: #e74c3c;
-    font-weight: 600;
-}
-
-.cell-meets {
-    color: #27ae60;
-    font-weight: 600;
-}
-
-.cell-above {
-    color: #f39c12;
-    font-weight: 600;
-}
-
-.cell-none {
-    color: #aab5bb;
-}
-
-.cell-icon {
-    font-size: 11px;
-}
+.cell-below { color: #c0392b; font-weight: 600; }
+.cell-meets { color: #1e8449; font-weight: 600; }
+.cell-above { color: #d68910; font-weight: 600; }
+.cell-none  { color: #95a5a6; }
 
 .cell-value {
-    font-size: 11px;
+    font-size: 10px;
+}
+
+/* ===============================
+   REMARK CHIPS
+================================ */
+.remark {
+    text-align: left;
+}
+
+.remark-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.remark-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 8px 2px 4px;
+    border-radius: 12px;
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+}
+
+.chip-below { background-color: #e74c3c; }
+.chip-meets { background-color: #27ae60; }
+.chip-above { background-color: #f39c12; }
+.chip-none  { background-color: #b2bec3; color: #444; }
+
+.chip-icon {
+    font-size: 11px !important;
+    line-height: 1 !important;
+    user-select: none;
+}
+
+.chip-label {
+    font-size: 9px;
 }
 
 /* ===============================

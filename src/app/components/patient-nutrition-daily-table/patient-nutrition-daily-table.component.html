@@ -25,24 +25,45 @@
           </td>
 
           <td>
+            <div *ngIf="item.lunch === 0; else lunchVal" class="status-badge badge-none">
+              <span class="material-icons status-icon">remove</span>
+            </div>
+            <ng-template #lunchVal>
               {{ item.lunch | number:'1.0-1' }}
               {{ item.nutrient === 'Calories' ? 'kcal' : 'g' }}
+            </ng-template>
           </td>
 
           <td>
+            <div *ngIf="item.dinner === 0; else dinnerVal" class="status-badge badge-none">
+              <span class="material-icons status-icon">remove</span>
+            </div>
+            <ng-template #dinnerVal>
               {{ item.dinner | number:'1.0-1' }}
               {{ item.nutrient === 'Calories' ? 'kcal' : 'g' }}
+            </ng-template>
           </td>
 
           <td [ngClass]="'cell-' + item.classification">
-            <span class="cell-icon">{{ getIcon(item.classification) }}</span>
-            <span class="cell-value"> {{ item.total | number:'1.0-1' }} {{ item.nutrient === 'Calories' ? 'kcal' : 'g' }}</span>
+            <div class="cell-content">
+              <div class="status-badge" [ngClass]="'badge-' + item.classification">
+                <span class="material-icons status-icon">{{ getIcon(item.classification) }}</span>
+              </div>
+              <span class="cell-value" *ngIf="item.classification !== 'none'">{{ item.total | number:'1.0-1' }} {{ item.nutrient === 'Calories' ? 'kcal' : 'g' }}</span>
+            </div>
           </td>
 
-          <td class="remark">{{ item.remark }}</td>
+          <td class="remark">
+            <div class="remark-chips">
+              <div class="remark-chip" [ngClass]="'chip-' + item.classification">
+                <span class="material-icons chip-icon">{{ getIcon(item.classification) }}</span>
+                <span class="chip-label">{{ getRemarkLabel(item.classification) }}</span>
+              </div>
+            </div>
+          </td>
       </tr>
       </tbody>
   </table>
   </div>
 
-<div class="section-space"></div>
+<!-- <div class="section-space"></div> -->

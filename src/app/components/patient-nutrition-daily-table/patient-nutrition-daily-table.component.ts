@@ -56,9 +56,16 @@ export class PatientNutritionDailyTableComponent implements OnChanges {
   }
 
   getIcon(classification: string): string {
-    if (classification === 'below') return '↓';
-    if (classification === 'above') return '↑';
-    if (classification === 'meets') return '✓';
-    return '—';
+    if (classification === 'below') return 'arrow_downward';
+    if (classification === 'above') return 'arrow_upward';
+    if (classification === 'meets') return 'check';
+    return 'remove';
+  }
+
+  getRemarkLabel(classification: string): string {
+    if (classification === 'below') return 'Below';
+    if (classification === 'above') return 'Above';
+    if (classification === 'meets') return 'Meets';
+    return 'No intake';
   }
 }

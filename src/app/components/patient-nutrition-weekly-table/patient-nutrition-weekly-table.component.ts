@@ -40,7 +40,7 @@ export class PatientNutritionWeeklyTableComponent implements OnChanges {
         unit,
         recommended,
         values,
-        frequencyRemark: this.getFrequencyRemark(values, recommended.min, recommended.max, 'days')
+        remarkParts: this.getRemarkParts(values, recommended.min, recommended.max, 'days')
       };
     };
 
@@ -62,27 +62,24 @@ export class PatientNutritionWeeklyTableComponent implements OnChanges {
 
   getIcon(value: number, min: number, max: number): string {
     const c = this.classify(value, min, max);
-    if (c === 'none')  return '—';
-    if (c === 'below') return '↓';
-    if (c === 'above') return '↑';
-    return '✓';
+    if (c === 'none')  return 'remove';
+    if (c === 'below') return 'arrow_downward';
+    if (c === 'above') return 'arrow_upward';
+    return 'check_circle';
   }
 
-  getFrequencyRemark(values: number[], min: number, max: number, unit: string): string {
-    const total = values.length;
+  getRemarkParts(values: number[], min: number, max: number, unit: string): {icon: string, label: string, cls: string}[] {
     const recorded = values.filter(v => v > 0);
-    if (recorded.length === 0) return 'No intake recorded';
+    if (recorded.length === 0) return [{icon: 'remove', label: 'No intake', cls: 'none'}];
 
-    const below = recorded.filter(v => v < min).length;
-    const meets = recorded.filter(v => v >= min && v <= max).length;
-    const above = recorded.filter(v => v > max).length;
+    const candidates = [
+      {icon: 'arrow_downward', label: 'Below', cls: 'below', count: recorded.filter(v => v < min).length},
+      {icon: 'check_circle',   label: 'Meets', cls: 'meets', count: recorded.filter(v => v >= min && v <= max).length},
+      {icon: 'arrow_upward',   label: 'Above', cls: 'above', count: recorded.filter(v => v > max).length},
+    ].filter(c => c.count > 0);
 
-    const parts: string[] = [];
-    if (below > 0) parts.push(`↓ Below: ${below}/${total} ${unit}`);
-    if (meets > 0) parts.push(`✓ Meets: ${meets}/${total} ${unit}`);
-    if (above > 0) parts.push(`↑ Above: ${above}/${total} ${unit}`);
-
-    return parts.join(' | ');
+    candidates.sort((a, b) => b.count - a.count);
+    return [candidates[0]];
   }
 
   getWeekDay(date: string): string {

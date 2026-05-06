@@ -43,6 +43,7 @@ export class RecommenderService {
   // }
 
   private apiUrl = 'https://fgktksbk-8001.jpe1.devtunnels.ms/api';
+  //   private apiUrl = 'https://z76tm28g-8001.asse.devtunnels.ms/api'; - AJ laptop endpoint
   private baseUrl = '/recommender-api/api';
 
   constructor(private http: HttpClient) { }
