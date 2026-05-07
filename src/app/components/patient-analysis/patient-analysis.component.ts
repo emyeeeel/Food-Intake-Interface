@@ -49,6 +49,8 @@ export class PatientAnalysisComponent implements OnDestroy, OnInit, OnChanges{
   recommendationLoading: boolean = false;
   recommendationError: string | null = null;
 
+  private cache: Partial<Record<'daily' | 'weekly' | 'monthly', any>> = {};
+
   patient?: any;
   date?: string;
   selectedDate?: any;
@@ -97,61 +99,76 @@ export class PatientAnalysisComponent implements OnDestroy, OnInit, OnChanges{
   // ================================
   // RECOMMENDATION
   // ================================
+  private getRequest$(period: 'daily' | 'weekly' | 'monthly') {
+    switch (period) {
+      case 'daily':
+        return this.recommenderService.getDailyNutritionAndFoodRecommendations(this.patientId);
+      case 'weekly':
+        return this.recommenderService.getWeeklyNutritionAndFoodRecommendations(this.patientId);
+      case 'monthly':
+        return this.recommenderService.getMonthlyNutritionAndFoodRecommendations(this.patientId);
+    }
+  }
+
+  private applyResponse(period: 'daily' | 'weekly' | 'monthly', response: any): void {
+    this.recommendationData = response;
+    this.recommendationText = response.response ?? JSON.stringify(response, null, 2);
+
+    if (period === 'daily') {
+      this.patient = response.patient;
+      this.date = this.formatDate(response.date);
+    } else {
+      this.date = this.formatDateRange(response.dates_list);
+    }
+  }
+
   loadRecommendation(period: 'daily' | 'weekly' | 'monthly'): void {
+    if (this.cache[period]) {
+      this.applyResponse(period, this.cache[period]);
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.recommendationLoading = true;
     this.recommendationError = null;
     this.recommendationText = '';
 
-    let request$;
-
-    switch (period) {
-      case 'daily':
-        request$ = this.recommenderService.getDailyNutritionAndFoodRecommendationsByDate(this.patientId, this.selectedDate);
-        break;
-      case 'weekly':
-        request$ = this.recommenderService.getWeeklyNutritionAndFoodRecommendations(this.patientId);
-        break;
-      case 'monthly':
-        request$ = this.recommenderService.getMonthlyNutritionAndFoodRecommendations(this.patientId);
-        break;
-    }
-
-    request$.subscribe({
+    this.getRequest$(period).subscribe({
       next: (response) => {
-        this.recommendationData = response;
-        console.log(this.recommendationData);
-
-        this.recommendationText = response.response ?? JSON.stringify(response, null, 2);
-        console.log(this.recommendationText);
+        this.cache[period] = response;
+        this.applyResponse(period, response);
+        this.recommendationLoading = false;
+        this.cdr.detectChanges();
 
         if (period === 'daily') {
-          this.patient = response.patient;
-          this.date = this.formatDate(response.date);
-        } else if (period === 'weekly') {
-          this.date = this.formatDateRange(response.dates_list);
-        } else if (period === 'monthly') {
-          this.date = this.formatDateRange(response.dates_list);
+          this.prefetchInBackground();
         }
-
-        this.recommendationLoading = false;
-        this.cdr.detectChanges(); // Ensure UI updates with new recommendation data
       },
       error: (err) => {
         console.error('Recommendation error:', err);
         this.recommendationError = 'Unable to load dietary recommendations';
         this.recommendationLoading = false;
-        this.cdr.detectChanges(); // Ensure UI updates with error state
+        this.cdr.detectChanges();
       }
     });
   }
 
+  private prefetchInBackground(): void {
+    (['weekly', 'monthly'] as const).forEach(period => {
+      if (this.cache[period]) return;
+      this.getRequest$(period).subscribe({
+        next: (response) => { this.cache[period] = response; },
+        error: () => { /* silent — user will retry on tab switch */ }
+      });
+    });
+  }
 
   // ================================
-  // 🔥 UPDATE 
+  // UPDATE
   // ================================
   onPeriodChange(period: 'daily' | 'weekly' | 'monthly'): void {
     this.selectedPeriod = period;
-    this.loadRecommendation(this.selectedPeriod);
+    this.loadRecommendation(period);
   }
 
 

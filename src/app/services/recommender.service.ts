@@ -91,4 +91,19 @@ export class RecommenderService {
     return this.http.get(`${this.apiUrl}/recommend/nutri-and-food/patient/${patientId}/monthly/${date}/`);
   }
 
+  // DAILY TREND - By Patient & Date (query param)
+  getDailyTrend(patientId: number, date: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/recommend/nutri-and-food/patient/${patientId}/daily/trend/`, { params: { date } });
+  }
+
+  // WEEKLY TREND - By Patient & Date (query param)
+  getWeeklyTrend(patientId: number, date: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/recommend/nutri-and-food/patient/${patientId}/weekly/trend/`, { params: { date } });
+  }
+
+  // MONTHLY TREND - By Patient & Date (query param)
+  getMonthlyTrend(patientId: number, date: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/recommend/nutri-and-food/patient/${patientId}/monthly/trend/`, { params: { date } });
+  }
+
 }
