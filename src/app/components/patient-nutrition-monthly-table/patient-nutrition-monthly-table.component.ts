@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnChanges } from '@angular/core';
 
+const NUTRIENT_KEYS = ['calories_kcal', 'protein_g', 'fats_g', 'carbohydrates_g', 'fiber_g'];
+
 @Component({
   selector: 'app-patient-nutrition-monthly-table',
   standalone: true,
@@ -13,7 +15,7 @@ export class PatientNutritionMonthlyTableComponent implements OnChanges {
 
   weeks: any[] = [];
   rows: any[] = [];
-  monthlyAvg: any = {};
+  monthlyTotal: any = {};
 
   ngOnChanges() {
     if (!this.recommendationData) return;
@@ -21,42 +23,48 @@ export class PatientNutritionMonthlyTableComponent implements OnChanges {
     const weeklyData = this.recommendationData.weekly_data;
     const monthlyData = this.recommendationData.monthly_data;
 
-    // ✅ 1. Sort daily data
+    if (!weeklyData || !monthlyData) return;
+
+    // Sort daily entries by numeric key
     const days = Object.keys(monthlyData)
       .map(d => +d)
       .sort((a, b) => a - b)
       .map(d => monthlyData[d]);
 
-    // ✅ 2. Split into chunks of 7 days
+    // Split into chunks of 7 for week grouping
     const weekChunks: any[][] = [];
     for (let i = 0; i < days.length; i += 7) {
       weekChunks.push(days.slice(i, i + 7));
     }
 
-    // ✅ 3. Build weeks with correct ranges
+    // Build weeks — compute averages from daily total_nutritional_content
     this.weeks = Object.keys(weeklyData)
       .sort((a, b) => +a - +b)
       .map((key, index) => {
-        const w = weeklyData[key];
         const chunk = weekChunks[index] || [];
+        const avg: Record<string, number> = {};
 
-        const startDate = chunk[0]?.date;
-        const endDate = chunk[chunk.length - 1]?.date;
+        for (const n of NUTRIENT_KEYS) {
+          const vals = chunk
+            .map((d: any) => d?.total_nutritional_content?.[n] ?? 0)
+            .filter((v: number) => v > 0);
+          avg[n] = vals.length > 0
+            ? vals.reduce((a: number, b: number) => a + b, 0) / vals.length
+            : 0;
+        }
 
         return {
-          week: key,
-          avg: w.weekly_average_nutritional_content,
-          remark: w.weekly_nutrition_remarks,
-          start: this.formatDate(startDate),
-          end: this.formatDate(endDate),
+          week:  key,
+          avg,
+          start: this.formatDate(chunk[0]?.date),
+          end:   this.formatDate(chunk[chunk.length - 1]?.date),
         };
       });
 
-    // ✅ 4. Monthly avg
-    this.monthlyAvg =
-      this.recommendationData.monthly_average_nutritional_content;
+    // Monthly total (used for the Monthly Avg column)
+    this.monthlyTotal = this.recommendationData.monthly_total_nutritional_content ?? {};
 
-    // ✅ 5. Build rows
+    // Build rows
     this.rows = [
       this.buildRow('Calories',      'kcal', 'calories_kcal'),
       this.buildRow('Protein',       'g',    'protein_g'),
@@ -68,13 +76,13 @@ export class PatientNutritionMonthlyTableComponent implements OnChanges {
 
   buildRow(label: string, unit: string, key: string) {
     const recommended = this.recommendationData.monthly_dri[key];
-    const values = this.weeks.map(w => w.avg[key]);
+    const values = this.weeks.map(w => w.avg[key] ?? 0);
     return {
-      nutrient: label,
+      nutrient:    label,
       unit,
       recommended,
       values,
-      monthlyAvg: this.monthlyAvg[key],
+      monthlyTotal:  this.monthlyTotal[key] ?? 0,
       remarkParts: this.getRemarkParts(values, recommended.min, recommended.max)
     };
   }

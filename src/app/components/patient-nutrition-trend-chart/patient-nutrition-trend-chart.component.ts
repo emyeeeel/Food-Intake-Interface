@@ -99,6 +99,8 @@ export class PatientNutritionTrendChartComponent implements OnChanges, AfterView
     const weeklyData = this.recommendationData.weekly_data;
     const monthlyData = this.recommendationData.monthly_data;
 
+    if (!weeklyData || !monthlyData) return { labels: [] as string[], datasets: [] };
+
     const days = Object.keys(monthlyData)
       .map(Number).sort((a, b) => a - b)
       .map(d => monthlyData[d]);
@@ -116,9 +118,21 @@ export class PatientNutritionTrendChartComponent implements OnChanges, AfterView
       .sort((a, b) => +a - +b)
       .map((key, i) => {
         const chunk = weekChunks[i] || [];
+
+        // Compute averages from daily total_nutritional_content
+        const avg: Record<string, number> = {};
+        for (const n of NUTRIENTS.map(n => n.key)) {
+          const vals = chunk
+            .map((d: any) => d?.total_nutritional_content?.[n] ?? 0)
+            .filter((v: number) => v > 0);
+          avg[n] = vals.length > 0
+            ? vals.reduce((a: number, b: number) => a + b, 0) / vals.length
+            : 0;
+        }
+
         return {
           label: `W${key} (${fmt(chunk[0]?.date)}–${fmt(chunk[chunk.length - 1]?.date)})`,
-          avg: weeklyData[key].weekly_average_nutritional_content,
+          avg,
         };
       });
 
@@ -126,7 +140,7 @@ export class PatientNutritionTrendChartComponent implements OnChanges, AfterView
 
     const datasets = NUTRIENTS.map(n => ({
       label:            n.label,
-      data:             weeks.map(w => w.avg?.[n.key] ?? 0),
+      data:             weeks.map(w => w.avg[n.key] ?? 0),
       borderColor:      n.color,
       backgroundColor:  n.color + '22',
       tension:          0.3,

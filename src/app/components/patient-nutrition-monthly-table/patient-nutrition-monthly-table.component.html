@@ -8,14 +8,14 @@
 
         <th *ngFor="let w of weeks">
           <div class="week-header">
-            <div class="week-title">W{{ w.week }} Avg</div>
+            <div class="week-title">Week {{ w.week }}</div>
             <div class="week-range">
               {{ w.start }} – {{ w.end }}
             </div>
           </div>
         </th>
 
-        <th>Monthly Avg</th>
+        <th>Monthly Total</th>
         <th>Remarks</th>
       </tr>
     </thead>
@@ -40,7 +40,7 @@
         </td>
 
         <td>
-          {{ row.monthlyAvg | number:'1.0-1' }} {{ row.unit }}
+          {{ row.monthlyTotal | number:'1.0-1' }} {{ row.unit }}
         </td>
 
         <td class="remark">
