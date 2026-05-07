@@ -30,7 +30,7 @@ export class PatientNutritionWeeklyTableComponent implements OnChanges {
     const get = (d: any, key: string) =>
       d?.total_nutritional_content?.[key] ?? 0;
 
-    const dris = res.patient_dris;
+    const dris = res.weekly_dri;
 
     const buildRow = (nutrient: string, unit: string, key: string, driKey: string) => {
       const recommended = dris[driKey];
@@ -40,16 +40,16 @@ export class PatientNutritionWeeklyTableComponent implements OnChanges {
         unit,
         recommended,
         values,
-        remarkParts: this.getRemarkParts(values, recommended.min, recommended.max, 'days')
+        remarkParts: this.getRemarkParts(values, recommended.min, recommended.max)
       };
     };
 
     this.rows = [
-      buildRow('Calories', 'kcal', 'calories_kcal', 'calories_kcal'),
-      buildRow('Protein',  'g',    'protein_g',      'protein_g'),
-      buildRow('Fats',     'g',    'fats_g',         'fats_g'),
-      buildRow('Carbohydrates', 'g', 'carbohydrates_g', 'carbohydrates_g'),
-      buildRow('Fiber',    'g',    'fiber_g',        'fiber_g'),
+      buildRow('Calories',      'kcal', 'calories_kcal',    'calories_kcal'),
+      buildRow('Protein',       'g',    'protein_g',        'protein_g'),
+      buildRow('Fats',          'g',    'fats_g',           'fats_g'),
+      buildRow('Carbohydrates', 'g',    'carbohydrates_g',  'carbohydrates_g'),
+      buildRow('Fiber',         'g',    'fiber_g',          'fiber_g'),
     ];
   }
 
@@ -68,7 +68,7 @@ export class PatientNutritionWeeklyTableComponent implements OnChanges {
     return 'check_circle';
   }
 
-  getRemarkParts(values: number[], min: number, max: number, unit: string): {icon: string, label: string, cls: string}[] {
+  getRemarkParts(values: number[], min: number, max: number): {icon: string, label: string, cls: string}[] {
     const recorded = values.filter(v => v > 0);
     if (recorded.length === 0) return [{icon: 'remove', label: 'No intake', cls: 'none'}];
 

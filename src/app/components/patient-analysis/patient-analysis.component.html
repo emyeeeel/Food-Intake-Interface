@@ -64,8 +64,10 @@
       <app-patient-nutrition-daily-table  *ngIf="recommendationData" [recommendationData]="recommendationData"></app-patient-nutrition-daily-table>
     } @else if (selectedPeriod === 'weekly') {
       <app-patient-nutrition-weekly-table *ngIf="recommendationData" [recommendationData]="recommendationData"></app-patient-nutrition-weekly-table>
+      <app-patient-nutrition-trend-chart *ngIf="recommendationData" [recommendationData]="recommendationData" mode="weekly"></app-patient-nutrition-trend-chart>
     } @else if (selectedPeriod === 'monthly') {
       <app-patient-nutrition-monthly-table *ngIf="recommendationData" [recommendationData]="recommendationData"></app-patient-nutrition-monthly-table>
+      <app-patient-nutrition-trend-chart *ngIf="recommendationData" [recommendationData]="recommendationData" mode="monthly"></app-patient-nutrition-trend-chart>
     }
 
     <div class="analysis-section">

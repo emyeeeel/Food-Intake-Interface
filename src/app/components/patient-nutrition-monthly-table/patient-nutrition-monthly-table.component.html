@@ -4,7 +4,7 @@
     <thead>
       <tr>
         <th>Nutrient</th>
-        <th>DRIs</th>
+        <th>Monthly DRIs</th>
 
         <th *ngFor="let w of weeks">
           <div class="week-header">
@@ -35,7 +35,7 @@
             <div class="status-badge" [ngClass]="'badge-' + classify(v, row.recommended.min, row.recommended.max)">
               <span class="material-icons status-icon">{{ getIcon(v, row.recommended.min, row.recommended.max) }}</span>
             </div>
-            <span class="cell-value" *ngIf="v !== 0">{{ v | number:'1.0-1' }} {{ row.unit }}</span>
+            <!-- <span class="cell-value" *ngIf="v !== 0">{{ v | number:'1.0-1' }} {{ row.unit }}</span> -->
           </div>
         </td>
 
@@ -59,4 +59,4 @@
   </table>
 </div>
 
-<div class="section-space"></div>
+<!-- <div class="section-space"></div> -->

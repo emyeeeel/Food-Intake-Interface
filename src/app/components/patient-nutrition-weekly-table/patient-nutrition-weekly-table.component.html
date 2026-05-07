@@ -5,7 +5,7 @@
     <thead>
       <tr>
         <th>Nutrient</th>
-        <th>DRIs</th>
+        <th>Weekly DRIs</th>
         <th *ngFor="let d of days">
           {{ getWeekDay(d?.date) }}<br>
           {{ d?.date | date:'MM/dd' }}
@@ -30,7 +30,7 @@
             <div class="status-badge" [ngClass]="'badge-' + classify(v, row.recommended.min, row.recommended.max)">
               <span class="material-icons status-icon">{{ getIcon(v, row.recommended.min, row.recommended.max) }}</span>
             </div>
-            <span class="cell-value" *ngIf="v !== 0">{{ v | number:'1.0-1' }} {{ row.unit }}</span>
+            <!-- <span class="cell-value" *ngIf="v !== 0">{{ v | number:'1.0-1' }} {{ row.unit }}</span> -->
           </div>
         </td>
 
@@ -50,4 +50,4 @@
   </table>
 </div>
 
-<div class="section-space"></div>
+<!-- <div class="section-space"></div> -->

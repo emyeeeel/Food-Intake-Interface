@@ -58,16 +58,16 @@ export class PatientNutritionMonthlyTableComponent implements OnChanges {
 
     // ✅ 5. Build rows
     this.rows = [
-      this.buildRow('Calories', 'kcal', 'calories_kcal'),
-      this.buildRow('Protein', 'g', 'protein_g'),
-      this.buildRow('Fats', 'g', 'fats_g'),
-      this.buildRow('Carbohydrates', 'g', 'carbohydrates_g'),
-      this.buildRow('Fiber', 'g', 'fiber_g'),
+      this.buildRow('Calories',      'kcal', 'calories_kcal'),
+      this.buildRow('Protein',       'g',    'protein_g'),
+      this.buildRow('Fats',          'g',    'fats_g'),
+      this.buildRow('Carbohydrates', 'g',    'carbohydrates_g'),
+      this.buildRow('Fiber',         'g',    'fiber_g'),
     ];
   }
 
   buildRow(label: string, unit: string, key: string) {
-    const recommended = this.recommendationData.patient_dris[key];
+    const recommended = this.recommendationData.monthly_dri[key];
     const values = this.weeks.map(w => w.avg[key]);
     return {
       nutrient: label,

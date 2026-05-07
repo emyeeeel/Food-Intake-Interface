@@ -23,13 +23,14 @@ import { DateService } from '../../services/date.service';
 import { PatientNutritionDailyTableComponent } from '../patient-nutrition-daily-table/patient-nutrition-daily-table.component';
 import { PatientNutritionWeeklyTableComponent } from '../patient-nutrition-weekly-table/patient-nutrition-weekly-table.component';
 import { PatientNutritionMonthlyTableComponent } from '../patient-nutrition-monthly-table/patient-nutrition-monthly-table.component';
+import { PatientNutritionTrendChartComponent } from '../patient-nutrition-trend-chart/patient-nutrition-trend-chart.component';
 
 Chart.register(...registerables, annotationPlugin);
 
 @Component({
   selector: 'app-patient-analysis',
   standalone: true,
-  imports: [CommonModule, FormsModule, PatientNutritionDailyTableComponent, PatientNutritionWeeklyTableComponent, PatientNutritionMonthlyTableComponent],
+  imports: [CommonModule, FormsModule, PatientNutritionDailyTableComponent, PatientNutritionWeeklyTableComponent, PatientNutritionMonthlyTableComponent, PatientNutritionTrendChartComponent],
   templateUrl: './patient-analysis.component.html',
   styleUrls: ['./patient-analysis.component.scss'],
 })

@@ -42,8 +42,8 @@ export class RecommenderService {
   //   return this.http.get(`${this.baseUrl}/recommend/patient/${patientId}/general`);
   // }
 
-  private apiUrl = 'https://fgktksbk-8001.jpe1.devtunnels.ms/api';
-  //   private apiUrl = 'https://z76tm28g-8001.asse.devtunnels.ms/api'; - AJ laptop endpoint
+  // private apiUrl = 'https://fgktksbk-8001.jpe1.devtunnels.ms/api';
+  private apiUrl = 'https://z76tm28g-8001.asse.devtunnels.ms/api'; //AJ laptop endpoint
   private baseUrl = '/recommender-api/api';
 
   constructor(private http: HttpClient) { }
