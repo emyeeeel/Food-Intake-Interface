@@ -142,7 +142,6 @@ export class MealAssignmentComponent implements OnInit, OnChanges, OnDestroy {
           meal_name: assignment.meal_detail.meal_name,
           meal_time: assignment.meal_detail.meal_time,
           day_cycle: assignment.meal_detail.day_cycle,
-          plate_type: assignment.meal_detail.plate_type,
           created_at: assignment.meal_detail.created_at,
           updated_at: assignment.meal_detail.updated_at,
           ingredients: assignment.meal_detail.ingredients

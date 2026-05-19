@@ -74,7 +74,6 @@ export class PrintAllMealsComponent implements OnInit {
             name: meal.meal_name,
             mealTime: meal.meal_time,
             dayCycle: meal.day_cycle,
-            plateType: meal.plate_type,
             ingredientsCount: meal.ingredients?.length || 0,
             createdAt: meal.created_at,
             updatedAt: meal.updated_at

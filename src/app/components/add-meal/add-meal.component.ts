@@ -26,7 +26,6 @@ export class AddMealComponent implements OnInit {
     meal_name: '',
     meal_time: '',
     day_cycle: undefined, // Changed from empty string to undefined
-    plate_type: '',
     ingredients: [] as number[]
   };
 
@@ -49,13 +48,6 @@ export class AddMealComponent implements OnInit {
   value: i + 1,            // ✅ INTEGER
   label: `第${i + 1}天`
 }));
-
-
-  plateTypeOptions = [
-  { value: '金属板', label: '金属板' },
-  { value: '金属碗', label: '金属碗' },
-  { value: '陶瓷碗', label: '陶瓷碗' }
-];
 
 
   constructor(
@@ -116,10 +108,6 @@ export class AddMealComponent implements OnInit {
           
           if (apiMeal.day_cycle && !this.meal.day_cycle) {
             this.meal.day_cycle = apiMeal.day_cycle;
-          }
-          
-          if (apiMeal.plate_type && !this.meal.plate_type) {
-            this.meal.plate_type = apiMeal.plate_type;
           }
           
           // Store the meal ID if it was created/updated on the backend
@@ -188,10 +176,6 @@ export class AddMealComponent implements OnInit {
         formData.append('day_cycle', String(this.meal.day_cycle)); // Convert number to string for FormData
       }
 
-      if (this.meal.plate_type) {
-        formData.append('plate_type', this.meal.plate_type);
-      }
-
       if (this.mealImage) {
         formData.append('image', this.mealImage, this.mealImage.name);
       }
@@ -210,7 +194,6 @@ private buildMealFormData(): FormData {
   formData.append('meal_name', this.meal.meal_name!);
   formData.append('meal_time', this.meal.meal_time!);
   formData.append('day_cycle', String(this.meal.day_cycle!)); // Convert number to string for FormData
-  formData.append('plate_type', this.meal.plate_type!);
 
   console.log('Ingredients List: ', this.generatedIngredients)
 
@@ -268,8 +251,7 @@ private buildMealFormData(): FormData {
     return !!(
       this.meal.meal_name?.trim() &&
       this.meal.meal_time &&
-      this.meal.day_cycle &&
-      this.meal.plate_type
+      this.meal.day_cycle
     );
   }
 
@@ -277,8 +259,7 @@ private buildMealFormData(): FormData {
     this.meal = {
       meal_name: '',
       meal_time: '',
-      day_cycle: undefined, // Changed from empty string to undefined
-      plate_type: '',
+      day_cycle: undefined,
       ingredients: []
     };
     this.generatedIngredients = [];
@@ -348,8 +329,7 @@ private buildMealFormData(): FormData {
     this.meal = {
       meal_name: '',
       meal_time: '',
-      day_cycle: undefined, // Changed from empty string to undefined
-      plate_type: '',
+      day_cycle: undefined,
       image: '',
       ingredients: []
     };

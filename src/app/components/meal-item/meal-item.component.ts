@@ -17,8 +17,6 @@ export class MealItemComponent {
   @Input() dayCycleValue: string = '';
   @Input() mealTimeLabel: string = '餐別';
   @Input() mealTimeValue: string = '';
-  @Input() plateTypeLabel: string = '樣式';
-  @Input() plateTypeValue: string = '';
 
   @Input() mealId: number | null = null;
 

@@ -18,4 +18,5 @@ export interface IntakeRecord {
     image: File | null;
     depth_csv: File | null;
     meal_phase: string;
+    plate_type?: string;
 }

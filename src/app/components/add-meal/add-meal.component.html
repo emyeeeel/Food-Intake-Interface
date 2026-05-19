@@ -106,15 +106,6 @@
                   }
                 </select>
               </div>
-              <div class="dropdown-wrapper">
-                <label for="plateType">餐盤類型</label>
-                <select id="plateType" name="plateType" [(ngModel)]="meal.plate_type" class="form-select" required>
-                  <option value="" disabled>選擇餐盤類型</option>
-                  @for (option of plateTypeOptions; track option) {
-                    <option [value]="option.value">{{ option.label }}</option>
-                  }
-                </select>
-              </div>
             </div>
           </div>
           <div class="form-row ingredients-row">

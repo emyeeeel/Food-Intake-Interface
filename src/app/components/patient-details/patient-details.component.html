@@ -164,12 +164,6 @@
                           <img [src]="assignment.meal_detail.image" [alt]="assignment.meal_detail.meal_name">
                         </div>
                       }
-                      @if (assignment.meal_detail.plate_type) {
-                        <div class="plate-type">
-                          <span class="label">餐盤類型:</span>
-                          <span class="value">{{ assignment.meal_detail.plate_type }}</span>
-                        </div>
-                      }
                     </div>
                   } @else {
                     <div class="meal-loading">載入餐點資料...</div>
