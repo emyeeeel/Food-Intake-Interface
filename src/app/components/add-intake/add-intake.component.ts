@@ -548,6 +548,26 @@ startScanner(): void {
             const imageFile = new File([imgBlob], `intake_test_${Date.now()}.png`, { type: imgBlob.type || 'image/png' });
             const csvFile = new File([csvBlobFetched], `depth_test_${Date.now()}.csv`, { type: 'text/csv' });
 
+            // Container classification — resolve machine_ip once and cache in localStorage
+            let machine_ip = localStorage.getItem('machine_ip') ?? this.settingsService.machineIp ?? null;
+            if (!machine_ip) {
+              const settingsRes = await firstValueFrom(
+                this.http.get<any>(`${environment.apiBaseUrl}/api/settings/${environment.machineID}/`)
+              );
+              machine_ip = settingsRes.machine_ip as string;
+              if (machine_ip) localStorage.setItem('machine_ip', machine_ip);
+            }
+            console.log('machine_ip:', machine_ip);
+
+            const demoForm = new FormData();
+            demoForm.append('image', imageFile);
+            const classification = await firstValueFrom(
+              this.http.post<any>(`${machine_ip}/api/capture/demo/`, demoForm)
+            );
+            console.log('Container classification:', classification);
+            const containerType: string = classification.container_type;
+            const tareWeight: number = classification.tare_weight;
+
             // Fixed test weight outputs based on meal phase
             let netWeight = 0;
             if (meal_phase_temp === '前') {
@@ -555,7 +575,7 @@ startScanner(): void {
             } else {
               netWeight = 215.78;
             }
-            console.log('Fixed test netWeight:', netWeight);
+            console.log('containerType:', containerType, '| tareWeight:', tareWeight, '| netWeight:', netWeight);
 
             // Original weight parsing (commented out for test)
             // try {

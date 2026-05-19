@@ -61,7 +61,7 @@
                 <th>Meal Time</th>
                 <th>Day Cycle</th>
                 <th>Plate Type</th>
-                <th>Ingredients</th>
+                <!-- <th>Ingredients</th> -->
                 <th>Created</th>
               </tr>
             </thead>
@@ -84,7 +84,7 @@
                     <td class="meal-time">{{ meal.meal_time }}</td>
                     <td class="day-cycle">Day {{ meal.day_cycle }}</td>
                     <td class="plate-type">{{ meal.plate_type }}</td>
-                    <td class="ingredients">{{ getMealIngredients(meal) }}</td>
+                    <!-- <td class="ingredients">{{ getMealIngredients(meal) }}</td> -->
                     <td class="created-at">{{ meal.created_at | date:'short' }}</td>
                   </tr>
                 }
@@ -195,7 +195,7 @@
                         <th>Meal Time</th>
                         <th>Day Cycle</th>
                         <th>Plate Type</th>
-                        <th>Ingredients</th>
+                        <!-- <th>Ingredients</th> -->
                         <th>Created</th>
                       </tr>
                     </thead>
@@ -207,7 +207,7 @@
                           <td>{{ meal.meal_time }}</td>
                           <td>Day {{ meal.day_cycle }}</td>
                           <td>{{ meal.plate_type }}</td>
-                          <td>{{ getMealIngredients(meal) }}</td>
+                          <!-- <td>{{ getMealIngredients(meal) }}</td> -->
                           <td>{{ meal.created_at | date:'short' }}</td>
                         </tr>
                       }
