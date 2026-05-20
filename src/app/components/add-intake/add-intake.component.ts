@@ -568,6 +568,10 @@ startScanner(): void {
             const containerType: string = classification.container_type;
             const tareWeight: number = classification.tare_weight;
 
+            const validPlateTypes = new Set(['big_metal_tray', 'small_metal_tray', 'metal_bowl', 'unknown']);
+            const plateType: string = validPlateTypes.has(containerType) ? containerType : 'unknown';
+            console.log('plateType:', plateType);
+
             // Fixed test weight outputs based on meal phase
             let netWeight = 0;
             if (meal_phase_temp === '前') {
@@ -620,6 +624,7 @@ startScanner(): void {
             
             formData.append('recorded_at', new Date().toISOString());
             formData.append('meal_phase', meal_phase);
+            formData.append('plate_type', plateType);
             formData.append('image', imageFile);
             formData.append('depth_csv', csvFile);
 
