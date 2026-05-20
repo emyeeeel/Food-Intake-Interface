@@ -77,7 +77,7 @@
         flex-wrap: wrap;
         gap: 0.5rem;
         justify-content: center;
-  
+
         .volume-item {
           background-color: #e0f7fa;
           color: #00796b;
@@ -86,7 +86,25 @@
           font-size: 13px;
         }
       }
+
+      .no-detection {
+        color: #999;
+        font-style: italic;
+        font-size: 13px;
+        list-style: none;
+      }
     }
+  }
+
+  .fallback-note {
+    width: 100%;
+    background-color: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #795548;
+    margin-bottom: 8px;
   }
 
   .generate-intake {
@@ -219,6 +237,12 @@
       color: #00313C;
       font-weight: 700;
       margin: 0 0 16px 0;
+    }
+
+    .no-detection {
+      color: #999;
+      font-style: italic;
+      font-size: 13px;
     }
 
     .detail-grid {

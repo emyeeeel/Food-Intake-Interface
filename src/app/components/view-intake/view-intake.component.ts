@@ -24,6 +24,7 @@ export class ViewIntakeComponent implements OnInit {
 
   showIntakeResults = false;
   isCalculating = false;
+  usedWeightFallback = false;
 
   ltcpatiendid!: number;
   intakeId!: number;
@@ -177,78 +178,57 @@ export class ViewIntakeComponent implements OnInit {
     }
 
     private generateIntakeData(): void {
+    const afterHasNoItems = (this.estimationAfter?.food_items?.length ?? 0) === 0;
+    this.usedWeightFallback = afterHasNoItems;
 
-    const beforeTotalVolume = this.estimationBefore?.total_volume_ml || 0;
-    const afterTotalVolume = this.estimationAfter?.total_volume_ml || 0;
-
-    const volumeConsumed =
-      Math.max(0, beforeTotalVolume - afterTotalVolume);
-
-    const volumePercentage =
-      beforeTotalVolume > 0
-        ? Math.round((volumeConsumed / beforeTotalVolume) * 10000) / 100
-        : 0;
-
+    let totalConsumed: number;
+    let consumptionPercentage: number;
     const itemDetails: any[] = [];
 
-    if (this.estimationBefore) {
+    if (afterHasNoItems) {
+      const beforeWeight = this.beforeIntake?.weight_g ?? 0;
+      const afterWeight = this.afterIntake?.weight_g ?? 0;
+      totalConsumed = parseFloat(Math.max(0, beforeWeight - afterWeight).toFixed(2));
+      consumptionPercentage = beforeWeight > 0
+        ? Math.min(100, Math.round((totalConsumed / beforeWeight) * 10000) / 100)
+        : 0;
+    } else {
+      const beforeTotalVolume = this.estimationBefore?.total_volume_ml || 0;
+      const afterTotalVolume = this.estimationAfter?.total_volume_ml || 0;
+      totalConsumed = Math.max(0, beforeTotalVolume - afterTotalVolume);
+      consumptionPercentage = beforeTotalVolume > 0
+        ? Math.round((totalConsumed / beforeTotalVolume) * 10000) / 100
+        : 0;
 
-      const beforeMap = new Map<string, FoodItem>();
-      const afterMap = new Map<string, FoodItem>();
+      if (this.estimationBefore) {
+        const beforeMap = new Map<string, FoodItem>();
+        const afterMap = new Map<string, FoodItem>();
 
-      // Build before map
-      this.estimationBefore.food_items.forEach(item => {
-        beforeMap.set(item.food_class, item);
-      });
+        this.estimationBefore.food_items.forEach(item => beforeMap.set(item.food_class, item));
+        this.estimationAfter?.food_items.forEach(item => afterMap.set(item.food_class, item));
 
-      // Build after map
-      if (this.estimationAfter) {
-        this.estimationAfter.food_items.forEach(item => {
-          afterMap.set(item.food_class, item);
-        });
-      }
+        const allClasses = new Set([...beforeMap.keys(), ...afterMap.keys()]);
 
-      // Union of all food classes
-      const allClasses = new Set([
-        ...beforeMap.keys(),
-        ...afterMap.keys()
-      ]);
-
-      allClasses.forEach(foodClass => {
-
-        const beforeVol = beforeMap.get(foodClass)?.volume_ml || 0;
-        const afterVol = afterMap.get(foodClass)?.volume_ml || 0;
-
-        // If item disappears after → assume fully eaten
-        const consumed =
-          afterMap.has(foodClass)
+        allClasses.forEach(foodClass => {
+          const beforeVol = beforeMap.get(foodClass)?.volume_ml || 0;
+          const afterVol = afterMap.get(foodClass)?.volume_ml || 0;
+          const consumed = afterMap.has(foodClass)
             ? Math.max(0, beforeVol - afterVol)
             : beforeVol;
-
-        const percentage =
-          beforeVol > 0
+          const percentage = beforeVol > 0
             ? Math.round((consumed / beforeVol) * 10000) / 100
             : 0;
 
-        itemDetails.push({
-          name: foodClass,
-          before: beforeVol,
-          after: afterVol,
-          consumed: consumed,
-          percentage: percentage
+          itemDetails.push({ name: foodClass, before: beforeVol, after: afterVol, consumed, percentage });
         });
-
-      });
-
+      }
     }
 
     this.intakeData = {
-      totalItems: itemDetails.length,
-      totalVolume: volumeConsumed,
-      consumptionPercentage: volumePercentage,
-      itemDetails: itemDetails,
-      beforeTotalVolume: beforeTotalVolume,
-      afterTotalVolume: afterTotalVolume
+      totalItems: this.estimationBefore?.food_items?.length ?? 0,
+      totalConsumed,
+      consumptionPercentage,
+      itemDetails,
     };
 
     console.log('Calculated Intake Data:', this.intakeData);
