@@ -62,7 +62,7 @@
               <td class="meal-name">{{ intake.meal_detail!.meal_name }}</td>
               <td class="meal-time">{{ intake.meal_detail!.meal_time }}</td>
               <td class="meal-phase">{{ intake.meal_phase }}</td>
-              <td class="meal-name">{{ intake.plate_type || '--' }}</td>
+              <td class="meal-name">{{ (intake.plate_type && plateTypeLabels[intake.plate_type]) || intake.plate_type || '--' }}</td>
               <td>{{ intake.weight_g || '-' }}</td>
               <td>{{ getConsumedPercentage(intake) }}</td>
               <td class="image-cell">

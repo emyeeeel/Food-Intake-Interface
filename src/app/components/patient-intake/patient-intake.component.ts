@@ -21,6 +21,13 @@ import { DateService } from '../../services/date.service';
 export class PatientIntakeComponent implements OnInit, OnChanges, OnDestroy {
   @Input() patientId: number = 0;
 
+  readonly plateTypeLabels: Record<string, string> = {
+    big_metal_tray: '大金屬盤',
+    small_metal_tray: '小金屬盤',
+    metal_bowl: '金屬碗',
+    unknown: '未知',
+  };
+
   ltcPatient: LTCPatient | null = null;
   intakes: IntakeRecord[] = [];
   // Pagination state

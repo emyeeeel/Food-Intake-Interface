@@ -529,11 +529,21 @@ startScanner(): void {
             let testImageUrl = '';
             let testCsvUrl = '';
 
+            // Big Metal Plate test samples
+            // if (meal_phase_temp === '後') {
+            //   testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/後/intake_test_1777569606762.png';
+            //   testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/後/depth_test_1777569606763.csv';
+            // } else {
+            //   testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/前/intake_test_1777569548690.png';
+            //   testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/前/depth_test_1777569548690.csv';
+            // }
+
+            // For testing small metal plate and metal bowl, only png values are changed
             if (meal_phase_temp === '後') {
-              testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/後/intake_test_1777569606762.png';
+              testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-03/午餐/20260430/前/4b5f9588-393d-403b-ac5e-c43063e7531f.png';
               testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/後/depth_test_1777569606763.csv';
             } else {
-              testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/前/intake_test_1777569548690.png';
+              testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-03/午餐/20260430/後/17aaed1c-7bf9-4f1a-8388-92653046102b.png';
               testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/前/depth_test_1777569548690.csv';
             }
 
@@ -568,8 +578,14 @@ startScanner(): void {
             const containerType: string = classification.container_type;
             const tareWeight: number = classification.tare_weight;
 
-            const validPlateTypes = new Set(['big_metal_tray', 'small_metal_tray', 'metal_bowl', 'unknown']);
-            const plateType: string = validPlateTypes.has(containerType) ? containerType : 'unknown';
+            const plateTypeMap: Record<string, string> = {
+              big_metal_tray: '大金屬盤',
+              small_metal_tray: '小金屬盤',
+              metal_bowl: '金屬碗',
+              unknown: '未知',
+            };
+            const plateTypeKey: string = plateTypeMap[containerType] ? containerType : 'unknown';
+            const plateType: string = plateTypeMap[plateTypeKey];
             console.log('plateType:', plateType);
 
             // Fixed test weight outputs based on meal phase
@@ -579,7 +595,7 @@ startScanner(): void {
             } else {
               netWeight = 215.78;
             }
-            console.log('containerType:', containerType, '| tareWeight:', tareWeight, '| netWeight:', netWeight);
+            console.log('containerType:', containerType, '| tareWeight:', tareWeight, '| netWeight (raw):', netWeight);
 
             // Original weight parsing (commented out for test)
             // try {
@@ -588,6 +604,13 @@ startScanner(): void {
             // } catch (error) {
             //   console.error('Failed to parse weight JSON:', error);
             // }
+
+            // Subtract container tare weight to get actual food weight.
+            // Skip when plate type is unknown — tare weight is unreliable.
+            if (plateTypeKey !== 'unknown') {
+              netWeight = parseFloat(Math.max(0, netWeight - tareWeight).toFixed(2));
+            }
+            console.log('netWeight (after tare deduction):', netWeight);
 
             const meal_phase = this.selectedMealType === 'Before' ? '前' : '後';
             console.log('meal_phase:', meal_phase);
@@ -624,7 +647,7 @@ startScanner(): void {
             
             formData.append('recorded_at', new Date().toISOString());
             formData.append('meal_phase', meal_phase);
-            formData.append('plate_type', plateType);
+            formData.append('plate_type', plateTypeKey);
             formData.append('image', imageFile);
             formData.append('depth_csv', csvFile);
 
