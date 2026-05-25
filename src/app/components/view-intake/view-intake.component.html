@@ -22,7 +22,7 @@
             <li> {{ item.food_class }} </li>
           }
         </ul>
-        <p><strong>重量:</strong> {{ beforeIntake!.weight_g }} g</p>
+        <p><strong>重量:</strong> {{ getPlateTypeLabel(beforeIntake!.plate_type) }} - {{ beforeIntake!.weight_g }} g</p>
         <div class="volumes">
           @if (estimationBefore!.food_items.length > 0) {
             <strong>預估體積 (ml):</strong>
@@ -48,7 +48,7 @@
               <li> {{ item.food_class }} </li>
             }
           </ul>
-          <p><strong>重量:</strong> {{ afterIntake!.weight_g }} g</p>
+          <p><strong>重量:</strong> {{ getPlateTypeLabel(afterIntake!.plate_type) }} - {{ afterIntake!.weight_g }} g</p>
           <div class="volumes">
             @if (estimationAfter!.food_items.length > 0) {
               <strong>預估體積 (ml):</strong>

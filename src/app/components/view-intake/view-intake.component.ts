@@ -19,6 +19,18 @@ import { EstimationService } from '../../services/estimate.service';
 })
 export class ViewIntakeComponent implements OnInit {
 
+  private readonly plateTypeLabels: Partial<Record<string, string>> = {
+    big_metal_tray: '大金屬盤',
+    small_metal_tray: '小金屬盤',
+    metal_bowl: '金屬碗',
+    'UNCERTAIN / BACKGROUND': '未知',
+  };
+
+  getPlateTypeLabel(plateType: string | undefined): string {
+    if (!plateType) return '—';
+    return this.plateTypeLabels[plateType] ?? plateType;
+  }
+
   loading = true;
   error: string | null = null;
 
