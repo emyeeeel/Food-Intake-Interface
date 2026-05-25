@@ -64,29 +64,31 @@
       <app-patient-nutrition-daily-table  *ngIf="recommendationData" [recommendationData]="recommendationData"></app-patient-nutrition-daily-table>
     } @else if (selectedPeriod === 'weekly') {
       <app-patient-nutrition-weekly-table *ngIf="recommendationData" [recommendationData]="recommendationData"></app-patient-nutrition-weekly-table>
-      <app-patient-nutrition-trend-chart *ngIf="recommendationData" [recommendationData]="recommendationData" mode="weekly"></app-patient-nutrition-trend-chart>
-    } @else if (selectedPeriod === 'monthly') {
+      <!-- <app-patient-nutrition-trend-chart *ngIf="recommendationData" [recommendationData]="recommendationData" mode="weekly"></app-patient-nutrition-trend-chart>
+    } @else if (selectedPeriod === 'monthly') { -->
       <app-patient-nutrition-monthly-table *ngIf="recommendationData" [recommendationData]="recommendationData"></app-patient-nutrition-monthly-table>
-      <app-patient-nutrition-trend-chart *ngIf="recommendationData" [recommendationData]="recommendationData" mode="monthly"></app-patient-nutrition-trend-chart>
+      <!-- <app-patient-nutrition-trend-chart *ngIf="recommendationData" [recommendationData]="recommendationData" mode="monthly"></app-patient-nutrition-trend-chart> -->
     }
+
+    <app-alternative-meals [patientId]="patientId" [period]="selectedPeriod"></app-alternative-meals>
 
     <div class="analysis-section">
       <div class="analysis-content">
-        <h3>Meal Recommendations</h3>
+        <h3>Clinical Notes</h3>
 
-        @if (recommendationLoading) {
+        @if (clinicalNotesLoading) {
           <div class="section-loading">
             <div class="loading-spinner"></div>
             <span>生成AI飲食建議中...</span>
           </div>
-        } @else if (recommendationError) {
+        } @else if (clinicalNotesError) {
           <div class="analysis-error">
-            <p>{{ recommendationError }}</p>
+            <p>{{ clinicalNotesError }}</p>
           </div>
-        } @else if (recommendationText) {
-          <pre class="analysis-text">{{ recommendationText }}</pre>
+        } @else if (clinicalNotesText) {
+          <pre class="analysis-text">{{ clinicalNotesText }}</pre>
         } @else {
-          <pre class="analysis-text">等待數據載入完成後生成分析...</pre>ss
+          <pre class="analysis-text">等待數據載入完成後生成分析...</pre>
         }
       </div>
     </div>

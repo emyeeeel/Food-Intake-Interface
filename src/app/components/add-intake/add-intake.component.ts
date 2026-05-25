@@ -530,22 +530,22 @@ startScanner(): void {
             let testCsvUrl = '';
 
             // Big Metal Plate test samples
-            // if (meal_phase_temp === '後') {
-            //   testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/後/intake_test_1777569606762.png';
-            //   testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/後/depth_test_1777569606763.csv';
-            // } else {
-            //   testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/前/intake_test_1777569548690.png';
-            //   testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/前/depth_test_1777569548690.csv';
-            // }
-
-            // For testing small metal plate and metal bowl, only png values are changed
             if (meal_phase_temp === '後') {
-              testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-03/午餐/20260430/前/4b5f9588-393d-403b-ac5e-c43063e7531f.png';
+              testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/後/intake_test_1777569606762.png';
               testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/後/depth_test_1777569606763.csv';
             } else {
-              testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-03/午餐/20260430/後/17aaed1c-7bf9-4f1a-8388-92653046102b.png';
+              testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/前/intake_test_1777569548690.png';
               testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/前/depth_test_1777569548690.csv';
             }
+
+            // For testing small metal plate and metal bowl, only png values are changed
+            // if (meal_phase_temp === '後') {
+            //   testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-03/午餐/20260430/前/4b5f9588-393d-403b-ac5e-c43063e7531f.png';
+            //   testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/後/depth_test_1777569606763.csv';
+            // } else {
+            //   testImageUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-03/午餐/20260430/後/17aaed1c-7bf9-4f1a-8388-92653046102b.png';
+            //   testCsvUrl = 'https://q30gkzkn-8000.asse.devtunnels.ms/media/food_intake/嘉義國泰綜合長照機構/machine_3/Room_102-02/午餐/20260501/前/depth_test_1777569548690.csv';
+            // }
 
             const [imgRes, csvRes] = await Promise.all([fetch(testImageUrl), fetch(testCsvUrl)]);
             if (!imgRes.ok || !csvRes.ok) {
@@ -582,7 +582,7 @@ startScanner(): void {
               big_metal_tray: '大金屬盤',
               small_metal_tray: '小金屬盤',
               metal_bowl: '金屬碗',
-              unknown: '未知',
+              unknown: 'UNCERTAIN / BACKGROUND',
             };
             const plateTypeKey: string = plateTypeMap[containerType] ? containerType : 'unknown';
             const plateType: string = plateTypeMap[plateTypeKey];
@@ -591,7 +591,7 @@ startScanner(): void {
             // Fixed test weight outputs based on meal phase
             let netWeight = 0;
             if (meal_phase_temp === '前') {
-              netWeight = 667.12;
+              netWeight = 467.12;
             } else {
               netWeight = 215.78;
             }

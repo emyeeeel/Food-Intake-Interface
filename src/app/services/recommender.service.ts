@@ -106,4 +106,19 @@ export class RecommenderService {
     return this.http.get(`${this.apiUrl}/recommend/nutri-and-food/patient/${patientId}/monthly/trend/`, { params: { date } });
   }
 
+  // KNN-JUSTIFIED CLINICAL NOTES - Daily
+  getDailyKnnJustified(patientId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/recommend/nutri-and-food/patient/${patientId}/knn-justified/`);
+  }
+
+  // KNN-JUSTIFIED CLINICAL NOTES - Weekly
+  getWeeklyKnnJustified(patientId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/recommend/nutri-and-food/patient/${patientId}/knn-justified/weekly`);
+  }
+
+  // KNN-JUSTIFIED CLINICAL NOTES - Monthly
+  getMonthlyKnnJustified(patientId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/recommend/nutri-and-food/patient/${patientId}/knn-justified/monthly`);
+  }
+
 }

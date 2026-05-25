@@ -24,13 +24,14 @@ import { PatientNutritionDailyTableComponent } from '../patient-nutrition-daily-
 import { PatientNutritionWeeklyTableComponent } from '../patient-nutrition-weekly-table/patient-nutrition-weekly-table.component';
 import { PatientNutritionMonthlyTableComponent } from '../patient-nutrition-monthly-table/patient-nutrition-monthly-table.component';
 import { PatientNutritionTrendChartComponent } from '../patient-nutrition-trend-chart/patient-nutrition-trend-chart.component';
+import { AlternativeMealsComponent } from '../alternative-meals/alternative-meals.component';
 
 Chart.register(...registerables, annotationPlugin);
 
 @Component({
   selector: 'app-patient-analysis',
   standalone: true,
-  imports: [CommonModule, FormsModule, PatientNutritionDailyTableComponent, PatientNutritionWeeklyTableComponent, PatientNutritionMonthlyTableComponent, PatientNutritionTrendChartComponent],
+  imports: [CommonModule, FormsModule, PatientNutritionDailyTableComponent, PatientNutritionWeeklyTableComponent, PatientNutritionMonthlyTableComponent, AlternativeMealsComponent],
   templateUrl: './patient-analysis.component.html',
   styleUrls: ['./patient-analysis.component.scss'],
 })
@@ -49,7 +50,12 @@ export class PatientAnalysisComponent implements OnDestroy, OnInit, OnChanges{
   recommendationLoading: boolean = false;
   recommendationError: string | null = null;
 
+  clinicalNotesText: string = '';
+  clinicalNotesLoading: boolean = false;
+  clinicalNotesError: string | null = null;
+
   private cache: Partial<Record<'daily' | 'weekly' | 'monthly', any>> = {};
+  private clinicalNotesCache: Partial<Record<'daily' | 'weekly' | 'monthly', string>> = {};
 
   patient?: any;
   date?: string;
@@ -79,6 +85,7 @@ export class PatientAnalysisComponent implements OnDestroy, OnInit, OnChanges{
     });
 
     this.loadRecommendation(this.selectedPeriod);
+    this.loadClinicalNotes(this.selectedPeriod);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -164,11 +171,49 @@ export class PatientAnalysisComponent implements OnDestroy, OnInit, OnChanges{
   }
 
   // ================================
+  // CLINICAL NOTES
+  // ================================
+  loadClinicalNotes(period: 'daily' | 'weekly' | 'monthly'): void {
+    if (this.clinicalNotesCache[period]) {
+      this.clinicalNotesText = this.clinicalNotesCache[period]!;
+      this.clinicalNotesError = null;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.clinicalNotesLoading = true;
+    this.clinicalNotesError = null;
+    this.clinicalNotesText = '';
+
+    const request$ = period === 'daily'
+      ? this.recommenderService.getDailyKnnJustified(this.patientId)
+      : period === 'weekly'
+        ? this.recommenderService.getWeeklyKnnJustified(this.patientId)
+        : this.recommenderService.getMonthlyKnnJustified(this.patientId);
+
+    request$.subscribe({
+      next: (response) => {
+        const text = response?.response ?? response?.notes ?? JSON.stringify(response, null, 2);
+        this.clinicalNotesCache[period] = text;
+        this.clinicalNotesText = text;
+        this.clinicalNotesLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.clinicalNotesError = 'Unable to load clinical notes';
+        this.clinicalNotesLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // ================================
   // UPDATE
   // ================================
   onPeriodChange(period: 'daily' | 'weekly' | 'monthly'): void {
     this.selectedPeriod = period;
     this.loadRecommendation(period);
+    this.loadClinicalNotes(period);
   }
 
 

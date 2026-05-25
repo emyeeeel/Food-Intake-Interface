@@ -1,0 +1,55 @@
+<div class="alt-meals-container">
+  <h3 class="alt-meals-title">Alternative Meal Recommendations</h3>
+
+  @if (loading) {
+    <div class="alt-meals-loading">
+      <div class="loading-spinner"></div>
+      <span>載入替代餐點建議中...</span>
+    </div>
+  } @else if (error) {
+    <div class="alt-meals-error">
+      <p>{{ error }}</p>
+    </div>
+  } @else if (recommendations.length === 0) {
+    <div class="alt-meals-empty">
+      <p>暫無替代餐點建議</p>
+    </div>
+  } @else {
+    <div class="alt-meals-list">
+      @for (meal of recommendations; track meal.meal_id) {
+        <div class="meal-card">
+          <div class="meal-card-header">
+            <span class="meal-rank">#{{ meal.rank }}</span>
+            <span class="meal-name">{{ meal.meal_name }} - Day {{ meal.day_cycle }}</span>
+            <span class="meal-time-badge">{{ meal.meal_time }}</span>
+          </div>
+          <div class="meal-card-body">
+            <div class="meal-nutrients">
+              <div class="nutrient-item">
+                <span class="nutrient-label">Cal</span>
+                <span class="nutrient-value">{{ meal.calories_kcal | number:'1.0-0' }} kcal</span>
+              </div>
+              <div class="nutrient-item">
+                <span class="nutrient-label">Protein</span>
+                <span class="nutrient-value">{{ meal.protein_g | number:'1.1-1' }}g</span>
+              </div>
+              <div class="nutrient-item">
+                <span class="nutrient-label">Fat</span>
+                <span class="nutrient-value">{{ meal.fat_g | number:'1.1-1' }}g</span>
+              </div>
+              <div class="nutrient-item">
+                <span class="nutrient-label">Carbs</span>
+                <span class="nutrient-value">{{ meal.carbohydrates_g | number:'1.1-1' }}g</span>
+              </div>
+              <div class="nutrient-item">
+                <span class="nutrient-label">Fiber</span>
+                <span class="nutrient-value">{{ meal.fiber_g | number:'1.1-1' }}g</span>
+              </div>
+            </div>
+            <p class="meal-explanation">{{ meal.explanation }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

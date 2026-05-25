@@ -1,0 +1,136 @@
+.alt-meals-container {
+  background: #f9fcfd;
+  border-radius: 12px;
+  border: 1px solid #e4eef2;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  padding: 16px 18px;
+  margin-top: 5px;
+}
+
+.alt-meals-title {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.alt-meals-loading,
+.alt-meals-error,
+.alt-meals-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #6b8a92;
+  padding: 8px 0;
+
+  p {
+    margin: 0;
+  }
+}
+
+.alt-meals-error {
+  color: #c0392b;
+}
+
+.loading-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #e4eef2;
+  border-top-color: #4fb6b0;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.alt-meals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meal-card {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e4eef2;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.meal-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #f0fbfa 0%, #e8f5f4 100%);
+  border-bottom: 1px solid #deeeed;
+}
+
+.meal-rank {
+  font-size: 10px;
+  font-weight: 700;
+  color: #4fb6b0;
+  min-width: 20px;
+}
+
+.meal-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.meal-time-badge {
+  font-size: 9px;
+  font-weight: 500;
+  color: #4fb6b0;
+  background: #e0f5f3;
+  border-radius: 6px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+.meal-card-body {
+  padding: 8px 12px;
+}
+
+.meal-nutrients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.nutrient-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f4f9fa;
+  border-radius: 6px;
+  padding: 3px 8px;
+  min-width: 52px;
+}
+
+.nutrient-label {
+  font-size: 9px;
+  color: #7a9ba2;
+  font-weight: 500;
+}
+
+.nutrient-value {
+  font-size: 10px;
+  font-weight: 600;
+  color: #2c6f6b;
+}
+
+.meal-explanation {
+  font-size: 9px;
+  color: #6b8a92;
+  line-height: 1.5;
+  margin: 0;
+  white-space: normal;
+  word-break: break-word;
+}

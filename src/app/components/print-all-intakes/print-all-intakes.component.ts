@@ -54,9 +54,6 @@ export class PrintAllIntakesComponent implements OnInit {
     });
   }
 
-  formatDate(dateStr: string): Date {
-    return new Date(dateStr.split('.')[0] + 'Z');
-  }
 
   calculatePagination(): void {
     this.totalPages = Math.ceil(this.totalIntakes / this.pageSize);
