@@ -124,18 +124,13 @@ public getConsumedPercentage(intake: IntakeRecord): string {
   
     // Map your data into Excel-friendly format
     const excelData = this.intakes.map(intake => {
-      const dayCycle = intake.meal_detail?.day_cycle ?? null;
       let formattedDate = '-';
-      if (dayCycle !== null) {
-        try {
-          const dateObj = this.dateService.getDateForCycleDay(dayCycle);
-          const yyyy = dateObj.getFullYear();
-          const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-          const dd = String(dateObj.getDate()).padStart(2, '0');
-          formattedDate = `${yyyy}${mm}${dd}`; // yyyymmdd format
-        } catch (err) {
-          console.warn('Error formatting date for day cycle:', dayCycle, err);
-        }
+      if (intake.recorded_at) {
+        const dateObj = new Date(intake.recorded_at);
+        const yyyy = dateObj.getFullYear();
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        formattedDate = `${yyyy}${mm}${dd}`;
       }
   
       return {

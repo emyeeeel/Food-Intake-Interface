@@ -58,7 +58,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let intake of paginatedIntakes">
-              <td class="day-cycle">{{ getDateForDayCycle(intake.meal_detail!.day_cycle) }}</td>
+              <td class="day-cycle">{{ intake.recorded_at | date:'yyyyMMdd' }}</td>
               <td class="meal-name">{{ intake.meal_detail!.meal_name }}</td>
               <td class="meal-time">{{ intake.meal_detail!.meal_time }}</td>
               <td class="meal-phase">{{ intake.meal_phase }}</td>

@@ -510,11 +510,11 @@ startScanner(): void {
             const rgbFileData = await zip.file('rgb_image.png')?.async('blob');
             if (!rgbFileData) throw new Error('RGB image not found in ZIP');
 
-            const weightBlob = await zip.file('weightdatas.json')?.async('blob');
-            if (!weightBlob) throw new Error('weightdatas.json not found in ZIP');
+            // const weightBlob = await zip.file('weightdatas.json')?.async('blob');
+            // if (!weightBlob) throw new Error('weightdatas.json not found in ZIP');
 
-            const weightText = await weightBlob.text();
-            console.log('Raw JSON text:', weightText);
+            // const weightText = await weightBlob.text();
+            // console.log('Raw JSON text:', weightText);
 
             // Original zip extraction (commented out for manual test URL input)
             // const imageFile = new File([rgbFileData], `intake_${Date.now()}.png`, { type: 'image/png' });
@@ -642,12 +642,15 @@ startScanner(): void {
                 const clamped = Math.max(0, Math.min(100, remaining));
 
                 formData.append('volume_ml', clamped.toFixed(2));
+              } else {
+                formData.append('volume_ml', '0');
               }
             }
             
             formData.append('recorded_at', new Date().toISOString());
             formData.append('meal_phase', meal_phase);
             formData.append('plate_type', plateTypeKey);
+            formData.append('container_type', containerType);
             formData.append('image', imageFile);
             formData.append('depth_csv', csvFile);
 
@@ -677,8 +680,9 @@ startScanner(): void {
 
             resolve(createdRecord);
 
-          } catch (err) {
+          } catch (err: any) {
             console.error('Failed to create intake record:', err);
+            if (err?.error) console.error('Backend error detail:', err.error);
             this.isProcessing = false;
             reject(err);
           }

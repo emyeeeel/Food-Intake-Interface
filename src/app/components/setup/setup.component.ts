@@ -25,6 +25,7 @@ export class SetupComponent implements OnInit {
     'custom.pt',
     'merge.pt',
     'fine_640.pt',
+    'best.pt',
   ];
 
   constructor(private fb: FormBuilder, private settingsService: SettingsService) {}
@@ -83,7 +84,7 @@ export class SetupComponent implements OnInit {
       dinner_end:             v.dinnerEnd,
       meal_cycle_start_date:  v.mealCycleStartDate,
       meal_cycle_length:      v.mealCycleLength,
-      yolo_model:             v.yoloModel,
+      model_filepath:         v.yoloModel,
     };
 
     try {
@@ -104,7 +105,7 @@ export class SetupComponent implements OnInit {
 
     // Uses the publicly exposed http from the service — no private member hack
     await firstValueFrom(
-      this.settingsService.http.put(`${environment.apiBaseUrl}/api/settings/${id}/`, data)
+      this.settingsService.http.patch(`${environment.apiBaseUrl}/api/settings/${id}/`, data)
     );
   }
 }
